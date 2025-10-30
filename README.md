@@ -1,2052 +1,1786 @@
+<div align="center">
+
 # Cherut
-Personal development App
- Personal Excellence Platform
-Table of Contents
-Overview
-Target Audience
-Core Philosophy & Design Principles
-System Architecture
-Data Model & Entities
-Module-by-Module Breakdown
-Business Rules & Security
-UI/UX Guidelines
-Technical Stack
-Current Limitations & Future Improvements
-Overview
-The Mission Command Center is a comprehensive personal productivity and life management system designed specifically for high-performing, mission-driven individuals. Unlike traditional productivity apps that focus solely on task management, this platform provides a holistic approach to personal excellence by integrating:
 
-Life area assessment and tracking
-Goal setting with OKR methodology
-Habit formation and consistency tracking
-Task and action management
-Visual inspiration through vision boards
-Daily reflection and mental state monitoring
-The system is built on the principle that excellence requires both introspection and measurable performance data. It enables users to align their daily actions with long-term vision while maintaining balance across all major life domains.
+**Master Your Life System**
 
-Key Differentiators
-Holistic Integration: All modules are interconnected - tasks link to goals, goals connect to life areas, habits support objectives
-Data-Driven Introspection: Combines qualitative reflection with quantitative metrics
-Mission-Focused Design: Interface designed for focus and clarity, not distraction
-Balanced Scorecard Approach: Uses the Wheel of Life framework to ensure balanced progress
-English-Only: Maintains consistency and clarity for the target audience
-Target Audience
-Primary Users
-Founders & Entrepreneurs: Building businesses while maintaining personal growth
-High-Performance Athletes: Tracking multiple aspects of training and life balance
-Creative Professionals: Managing projects while nurturing creativity and inspiration
-Ambitious Professionals: Climbing career ladders while developing holistically
-Self-Mastery Seekers: Individuals committed to systematic personal development
-User Characteristics
-Age range: 25-45 years old
-High self-motivation and discipline
-Goal-oriented mindset
-Comfortable with structured systems
-English-speaking
-Desktop and mobile users (responsive design required)
-Values data privacy and personal data ownership
-User Pain Points Addressed
-Fragmented Tools: Currently using multiple apps (habit tracker, goal planner, journal, task manager)
-Lack of Integration: Can't see how daily tasks connect to long-term vision
-Imbalanced Progress: Excelling in career but neglecting health, relationships, or personal growth
-Motivation Decay: Lost sight of the "why" behind daily actions
-Analysis Paralysis: Too much data, not enough actionable insights
-Core Philosophy & Design Principles
-1. Command Center Metaphor
-The system is intentionally designed to feel like a mission control center, not a casual lifestyle app. This manifests in:
+A premium personal excellence platform for those who refuse to settle for mediocrity. Build discipline, break limits, and dominate every aspect of your life.
 
-Military-inspired terminology ("Mission Control", "Command Center")
-Sharp, precise visual language
-Information density without clutter
-Emphasis on metrics and progress indicators
-Professional, focused atmosphere
-2. Bold Minimalism
-Visual design follows strict guidelines:
+[Overview](#overview) • [Pricing](#pricing) • [Architecture](#architecture) • [Tech Stack](#tech-stack) • [Getting Started](#getting-started)
 
-No rounded corners: Sharp, precise rectangles convey seriousness
-No gradients: Flat colors maintain focus
-Geometric typography: Clean sans-serif fonts with strong hierarchy
-Limited color palette: Muted earth tones (bronze, rust, olive) instead of bright, playful colors
-Purposeful white space: Clean layouts without feeling empty
-3. Function Over Decoration
-Every visual element serves a purpose:
+---
 
-Animations only for feedback and transitions (no decorative motion)
-Icons are functional, not decorative
-Color indicates status or category, not aesthetics
-Typography creates hierarchy, not personality
-4. Data Integrity & Relations
-All data maintains referential integrity:
+</div>
 
-Goals must connect to Life Areas
-Habits can link to Goals and Life Areas
-Tasks can reference Goals, Habits, or Life Areas
-Deletion cascades appropriately
-User can only access their own data
-5. Progressive Enhancement
-System grows with user maturity:
+## Overview
 
-Simple to start (create life areas, set first goal)
-Complexity scales as user engages more deeply
-Power features revealed contextually
-Defaults guide best practices
-System Architecture
-High-Level Structure
+Cherut is a **premium personal excellence platform** for high-performers, entrepreneurs, and those committed to systematic self-mastery. This isn't another productivity app—it's your command center for total life optimization.
+
+**English-First Platform** - Designed for global high-achievers.
+
+### Core Capabilities
+
+```
+Life Areas          Track satisfaction across 12 core life domains
+Goals & OKRs        Define objectives with measurable key results
+Habit Tracking      Build consistency through recurring activities
+Task Management     Manage actions linked to goals and habits
+Vision Board        Visual inspiration for dreams and aspirations
+Daily Reflection    Monitor emotional state and mental clarity
+AI Coach            Adaptive intelligence that learns from you (Pro/Master)
+Analytics           Predictive insights and trend analysis (Pro/Master)
+```
+
+### Why Cherut?
+
+| Feature | Description |
+|---------|-------------|
+| **Premium Experience** | Built for those who demand excellence, not free tools |
+| **AI-Powered Growth** | Intelligent suggestions and predictive insights (Pro/Master) |
+| **Data-Driven** | Combines qualitative reflection with quantitative metrics |
+| **Battle-Tested** | Minimalist interface designed for focus and clarity |
+| **Holistic System** | All modules interconnect - see the complete picture |
+
+---
+
+## 💎 Pricing
+
+### Choose Your Battle Level
+
+| Plan | Price | Tagline | Best For |
+|------|-------|---------|----------|
+| **🥉 Core** | $10/month | *"Find your balance."* | Start your transformation |
+| **🥈 Pro** | $20/month | *"Grow with intelligence."* | Push limits with AI |
+| **🥇 Master** | $30/month | *"Master your life system."* | Dominate everything |
+
+### 🥉 Cherut Core — $10/month
+**Start Your Battle. Own Your Day.**
+
+Your first step toward ending mediocrity. Build discipline, resistance, and mental clarity.
+
+**Includes:**
+- ✅ All essential modules (Life Areas, Goals, Habits, Tasks, Vision Board, Reflection)
+- ✅ Cloud sync across all devices
+- ✅ Weekly progress dashboard
+- ✅ Social sharing (share achievements, weekly wins)
+- ✅ Minimalist, distraction-free design
+- ✅ Mobile + Web access
+
+**🧭 Mission**: Build discipline. Master the basics. Begin transformation.
+
+### 🥈 Cherut Pro — $20/month
+**Push Further. Break Limits.**
+
+For those who refuse to be average. Use AI and data to break barriers.
+
+**Everything in Core, plus:**
+- 🧠 AI Goal & Habit Suggestions
+- 📊 Monthly trends and analytics
+- 🔗 Integrations: Notion, Trello, Google Calendar
+- 📝 AI Journaling with mood analysis
+- 📄 Custom reports (PDF/CSV)
+- 📤 Social sharing (share achievements, weekly wins)
+- 👥 Access to Cherut Circle community
+
+**🧠 Mission**: Transform discipline into intelligence. Break barriers. Level up.
+
+### 🥇 Cherut Master — $30/month
+**Dominate Yourself. Lead Your Life. Leave a Mark.**
+
+The ultimate weapon for those who want maximum performance and total life control.
+
+**Everything in Pro, plus:**
+- 🤖 Adaptive AI Coach (learns from you, creates personalized action plans)
+- 🔮 Predictive AI (anticipate obstacles before they appear)
+- ⚡ Task & routine automation
+- 💪 Advanced integrations: Apple Health, Fitbit, Todoist
+- 📧 Automatic weekly reports
+- 🎨 Complete customization (layouts, themes, dashboards)
+- 🌟 Enhanced social sharing (custom branded achievement cards)
+- 👑 Cherut Elite Circle (exclusive mentorship & strategic feedback)
+
+**👑 Mission**: Be relentless. Surpass limits. Inspire greatness. Leave your mark.
+
+---
+
+## Complete Features & Plans
+
+### 1️⃣ User Profile & Identity
+
+**Basic Information**
+- Personal data: Name, photo, email, birth date, location (optional)
+- Life Purpose: Personal mission statement (editable)
+- Life Philosophy: Personal value tags (growth, family, impact, freedom)
+
+**Settings**
+- Preferences: Language, timezone, visual theme (light/dark/custom)
+- Notifications: Push, email, smart reminders by activity type
+- Security: Password, 2FA, remote logout, access history
+- Active Plan: Core / Pro / Master with renewal date
+
+**Public Identity** (optional)
+- Profile Badge: Level badge with achievements and focus areas
+- Public Stats: Streaks, completed goals, badges (privacy controls)
+
+---
+
+### 2️⃣ Mission Control Dashboard
+
+**Smart Overview**
+- **Pulse Score**: Overall health indicator across 4 dimensions (Personal Power, Professional Drive, Relational Strength, Inner Alignment)
+- **Focus Mode**: Priority area of the week with action suggestions
+- **Quick Actions**: Shortcuts for habit logging, urgent tasks, daily reflection
+
+**Life Areas Dashboard**
+
+**Personal Power**
+- Health & Energy (status, last activity, next habit)
+- Intellectual Development (courses, books, certifications)
+- Emotional Resilience (mood tracking, wellness practices)
+- Creativity & Fun (creative projects, hobbies, leisure time)
+
+**Professional Drive**
+- Career & Purpose (career goals, strategic projects)
+- Financial Resources (financial goals, income/expense tracker)
+- Skill Mastery (skills in development, progress)
+- Achievements (milestones reached, short/medium-term goals)
+
+**Relational Strength**
+- Family (quality time, important events)
+- Romantic Life (relationship check-ins, special moments)
+- Social Life (networking, friendships, social events)
+- Social Contribution (volunteering, impact, community projects)
+
+**Inner Alignment**
+- Fulfillment (overall satisfaction, gratitude, meaningful achievements)
+- Spiritual Discipline (daily practices, meditation, introspection)
+- Vision & Legacy (long-term objectives, desired impact)
+
+**Visual Customization**
+- Configurable widgets: Drag and organize modules
+- Color coding: Customizable color code per Life Area
+- Custom icons: Symbol library for each dimension
+- Layouts: Grid, List, Kanban, Timeline
+
+---
+
+### 3️⃣ Goals & OKRs System
+
+**Objective Structure**
+- Objectives: Linked to specific Life Areas
+- Key Results: 2-5 measurable KRs per objective
+- Timeline: Quarterly (90 days), Yearly, Multi-year
+- SMART Check: Automatic goal validation (Specific, Measurable, Achievable, Relevant, Time-bound)
+
+**Strategic Management**
+- Digital Vision Board: Images, PDFs, links organized by objective
+- Action Plans: Break down OKRs into actionable tasks
+- Dependencies: Map interdependencies between goals
+- Risk Assessment (Pro/Master): Risk and blocker analysis
+
+**Progress Tracking**
+- Completion %: Per KR and overall objective
+- Status Labels: On Track / At Risk / Behind / Completed
+- Milestone Markers: Intermediate milestones with celebrations
+- Review History: Weekly/monthly check-ins recorded
+
+---
+
+### 4️⃣ Habits & Routines
+
+**Habit System**
+- Habit Stacking: Chain related habits together
+- Frequency: Daily, weekly, custom (e.g., 3x/week)
+- Time Slots: Ideal times with smart reminders
+- Streaks: Sequence counter with failure protection (1 skip allowed)
+
+**Advanced Tracking**
+- Quick Check-in: Mark completion with one tap
+- Intensity Tracking: 1-10 scale for execution quality
+- Context Notes: Quick notes about each execution
+- Habit Analytics: Consistency charts, best time, correlations
+
+**Automations** (Pro/Master)
+- Smart Reminders: Context-based (location, time, previous activity)
+- Adaptive Scheduling: Time adjustment based on success patterns
+- Habit Chaining: Next habit suggestions based on completed ones
+
+---
+
+### 5️⃣ Task Management
+
+**Organization**
+- Smart Linking: Tasks connected to goals, OKRs, and habits
+- Prioritization: Eisenhower Matrix (urgent/important), MoSCoW (Must/Should/Could/Won't)
+- Categories: By Life Area, project, or context (@work, @home, @calls)
+- Subtasks: Unlimited decomposition with aggregated progress
+
+**Features**
+- Deadlines: Due dates with escalated alerts
+- Recurrence: Recurring tasks (daily, weekly, monthly)
+- Attachments: Files, links, notes, checklists
+- Delegation (Pro/Master): Assign tasks to accountability partners
+
+**Views**
+- Today View: Focus on current day with time blocking
+- Kanban Board: To Do / In Progress / Done
+- Calendar View: Agenda integration
+- GTD Inbox: Quick idea capture for later triage
+
+---
+
+### 6️⃣ Time Tracker & Time Blocking
+
+**Manual Time Tracking**
+- Start/Stop Timer: Stopwatch for ongoing activities
+- Activity Categories: Linked to Life Areas, projects, or tasks
+- Session Notes: Post-session notes about work done
+- Historical Log: Complete history of time invested
+
+**Smart Time Blocking** (Pro/Master)
+- Auto-scheduling: AI suggests ideal blocks based on:
+  - Week priorities
+  - Historical productivity patterns
+  - Goal and task deadlines
+  - Critical habits
+- Focus Blocks: Deep work sessions with DND mode
+- Buffer Times: Automatic breaks between blocks
+- Calendar Sync: Two-way sync with Google Calendar
+
+**Time Analytics**
+- Time Distribution: Pie chart by Life Area
+- Productive Hours: Productivity peak identification
+- Time Goals: Time investment goals by category
+- ROI Analysis: Correlation between time invested and goal progress
+
+---
+
+### 7️⃣ Daily Reflection & Awareness
+
+**Daily Check-in**
+- Mood Tracker: Mood scale (1-10) + emoji
+- Energy Levels: Physical, mental, emotional (1-10)
+- Productivity Score: Self-assessment of the day
+- Gratitude Log: 3 things you're grateful for
+
+**Structured Journaling**
+- Daily Wins: Day's achievements (small and big)
+- Challenges: Obstacles faced and learnings
+- Tomorrow's Focus: 3 priorities for next day
+- Free Notes: Space for free reflection
+
+**AI Insights** (Pro/Master)
+- Pattern Recognition: Correlations between mood, energy, and productivity
+- Trigger Analysis: Identify factors affecting performance
+- Personalized Prompts: Context-adapted reflection questions
+- Weekly Summary: AI-generated summary with actionable insights
+
+---
+
+### 8️⃣ AI & Analytics (Pro/Master Only)
+
+**AI Coach** (Pro)
+- Daily Briefing: Morning summary with focus suggestions
+- Habit Coaching: Tips to maintain streaks and improve consistency
+- Goal Strategist: Action suggestions to accelerate OKRs
+- Check-in Automation: Contextual reminders for reviews
+
+**Predictive AI** (Master)
+- Performance Forecasting: Predict goal completion % based on current pace
+- Risk Alerts: Early warnings for at-risk goals (2+ weeks delayed)
+- Burnout Detection: Energy/mood pattern analysis to prevent burnout
+- Optimization Suggestions: Time and effort redistribution recommendations
+
+**Advanced Analytics**
+- Life Areas: Radar charts, trend lines, time distribution
+- Goals & OKRs: Historical completion rate, average time, bottleneck analysis
+- Habits: Consistency heatmap, streaks/lapses, habit correlations
+- Time: Deep vs shallow work, ideal vs real allocation, productivity by time/day
+
+---
+
+### 9️⃣ Social & Community
+
+**Cherut Circle** (Pro)
+- Community Feed: Achievement updates (opt-in)
+- Challenges: Collective 7-30 day challenges
+- Accountability Partners: Match with users with similar goals
+- Discussion Groups: Forums by topic (career, health, mindset)
+
+**Cherut Elite Circle** (Master)
+- 1:1 Mentoring: Monthly sessions with certified coaches
+- Peer Feedback: Strategic OKR review by other Masters
+- Mastermind Groups: Closed groups of 5-8 people
+- Exclusive Events: Workshops, webinars, networking
+
+**Gamification**
+- Badges System: Streaks (7, 30, 100, 365 days), Goals (10, 50, 100 completed), Life Areas (domain mastery), Community (contributions)
+- Leaderboards: Optional rankings by category
+- Achievements: Special achievements ("Consistent Early Riser", "Balance Master")
+
+---
+
+### 🔟 Integrations & Automations
+
+**Trello Integration** (Pro)
+- Bidirectional Sync: Boards ↔ Projects, Cards ↔ Tasks
+- Label Mapping: Trello tags → Internal categories
+- Deadlines: Trello dates synchronized
+- Checklists: Subtask import
+
+**Google Calendar Integration** (Pro)
+- Event Sync: External events appear on dashboard
+- Time Block Sync: Blocks created in app appear in Calendar
+- Reminders: Habit and task reminders in Calendar
+- Availability Check: Prevents overlaps in time block suggestions
+
+**Wearables** (Master)
+- Apple Health / Fitbit Sync: Steps, exercise → Health & Energy; Sleep → Energy Levels; Mindfulness → Emotional Resilience
+- Auto-logging: Exercise habits marked automatically
+- Health Trends: Correlation with mood and productivity
+
+**Zapier/Make Integration** (Master)
+- Custom Automations: Connect with 1000+ apps
+- Webhooks: Custom events (goal completed, streak lost)
+- Data Export: Automatic backup to Google Sheets/Notion
+
+---
+
+### 1️⃣1️⃣ Feature Comparison by Plan
+
+| Feature | Core | Pro | Master |
+|---------|------|-----|--------|
+| **Dashboard & Life Areas** | ✅ | ✅ | ✅ |
+| **SMART Goals & OKRs** | 5 active | Unlimited | Unlimited |
+| **Habits & Streaks** | 10 active | Unlimited | Unlimited |
+| **Tasks & Projects** | 50 active | Unlimited | Unlimited |
+| **Manual Time Tracker** | ✅ | ✅ | ✅ |
+| **Smart Time Blocking** | ❌ | ✅ | ✅ |
+| **Daily Reflection** | ✅ | ✅ | ✅ |
+| **AI Coach & Suggestions** | ❌ | ✅ | ✅ |
+| **Predictive AI Insights** | ❌ | ❌ | ✅ |
+| **Advanced Analytics** | Basic | Complete | Complete + Custom |
+| **Vision Board** | 10 items | Unlimited | Unlimited |
+| **Integrations** (Trello, Calendar) | 1 integration | 3 integrations | Unlimited |
+| **Wearables Sync** | ❌ | ❌ | ✅ |
+| **Cherut Circle** | ❌ | ✅ | Elite ✅ |
+| **Mentoring & Feedback** | ❌ | ❌ | ✅ |
+| **Automations** (Zapier) | ❌ | ❌ | ✅ |
+| **Customization** (Themes, Layouts) | Limited | Complete | Complete + Custom CSS |
+| **Data History** | 6 months | 2 years | Unlimited |
+| **Data Export** | CSV | CSV + PDF | CSV + PDF + API |
+| **Social Sharing** | ✅ Basic | ✅ | ✅ Enhanced |
+
+---
+
+### 🎯 MVP Focus (Core Plan - Phase 1)
+
+**What we're building first** (Months 1-3):
+
+✅ **Included in MVP:**
+- User Profile & Identity (basic)
+- Mission Control Dashboard (essential widgets)
+- Life Areas (12 default with satisfaction tracking)
+- Goals & OKRs (up to 5 active with KRs)
+- Habits (up to 10 active with streak tracking)
+- Tasks (up to 50 active with priorities)
+- Vision Board (up to 10 items)
+- Daily Reflection (mood, energy, gratitude)
+- Manual Time Tracker
+- Basic analytics (charts and progress tracking)
+
+❌ **NOT in MVP** (Coming in Pro/Master):
+- AI Coach & Suggestions
+- Predictive AI
+- Advanced Analytics
+- Social & Community features
+- Integrations (Trello, Calendar, Wearables)
+- Automations (Zapier)
+- Smart Time Blocking
+
+**Why this approach?**
+- ✅ $0 development cost (no AI infrastructure yet)
+- ✅ Core value validated with real users
+- ✅ Faster time to market (2-3 months vs 6+ months)
+- ✅ Revenue from day 1 funds Pro/Master development
+- ✅ User feedback shapes AI features
+
+**Architecture Note:**
+- MVP: Modular Monolith (NestJS)
+- Future (Pro/Master): Microservices for AI & Analytics will be added
+
+---
+
+## Architecture
+
+### Modular Monolith Design
+
+```
 ┌─────────────────────────────────────────────────┐
-│              Authentication Layer                │
-│         (User.me(), loginWithRedirect)          │
+│          Landing Page (Public)                  │
+│  - Pricing tiers presentation                   │
+│  - Feature showcase                             │
+│  - Authentication gateway                       │
 └─────────────────────────────────────────────────┘
                        ↓
 ┌─────────────────────────────────────────────────┐
-│                Layout Component                  │
-│  - Navigation                                    │
-│  - Theme Management (Dark/Light)                │
-│  - User Profile & Logout                         │
+│          Authentication & Authorization          │
+│  - Paid user verification ($10/month minimum)   │
+│  - Admin user (full access)                     │
+│  - Tester user (restricted data, user view)    │
 └─────────────────────────────────────────────────┘
                        ↓
-┌─────────────────────────────────────────────────┐
-│                 Page Modules                     │
-│  ┌──────────┬──────────┬──────────┬──────────┐ │
-│  │Dashboard │Life Areas│  Goals   │  Habits  │ │
-│  └──────────┴──────────┴──────────┴──────────┘ │
-│  ┌──────────┬──────────────────────────────────┐│
-│  │  Tasks   │       Vision Board               ││
-│  └──────────┴──────────────────────────────────┘│
-└─────────────────────────────────────────────────┘
-                       ↓
-┌─────────────────────────────────────────────────┐
-│              Data Layer (Entities)               │
-│  - LifeArea    - HabitLog                       │
-│  - Goal        - Task                            │
-│  - Habit       - VisionBoardItem                │
-│  - DailyReflection                              │
-└─────────────────────────────────────────────────┘
-Component Hierarchy
-Layout.js
-├── Navigation Sidebar
-│   ├── Logo/Header
-│   ├── Navigation Items (6 pages)
-│   └── User Profile Section
-│       ├── Theme Toggle (Dark/Light)
-│       └── Logout Button
-├── Mobile Sheet Navigation
-└── Page Content Area
-    ├── Dashboard Page
-    ├── Life Areas Page
-    ├── Goals Page
-    ├── Habits Page
-    ├── Tasks Page
-    └── Vision Board Page
-Data Model & Entities
-Entity Relationship Diagram
-┌─────────────┐
-│    User     │ (Built-in)
-│ (Auth)      │
-└──────┬──────┘
-       │ created_by
-       ├──────────────────┐
-       ↓                  ↓
-┌─────────────┐    ┌─────────────┐
-│  LifeArea   │    │   Daily     │
-│             │    │ Reflection  │
-└──────┬──────┘    └─────────────┘
-       │
-       ├─────────────────────┐
-       ↓                     ↓
-┌─────────────┐      ┌─────────────┐
-│    Goal     │      │   Habit     │
-│             │←─────┤             │
-└──────┬──────┘      └──────┬──────┘
-       │                    │
-       │                    ↓
-       │             ┌─────────────┐
-       │             │  HabitLog   │
-       │             └─────────────┘
-       ↓
-┌─────────────┐      ┌─────────────┐
-│    Task     │      │   Vision    │
-│             │      │ BoardItem   │
-└─────────────┘      └──────┬──────┘
-                            │
-                            ↓ (optional)
-                      ┌─────────────┐
-                      │    Goal     │
-                      │ (converted) │
-                      └─────────────┘
-Detailed Entity Schemas
-1. LifeArea Entity
-Purpose: Represents one of the 12 core life domains based on the Wheel of Life framework.
+        ┌──────────────┴──────────────┐
+        ↓                              ↓
+┌──────────────────┐        ┌──────────────────┐
+│  User Dashboard  │        │ Admin Dashboard  │
+│  (Paid/Tester)   │        │  (Admin Only)    │
+│                  │        │                  │
+│  - Personal data │        │  - User mgmt     │
+│  - Life areas    │        │  - Analytics     │
+│  - Goals, habits │        │  - System health │
+│  - Private view  │        │  - Reports       │
+└──────────────────┘        └──────────────────┘
+```
 
-Schema:
+### Future: Microservices (Phase 2 - Pro/Master Features)
 
-{
-  "name": "string (required)",
-  "category": "enum (required)",
-  "satisfaction_rating": "number 0-10 (required)",
-  "reflection": "string (optional)",
-  "focus_areas": "array of strings (optional)"
+```
+Core Monolith (MVP) → AI Service (Python/FastAPI) [Phase 2]
+                     → Analytics Service (Node.js/NestJS) [Phase 2]
+                     → Notification Service [Phase 2]
+```
+
+**Phase 1 (MVP - Core Plan)**:
+- Modular Monolith (NestJS)
+- All Core features in single codebase
+- No AI/Analytics infrastructure
+- $0 additional costs
+
+**Phase 2 (Pro/Master Features)**:
+- AI Service: Goal suggestions, habit coaching, predictive insights
+- Analytics Service: Advanced metrics, pattern recognition
+- Notification Service: Smart reminders, community updates
+
+**Why Later?**
+- ✅ Validate product-market fit first
+- ✅ No AI costs during MVP ($0 OpenAI API usage)
+- ✅ User feedback shapes AI features
+- ✅ Revenue from Core users funds microservices development
+
+---
+
+## Tech Stack
+
+### Landing Page
+
+```
+Framework        Next.js 14+ (App Router)
+Language         TypeScript (English content)
+UI Library       Tailwind CSS + Headless UI
+Components       Radix UI Primitives
+Animations       Framer Motion
+Forms            React Hook Form + Zod
+Analytics        Vercel Analytics
+```
+
+### Web Application
+
+**Frontend**
+```
+Framework        Next.js 14+ (App Router)
+Language         TypeScript
+UI Library       Tailwind CSS + Headless UI
+Components       Radix UI Primitives
+Icons            Lucide React
+Charts           Recharts
+State            React Hooks + TanStack Query
+Forms            React Hook Form + Zod
+```
+
+**Backend (Modular Monolith)**
+```
+Framework        NestJS
+Language         TypeScript
+Architecture     Modular Monolith (decoupled layers)
+Modules          Auth, Users, Goals, Habits, Tasks, Admin, Payments
+API              RESTful
+Validation       class-validator + class-transformer
+Auth             Passport + JWT
+Payments         Stripe (subscription management)
+```
+
+### Mobile Application
+
+```
+Framework        Expo (React Native)
+Language         TypeScript
+Navigation       Expo Router
+UI Library       React Native Elements / Tamagui
+State            TanStack Query + Zustand
+Auth             Firebase Auth SDK
+Styling          NativeWind (Tailwind for RN)
+```
+
+### Infrastructure
+
+```
+Database         Firebase Firestore (Spark Plan free → Blaze when scaling)
+Storage          Firebase Storage (5GB free → pay-as-you-go)
+Authentication   Firebase Auth (unlimited users free)
+Payments         Stripe (free account, 2.9% + $0.30 per transaction)
+Hosting (Web)    Vercel (Hobby free → Pro $20 when needed)
+Hosting (API)    Render (750h/month free → $7 when scaling)
+Email            Resend (3K emails/month free)
+Analytics        Vercel Analytics (free tier)
+Monitoring       Sentry (5K errors/month free)
+CI/CD            GitHub Actions (2000 min/month free)
+
+Development Cost: $0/month (all free tiers)
+Production Cost:  Scales with revenue (break-even at ~20 users)
+```
+
+### User Roles & Access Control
+
+```typescript
+enum UserRole {
+  ADMIN = 'admin',           // Full system access, admin dashboard
+  TESTER = 'tester',         // User view, restricted test data, no payment
+  PAID_USER = 'paid_user'    // Full user access, requires active subscription
 }
-Built-in Fields (auto-generated):
 
-id: Unique identifier
-created_date: Timestamp of creation
-updated_date: Last modification timestamp
-created_by: User email (ensures data isolation)
-Categories (4 primary groupings):
+// Access Rules
+- Admin: Access to admin dashboard, user management, system analytics
+- Tester: Access to user dashboard, test data only, no payment required
+- Paid User: Access to user dashboard, own data only, requires $10+ subscription
+- All users see ONLY their own data (strict data isolation)
+```
 
-Personal Power
+---
 
-Health & Energy
-Intellectual Development
-Emotional Resilience
-Professional Drive
+## Design Philosophy
 
-Career & Purpose
-Financial Resources
-Social Contribution
-Relational Strength
+### Minimalist Principles
 
-Family
-Romantic Life
-Social Life
-Inner Alignment
+- **Clean Layout** - Purposeful white space, clear visual hierarchy
+- **Flat Colors** - No gradients, muted earth tones
+- **Geometric Typography** - Clean sans-serif with strong hierarchy
+- **Functional Icons** - Every element serves a purpose
+- **Sharp Borders** - Precise rectangles, minimal rounded corners
 
-Creativity, Hobbies & Fun
-Fulfillment & Happiness
-Spiritual Discipline
-Business Rules:
+### Color Palette
 
-Each user can have multiple life areas
-Satisfaction rating must be between 0-10 (inclusive)
-Default 12 life areas are created on first access
-Life areas can be customized (added, renamed, or deleted)
-Deleting a life area should warn about connected goals/habits/tasks
-Usage:
+```
+Landing Page (Premium Feel)
+  Background       #FAFAFA (clean white)
+  Foreground       #0A0A0A (deep black)
+  Accent Gold      #D4AF37 (premium gold)
+  Accent Bronze    #B87333 (bronze)
+  Accent Silver    #C0C0C0 (silver)
 
-Displayed on Dashboard in Wheel of Life chart
-Filter option in Goals, Habits, and Tasks modules
-Average satisfaction shown as overall life balance metric
-2. Goal Entity
-Purpose: Represents objectives using OKR (Objectives and Key Results) methodology.
+App - Dark Mode (Default)
+  Background       #0F0F0F (near-black)
+  Foreground       #FFFFFF (white)
+  Accent Primary   #B97F57 (bronze)
+  Accent Secondary #C75E5E (muted red)
+  Accent Tertiary  #6B8E23 (olive)
 
-Schema:
+App - Light Mode (Optional)
+  Background       #F8F8F8 (off-white)
+  Foreground       #111111 (near-black)
+  Accents          Same as dark mode
+```
 
-{
-  "objective": "string (required)",
-  "description": "string (optional)",
-  "life_area_id": "string (required) - foreign key",
-  "target_date": "date (required)",
-  "status": "enum: active|completed|paused|cancelled",
-  "priority": "enum: critical|high|medium|low",
-  "key_results": "array of objects"
+---
+
+## Target Audience
+
+### Who This Is For
+
+Cherut is built for **premium users** who invest in themselves:
+
+- **🚀 Founders & CEOs** - Dominate business while optimizing personal life
+- **💼 High-Performing Professionals** - Excel in career without sacrificing health/relationships
+- **🏆 Athletes & Competitors** - Track training, recovery, and mental edge
+- **🎯 Self-Mastery Practitioners** - Systematic approach to becoming elite
+- **💡 Ambitious Creators** - Balance multiple projects with ruthless efficiency
+
+### Who This Is NOT For
+
+- ❌ People looking for free productivity apps
+- ❌ Casual users unwilling to invest $10/month
+- ❌ Those seeking quick fixes without commitment
+- ❌ Anyone not serious about systematic self-improvement
+
+### Value Proposition
+
+| Problem | Cherut Solution |
+|---------|-----------------|
+| **Fragmented tools** | All-in-one premium platform |
+| **No accountability** | AI coach + community (Pro/Master) |
+| **Lost vision** | Clear goal-to-task hierarchy + Vision Board |
+| **No insights** | Predictive AI analytics (Pro/Master) |
+| **Generic advice** | Adaptive AI that learns YOU (Master) |
+
+**Investment**: $10-30/month
+**ROI**: Priceless clarity, discipline, and results
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+**For Development:**
+- Node.js 18+ and npm
+- Firebase account (development/production)
+- Vercel account (deployment)
+- Render account (API hosting)
+- Stripe account (payment processing)
+- Git
+
+**For Users:**
+- Active subscription ($10/month minimum)
+- Modern web browser (Chrome, Safari, Firefox, Edge)
+- Mobile device for iOS/Android app (optional)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/cherut.git
+cd cherut
+
+# Install dependencies for all apps
+npm install
+
+# Or install individually
+cd apps/web && npm install
+cd apps/mobile && npm install
+cd apps/api && npm install
+```
+
+### Firebase Setup
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+2. Enable Authentication (Email/Password, Google)
+3. Create Firestore database
+4. Enable Firebase Storage
+5. Download service account credentials for API
+6. Copy Firebase config to environment files
+
+### Running Locally
+
+```bash
+# Terminal 1 - Start API
+cd apps/api
+npm run start:dev
+
+# Terminal 2 - Start Web
+cd apps/web
+npm run dev
+
+# Terminal 3 - Start Mobile (optional)
+cd apps/mobile
+npm start
+```
+
+Access the applications:
+- Web: http://localhost:3000
+- API: http://localhost:3001
+- Mobile: Scan QR code with Expo Go app
+
+### Quick Setup
+
+1. **Create Account** - Sign up with email or Google OAuth
+2. **Set Life Areas** - Default 12 areas created automatically
+3. **Rate Satisfaction** - Assess current state (0-10 scale)
+4. **Define First Goal** - Create objective with key results
+5. **Start Tracking** - Add habits and daily tasks
+
+---
+
+## Data Model
+
+### Core Entities
+
+```
+User
+ ├── Subscription (Stripe integration)
+ │    ├── Plan: Core ($10) / Pro ($20) / Master ($30)
+ │    ├── Status: active / canceled / past_due
+ │    └── Billing cycle
+ │
+ ├── Role: admin / tester / paid_user
+ │
+ ├── LifeArea (12 default domains)
+ │    ├── Goal (OKRs with key results)
+ │    │    └── Task (actionable items)
+ │    └── Habit (recurring activities)
+ │         └── HabitLog (completion tracking)
+ │
+ ├── VisionBoardItem (visual inspiration)
+ ├── DailyReflection (emotional check-ins)
+ └── AIInsights (Pro/Master only)
+      ├── Goal suggestions
+      ├── Habit recommendations
+      ├── Predictive analytics
+      └── Mood analysis
+```
+
+### Subscription Plans
+
+```typescript
+interface Subscription {
+  userId: string;
+  plan: 'core' | 'pro' | 'master';
+  status: 'active' | 'canceled' | 'past_due' | 'trialing';
+  stripeCustomerId: string;
+  stripeSubscriptionId: string;
+  currentPeriodEnd: Date;
+  cancelAtPeriodEnd: boolean;
 }
-Key Results Structure:
 
-{
-  "description": "string",
-  "target_value": "number",
-  "current_value": "number (default: 0)",
-  "unit": "string (e.g., 'kg', 'hours', 'clients')",
-  "due_date": "date (optional)"
-}
-Business Rules:
-
-Must be linked to a Life Area
-At least one key result recommended (but not enforced)
-Progress calculated as average completion of all key results
-Status transitions: active → completed/paused/cancelled
-Cannot complete goal if key results are below target (warning only)
-Priority affects sorting and daily focus recommendations
-Calculations:
-
-Goal Progress: (Σ(current_value/target_value) / number_of_KRs) * 100
-Success Rate: Percentage of completed goals vs total goals per life area
-Usage:
-
-Displayed grouped by Life Area
-Can be linked to Habits and Tasks
-Featured in Dashboard "Active Goals" metric
-Can be created from Vision Board items (conversion feature)
-3. Habit Entity
-Purpose: Tracks recurring activities that support goals and life areas.
-
-Schema:
-
-{
-  "name": "string (required)",
-  "description": "string (optional)",
-  "life_area_id": "string (required)",
-  "goal_id": "string (optional)",
-  "frequency": "enum: daily|weekly|custom",
-  "frequency_details": {
-    "times_per_week": "number (optional)",
-    "specific_days": "array of strings (optional)"
-  },
-  "preferred_time": "enum: morning|afternoon|evening|anytime",
-  "streak_count": "number (default: 0)",
-  "completion_rate": "number (default: 0)",
-  "is_active": "boolean (default: true)"
-}
-Business Rules:
-
-Must be linked to a Life Area
-Can optionally link to a Goal
-Streak resets if habit is not completed within frequency window
-Completion rate calculated over last 30 days
-Inactive habits don't show in daily tracking but preserve history
-Calculations:
-
-Streak Count: Consecutive days/weeks of completion
-Completion Rate: (completed_logs / expected_completions) * 100 (last 30 days)
-Habit Strength Score: Combination of streak and completion rate
-Usage:
-
-Daily check-in interface on Dashboard
-Weekly calendar view in Habits module
-Grouped by Life Area for context
-Can create Tasks from Habits (e.g., "Do morning workout")
-4. HabitLog Entity
-Purpose: Records individual completions of habits.
-
-Schema:
-
-{
-  "habit_id": "string (required)",
-  "date": "date (required)",
-  "completed": "boolean (required)",
-  "notes": "string (optional)"
-}
-Business Rules:
-
-One log entry per habit per day
-Cannot log future dates
-Updating existing date overwrites previous entry
-Used to calculate streak and completion rate
-Deleting a habit should optionally delete all logs (cascade)
-Usage:
-
-Created when user marks habit as complete/incomplete
-Displayed in weekly calendar view
-Used for analytics and progress tracking
-Optional notes for reflection
-5. Task Entity
-Purpose: Represents actionable items that can be linked to goals, habits, or life areas.
-
-Schema:
-
-{
-  "title": "string (required)",
-  "description": "string (optional)",
-  "goal_id": "string (optional)",
-  "habit_id": "string (optional)",
-  "life_area_id": "string (optional)",
-  "priority": "enum: critical|high|medium|low",
-  "status": "enum: todo|in_progress|completed|cancelled",
-  "due_date": "date (optional)",
-  "estimated_hours": "number (optional)",
-  "is_daily_focus": "boolean (default: false)"
-}
-Business Rules:
-
-Can exist independently or link to Goal, Habit, or Life Area
-Critical priority tasks automatically marked as daily focus
-Completed tasks remain in system for analytics
-Tasks can be filtered by status, priority, life area, or goal
-Only 3-5 daily focus tasks recommended
-Status Transitions:
-
-todo → in_progress → completed
-  ↓         ↓
-cancelled  cancelled
-Usage:
-
-Main action management interface
-Featured in Dashboard "Daily Focus" section
-Can be created from Goals (breaking down key results)
-Grouped by Life Area in Tasks module
-Filtered views: all, today (daily focus), pending, completed
-6. VisionBoardItem Entity
-Purpose: Visual inspiration items that represent aspirations and dreams.
-
-Schema:
-
-{
-  "title": "string (required)",
-  "description": "string (optional)",
-  "image_url": "string (required)",
-  "category": "string (optional)",
-  "goal_id": "string (optional)",
-  "position_x": "number (default: 0)",
-  "position_y": "number (default: 0)"
-}
-Business Rules:
-
-Image must be uploaded to storage (uses UploadFile integration)
-Can be converted into a Goal (creates new Goal entity)
-Categories are user-defined (free text)
-Position fields reserved for future drag-and-drop feature
-Images stored with unique URLs
-Usage:
-
-Masonry/Pinterest-style grid layout
-Hover reveals title, description, and actions
-Can tag with categories for filtering
-Serves as visual motivation and long-term vision reminder
-7. DailyReflection Entity
-Purpose: Captures daily mental/emotional state and brief reflections.
-
-Schema:
-
-{
-  "date": "date (required)",
-  "emotional_state": "number 1-10 (required)",
-  "mental_clarity": "number 1-10 (required)",
-  "energy_level": "number 1-10 (required)",
-  "daily_wins": "array of strings (optional)",
-  "challenges": "array of strings (optional)",
-  "tomorrow_focus": "array of strings (optional)",
-  "notes": "string (optional)"
-}
-Business Rules:
-
-One reflection per user per day
-Cannot create future reflections
-Ratings are subjective self-assessments
-Optional fields encourage deeper reflection but not required
-Used for trend analysis over time
-Usage:
-
-Quick check-in widget on Dashboard
-Can view historical trends (future feature)
-Helps identify patterns (low energy days, high stress periods)
-Encourages daily engagement with platform
-Data Relationships & Integrity
-Hierarchical Structure:
-
-User (created_by field on all entities)
-  ↓
-LifeArea (foundational organizing principle)
-  ↓
-Goal (objectives within life areas)
-  ↓
-Habit (supports goals and life areas)
-Task (actions supporting goals/habits)
-
-VisionBoardItem (can convert to Goal)
-DailyReflection (standalone daily entry)
-HabitLog (tracks habit completions)
-Cascade Deletion Rules:
-
-Deleting a LifeArea should:
-
-Warn about connected Goals, Habits, Tasks
-Optionally orphan items (set life_area_id to null) OR
-Cascade delete all connected items (destructive)
-Deleting a Goal should:
-
-Orphan Tasks/Habits linked to it (don't delete)
-Delete all Key Results (embedded in Goal)
-Deleting a Habit should:
-
-Optionally delete all HabitLog entries
-Orphan Tasks linked to it
-Deleting a VisionBoardItem should:
-
-Delete image from storage (if not used elsewhere)
-Unlink from Goal if converted
-Data Isolation:
-
-All queries filter by created_by = current_user.email
-Users can never see other users' data
-No sharing or collaboration features (single-player mode)
-Module-by-Module Breakdown
-Module 1: Dashboard (Mission Control)
-Purpose: Central hub showing high-level progress, daily priorities, and quick actions.
-
-Location: /Dashboard
-
-Components:
-
-Header Section
-
-Date display (e.g., "Monday, October 29, 2025")
-Page title: "Mission Control"
-Stats Cards Row (4 cards):
-
-Active Goals: Count of goals with status="active"
-
-Subtitle: "X total goals"
-Icon: Target
-Accent: Primary (Bronze)
-Habit Streak: Longest current streak across all habits
-
-Subtitle: "X active habits"
-Icon: RotateCcw
-Accent: Secondary (Rust Red)
-Tasks This Week: Count of completed tasks in last 7 days
-
-Subtitle: "X pending"
-Icon: CheckSquare
-Accent: Tertiary (Olive Green)
-Life Satisfaction: Average satisfaction rating across all life areas
-
-Subtitle: "Average across all areas"
-Icon: TrendingUp
-Accent: Quaternary (Steel Blue)
-Daily Focus Section
-
-Shows 3-5 tasks marked as is_daily_focus: true or priority: critical
-Each task displays:
-Checkbox for completion toggle
-Title and description
-Priority badge
-Due date (if set)
-Click checkbox to mark complete/incomplete
-Empty state: "No critical tasks for today"
-Purpose: Maintains focus on most important actions
-Wheel of Life Chart
-
-Radar/spider chart showing satisfaction ratings for all life areas
-Color: Primary accent (Bronze)
-Scale: 0-10 on radial axis
-Area labels on polar angles
-Shows visual balance across life domains
-Average satisfaction score displayed below chart
-Clicking opens Life Areas page (future enhancement)
-Recent Activity Feed
-
-Chronological list of latest:
-Goals created/completed
-Tasks completed
-Habits with notable streaks
-Each item shows:
-Icon (type-specific)
-Title
-Timestamp (relative: "Today", "Yesterday", "Oct 25")
-Subtitle (context like "Completed" or "5 day streak")
-Limited to 6 most recent items
-Sorted by updated_date descending
-Quick Reflection Widget (Daily Check-In)
-
-If no reflection exists for today:
-
-Prompt: "How are you feeling today?"
-Button: "Quick Check-In"
-If editing/creating:
-
-3 slider inputs (1-10 scale):
-Emotional State (Heart icon, primary color)
-Mental Clarity (Brain icon, secondary color)
-Energy Level (Zap icon, tertiary color)
-Text area: "Quick Notes"
-Buttons: "Cancel" and "Save"
-If reflection exists for today:
-
-Display 3 metrics as vertical cards
-Show notes below
-Edit icon to modify
-Interactions:
-
-Click stat cards → Navigate to relevant module
-Check task → Update status to "completed"
-Uncheck task → Revert to "todo"
-Click "Quick Check-In" → Show reflection form
-All data loads on page mount
-Refresh after any mutation (task complete, reflection save)
-Loading State:
-
-Shows "Loading Mission Control..." centered
-Fetches in parallel:
-User profile
-Life areas (for Wheel of Life)
-Goals (for stats and recent activity)
-Habits (for stats and recent activity)
-Tasks (for daily focus and stats)
-Today's daily reflection
-Business Logic:
-
-Daily focus tasks: is_daily_focus = true OR priority = "critical"
-Habit streak: Maximum of streak_count across all habits where is_active = true
-Life satisfaction: Average of satisfaction_rating across all life areas
-Recent activity: Sort by updated_date DESC, limit 6, include goals/tasks/habits
-Future Enhancements:
-
-Weekly/monthly progress charts
-Notifications for overdue tasks
-Inspirational quote based on vision board
-Quick add task from dashboard
-Calendar integration showing today's schedule
-Module 2: Life Areas
-Purpose: Manage and track satisfaction across the 12 core life domains.
-
-Location: /LifeAreas
-
-Layout:
-
-Header:
-
-Title: "Life Areas"
-Subtitle: "Track satisfaction across all areas of your life"
-Overall Satisfaction metric (X.X/10)
-Button: "Add Area" (creates custom life area)
-Left Sidebar (Sticky):
-
-Wheel of Life Chart (same as dashboard)
-Displays average satisfaction
-Visual representation of balance
-Main Content Area:
-
-Life areas grouped by 4 categories:
-Personal Power
-Professional Drive
-Relational Strength
-Inner Alignment
-Each category has:
-Category header with colored dot indicator
-Grid of life area cards (2-3 columns)
-Life Area Card:
-
-Header:
-
-Area name (e.g., "Health & Energy")
-Edit icon (top right)
-Delete icon (below edit)
-Content:
-
-Satisfaction rating: "X/10" (large, colored by rating)
-Label: "Excellent" / "Good" / "Fair" / "Needs Attention"
-Progress bar (horizontal, fills based on rating)
-Reflection text (truncated to 3 lines)
-Footer:
-
-Focus areas tags (max 2 shown, "+X more" if overflow)
-Each tag colored with category accent
-Rating Labels:
-
-8-10: "Excellent"
-6-7: "Good"
-4-5: "Fair"
-0-3: "Needs Attention"
-Default Life Areas: When user first accesses, 12 default areas are created:
-
-Personal Power:
-
-Health & Energy
-Intellectual Development
-Emotional Resilience
-Professional Drive:
-
-Career & Purpose
-Financial Resources
-Social Contribution
-Relational Strength:
-
-Family
-Romantic Life
-Social Life
-Inner Alignment:
-
-Creativity, Hobbies & Fun
-Fulfillment & Happiness
-Spiritual Discipline
-Create/Edit Life Area Dialog:
-
-Modal overlay with form
-Fields:
-Area Name: Text input (required)
-Category: Dropdown (4 options, required)
-Satisfaction Rating: Slider (0-10, required)
-Shows current value as you drag
-Reflection & Notes: Textarea (optional)
-Prompt: "How do you feel about this area? What could be improved?"
-Focus Areas: Tag input
-Add tags with Enter or "Add" button
-Click tag to remove
-Examples: "Exercise routine", "Financial planning", "Quality time"
-Buttons:
-"Cancel" (outline, closes dialog)
-"Create Area" or "Update Area" (primary, saves)
-Delete Confirmation Dialog:
-
-Alert dialog overlay
-Title: "Are you absolutely sure?"
-Description: "This action cannot be undone. This will permanently delete this life area and all related data."
-Buttons:
-"Cancel" (default)
-"Delete" (destructive, red background)
-Interactions:
-
-Click "Add Area" → Open create dialog
-Click edit icon → Open edit dialog with prefilled data
-Click delete icon → Show confirmation dialog
-Confirm delete → Remove life area, reload page
-Drag satisfaction slider → See real-time value update
-Add focus area → Press Enter or click "Add"
-Click focus area tag → Remove from list
-Color Coding by Category:
-
-Personal Power: Primary accent (Bronze #B97F57)
-Professional Drive: Secondary accent (Rust Red #C75E5E)
-Relational Strength: Tertiary accent (Olive Green #6B8E23)
-Inner Alignment: Quaternary accent (Steel Blue #4682B4)
-Business Logic:
-
-Overall satisfaction = Average of all satisfaction_rating values
-Wheel of Life updates after any area modification
-Empty state shouldn't occur (defaults created on first load)
-Can add unlimited custom areas
-Categories help organize but don't limit functionality
-Future Enhancements:
-
-Historical satisfaction trends (line chart over time)
-AI-suggested focus areas based on low ratings
-Export Wheel of Life as image
-Comparison with previous month/quarter
-Linked goals/habits count per area
-Drag to reorder areas within categories
-Module 3: Goals & OKRs
-Purpose: Define objectives and track measurable key results aligned with life areas.
-
-Location: /Goals
-
-Layout:
-
-Header:
-
-Title: "Goals & OKRs"
-Subtitle: "Define objectives and track key results across your life areas"
-Button: "New Goal" (primary, opens create dialog)
-Stats Row (3 cards):
-
-Active Goals: Count of status = "active"
-Trend: "X completed"
-Average Progress: Average progress across all goals
-Trend: "Across all goals"
-Total Goals: Count of all goals (any status)
-Trend: "All time"
-Goals Grouped by Life Area:
-
-Each life area with goals shows:
-Life area name as section header
-Grid of goal cards (2-3 columns)
-Areas without goals are not shown
-Goal Card:
-
-Header:
-
-Status badge (colored, uppercase)
-Active: Primary accent
-Completed: Tertiary accent (green)
-Paused: Quaternary accent (blue)
-Cancelled: Muted gray
-Priority badge (smaller, uppercase)
-Objective title (bold, large)
-Edit icon (top right)
-Delete icon (below edit)
-Content:
-
-Progress section:
-Label: "Progress"
-Percentage: "XX.X%"
-Progress bar (colored by status)
-Description (truncated to 2 lines if long)
-Footer:
-
-Due date: Calendar icon + "Due: MMM d, yyyy"
-Key results count: Target icon + "X KRs"
-Progress Calculation:
-
-For each Key Result:
-  kr_progress = (current_value / target_value) * 100
-
-goal_progress = average(all kr_progress values)
-Create/Edit Goal Dialog:
-
-Large modal (max-width: 2xl)
-Scrollable content area
-Two-column layout where applicable
-Form Fields:
-
-Objective (Text input, required)
-
-Placeholder: "What do you want to achieve?"
-Example: "Launch successful SaaS product"
-Life Area (Dropdown, required)
-
-Lists all life areas
-Grouped by category visually
-Target Date (Date picker, required)
-
-Calendar popup
-Cannot select past dates
-Priority (Dropdown, default: "medium")
-
-Options: Critical, High, Medium, Low
-Description (Textarea, optional)
-
-Placeholder: "Detailed description of your goal"
-3 rows tall
-Key Results Section:
-
-Header: "Key Results" with "Add KR" button
-List of KR input groups:
-Each KR has:
-
-Description: Text input
-
-Placeholder: "What will you measure?"
-Target Value: Number input
-
-Placeholder: "Target"
-Current Value: Number input
-
-Placeholder: "Current"
-Unit: Text input
-
-Placeholder: "Unit" (e.g., "kg", "clients", "hours")
-Delete Icon: Removes this KR
-
-Each KR displayed in bordered card
-
-Can have unlimited KRs
-
-At least 1 recommended (not enforced)
-
-"Add KR" button creates empty KR group
-
-Status Transitions:
-
-New goals default to "active"
-User can change status in edit dialog
-Completed goals remain visible in list
-Cancelled goals shown in muted style
-Priority Levels:
-
-Critical: Urgent and important, shows in red
-High: Important, shows in primary accent
-Medium: Standard priority
-Low: Nice to have, shows in muted color
-Delete Confirmation:
-
-Same pattern as Life Areas
-Warning: "This will permanently delete this goal and its key results"
-Does NOT delete linked tasks/habits (orphans them)
-Empty State:
-
-Icon: Target (large, muted)
-Title: "No Goals Yet"
-Description: "Start by creating your first goal to track progress"
-Button: "Create First Goal"
-Interactions:
-
-Click "New Goal" → Open create dialog
-Click "Add KR" → Add empty KR input group
-Click KR delete icon → Remove that KR
-Type in KR fields → Auto-saves with goal
-Click edit icon → Open edit dialog with data
-Click delete icon → Show confirmation
-Confirm delete → Remove goal, reload
-Grouping Logic:
-
-Goals grouped by life_area_id
-Within each group, sorted by:
-Status (active first)
-Priority (critical first)
-Target date (soonest first)
-Future Enhancements:
-
-Progress timeline visualization
-Milestones between KRs
-Auto-suggest related habits/tasks
-Templates for common goals
-Success rate analytics per life area
-Goal dependencies (prerequisite goals)
-Recurring goals (quarterly OKRs)
-Export to PDF for quarterly reviews
-Module 4: Habits
-Purpose: Track recurring activities that build consistency and support goals.
-
-Location: /Habits
-
-Layout:
-
-Header:
-
-Title: "Habit Tracking Engine"
-Subtitle: "Build consistency and track your daily routines"
-Button: "New Habit" (primary)
-Stats Row (3 cards):
-
-Active Habits: Count of is_active = true
-Trend: "X total habits"
-Total Streaks: Sum of all streak_count values
-Trend: "Combined streaks"
-Avg Completion: Average completion_rate across habits
-Trend: "Success rate"
-Habits Grouped by Life Area:
-
-Section header: Life area name
-Grid of habit cards (2-3 columns)
-Habit Card:
-
-Header:
-
-Habit name (bold)
-Streak count badge: "X day streak" (colored by streak length)
-Completion rate: "XX% complete"
-Edit icon (top right)
-Delete icon (below edit)
-Content:
-
-Description (if provided, 2 lines max)
-This Week Section:
-Label: "This Week"
-7-day grid (Mon-Sun)
-Each day shows:
-Day abbreviation (M, T, W, etc.)
-Date number
-Completion status:
-Empty circle: Not completed
-Filled circle with checkmark: Completed
-Highlighted border if today
-Click any day to toggle completion
-Footer:
-
-Frequency: "daily" / "weekly" / "custom"
-Preferred time: "morning" / "afternoon" / "evening" / "anytime"
-Status badge: "Active" / "Paused"
-Streak Coloring:
-
-0-3 days: Muted gray
-4-6 days: Tertiary accent (olive)
-7-13 days: Primary accent (bronze)
-14-20 days: Secondary accent (rust)
-21+ days: Quaternary accent (steel blue) - "Elite"
-Create/Edit Habit Dialog:
-
-Modal overlay
-Form fields:
-Name (Text input, required)
-
-Placeholder: "e.g., Morning Workout"
-Description (Textarea, optional)
-
-Placeholder: "What does this habit involve?"
-Life Area (Dropdown, required)
-
-Lists all life areas
-Link to Goal (Dropdown, optional)
-
-Lists all active goals
-Helps connect habits to objectives
-Frequency (Dropdown, required)
-
-Options: Daily, Weekly, Custom
-If "Weekly" selected:
-Show "Times per week" number input
-If "Custom" selected:
-Show day-of-week checkboxes (M T W T F S S)
-Preferred Time (Dropdown, default: "anytime")
-
-Options: Morning, Afternoon, Evening, Anytime
-Used for future reminder features
-Is Active (Checkbox, default: true)
-
-Paused habits don't show in daily tracking
-Preserves streak and history
-Habit Completion:
-
-Click day circle → Toggle completion
-Creates/updates HabitLog entry
-Automatically calculates:
-Streak count (consecutive completions)
-Completion rate (last 30 days)
-Streak Calculation Logic:
-
-Start from today, count backwards:
-- If habit completed yesterday, streak++
-- If missed, break streak
-- Continue until first miss or habit creation date
-Completion Rate Calculation:
-
-last_30_days = HabitLog entries in last 30 days
-expected_completions = based on frequency over 30 days
-
-completion_rate = (actual_completions / expected_completions) * 100
-Delete Confirmation:
-
-Warning: "This will permanently delete this habit and all its logs"
-Option to keep logs (future enhancement)
-Empty State:
-
-Icon: RotateCcw (large)
-Title: "No Habits Yet"
-Description: "Start building consistency with your first habit"
-Button: "Create First Habit"
-Interactions:
-
-Click "New Habit" → Open create dialog
-Click day in week grid → Toggle completion, create HabitLog
-Click edit icon → Open edit dialog
-Click delete icon → Show confirmation
-Toggle "Is Active" → Pause/resume habit
-Business Logic:
-
-Today's date highlighted in week grid
-Cannot mark future dates
-Can mark past dates (catch-up logging)
-Streak only counts if frequency requirements met
-Daily habits: Must complete each day
-Weekly habits: Must meet times-per-week target
-Custom habits: Must complete on specified days
-Future Enhancements:
-
-Monthly calendar view
-Habit strength score visualization
-Best time analysis (when most likely to complete)
-Habit stacking suggestions (pair with existing habits)
-Reminders/notifications
-Habit templates library
-Export streak data
-Social accountability (share streaks)
-Habit challenges (30-day, 100-day)
-Module 5: Tasks
-Purpose: Manage actionable items with priority, due dates, and connections to goals/habits.
-
-Location: /Tasks
-
-Layout:
-
-Header:
-
-Title: "Task & Action Management"
-Subtitle: "Track your daily actions and link them to goals"
-Button: "New Task" (primary)
-Stats Row (4 cards):
-
-Total Tasks: Count of all tasks
-Completed: Count of status = "completed"
-Pending: Count of status = "todo" or "in_progress"
-Daily Focus: Count of is_daily_focus = true
-Filter Buttons:
-
-"All Tasks"
-"Daily Focus"
-"Pending"
-"Completed"
-Active filter highlighted in primary accent
-Tasks Grouped by Life Area:
-
-Section header: Life area name (count)
-List layout (not grid - tasks are horizontal)
-Task Card:
-
-Horizontal layout with checkbox left-aligned
-
-Left Section:
-
-Checkbox (large):
-Empty square: Not completed
-Filled square with checkmark: Completed
-Click toggles status between "todo" and "completed"
-Center Section (Main Content):
-
-Header Row:
-
-Title (bold)
-Strikethrough if completed
-Gray color if completed
-Edit and delete icons (right-aligned)
-Description (if exists):
-
-Gray text, smaller font
-Badges Row:
-
-Priority badge: "CRITICAL", "HIGH", "MEDIUM", "LOW"
-Colored background (critical=red, high=bronze, etc.)
-Status badge: "TODO", "IN PROGRESS", "COMPLETED"
-Daily focus badge (if is_daily_focus = true):
-AlertTriangle icon + "DAILY FOCUS"
-Highlighted in accent color
-Due date (if set):
-Calendar icon + "Due: MMM d"
-Red text if overdue
-Estimated hours (if set):
-Clock icon + "X hours"
-Priority Colors:
-
-Critical: Secondary accent (rust red)
-High: Primary accent (bronze)
-Medium: Tertiary accent (olive)
-Low: Quaternary accent (steel blue)
-Status Colors:
-
-Todo: Muted gray
-In Progress: Quaternary accent (blue)
-Completed: Tertiary accent (green)
-Cancelled: Muted gray
-Create/Edit Task Dialog:
-
-Modal overlay
-Form fields:
-Title (Text input, required)
-
-Placeholder: "What needs to be done?"
-Description (Textarea, optional)
-
-Placeholder: "Add details..."
-Life Area (Dropdown, optional)
-
-Lists all life areas
-Helps categorize task
-Link to Goal (Dropdown, optional)
-
-Lists all active goals
-Connects task to objective
-Link to Habit (Dropdown, optional)
-
-Lists all active habits
-Supports habit completion
-Priority (Dropdown, default: "medium")
-
-Options: Critical, High, Medium, Low
-Status (Dropdown, default: "todo")
-
-Options: Todo, In Progress, Completed, Cancelled
-Due Date (Date picker, optional)
-
-Calendar popup
-Estimated Hours (Number input, optional)
-
-For time management
-Daily Focus (Checkbox, default: false)
-
-Mark as priority for today
-Shows on Dashboard
-Filtering Logic:
-
-All Tasks: Show everything
-Daily Focus: Only is_daily_focus = true
-Pending: status IN ("todo", "in_progress")
-Completed: status = "completed"
-Grouping & Sorting:
-
-Group by Life Area
-Within group, sort by:
-is_daily_focus (true first)
-Priority (critical first)
-Due date (soonest first)
-Created date (newest first)
-Delete Confirmation:
-
-Warning: "This will permanently delete this task"
-Simpler than other modules (no cascade effects)
-Empty State:
-
-Varies by filter:
-All: "No Tasks Found - Create your first task"
-Daily Focus: "No critical tasks for today"
-Pending: "No pending tasks found"
-Completed: "No completed tasks yet"
-Interactions:
-
-Click checkbox → Toggle between "todo" and "completed"
-Click "New Task" → Open create dialog
-Click edit icon → Open edit dialog
-Click delete icon → Show confirmation
-Select filter → Reload task list
-Click task title → Future: Open detail view
-Business Logic:
-
-Critical priority auto-sets is_daily_focus = true
-Overdue tasks highlighted (due_date < today)
-Completed tasks can be unchecked (reverts to todo)
-Tasks without life area shown in "No Area" group
-Maximum 3-5 daily focus tasks recommended (not enforced)
-Future Enhancements:
-
-Drag-and-drop reordering
-Bulk actions (select multiple, bulk delete/complete)
-Calendar view
-Recurring tasks
-Subtasks/checklists
-Task dependencies
-Time tracking (start timer)
-Pomodoro integration
-Export to calendar apps
-Task templates
-Module 6: Vision Board
-Purpose: Visual inspiration board with images representing dreams, goals, and aspirations.
-
-Location: /VisionBoard
-
-Layout:
-
-Header:
-
-Title: "Vision Board"
-Subtitle: "Create your visual dream wall to inspire your goals"
-Button: "Add Inspiration" (primary)
-Main Content:
-
-Masonry/Pinterest-style grid layout
-Responsive columns:
-Mobile: 1 column
-Tablet: 2 columns
-Desktop: 3 columns
-Large desktop: 4 columns
-Items maintain aspect ratio (no cropping)
-Variable heights create organic flow
-Vision Board Item:
-
-Image:
-
-Full-width, auto-height
-High quality (uploaded by user)
-No borders in default state
-Hover Overlay (appears on mouse over):
-
-Gradient overlay (black, bottom to top)
-
-Smooth opacity transition (300ms)
-
-Bottom Section:
-
-Title (white, bold)
-Description (light gray, 2 lines max)
-Top Right Corner:
-
-Edit button (icon only)
-Background: Black with 50% opacity
-Hover: Black with 80% opacity
-Delete button (icon only)
-Same styling
-Changes to red on hover
-Create/Edit Vision Item Dialog:
-
-Modal overlay
-Form fields:
-Image Upload:
-
-File input
-Shows preview after selection
-Accepts: jpg, png, gif, webp
-Max size: 5MB (enforced by backend)
-Displays current image if editing
-Title (Text input, required)
-
-Placeholder: "e.g., Mountain Summit"
-What does this image represent?
-Description (Textarea, optional)
-
-Placeholder: "What does this image represent to you?"
-3 rows tall
-Personal reflection
-Category (Text input, optional)
-
-Placeholder: "e.g., Career, Travel, Health"
-User-defined tags
-Future: Auto-suggest from existing categories
-Link to Goal (Dropdown, optional - future feature)
-
-If vision item becomes real goal
-Creates Goal entity with prefilled data
-Image Upload Flow:
-
-1. User selects file
-2. Preview shown immediately (local URL)
-3. On form submit:
-   - Upload file to storage (UploadFile integration)
-   - Receive file_url from storage
-   - Save VisionBoardItem with file_url
-4. Image persisted in cloud storage
-Delete Confirmation:
-
-Warning: "This will permanently delete this vision board item"
-Note: Image remains in storage (not deleted)
-Empty State:
-
-Icon: Image (large, muted)
-Title: "Your Vision Board is Empty"
-Description: "Add images that inspire you and represent your goals."
-Button: "Add First Image"
-Interactions:
-
-Click "Add Inspiration" → Open create dialog
-Hover item → Show overlay with details and actions
-Click edit → Open edit dialog with data
-Click delete → Show confirmation
-Click image → Future: Full-screen view
-Layout Behavior:
-
-Uses CSS columns for masonry effect
-break-inside: avoid prevents items from splitting
-Gap between items: 1.5rem (24px)
-Items fill column width, height auto
-Business Logic:
-
-Images uploaded via Core.UploadFile integration
-Returns file_url for permanent storage
-No image optimization (uses original)
-Categories are free text (no predefined list)
-Can have unlimited vision items
-No limit on image file size (within backend limits)
-Future Enhancements:
-
-Drag-and-drop positioning (grid mode)
-Filter by category
-Lightbox for full-size viewing
-Convert to goal (creates Goal with image link)
-AI-suggested vision images based on goals
-Collage mode (multiple images in one view)
-Downloadable vision board as single image
-Sharing (generate public link)
-Vision board templates
-Quote overlays on images
-Business Rules & Security
-Authentication & Authorization
-User Authentication:
-
-Handled by Base44 platform (built-in)
-User object properties:
-id: Unique identifier
-email: Email address
-full_name: Display name
-role: "admin" or "user"
-created_date: Account creation timestamp
-Access Control:
-
-All entities have created_by field (auto-populated)
-Queries automatically filtered by created_by = current_user.email
-Users can ONLY access their own data
-No cross-user data visibility
-No sharing or collaboration features
-Session Management:
-
-User.me(): Returns current authenticated user
-Throws error if not authenticated
-User.loginWithRedirect(nextUrl): Redirects to login page
-User.logout(): Ends session, clears cache
-Layout component checks auth on mount
-Security Patterns:
-
-// Example: Loading data securely
-const loadData = async () => {
-  const user = await User.me(); // Get current user
-  const items = await Entity.filter({ 
-    created_by: user.email  // Filter by current user
-  });
+// Feature Access by Plan
+const features = {
+  core: ['basic_modules', 'cloud_sync', 'mobile_app'],
+  pro: [...core, 'ai_suggestions', 'analytics', 'integrations', 'community'],
+  master: [...pro, 'adaptive_ai', 'predictive_ai', 'automation', 'elite_circle']
 };
-Data Validation Rules
-Life Areas:
+```
 
-name: Required, 1-100 characters
-category: Required, must be one of 4 predefined categories
-satisfaction_rating: Required, integer 0-10
-reflection: Optional, max 1000 characters
-focus_areas: Optional array, each item max 50 characters
+### Entity Relationships & Access Control
+
+- **Data Isolation**: Each user sees ONLY their own data
+- **Admin Access**: Admin user can view all users, manage system
+- **Tester Access**: Test data only, user-level view
+- **Paid Access**: Requires active subscription ($10+ minimum)
+- Goals must link to Life Areas
+- Habits can link to Goals and Life Areas
+- Tasks can reference Goals, Habits, or Life Areas
+- AI features gated by subscription plan
+- Deletion cascades with user confirmation
+
+---
+
+## Key Features
+
+### Wheel of Life
+
+Visual radar chart showing satisfaction across all life domains. Helps identify imbalanced areas requiring attention.
+
+### OKR Methodology
+
+Objectives and Key Results framework for measurable goal tracking. Each goal has multiple quantifiable key results with target values.
+
+### Habit Streaks
+
+Consecutive completion tracking with visual 7-day grid. Streaks are color-coded by length (0-3 days gray, 21+ days blue).
+
+### Daily Focus
+
+Intelligent task prioritization highlighting 3-5 critical items. Auto-includes tasks marked as critical priority.
+
+### Progress Tracking
+
+Automatic calculation of:
+- Goal progress (average of key results)
+- Habit completion rates (last 30 days)
+- Life satisfaction trends
+- Task completion metrics
+
+---
+
+## Architecture
+
+### Component Structure
+
+```
+Layout
+ ├── Navigation (sidebar/mobile sheet)
+ ├── Theme Toggle (dark/light mode)
+ └── Page Content
+      ├── Dashboard (Mission Control)
+      ├── Life Areas (Wheel of Life)
+      ├── Goals (OKR management)
+      ├── Habits (tracking engine)
+      ├── Tasks (action management)
+      └── Vision Board (inspiration)
+```
+
+### Data Flow
+
+```
+Web Flow:
+User → Next.js UI → NestJS API → Firebase Firestore
+                        ↓
+     ← JSON Response ←
+
+Mobile Flow:
+User → Expo App → NestJS API → Firebase Firestore
+                      ↓
+   ← JSON Response ←
+```
+
+### Security
+
+- Firebase Authentication (Email/Password, OAuth)
+- JWT tokens for API authorization
+- User data isolation (userId filtering)
+- Row-level security rules in Firestore
+- HTTPS/TLS encryption
+- CORS configuration
+- Rate limiting
+
+---
+
+## Development
+
+### Project Structure
+
+```
+cherut/
+├── apps/
+│   ├── web/                    # Next.js web application
+│   │   ├── src/
+│   │   │   ├── app/            # App Router pages
+│   │   │   ├── components/     # React components
+│   │   │   ├── lib/            # Utilities
+│   │   │   └── styles/         # Global styles
+│   │   └── package.json
+│   │
+│   ├── mobile/                 # Expo mobile application
+│   │   ├── app/                # Expo Router
+│   │   ├── components/         # React Native components
+│   │   ├── hooks/              # Custom hooks
+│   │   └── package.json
+│   │
+│   └── api/                    # NestJS backend
+│       ├── src/
+│       │   ├── modules/        # Feature modules
+│       │   │   ├── auth/
+│       │   │   ├── goals/
+│       │   │   ├── habits/
+│       │   │   ├── tasks/
+│       │   │   └── users/
+│       │   ├── common/         # Shared utilities
+│       │   └── main.ts         # Entry point
+│       └── package.json
+│
+└── packages/                   # Shared packages (optional)
+    ├── types/                  # Shared TypeScript types
+    └── utils/                  # Shared utilities
+```
+
+### Key Commands
+
+**Web (Next.js)**
+```bash
+cd apps/web
+npm run dev         # Start development server
+npm run build       # Build for production
+npm run start       # Start production server
+npm run lint        # Run ESLint
+```
+
+**Mobile (Expo)**
+```bash
+cd apps/mobile
+npm start           # Start Expo dev server
+npm run android     # Run on Android
+npm run ios         # Run on iOS
+npm run web         # Run on web
+```
+
+**API (NestJS)**
+```bash
+cd apps/api
+npm run start:dev   # Start in watch mode
+npm run build       # Build for production
+npm run start:prod  # Start production server
+npm run test        # Run tests
+```
+
+### Environment Variables
+
+**Web (.env.local)**
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+```
+
+**Mobile (.env)**
+```env
+EXPO_PUBLIC_API_URL=http://localhost:3001
+EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_domain
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+```
+
+**API (.env)**
+```env
+PORT=3001
+NODE_ENV=development
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_CLIENT_EMAIL=your_email
+FIREBASE_PRIVATE_KEY=your_private_key
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=7d
+CORS_ORIGIN=http://localhost:3000
+```
+
+---
+
+## Deployment
+
+### Web Application (Vercel)
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+cd apps/web
+vercel
+
+# Production deployment
+vercel --prod
+```
+
+**Vercel Configuration:**
+- Framework: Next.js
+- Build Command: `npm run build`
+- Output Directory: `.next`
+- Install Command: `npm install`
+- Environment Variables: Add all `NEXT_PUBLIC_*` variables
+
+### API (Render - Free Tier)
+
+**Render (Recommended - 750h/month free):**
+
+1. Create account at [render.com](https://render.com)
+2. Click "New +" → "Web Service"
+3. Connect your GitHub repository
+4. Configure:
+   - **Name**: cherut-api
+   - **Root Directory**: `apps/api`
+   - **Environment**: Node
+   - **Build Command**: `npm install && npm run build`
+   - **Start Command**: `npm run start:prod`
+   - **Instance Type**: Free (auto-sleeps after 15min inactivity)
+5. Add environment variables (from `.env` file)
+6. Deploy!
+
+**Note**: Free tier auto-sleeps after 15min of inactivity. First request after sleep takes ~30s. Upgrade to $7/month for always-on.
+
+### Mobile Application
+
+**Expo EAS Build:**
+```bash
+# Install EAS CLI
+npm install -g eas-cli
+
+# Configure EAS
+cd apps/mobile
+eas login
+eas build:configure
+
+# Build for production
+eas build --platform android
+eas build --platform ios
+
+# Submit to stores
+eas submit -p android
+eas submit -p ios
+```
+
+### Firebase Configuration
+
+1. **Firestore Indexes**: Deploy indexes defined in `firestore.indexes.json`
+2. **Security Rules**: Deploy rules from `firestore.rules`
+3. **Storage Rules**: Configure storage rules for image uploads
+
+```bash
+# Deploy Firebase configuration
+firebase deploy --only firestore:rules
+firebase deploy --only firestore:indexes
+firebase deploy --only storage
+```
+
+### Recommended Setup (100% Free Tier)
+
+| Component | Platform | Free Tier | Reason |
+|-----------|----------|-----------|--------|
+| **Web Frontend** | Vercel | Unlimited | Optimal Next.js integration, edge functions |
+| **API Backend** | Render | 750h/month | Simple deployment, auto-sleep on inactivity |
+| **Database** | Firebase Firestore | 1GB storage, 50K reads/day | Real-time sync, generous free tier |
+| **Storage** | Firebase Storage | 5GB, 1GB/day transfer | Integrated with Firestore, CDN included |
+| **Auth** | Firebase Auth | Unlimited users | Multiple providers, no cost |
+| **Mobile Builds** | Expo EAS | 30 builds/month | Over-the-air updates (free unlimited) |
+| **Monitoring** | Sentry | 5K errors/month | Error tracking, performance monitoring |
+| **CI/CD** | GitHub Actions | 2000 min/month | Automated testing and deployment |
+
+**Total Monthly Cost**: $0 (within free tiers)
+
+### Free Tier Limits & Upgrade Path
+
+| Service | Free Limit | When to Upgrade | Paid Cost |
+|---------|------------|-----------------|-----------|
+| **Vercel** | Unlimited deployments | Custom domains (>1), team features | $20/month |
+| **Render** | 750h/month (auto-sleep) | 24/7 uptime needed | $7/month |
+| **Firebase Firestore** | 1GB, 50K reads/day | >50K active users | Pay-as-you-go |
+| **Firebase Storage** | 5GB, 1GB/day | Heavy media usage | Pay-as-you-go |
+| **Expo EAS** | 30 builds/month | >30 builds needed | $29/month |
+| **Sentry** | 5K errors/month | Production at scale | $26/month |
+
+**Estimated Cost at Scale** (~10K users):
+- Vercel: $0 (still free)
+- Render: $7/month (always-on)
+- Firebase: ~$25/month
+- **Total**: ~$32/month
+
+---
+
+## Roadmap
+
+### MVP Features (Launch - Month 1)
+
+| Feature | Priority | Status |
+|---------|----------|--------|
+| **Landing Page** | Critical | Planned |
+| **Stripe Integration** | Critical | Planned |
+| **User Auth (Firebase)** | Critical | Planned |
+| **Admin Dashboard** | Critical | Planned |
+| **Core Modules** (Life Areas, Goals, Habits, Tasks) | Critical | Planned |
+| **Mobile App (Expo)** | High | Planned |
+| **Vision Board** | High | Planned |
+| **Daily Reflection** | High | Planned |
+
+### Post-Launch Features (Months 2-6)
+
+| Feature | Plan | Timeline |
+|---------|------|----------|
+| **Social Sharing** | Pro/Master | Month 2 |
+| **AI Goal Suggestions** | Pro/Master | Month 2 |
+| **Analytics Dashboard** | Pro/Master | Month 3 |
+| **Notion/Calendar Integration** | Pro | Month 4 |
+| **AI Journaling** | Pro/Master | Month 4 |
+| **Enhanced Social Cards** | Master | Month 5 |
+| **Predictive AI** | Master | Month 5 |
+| **Adaptive AI Coach** | Master | Month 6 |
+
+### Future: Microservices (Months 7-12)
+
+| Service | Technology | Purpose |
+|---------|-----------|---------|
+| **AI Service** | Python/FastAPI | Goal suggestions, mood analysis, predictions |
+| **Analytics Service** | Node.js/NestJS | Advanced metrics, reports, insights |
+| **Notification Service** | Node.js | Email, push notifications, reminders |
+
+### Current Status
+
+- ✅ Business model defined
+- ✅ Pricing tiers established
+- ✅ Architecture designed (Modular Monolith)
+- ✅ Tech stack selected
+- 📋 Landing page design pending
+- 📋 Stripe integration pending
+- 📋 Admin dashboard pending
+- 📋 Core modules development starting
+
+---
+
+## Why This Stack?
+
+### 💰 Cost-Effective (Start Free, Scale Smart)
+
+Every service in this stack has a **generous free tier**, perfect for:
+- ✅ Development and testing
+- ✅ MVPs and proof of concepts
+- ✅ Early-stage startups (0-1K users)
+- ✅ Side projects and learning
+
+**No upfront costs** - only pay when you grow!
+
+### Next.js Benefits
+
+- **Server Components** - Reduced JavaScript bundle, faster page loads
+- **App Router** - Modern routing with layouts and nested routes
+- **API Routes** - Can serve as BFF (Backend for Frontend) if needed
+- **SEO Friendly** - Server-side rendering for better SEO
+- **Vercel Integration** - Seamless deployment, **100% free for hobby projects**
+
+### NestJS Benefits
+
+- **TypeScript First** - Type safety across the entire backend
+- **Modular Architecture** - Easy to scale and maintain
+- **Dependency Injection** - Clean, testable code
+- **Built-in Validation** - class-validator integration
+- **Microservices Ready** - Can split into microservices later
+
+### Expo Benefits
+
+- **Unified Codebase** - Share code between iOS, Android, and Web
+- **Over-the-Air Updates** - Update apps without app store review
+- **Native APIs** - Easy access to camera, notifications, storage
+- **Expo Router** - File-based routing like Next.js
+- **EAS Build** - Cloud build service for native apps
+
+### Firebase Benefits
+
+- **Real-time Sync** - Live updates across all devices
+- **Offline Support** - Built-in offline capabilities
+- **Authentication** - Multiple auth providers, **unlimited users for free**
+- **Generous Free Tier** - 1GB storage, 50K reads/day, 5GB file storage
+- **Scalability** - Auto-scales with your app, pay-as-you-go
+- **Security Rules** - Fine-grained access control
+- **No Server Management** - Fully managed, zero DevOps
+
+### TypeScript Benefits
+
+- **Type Safety** - Catch errors at compile time
+- **Better IDE Support** - Autocomplete and refactoring
+- **Shared Types** - Reuse types between frontend and backend
+- **Documentation** - Types serve as inline documentation
+- **Maintainability** - Easier to refactor and maintain
+
+---
+
+## 💰 Business Model: Premium SaaS
+
+### Revenue Model
+
+**Subscription Tiers:**
+- 🥉 Core: $10/month
+- 🥈 Pro: $20/month (includes social sharing)
+- 🥇 Master: $30/month (enhanced social sharing with branding)
+
+**Special Accounts (No Payment):**
+- Admin: 1 user (full system access)
+- Tester: 1 user (test data, user view)
+
+**Target Revenue (Year 1):**
+- 100 paying users (avg $15/month) = **$1,500/month** = **$18K/year**
+- 500 paying users (avg $15/month) = **$7,500/month** = **$90K/year**
+- 1,000 paying users (avg $15/month) = **$15,000/month** = **$180K/year**
+
+### Development Costs (Bootstrap Strategy)
+
+**Phase 1: Development (Months 1-2) - $0/month**
+
+Using free tiers only:
+- Vercel (Hobby): Unlimited deployments - FREE
+- Render (Free): 750h/month - FREE
+- Firebase (Spark): 1GB, 50K reads/day - FREE
+- Stripe: Free account (only pay per transaction)
+- Resend: 3K emails/month - FREE
+- Sentry: 5K errors/month - FREE
+- GitHub Actions: 2000 min/month - FREE
+
+**Total Development Cost**: $0/month ✅
+
+**Phase 2: Launch (First 20 users) - $0-7/month**
+
+- Keep free tiers
+- Optional: Render always-on ($7/month) to avoid cold starts
+- All other services still free
+
+**Phase 3: Scaling (20-100 users) - ~$30-50/month**
+
+- Vercel Pro: $20/month (better performance)
+- Render: $7/month (always-on)
+- Firebase: Still free (within limits)
+- Other services: Still free
+
+**Phase 4: Production (100+ users) - ~$186-211/month**
+
+| Service | Cost | Purpose |
+|---------|------|---------|
+| Vercel Pro | $20/month | Web hosting (production) |
+| Render | $25/month | API hosting (always-on) |
+| Firebase Blaze | ~$50-100/month | Database + Storage + Auth |
+| Stripe | 2.9% + $0.30/txn | Payment processing (variable) |
+| Resend Pro | $20/month | More emails |
+| Sentry | $26/month | Error monitoring |
+| OpenAI API | ~$50/month | AI features (Pro/Master) |
+
+**Total Fixed Costs at Scale**: ~$186-211/month
+
+### Profitability Analysis (Bootstrap Approach)
+
+| Phase | Users | Revenue/mo | Costs/mo | Profit/mo | ROI |
+|-------|-------|------------|----------|-----------|-----|
+| **Development** | 0 | $0 | $0 | $0 | ∞ |
+| **Launch** | 20 | $300 | $0-7 | $293-300 | 4,186%+ |
+| **Early Growth** | 50 | $750 | $30 | $720 | 2,400% |
+| **Scaling** | 100 | $1,500 | $50 | $1,450 | 2,900% |
+| **Production** | 500 | $7,500 | $211 | $7,289 | 3,454% |
+| **Mature** | 1,000 | $15,000 | $400 | $14,600 | 3,650% |
+
+**Key Insight**:
+- ✅ **$0 to start** - No upfront investment required
+- ✅ **Profitable from user #1** - Revenue > Costs immediately
+- ✅ **Break-even**: First paying user (with free tiers)
+- ✅ **Sustainable**: Costs scale slower than revenue
+
+### Growth Strategy
+
+**Phase 1: Launch (Months 1-3)**
+- Target: 50 paying users
+- Focus: Landing page optimization, early adopters
+- Revenue: $750/month
+
+**Phase 2: Growth (Months 4-12)**
+- Target: 500 paying users
+- Focus: Content marketing, partnerships, community
+- Revenue: $7,500/month
+
+**Phase 3: Scale (Year 2)**
+- Target: 2,000+ paying users
+- Focus: AI features, mobile app, enterprise
+- Revenue: $30,000+/month
+
+### Why Premium Pricing?
+
+✅ **Filters casual users** - Only serious users invest
+✅ **High-quality support** - Can afford dedicated customer success
+✅ **Better product** - Revenue funds AI, features, improvements
+✅ **Sustainable** - Not dependent on ads or data selling
+✅ **Elite positioning** - Premium price = premium experience
+
+---
+
+## 📅 Development Timeline & MVP Strategy
+
+### MVP Strategy: Bootstrap Approach
+
+**Philosophy**: Start with $0, validate with Core plan, scale with revenue.
+
+**Phase 1: MVP - Core Plan Only (Weeks 1-12)**
+
+| Week | Focus | Deliverables | Cost |
+|------|-------|--------------|------|
+| **1-2** | Foundation | Monorepo setup, Firebase config, Stripe setup | $0 |
+| **3-4** | Auth & Landing | Landing page with pricing, Stripe checkout, Firebase Auth | $0 |
+| **5-8** | Core Modules | Life Areas, Goals, Habits, Tasks, Vision Board, Reflection, Time Tracker | $0 |
+| **9-10** | Polish & Test | Admin dashboard, mobile responsive, basic analytics | $0 |
+| **11-12** | Launch | Beta launch (20-50 users), ProductHunt, iterate | $0-7 |
+
+**Total Phase 1 Cost**: $0 (using free tiers)
+**Time to Market**: 12 weeks (3 months)
+**Target**: 20-50 early adopters at $10/month = $200-500 MRR
+
+**Phase 2: Pro/Master Features (Months 4-12)**
+
+Funded by Core plan revenue ($500-2K/month from 50-200 users):
+
+| Month | Features | Technology | Funded By |
+|-------|----------|-----------|-----------|
+| **4-6** | AI Infrastructure | Python/FastAPI microservice, OpenAI API | Core revenue |
+| **4-6** | AI Features | Goal suggestions, Habit coaching, AI insights | Core revenue |
+| **7-9** | Advanced AI | Predictive AI, Analytics microservice | Core + Pro revenue |
+| **7-9** | Integrations | Trello, Google Calendar, Wearables | Core + Pro revenue |
+| **10-12** | Elite Features | Adaptive AI Coach, Zapier, Mentorship, Enhanced social cards | All revenue streams |
+
+**Phase 3: Mobile App (Month 13+)**
+
+Funded by existing revenue ($3K-7K/month from 200-500 users):
+
+- Expo mobile app development
+- Native iOS/Android features
+- App Store submissions
+- Push notifications
+- Offline sync optimization
+
+### What's In MVP vs What's NOT
+
+**✅ In MVP (Core Plan - Phase 1)**:
+- User Profile & Identity (basic)
+- Mission Control Dashboard (12 Life Areas with satisfaction tracking)
+- Goals & OKRs (up to 5 active with key results)
+- Habits (up to 10 active with streak tracking)
+- Tasks (up to 50 active with priorities)
+- Vision Board (up to 10 items)
+- Daily Reflection (mood, energy, gratitude)
+- Manual Time Tracker
+- Basic analytics (charts, progress tracking)
+- Social sharing (basic achievement sharing)
+- Stripe payment integration
+- Admin + Tester accounts
+
+**❌ NOT in MVP (Phase 2 - Pro/Master)**:
+- AI Coach & Suggestions
+- Predictive AI & Advanced Analytics
+- Smart Time Blocking
+- Community features (Cherut Circle)
+- Integrations (Trello, Calendar, Wearables)
+- Automations (Zapier)
+- Enhanced social sharing with branding
+- Mentorship system
+
+**Why This Approach?**
+1. **$0 Development Cost** - No AI infrastructure = no OpenAI API costs
+2. **Faster Validation** - Launch in 3 months vs 6+ months
+3. **Revenue-Funded Growth** - Core users fund Pro/Master development
+4. **User-Driven Features** - Real feedback shapes AI capabilities
+5. **Risk Mitigation** - Validate before investing in complex infrastructure
+
+---
+
+## 🏗️ Architecture Evolution
+
+### Phase 1: Modular Monolith (MVP)
+
+```
+┌─────────────────────────────────────────────────┐
+│          Landing Page (Next.js)                 │
+│  - Pricing presentation (Core/Pro/Master)       │
+│  - Feature showcase (English)                   │
+│  - Stripe checkout integration                  │
+└─────────────────────────────────────────────────┘
+                       ↓
+┌─────────────────────────────────────────────────┐
+│        Stripe Payment Gateway                    │
+│  - Subscription verification                     │
+│  - Plan management (Core/Pro/Master)            │
+│  - Webhook handling                             │
+└─────────────────────────────────────────────────┘
+                       ↓
+┌─────────────────────────────────────────────────┐
+│          Authentication (Firebase)               │
+│  - Email/Password + Google OAuth                │
+│  - Role-based access (admin/tester/paid_user)  │
+│  - JWT token generation                         │
+└─────────────────────────────────────────────────┘
+                       ↓
+        ┌──────────────┴──────────────┐
+        ↓                              ↓
+┌──────────────────┐        ┌──────────────────┐
+│  User Dashboard  │        │ Admin Dashboard  │
+│  (Paid/Tester)   │        │  (Admin Only)    │
+└──────────────────┘        └──────────────────┘
+        ↓
+┌─────────────────────────────────────────────────┐
+│      Modular Monolith API (NestJS)              │
+│  ├── Auth Module (JWT, roles)                   │
+│  ├── Users Module (profiles, settings)          │
+│  ├── Life Areas Module (12 domains)             │
+│  ├── Goals Module (OKRs, key results)           │
+│  ├── Habits Module (tracking, streaks)          │
+│  ├── Tasks Module (priorities, linking)         │
+│  ├── Vision Board Module (inspiration items)    │
+│  ├── Reflection Module (mood, energy, notes)    │
+│  ├── Time Tracker Module (manual tracking)      │
+│  └── Admin Module (user management, analytics)  │
+└─────────────────────────────────────────────────┘
+                       ↓
+┌─────────────────────────────────────────────────┐
+│       Firebase Firestore (Database)             │
+│  - User data (strict isolation)                 │
+│  - Real-time sync                               │
+│  - Offline support                              │
+│  - Free tier: 1GB, 50K reads/day                │
+└─────────────────────────────────────────────────┘
+```
+
+**Key Principles**:
+- ✅ Single codebase for all Core features
+- ✅ Decoupled modules with clear boundaries
+- ✅ No AI/Analytics infrastructure yet
+- ✅ Stripe integration for payments
+- ✅ Role-based access control
+- ✅ Data isolation per user
+
+### Phase 2: Microservices Architecture (Pro/Master)
+
+```
+Core Monolith (from Phase 1)
+        ↓
+        ├──→ AI Microservice (Python/FastAPI)
+        │    ├── OpenAI API integration
+        │    ├── Goal suggestions
+        │    ├── Habit coaching
+        │    ├── Predictive analytics
+        │    └── Mood analysis
+        │
+        ├──→ Analytics Microservice (NestJS)
+        │    ├── Advanced metrics
+        │    ├── Pattern recognition
+        │    ├── Custom reports (PDF/CSV)
+        │    └── Time series analysis
+        │
+        └──→ Notification Service (NestJS)
+             ├── Smart reminders
+             ├── Community updates
+             ├── Email campaigns (Resend)
+             └── Push notifications
+```
+
+**When to Add Microservices?**
+- Revenue justifies costs ($50-100/month for OpenAI API)
+- 50+ paying users requesting AI features
+- Core plan validated (product-market fit confirmed)
+- Team ready to maintain distributed architecture
+
+**Benefits of Phased Approach**:
+1. **Cost Efficiency** - Don't pay for unused AI infrastructure
+2. **Faster MVP** - No complex microservices setup initially
+3. **User Validation** - Build what users actually want
+4. **Team Learning** - Master monolith before microservices
+5. **Revenue Funding** - Use profits to fund Phase 2
+
+---
+
+## 💼 Complete Business Model
+
+### Revenue Streams
+
+**Primary Revenue: Subscriptions**
+
+| Plan | Price/Month | Target Audience | Annual Value |
+|------|-------------|-----------------|--------------|
+| **Core** | $10 | Beginners to systematic self-improvement | $120/user |
+| **Pro** | $20 | High-performers seeking AI assistance | $240/user |
+| **Master** | $30 | Elite users demanding maximum optimization | $360/user |
+
+**Average Revenue Per User (ARPU)**: $15/month
+- Assumption: 60% Core, 30% Pro, 10% Master
+- Calculation: (0.6 × $10) + (0.3 × $20) + (0.1 × $30) = $15
+
+**Special Accounts (Free)**:
+- 1 Admin account (system management)
+- 1 Tester account (QA and testing)
+
+### Revenue Projections
+
+**Year 1 Targets:**
+
+| Quarter | Users | ARPU | MRR | ARR | Costs/mo | Profit/mo |
+|---------|-------|------|-----|-----|----------|-----------|
+| **Q1** | 50 | $15 | $750 | $9K | $30 | $720 |
+| **Q2** | 150 | $15 | $2,250 | $27K | $50 | $2,200 |
+| **Q3** | 350 | $15 | $5,250 | $63K | $150 | $5,100 |
+| **Q4** | 500 | $15 | $7,500 | $90K | $211 | $7,289 |
+
+**Year 2 Targets:**
+
+| Quarter | Users | ARPU | MRR | ARR | Costs/mo | Profit/mo |
+|---------|-------|------|-----|-----|----------|-----------|
+| **Q1** | 750 | $16 | $12,000 | $144K | $300 | $11,700 |
+| **Q2** | 1,000 | $17 | $17,000 | $204K | $400 | $16,600 |
+| **Q3** | 1,500 | $18 | $27,000 | $324K | $600 | $26,400 |
+| **Q4** | 2,000 | $18 | $36,000 | $432K | $800 | $35,200 |
+
+**Assumptions**:
+- 5% monthly churn rate (industry average for SaaS)
+- 20% upgrade rate from Core to Pro (after 3-6 months)
+- 10% upgrade rate from Pro to Master (power users)
+- Average price increases as users upgrade over time
+
+### Operating Costs Breakdown
+
+**Phase 1: Development (Months 1-2) - $0/month**
+
+All free tiers:
+
+| Service | Plan | Limit | Cost |
+|---------|------|-------|------|
+| Vercel | Hobby | Unlimited deployments | $0 |
+| Render | Free | 750h/month (auto-sleep) | $0 |
+| Firebase | Spark | 1GB, 50K reads/day | $0 |
+| Stripe | Free | Pay per transaction only | $0 |
+| Resend | Free | 3K emails/month | $0 |
+| Sentry | Free | 5K errors/month | $0 |
+| GitHub Actions | Free | 2000 min/month | $0 |
+| **TOTAL** | | | **$0** |
+
+**Phase 2: Launch (0-20 users) - $0-7/month**
+
+Optional upgrade for better UX:
+
+| Service | Upgrade | Reason | Cost |
+|---------|---------|--------|------|
+| Render | Always-on | No cold starts (~30s delay) | $7 |
+| Others | Free tier | Still within limits | $0 |
+| **TOTAL** | | | **$0-7** |
+
+**Phase 3: Early Growth (20-100 users) - $30-50/month**
+
+| Service | Plan | Cost |
+|---------|------|------|
+| Vercel | Pro | $20 |
+| Render | Always-on | $7 |
+| Firebase | Blaze (pay-as-you-go) | $0-20 |
+| Others | Free tier | $0 |
+| **TOTAL** | | **$27-47** |
+
+**Phase 4: Production (100-500 users) - $191-241/month**
+
+| Service | Plan | Cost | Purpose |
+|---------|------|------|---------|
+| Vercel | Pro | $20 | Web hosting (production) |
+| Render | Upgraded | $25 | API hosting (24/7, scaled) |
+| Firebase | Blaze | $50-100 | Database + Storage + Auth |
+| Stripe | Variable | 2.9% + $0.30/txn | Payment processing |
+| Resend | Pro | $20 | Transactional emails |
+| Sentry | Team | $26 | Error monitoring at scale |
+| OpenAI API | Usage | $50 | AI features (Pro/Master) |
+| **TOTAL** | | **$191-241** | Fixed monthly costs |
+
+**Variable Costs (Stripe Fees)**:
+- Core ($10): $0.59 fee → $9.41 net revenue
+- Pro ($20): $0.88 fee → $19.12 net revenue
+- Master ($30): $1.17 fee → $28.83 net revenue
+
+### Profitability Analysis
+
+**Break-Even Point**: First paying user (when using free tiers!)
+
+| Phase | Users | Revenue/mo | Costs/mo | Profit/mo | Margin |
+|-------|-------|------------|----------|-----------|--------|
+| Development | 0 | $0 | $0 | $0 | - |
+| Launch | 20 | $300 | $0-7 | $293-300 | 97-100% |
+| Early Growth | 50 | $750 | $30 | $720 | 96% |
+| Scaling | 100 | $1,500 | $50 | $1,450 | 97% |
+| Production | 500 | $7,500 | $241 | $7,259 | 97% |
+| Mature | 1,000 | $15,000 | $400 | $14,600 | 97% |
+
+**Key Insights**:
+- ✅ **Zero Upfront Investment** - Start with $0 using free tiers
+- ✅ **Profitable Day 1** - First user covers all costs (when free)
+- ✅ **High Margins** - 96-97% profit margins throughout all phases
+- ✅ **Scalable** - Costs grow slower than revenue (exponential gap)
+- ✅ **Sustainable** - No dependency on external funding
+
+### Go-to-Market Strategy
+
+**Phase 1: Pre-Launch (Weeks 1-4)**
+
 Goals:
+- Build landing page with pricing tiers
+- Set up payment infrastructure (Stripe)
+- Create beta tester waitlist
 
-objective: Required, 1-200 characters
-description: Optional, max 1000 characters
-life_area_id: Required, must reference existing LifeArea
-target_date: Required, cannot be in past (on creation)
-status: Required, must be valid enum value
-priority: Required, must be valid enum value
-key_results: Optional array, each KR must have description and target_value
-Habits:
+Tactics:
+- Landing page with email capture
+- Social media teasers (Twitter, LinkedIn)
+- Content: "Why premium > free productivity tools"
+- Reddit posts (r/productivity, r/GetDisciplined)
 
-name: Required, 1-100 characters
-description: Optional, max 500 characters
-life_area_id: Required, must reference existing LifeArea
-goal_id: Optional, must reference existing Goal
-frequency: Required, valid enum value
-frequency_details: Required if frequency is "custom" or "weekly"
-preferred_time: Required, valid enum value
-streak_count: Auto-calculated, cannot be manually set
-completion_rate: Auto-calculated, cannot be manually set
-Tasks:
-
-title: Required, 1-200 characters
-description: Optional, max 1000 characters
-goal_id, habit_id, life_area_id: All optional foreign keys
-priority: Required, valid enum value
-status: Required, valid enum value
-due_date: Optional, any future or past date
-estimated_hours: Optional, positive number
-is_daily_focus: Boolean, defaults to false
-Vision Board Items:
-
-title: Required, 1-100 characters
-description: Optional, max 500 characters
-image_url: Required, must be valid URL
-category: Optional, 1-50 characters
-goal_id: Optional, must reference existing Goal
-Daily Reflections:
-
-date: Required, must be today or past (not future)
-emotional_state: Required, integer 1-10
-mental_clarity: Required, integer 1-10
-energy_level: Required, integer 1-10
-daily_wins, challenges, tomorrow_focus: Optional arrays
-notes: Optional, max 1000 characters
-Referential Integrity
-Foreign Key Relationships:
-
-life_area_id in Goals → Must exist in LifeArea table
-life_area_id in Habits → Must exist in LifeArea table
-goal_id in Habits → Must exist in Goal table (optional)
-goal_id, habit_id, life_area_id in Tasks → Must exist (all optional)
-habit_id in HabitLog → Must exist in Habit table
-Deletion Behavior:
-
-Delete LifeArea:
-
-Warn: "X goals, Y habits, Z tasks are linked"
-Option A: Orphan items (set foreign key to null)
-Option B: Cascade delete (remove everything)
-Recommended: Orphan (preserve user data)
-Delete Goal:
-
-Automatically delete all Key Results (embedded)
-Orphan linked Tasks (don't delete)
-Orphan linked Habits (don't delete)
-Remove link from VisionBoardItem if converted
-Delete Habit:
-
-Prompt: "Delete all habit logs too?"
-Option A: Delete habit only (preserve logs)
-Option B: Delete habit and logs (clean removal)
-Orphan linked Tasks
-Delete Task:
-
-Simple deletion (no cascade)
-Delete VisionBoardItem:
-
-Remove entity record
-Note: Image file remains in storage (not deleted)
-Calculated Fields
-Auto-Calculated (Not User-Editable):
-
-Goal.progress:
-
-Calculated from Key Results
-AVG(current_value / target_value * 100)
-Recalculated on any KR update
-Habit.streak_count:
-
-Calculated from HabitLog entries
-Consecutive completions from today backwards
-Resets to 0 if frequency not met
-Habit.completion_rate:
-
-Calculated from last 30 days of HabitLog
-(actual_completions / expected_completions) * 100
-Expected based on frequency
-Overall Life Satisfaction:
-
-Average of all LifeArea.satisfaction_rating
-Displayed on Dashboard and Life Areas
-Entity Timestamps:
-
-created_date: Set once on creation
-updated_date: Auto-updated on any change
-created_by: Set once from User.email
-Business Constraints
-Limits & Quotas:
-
-No hard limits on entity counts
-Recommended maximums (soft limits):
-Life Areas: 12-20 (avoid overwhelming)
-Active Goals: 5-10 (focus constraint)
-Active Habits: 5-15 (achievable consistency)
-Daily Focus Tasks: 3-5 (concentration limit)
-Vision Board Items: No limit
-Validation Messages:
-
-All required fields: "This field is required"
-Invalid dates: "Please select a valid date"
-Invalid ratings: "Rating must be between 0 and 10"
-Missing reference: "Please select a life area"
-File too large: "Image must be under 5MB"
-Status Transitions:
+**Phase 2: Soft Launch (Month 1-2)**
 
 Goals:
+- 20-50 early adopters
+- Validate pricing and product-market fit
+- Gather feedback for iteration
+
+Tactics:
+- Invite beta waitlist (50% discount first month)
+- ProductHunt launch
+- Indie Hackers community
+- Twitter/LinkedIn content marketing
+- Personal outreach to target personas
+
+**Phase 3: Growth (Month 3-6)**
+
+Goals:
+- 100-300 paying users
+- Refine product based on feedback
+- Build community (Pro/Master users)
+
+Tactics:
+- SEO content (productivity, self-improvement)
+- YouTube tutorials and demos
+- Partnerships with productivity influencers
+- Cherut Circle community launch (Pro/Master)
+- Case studies and testimonials
+
+**Phase 4: Scale (Month 7-12)**
+
+Goals:
+- 500-1,000 paying users
+- Launch AI features (Pro/Master)
+- Optimize mobile experience
+
+Tactics:
+- Paid ads (Google, Facebook, LinkedIn)
+- Affiliate program (20% recurring commission)
+- Press coverage (TechCrunch, ProductHunt Golden Kitty)
+- Corporate/team plans (future B2B opportunity)
+
+### Target Audience Deep Dive
+
+**Primary Personas:**
+
+**1. The Ambitious Founder (25-40)**
+- Building a startup while maintaining work-life balance
+- Needs systematic approach to manage multiple priorities
+- Willing to pay for tools that save time and provide clarity
+- Tech-savvy, values data and metrics
+- Income: $50K-200K+
+- Pain point: Fragmented tools, no holistic view
+
+**2. The High-Performer (30-45)**
+- Corporate executive or senior professional
+- Multiple responsibilities (work, family, health, relationships)
+- Seeks systematic approach to excel without burnout
+- Values efficiency, results, and data-driven decisions
+- Income: $100K-300K+
+- Pain point: Time management, maintaining balance
+
+**3. The Elite Athlete (20-35)**
+- Competitive mindset in sports or fitness
+- Tracks everything (training, nutrition, recovery, mindset)
+- Wants mental edge and holistic performance
+- Data-driven, disciplined, goal-oriented
+- Income: Variable, high dedication to excellence
+- Pain point: Mental training, life balance outside sport
+
+**4. The Self-Mastery Practitioner (25-50)**
+- Committed to personal growth and development
+- Reads books, takes courses, seeks frameworks
+- Looking for "operating system for life"
+- Willing to invest in self-improvement
+- Income: $60K-150K+
+- Pain point: Too many tools, no integrated system
+
+**Exclusions (NOT Our Audience)**:
+- ❌ Students or individuals with limited budgets
+- ❌ Casual productivity enthusiasts (not committed)
+- ❌ People seeking free tools only
+- ❌ "I'll try it if it's free" mindset
+- ❌ Those not serious about systematic self-improvement
+
+**Why Premium Positioning?**
+- Premium pricing filters for serious, committed users
+- Higher quality product and support are sustainable
+- Revenue funds continuous improvement and AI features
+- No dependency on ads or data selling (privacy-first)
+- Elite positioning attracts high-performers
+
+### Success Metrics & KPIs
+
+**North Star Metric**: Monthly Recurring Revenue (MRR)
+
+**Key Performance Indicators:**
+
+| Metric | Month 1 | Month 6 | Month 12 | Definition |
+|--------|---------|---------|----------|------------|
+| **MRR** | $500 | $3,000 | $7,500 | Monthly recurring revenue |
+| **Paying Users** | 50 | 200 | 500 | Active subscriptions |
+| **Churn Rate** | <10% | <5% | <5% | Monthly user cancellations |
+| **ARPU** | $10 | $15 | $15 | Average revenue per user |
+| **Conversion Rate** | 5% | 10% | 15% | Landing page → paid user |
+| **LTV** | $120 | $300 | $360 | Lifetime value per user |
+| **CAC** | <$30 | <$50 | <$75 | Customer acquisition cost |
+| **LTV:CAC Ratio** | 4:1 | 6:1 | 5:1 | Return on acquisition |
 
-New → Active (default)
-Active → Completed (manual)
-Active → Paused (manual)
-Active → Cancelled (manual)
-Paused → Active (resume)
-Cannot reopen Completed/Cancelled (create new instead)
-Tasks:
-
-New → Todo (default)
-Todo → In Progress (manual)
-Todo/In Progress → Completed (manual or checkbox)
-Any → Cancelled (manual)
-Completed → Todo (undo via checkbox)
-Habits:
-
-Active by default
-Can pause (keeps history)
-Cannot "complete" (ongoing)
-UI/UX Guidelines
-Visual Design System
-Color Palette:
-
-Dark Mode (Primary):
-
-Background: #0F0F0F (near black)
-Muted Background: #1A1A1A (slightly lighter)
-Foreground: #FFFFFF (white)
-Muted Foreground: #A3A3A3 (gray)
-Border: #2A2A2A (subtle borders)
-Light Mode (Secondary):
-
-Background: #F8F8F8 (off-white)
-Muted Background: #FFFFFF (pure white)
-Foreground: #111111 (near black)
-Muted Foreground: #666666 (medium gray)
-Border: #E2E2E2 (light gray borders)
-Accent Colors (Same in both modes):
-
-Primary: #B97F57 (Deep Bronze)
-Secondary: #C75E5E (Muted Red)
-Tertiary: #6B8E23 (Olive Green)
-Quaternary: #4682B4 (Steel Blue)
-Accent Usage:
-
-Primary: Main CTAs, Personal Power category
-Secondary: Destructive actions, Professional Drive category
-Tertiary: Success states, Relational Strength category
-Quaternary: Info states, Inner Alignment category
-Typography:
-
-Font family: System sans-serif stack (Inter, -apple-system, etc.)
-Headings: Bold weight (700)
-Body: Regular weight (400)
-UI elements: Medium weight (500)
-Font Sizes:
-
-Page Title (h1): 30px / 1.875rem
-Section Header (h2): 24px / 1.5rem
-Subsection (h3): 18px / 1.125rem
-Body: 16px / 1rem
-Small: 14px / 0.875rem
-Tiny: 12px / 0.75rem
-Spacing Scale:
-
-4px / 0.25rem (tight)
-8px / 0.5rem (compact)
-16px / 1rem (normal)
-24px / 1.5rem (comfortable)
-32px / 2rem (spacious)
-48px / 3rem (loose)
-Border Radius:
-
-None: 0px (strict geometric design)
-Note: Buttons use 0px, cards use 0px
-Exception: Badges use 2px for subtle softening
-Shadows:
-
-Card hover: 0 4px 6px rgba(0,0,0,0.1)
-Modal: 0 20px 25px rgba(0,0,0,0.15)
-Minimal usage (only for depth perception)
-Component Patterns
-Button Styles:
-
-Primary Button:
-
-Background: Accent primary (#B97F57)
-Text: White
-Hover: 90% opacity
-Used for: Main actions (create, save, submit)
-Secondary Button (Outline):
-
-Background: Transparent
-Border: 1px solid border color
-Text: Muted foreground
-Hover: Background = muted
-Used for: Cancel, secondary actions
-Ghost Button:
-
-Background: Transparent
-No border
-Text: Muted foreground
-Hover: Background = subtle muted
-Used for: Icon buttons, edit, delete
-Destructive Button:
-
-Background: Red (#C75E5E or #DC2626)
-Text: White
-Hover: Darker red
-Used for: Delete confirmations
-Card Layouts:
-
-Border: 1px solid border color
-Background: Muted
-Padding: 24px (1.5rem)
-Hover: Border opacity changes or subtle shadow
-No border radius (sharp corners)
-Form Inputs:
-
-Background: Background color (not muted)
-Border: 1px solid border color
-Focus: Border color = accent primary
-Text: Foreground color
-Placeholder: Muted foreground
-Badges:
-
-Small text (12px)
-Uppercase
-Padding: 4px 8px
-Border radius: 2px (exception to no-radius rule)
-Background: Accent color at 20% opacity
-Text: Accent color at 100%
-Progress Bars:
-
-Height: 8px (0.5rem) or 4px (0.25rem)
-Background: Border color
-Fill: Accent color (context-dependent)
-No border radius
-Smooth animated transition on value change
-Icons:
-
-Size: 16px or 20px (depending on context)
-Stroke width: 2px
-Color: Contextual (foreground, muted, or accent)
-Lucide React library only
-Interaction Patterns
-Loading States:
-
-Full page: Centered spinner with text
-Component: Skeleton loaders (gray rectangles)
-Button: Spinner replaces text, button disabled
-Text: "Loading..." or "Loading [Module]..."
-Empty States:
-
-Large muted icon (64px)
-Bold heading text
-Descriptive subtext
-Primary CTA button
-Centered layout
-Confirmation Dialogs:
-
-Alert dialog overlay (modal)
-Dark backdrop (60% opacity)
-Title: "Are you absolutely sure?"
-Description: Explain consequences
-Buttons: "Cancel" (default) and "Delete" (destructive)
-Forms:
-
-Labels above inputs
-Required fields marked with asterisk (*)
-Error messages below fields (red text)
-Success messages as toast notifications (future)
-Submit button at bottom right
-Cancel button at bottom left
-Hover States:
-
-Cards: Border opacity or shadow
-Buttons: Opacity or background change
-Icons: Color change
-Links: Underline or color change
-Duration: 200ms transition
-Focus States:
-
-Inputs: Border color change
-Buttons: Outline ring (accent color)
-Keyboard navigation: Visible focus ring
-Accessibility: Always show focus indicators
-Responsive Behavior:
-
-Desktop: Multi-column grids, sidebar navigation
-Tablet: 2-column grids, sidebar navigation
-Mobile: Single column, hamburger menu
-Breakpoints:
-sm: 640px
-md: 768px
-lg: 1024px
-xl: 1280px
-Navigation:
-
-Desktop: Fixed left sidebar (256px wide)
-Active page: Highlighted background (accent primary)
-Hover: Subtle background change
-Mobile: Sheet drawer from left
-Logo/header always visible
-Data Visualization:
-
-Wheel of Life: Radar chart (Recharts library)
-Progress bars: Horizontal bars
-Trends: Line charts (future)
-Stats: Numeric display with icon and accent color
-Accessibility
-WCAG Compliance:
-
-Color contrast: Minimum 4.5:1 for text
-Focus indicators: Visible on all interactive elements
-Keyboard navigation: Full support
-Screen readers: Semantic HTML, ARIA labels where needed
-Keyboard Shortcuts (Future):
-
-/ - Focus search
-N - New item (context-dependent)
-Esc - Close modal
-Tab - Navigate between fields
-Enter - Submit form
-? - Show shortcuts help
-Labels & Alt Text:
-
-All form inputs have labels
-All icons have aria-labels
-All images have alt text
-All buttons have descriptive text or aria-labels
-Technical Stack
-Frontend
-Core Framework:
-
-React 18+ (functional components, hooks)
-React Router DOM (client-side routing)
-Vite (build tool, dev server)
-UI Libraries:
-
-Shadcn/ui (component primitives)
-Tailwind CSS (utility-first styling)
-Lucide React (icon library)
-Recharts (data visualization)
-React Hook Form (form management - future)
-State Management:
-
-React useState/useEffect (local state)
-React Query / TanStack Query (server state, caching)
-No global state library (Redux, Zustand) currently
-Data Fetching:
-
-Base44 SDK (pre-initialized client)
-Entities: Entity.list(), Entity.filter(), Entity.create(), etc.
-User: User.me(), User.loginWithRedirect(), User.logout()
-Integrations: UploadFile(), InvokeLLM(), etc.
-Styling Approach:
-
-Inline styles with CSS variables for theming
-Tailwind utility classes for layout
-CSS-in-JS not used
-CSS custom properties for color palette
-Backend
-Platform:
-
-Base44 Backend-as-a-Service
-Managed authentication
-Managed database (Supabase PostgreSQL)
-Managed file storage
-API Pattern:
-
-RESTful (abstracted by SDK)
-Entity CRUD operations
-Automatic filtering by created_by
-Automatic timestamp management
-File Storage:
-
-Supabase Storage (public bucket)
-Image uploads via UploadFile() integration
-Returns permanent file_url
-No image processing (original files)
-Authentication:
-
-Email/password (handled by Base44)
-OAuth (Google, GitHub, etc.) - future
-JWT tokens (managed by platform)
-Session management (automatic)
-Deployment
-Hosting:
-
-Base44 platform (automatic deployment)
-CDN distribution
-SSL certificate included
-Custom domain support
-Build Process:
-
-Vite build on deploy
-Tree shaking, minification
-Asset optimization
-Source maps (optional)
-Environment:
-
-Production: Live user data
-No staging environment currently
-No CI/CD pipeline (manual deploy via Base44)
-Current Limitations & Future Improvements
-Known Limitations
-Functionality Gaps:
-
-No Data Export:
-
-Cannot export goals, habits, or tasks to CSV/PDF
-Cannot backup vision board images
-Future: Add export functionality
-No Reminders/Notifications:
-
-No push notifications
-No email reminders for due dates
-No habit completion reminders
-Future: Implement notification system
-Limited Analytics:
-
-No historical trend charts
-No comparative analysis (month-over-month)
-No predictive insights
-Future: Add analytics dashboard
-No Recurring Tasks/Goals:
-
-Tasks are one-time only
-Goals don't repeat quarterly
-Habits are only recurrence mechanism
-Future: Add recurring entity support
-No Collaboration:
-
-Single-user only
-Cannot share goals or vision boards
-No accountability partners
-No teams or groups
-Design decision: Intentionally personal
-No Mobile App:
-
-Web-only (responsive design)
-No native iOS/Android apps
-No offline support
-Future: PWA or native apps
-No Calendar Integration:
-
-Cannot sync with Google Calendar, iCal, etc.
-Tasks don't show in external calendars
-Future: Calendar API integration
-Limited Vision Board Features:
-
-No drag-and-drop reordering
-No collage mode
-No image editing
-No quote overlays
-Future: Enhanced vision board editor
-Technical Limitations:
-
-Performance:
-
-All data loaded on page mount (no pagination)
-No infinite scroll
-May slow down with 1000+ entities
-Future: Implement pagination, virtual scrolling
-Search:
-
-No global search
-No fuzzy search
-No filters within modules
-Future: Add comprehensive search
-Undo/Redo:
-
-Deletions are permanent (no trash/recycle bin)
-No undo for edits
-Confirmation dialogs only safeguard
-Future: Implement undo system
-Offline Support:
-
-Requires internet connection
-No service worker
-No local-first approach
-Future: PWA with offline cache
-Real-time Sync:
-
-No websockets
-Changes require page refresh if using multiple tabs
-Future: Implement real-time updates
-Design Limitations:
-
-Fixed Categories:
-
-Life area categories hardcoded (4 options)
-Cannot create custom categories
-Future: Allow custom category definitions
-English Only:
-
-No internationalization (i18n)
-No multi-language support
-By design for target audience
-Limited Customization:
-
-Cannot reorder navigation items
-Cannot hide modules
-Cannot customize dashboard layout
-Future: User preferences system
-No Dark Mode Animation:
-
-Theme toggle is instant
-No smooth transition between themes
-Future: Add theme transition animation
-Proposed Improvements
-High Priority:
-
-Analytics Dashboard:
-
-Historical satisfaction trends (line charts)
-Goal completion rates over time
-Habit consistency heatmaps
-Task productivity metrics
-Wheel of Life comparison (current vs past)
-Enhanced Goal Management:
-
-Goal templates (fitness, career, financial)
-Milestones between KRs
-Progress timeline visualization
-Dependencies (goal A before goal B)
-Recurring quarterly OKRs
-Smart Recommendations:
-
-AI-suggested focus areas (based on low satisfaction)
-Habit suggestions (based on goals)
-Task prioritization assistance
-Vision board image suggestions (via AI)
-Reminders & Notifications:
-
-Email reminders for overdue tasks
-Habit reminder at preferred time
-Goal deadline warnings
-Daily reflection prompt
-Data Export:
-
-Export all data to JSON
-Export goals/tasks to CSV
-Export vision board as PDF collage
-Weekly/monthly summary reports
-Medium Priority:
-
-Calendar Integration:
-
-Sync tasks with Google Calendar
-Import events as tasks
-Two-way sync for due dates
-iCal export
-Enhanced Habits:
-
-Habit stacking (pair with existing habits)
-Best time analysis (when most successful)
-Habit templates library
-Habit challenges (30-day, 100-day)
-Task Enhancements:
-
-Subtasks / checklists
-Task dependencies (A before B)
-Recurring tasks (daily, weekly, monthly)
-Time tracking (Pomodoro integration)
-Bulk actions (multi-select)
-Vision Board Evolution:
-
-Drag-and-drop positioning
-Grid mode (organized layout)
-Collage creation (multiple images)
-Quote text overlays
-Convert to goal workflow
-Search & Filters:
-
-Global search (across all modules)
-Advanced filters (date ranges, multiple criteria)
-Saved filter views
-Quick filter chips
-Low Priority:
-
-Collaboration Features:
-
-Share goals with accountability partner
-Public vision board links
-Export progress reports for coach/mentor
-Note: Intentionally limited, not a core feature
-Gamification:
-
-Achievement badges (100-day streak, etc.)
-Progress levels (beginner to master)
-Leaderboard (private, against past self)
-Streaks and milestones
-Mobile Apps:
-
-Native iOS app
-Native Android app
-Push notifications
-Offline support
-Widget for habit tracking
-Advanced Visualization:
-
-Burndown charts for goals
-Habit heatmap (GitHub-style)
-Energy/mood correlation charts
-Life area balance over time
-Journaling Integration:
-
-Expanded daily reflections
-Weekly review prompts
-Gratitude journal
-Lessons learned archive
-Architecture Improvements
-Code Quality:
-
-Add TypeScript for type safety
-Implement comprehensive error handling
-Add unit tests (Jest, React Testing Library)
-Add end-to-end tests (Playwright, Cypress)
-Set up linting (ESLint) and formatting (Prettier)
-Performance:
-
-Implement pagination for large datasets
-Add virtual scrolling for long lists
-Optimize images (WebP, lazy loading)
-Code splitting by route
-Caching strategy with React Query
-Security:
-
-Content Security Policy (CSP) headers
-XSS protection (input sanitization)
-CSRF tokens (handled by Base44)
-Rate limiting (prevent abuse)
-Audit logs (who did what, when)
-Scalability:
-
-Database indexing (on foreign keys, dates)
-Query optimization (reduce N+1 queries)
-CDN for static assets
-Implement Redis caching (if needed)
-DevOps:
-
-CI/CD pipeline (automated testing, deployment)
-Staging environment (test before production)
-Monitoring (error tracking, performance)
-Backups (automated daily backups)
-Version control best practices (branching strategy)
-Conclusion
-The Mission Command Center is a comprehensive personal productivity platform designed for high-performing individuals seeking systematic self-mastery. It combines holistic life assessment (Wheel of Life), structured goal setting (OKRs), habit formation, task management, and visual inspiration into a unified, data-driven system.
-
-Key Strengths
-Integrated Approach: All modules interconnect, providing context and alignment
-Balanced Scorecard: Ensures progress across all life domains, not just work
-Mission-Focused Design: Sharp, professional interface that promotes focus
-Data-Driven Introspection: Combines reflection with measurable metrics
-User Privacy: Complete data isolation, no sharing, single-user focus
-Core Value Proposition
-Unlike fragmented productivity tools, this platform provides a single source of truth for personal excellence. Users can see how their daily actions (tasks, habits) ladder up to quarterly goals, which align with life areas, all while maintaining visual inspiration (vision board) and regular reflection (daily check-in).
-
-Target Use Case
-The ideal user is a founder building a startup who also wants to maintain fitness, relationships, and personal growth. They use the system to:
-
-Track business goals (revenue, user acquisition)
-Monitor health habits (gym, sleep, nutrition)
-Maintain relationships (family time, date nights)
-Pursue learning (read books, online courses)
-Visualize dreams (vision board of future lifestyle)
-Every morning, they open Mission Control, see their daily focus tasks, check in emotionally, and review their Wheel of Life to ensure balance. Throughout the day, they mark habits complete and update task statuses. Weekly, they review goals and adjust key results. Monthly, they reflect on life area satisfaction and set new objectives.
-
-Path Forward
-The system is production-ready in its current state for disciplined users comfortable with structured systems. However, to reach a broader audience and increase engagement, the proposed improvements (especially analytics, reminders, and mobile apps) are essential.
-
-The architecture is solid, the data model is comprehensive, and the design system is consistent. With continued iteration based on user feedback, this platform can become the definitive tool for mission-driven personal excellence.
-
-Documentation Version: 1.0
-Last Updated: October 29, 2025
-Maintained By: Development Team
-License: Proprietary
+**Success Indicators:**
+
+✅ **Profitability**: Achieved Month 1 (15-20 users)
+✅ **Product-Market Fit**: Churn <5%, organic referrals >20%
+✅ **Scalability**: Infrastructure costs <20% of revenue
+✅ **Upgrade Rate**: 30%+ of Core users upgrade to Pro/Master within 6 months
+
+### Competitive Advantages
+
+**1. Premium Positioning**
+- No free tier = serious, committed users only
+- Higher quality product, better support, no ads
+- Privacy-first (no data selling)
+
+**2. Holistic Approach**
+- All-in-one platform (not just tasks or habits)
+- Interconnected modules (goals → tasks → habits)
+- 12 Life Areas framework (complete life view)
+
+**3. AI Intelligence (Pro/Master)**
+- Not just tracking, but insights and predictions
+- Adaptive learning (Master tier learns your patterns)
+- Context-aware suggestions
+
+**4. Data Privacy & Isolation**
+- User data completely isolated (can only see own data)
+- Admin access for support, but privacy-first
+- Premium = no ads, no data selling
+
+**5. English-First Global Platform**
+- Target worldwide high-performers
+- Not limited by geography
+- Premium positioning works globally
+
+**6. Bootstrap Business Model**
+- $0 to start = no external funding needed
+- Profitable from day 1
+- Revenue funds future development
+- Sustainable and independent
+
+---
+
+## 📚 Documentation & Resources
+
+### Project Documentation
+
+This README contains all essential documentation for Cherut. Historical documentation files have been archived:
+
+- `BUSINESS_MODEL.md` (archived) - Business model details now in README
+- `STACK_MIGRATION.md` (archived) - Migration plan now in README
+- `CHANGELOG.md` (archived) - Change history now in README
+- `DOCS_UPDATED.md` (archived) - Update summary
+
+### External Resources
+
+**Framework & Tools:**
+- [Next.js Documentation](https://nextjs.org/docs) - Web framework
+- [NestJS Documentation](https://docs.nestjs.com) - Backend framework
+- [Expo Documentation](https://docs.expo.dev) - Mobile framework
+- [Firebase Documentation](https://firebase.google.com/docs) - Database & Auth
+- [TypeScript Handbook](https://www.typescriptlang.org/docs) - Language reference
+- [Tailwind CSS](https://tailwindcss.com/docs) - Styling framework
+- [Stripe Documentation](https://stripe.com/docs) - Payment processing
+
+**Business & Strategy:**
+- [Indie Hackers](https://www.indiehackers.com) - Bootstrap startup community
+- [SaaS Metrics Guide](https://www.forentrepreneurs.com/saas-metrics-2/) - Business metrics
+- [ProductHunt](https://www.producthunt.com) - Launch platform
+
+---
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Guidelines
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## License
+
+This project is proprietary software. All rights reserved.
+
+---
+
+## Support
+
+For questions, issues, or feedback:
+
+- Open an issue on GitHub
+- Contact the development team
+
+---
+
+<div align="center">
+
+**Built with focus, designed for excellence**
+
+Cherut - Your Personal Excellence Platform
+
+</div>
