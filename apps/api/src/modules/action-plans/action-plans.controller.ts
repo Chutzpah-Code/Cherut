@@ -12,10 +12,10 @@ import {
 } from '@nestjs/common';
 import { ActionPlansService } from './action-plans.service';
 import { CreateActionPlanDto, UpdateActionPlanDto } from './dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
 
 @Controller('action-plans')
-@UseGuards(JwtAuthGuard)
+@UseGuards(FirebaseAuthGuard)
 export class ActionPlansController {
   constructor(private readonly actionPlansService: ActionPlansService) {}
 
