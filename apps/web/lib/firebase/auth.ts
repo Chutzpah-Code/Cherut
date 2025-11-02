@@ -8,6 +8,10 @@ import {
 import { auth } from './config';
 
 export const registerUser = async (email: string, password: string) => {
+  if (!auth) {
+    throw new Error('Firebase is not configured. Please add Firebase credentials to .env.local');
+  }
+
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     return userCredential.user;
@@ -17,6 +21,10 @@ export const registerUser = async (email: string, password: string) => {
 };
 
 export const loginUser = async (email: string, password: string) => {
+  if (!auth) {
+    throw new Error('Firebase is not configured. Please add Firebase credentials to .env.local');
+  }
+
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return userCredential.user;
@@ -26,6 +34,10 @@ export const loginUser = async (email: string, password: string) => {
 };
 
 export const logoutUser = async () => {
+  if (!auth) {
+    throw new Error('Firebase is not configured');
+  }
+
   try {
     await signOut(auth);
   } catch (error: any) {
@@ -34,14 +46,21 @@ export const logoutUser = async () => {
 };
 
 export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
+  if (!auth) {
+    callback(null);
+    return () => {};
+  }
+
   return onAuthStateChanged(auth, callback);
 };
 
 export const getCurrentUser = () => {
-  return auth.currentUser;
+  return auth?.currentUser || null;
 };
 
 export const getIdToken = async () => {
+  if (!auth) return null;
+  
   const user = auth.currentUser;
   if (!user) return null;
   return await user.getIdToken();
