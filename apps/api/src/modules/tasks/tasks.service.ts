@@ -84,9 +84,9 @@ export class TasksService {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
 
-    const task = doc.data();
+    const task: any = doc.data();
 
-    if (task.userId !== userId) {
+    if (task?.userId !== userId) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
 
@@ -159,7 +159,7 @@ export class TasksService {
    * Increment completed pomodoros
    */
   async incrementPomodoro(userId: string, taskId: string) {
-    const task = await this.findOne(userId, taskId);
+    const task: any = await this.findOne(userId, taskId);
 
     const currentPomodoros = task.completedPomodoros || 0;
     const estimatedPomodoros = task.estimatedPomodoros || 0;
@@ -188,7 +188,7 @@ export class TasksService {
    * Get tasks grouped by status (for Kanban board)
    */
   async getKanbanBoard(userId: string, lifeAreaId?: string) {
-    const tasks = await this.findAll(userId, lifeAreaId);
+    const tasks: any[] = await this.findAll(userId, lifeAreaId);
 
     const board = {
       todo: tasks.filter((t) => t.status === 'todo'),

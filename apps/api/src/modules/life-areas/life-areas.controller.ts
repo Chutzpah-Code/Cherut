@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { LifeAreasService } from './life-areas.service';
 import { CreateLifeAreaDto, UpdateLifeAreaDto } from './dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
 
 @Controller('life-areas')
-@UseGuards(JwtAuthGuard)
+@UseGuards(FirebaseAuthGuard)
 export class LifeAreasController {
   constructor(private readonly lifeAreasService: LifeAreasService) {}
 

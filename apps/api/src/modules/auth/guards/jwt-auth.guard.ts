@@ -1,4 +1,4 @@
-import { Injectable, ExecutionContext } from '@nestjs/common';
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 /**
@@ -63,7 +63,20 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
    * - Retorna true/false
    */
   canActivate(context: ExecutionContext) {
+    const request = context.switchToHttp().getRequest();
+    const token = request.headers.authorization?.replace('Bearer ', '');
+    console.log('[JwtAuthGuard] Token received:', token ? token.substring(0, 50) + '...' : 'NO TOKEN');
+
     // Chama lógica do AuthGuard do Passport
     return super.canActivate(context);
+  }
+
+  handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
+    console.log('[JwtAuthGuard] handleRequest - err:', err?.message, 'user:', user?.uid, 'info:', info?.message);
+
+    if (err || !user) {
+      throw err || new UnauthorizedException('Invalid token');
+    }
+    return user;
   }
 }

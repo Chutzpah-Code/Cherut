@@ -29,8 +29,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Only subscribe if Firebase is configured
     if (typeof subscribeToAuthChanges === 'function') {
-      const unsubscribe = subscribeToAuthChanges((user) => {
-        setUser(user);
+      const unsubscribe = subscribeToAuthChanges((firebaseUser) => {
+        setUser(firebaseUser);
         setLoading(false);
       });
 

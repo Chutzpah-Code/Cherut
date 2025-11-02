@@ -12,10 +12,10 @@ import {
 } from '@nestjs/common';
 import { HabitsService } from './habits.service';
 import { CreateHabitDto, UpdateHabitDto, LogHabitDto } from './dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
 
 @Controller('habits')
-@UseGuards(JwtAuthGuard)
+@UseGuards(FirebaseAuthGuard)
 export class HabitsController {
   constructor(private readonly habitsService: HabitsService) {}
 

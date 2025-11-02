@@ -49,7 +49,7 @@ export class TrackingService {
     return {
       summary: {
         totalLifeAreas: lifeAreas.length,
-        activeObjectives: objectives.filter((o) => o.status === 'in_progress')
+        activeObjectives: objectives.filter((o: any) => o.status === 'in_progress')
           .length,
         totalObjectives: objectives.length,
         totalKeyResults: keyResults.length,
@@ -114,7 +114,7 @@ export class TrackingService {
         },
         habits: {
           total: habits.length,
-          active: habits.filter((h) => h.isActive !== false).length,
+          active: habits.filter((h: any) => h.isActive !== false).length,
         },
       },
       timeRange: {
@@ -148,7 +148,7 @@ export class TrackingService {
     const avgKeyResultProgress =
       keyResults.length > 0
         ? keyResults.reduce(
-            (sum, kr) =>
+            (sum: number, kr: any) =>
               sum + ((kr.currentValue || 0) / kr.targetValue) * 100,
             0,
           ) / keyResults.length
@@ -157,11 +157,11 @@ export class TrackingService {
     return {
       objective,
       overallProgress: Math.min(avgKeyResultProgress, 100),
-      keyResults: keyResults.map((kr) => ({
+      keyResults: keyResults.map((kr: any) => ({
         ...kr,
         progress: ((kr.currentValue || 0) / kr.targetValue) * 100,
         actionPlansCount: allActionPlans.filter(
-          (ap) => ap.keyResultId === kr.id,
+          (ap: any) => ap.keyResultId === kr.id,
         ).length,
       })),
       actionPlans: {

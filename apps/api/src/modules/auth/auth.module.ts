@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { FirebaseStrategy } from './strategies/firebase.strategy';
 
 /**
  * 📚 EXPLICAÇÃO: Auth Module
@@ -61,7 +62,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, FirebaseStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

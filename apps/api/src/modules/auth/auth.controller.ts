@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { FirebaseAuthGuard } from './guards/firebase-auth.guard';
 
 /**
  * 📚 EXPLICAÇÃO: Auth Controller
@@ -121,18 +121,18 @@ export class AuthController {
    * GET /auth/me
    * Retorna dados do usuário logado
    *
-   * @UseGuards(JwtAuthGuard) → Protege rota (precisa estar autenticado)
+   * @UseGuards(FirebaseAuthGuard) → Protege rota (precisa estar autenticado)
    * @Request → Objeto da requisição (contém req.user injetado pelo guard)
    * @Returns: Dados do usuário
    *
    * COMO FUNCIONA:
    * 1. Cliente envia: GET /auth/me + Authorization: Bearer <token>
-   * 2. JwtAuthGuard valida token
+   * 2. FirebaseAuthGuard valida token
    * 3. Se válido → Guard injeta dados do usuário em req.user
    * 4. Controller retorna req.user
    */
   @Get('me')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(FirebaseAuthGuard)
   async getProfile(@Request() req) {
     return req.user;
   }

@@ -86,7 +86,7 @@ export class KeyResultsService {
   }
 
   async update(userId: string, id: string, updateDto: UpdateKeyResultDto) {
-    const existing = await this.findOne(userId, id);
+    const existing: any = await this.findOne(userId, id);
 
     const db = this.firebaseService.getFirestore();
 
@@ -116,7 +116,7 @@ export class KeyResultsService {
   }
 
   async remove(userId: string, id: string) {
-    const keyResult = await this.findOne(userId, id);
+    const keyResult: any = await this.findOne(userId, id);
 
     // Check if removing this KR would violate minimum requirement
     const remainingKRs = await this.countKeyResultsByObjective(

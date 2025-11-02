@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { TrackingService } from './tracking.service';
 import { TrackingQueryDto } from './dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
 
 /**
  * Tracking Controller
@@ -20,7 +20,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
  * - GET /tracking/habits → Habits analytics and streaks
  */
 @Controller('tracking')
-@UseGuards(JwtAuthGuard)
+@UseGuards(FirebaseAuthGuard)
 export class TrackingController {
   constructor(private readonly trackingService: TrackingService) {}
 
