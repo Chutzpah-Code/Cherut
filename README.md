@@ -109,8 +109,9 @@ The ultimate weapon for those who want maximum performance and total life contro
 
 **Basic Information**
 - Personal data: Name, photo, email, birth date, location (optional)
-- Life Purpose: Personal mission statement (editable)
-- Life Philosophy: Personal value tags (growth, family, impact, freedom)
+- **Life Purpose**: Personal mission statement - one sentence defining your "why" (editable anytime)
+- **Master Goals**: Vision of your future self across multiple life areas (editable anytime)
+- Life Philosophy: Personal value tags (user-created - e.g., growth, family, impact, freedom)
 
 **Settings**
 - Preferences: Language, timezone, visual theme (light/dark/custom)
@@ -166,23 +167,63 @@ The ultimate weapon for those who want maximum performance and total life contro
 
 ### 3️⃣ Goals & OKRs System
 
-**Objective Structure**
-- Objectives: Linked to specific Life Areas
-- Key Results: 2-5 measurable KRs per objective
-- Timeline: Quarterly (90 days), Yearly, Multi-year
-- SMART Check: Automatic goal validation (Specific, Measurable, Achievable, Relevant, Time-bound)
+**Hierarchical Structure**
+
+```
+Life Purpose (one sentence - your "why")
+    ↓
+Master Goals (vision of future self across life areas)
+    ↓
+Objectives (OKR methodology)
+    ↓
+Key Results (measurable outcomes)
+    ↓
+Action Plans (structured execution plan)
+    ↓
+Tasks (actionable items)
+```
+
+**Objectives (OKR Methodology)**
+- **Cycle Configuration**: 3 months (recommended), but user-configurable (can be changed to 1 month, 6 months, 1 year, etc.)
+- **Quantity**: User-defined (no hard limits - from 1 to unlimited)
+- **Linked to**: Specific Life Areas
+- **Editable**: Can be modified anytime, even after creation
+- **SMART Check**: Automatic validation (Specific, Measurable, Achievable, Relevant, Time-bound)
+- **Status Labels**: On Track / At Risk / Behind / Completed
+
+**Key Results (KRs)**
+- **Minimum**: 3 KRs per objective (enforced)
+- **Maximum**: User-defined (no hard limits)
+- **Measurable**: Each KR has target value and current progress
+- **Linked to**: Parent objective
+- **Editable**: Can be modified anytime
+- **Progress %**: Automatically calculated per KR
+- **Completion**: KR marked complete when target reached
+
+**Action Plans (one per KR)**
+
+Each Key Result has a structured Action Plan with 6 required fields:
+
+| Field | Description |
+|-------|-------------|
+| **What** | What will be done to achieve this KR |
+| **Why** | Why this action is necessary |
+| **Where** | Where the action will take place |
+| **How** | How the action will be executed |
+| **How Much** | Cost/budget for this action |
+| **Who** | Responsible person/team |
+
+**From Action Plans to Tasks**:
+- Tasks are automatically generated from Action Plans
+- Each Action Plan can spawn multiple tasks
+- Tasks inherit context from parent KR and Objective
 
 **Strategic Management**
 - Digital Vision Board: Images, PDFs, links organized by objective
-- Action Plans: Break down OKRs into actionable tasks
-- Dependencies: Map interdependencies between goals
+- Dependencies: Map interdependencies between objectives and KRs
 - Risk Assessment (Pro/Master): Risk and blocker analysis
-
-**Progress Tracking**
-- Completion %: Per KR and overall objective
-- Status Labels: On Track / At Risk / Behind / Completed
-- Milestone Markers: Intermediate milestones with celebrations
 - Review History: Weekly/monthly check-ins recorded
+- Milestone Markers: Intermediate milestones with celebrations
 
 ---
 
@@ -209,23 +250,73 @@ The ultimate weapon for those who want maximum performance and total life contro
 
 ### 5️⃣ Task Management
 
-**Organization**
-- Smart Linking: Tasks connected to goals, OKRs, and habits
-- Prioritization: Eisenhower Matrix (urgent/important), MoSCoW (Must/Should/Could/Won't)
-- Categories: By Life Area, project, or context (@work, @home, @calls)
-- Subtasks: Unlimited decomposition with aggregated progress
+**Task Types**
 
-**Features**
-- Deadlines: Due dates with escalated alerts
-- Recurrence: Recurring tasks (daily, weekly, monthly)
-- Attachments: Files, links, notes, checklists
-- Delegation (Pro/Master): Assign tasks to accountability partners
+Tasks can be created in two ways:
+
+1. **Linked Tasks** (generated from Action Plans)
+   - Automatically inherit context from Key Result and Objective
+   - Linked to parent KR and Life Area
+   - Part of hierarchical goal structure
+
+2. **Standalone Tasks** (created independently)
+   - Created directly without linking to objectives/KRs
+   - Can be linked to Life Areas or left unlinked
+   - Flexibility for ad-hoc work and quick captures
+
+**Task Structure (Trello-like Functionality)**
+
+Each task includes:
+
+| Field | Description | Required |
+|-------|-------------|----------|
+| **Title** | Task name | Yes |
+| **Description** | Detailed description with rich text | No |
+| **Due Date** | Deadline with time | No |
+| **Recurrence** | Daily, weekly, monthly, custom pattern | No |
+| **Priority** | Eisenhower Matrix (urgent/important), MoSCoW method | No |
+| **Life Area** | Linked to one of 12 Life Areas | No |
+| **Parent/Child** | Can be parent task with subtasks, or child of another task | No |
+| **Subtasks** | Unlimited nested subtasks with individual progress | No |
+| **Checklists** | Multiple checklists per task with checkable items | No |
+| **Attachments** | Files, images, links, notes | No |
+| **Labels/Tags** | Custom tags (@work, @home, @calls, etc.) | No |
+| **Status** | To Do / In Progress / Done / Blocked | Yes |
+
+**Hierarchy & Relationships**
+
+```
+Task (Parent)
+    ├── Subtask 1
+    │   ├── Checklist 1
+    │   │   ├── Item 1
+    │   │   └── Item 2
+    │   └── Checklist 2
+    ├── Subtask 2
+    └── Subtask 3
+```
+
+**Advanced Features**
+- **Parent/Child Linking**: Tasks can have parent-child relationships (unlimited nesting)
+- **Subtask Progress**: Parent task progress auto-calculated from subtask completion
+- **Recurring Tasks**: Set custom recurrence patterns (e.g., "Every Monday and Thursday", "First day of month")
+- **Checklist Management**: Add multiple checklists per task, each with multiple items
+- **Due Date Alerts**: Escalated notifications (1 week before, 1 day before, on due date, overdue)
+- **Delegation** (Pro/Master): Assign tasks to accountability partners
+
+**Organization & Filtering**
+- **Smart Linking**: Tasks can optionally link to Objectives, KRs, Action Plans, Habits, or Life Areas
+- **Prioritization**: Eisenhower Matrix (urgent/important), MoSCoW (Must/Should/Could/Won't)
+- **Categories**: By Life Area, project, context (@work, @home, @calls), or custom tags
+- **Filters**: By status, priority, due date, Life Area, linked goal, assignee
 
 **Views**
-- Today View: Focus on current day with time blocking
-- Kanban Board: To Do / In Progress / Done
-- Calendar View: Agenda integration
-- GTD Inbox: Quick idea capture for later triage
+- **Today View**: Focus on current day with time blocking
+- **Kanban Board**: To Do / In Progress / Done / Blocked columns (drag & drop)
+- **Calendar View**: Tasks displayed on calendar with due dates
+- **List View**: Traditional task list with sorting and filtering
+- **GTD Inbox**: Quick idea capture for later triage and organization
+- **Hierarchy View**: Parent-child tree structure with nested subtasks
 
 ---
 
@@ -350,10 +441,17 @@ The ultimate weapon for those who want maximum performance and total life contro
 
 | Feature | Core | Pro | Master |
 |---------|------|-----|--------|
-| **Dashboard & Life Areas** | ✅ | ✅ | ✅ |
-| **SMART Goals & OKRs** | 5 active | Unlimited | Unlimited |
+| **Dashboard & Life Areas** | ✅ 12 areas | ✅ 12 areas | ✅ 12 areas |
+| **Life Purpose** | ✅ Editable | ✅ Editable | ✅ Editable |
+| **Master Goals** | ✅ Editable | ✅ Editable | ✅ Editable |
+| **Objectives (OKR)** | 5 active | Unlimited | Unlimited |
+| **Key Results per Objective** | Min 3, unlimited max | Min 3, unlimited max | Min 3, unlimited max |
+| **Action Plans (per KR)** | ✅ 6 fields | ✅ 6 fields | ✅ 6 fields |
+| **Linked Tasks** (from Action Plans) | Included in 50 limit | Unlimited | Unlimited |
+| **Standalone Tasks** | Included in 50 limit | Unlimited | Unlimited |
+| **Task Features** | Full (subtasks, checklists, recurring, parent/child) | Full | Full |
+| **Task Views** | All (Today, Kanban, Calendar, List, Hierarchy, GTD) | All | All |
 | **Habits & Streaks** | 10 active | Unlimited | Unlimited |
-| **Tasks & Projects** | 50 active | Unlimited | Unlimited |
 | **Manual Time Tracker** | ✅ | ✅ | ✅ |
 | **Smart Time Blocking** | ❌ | ✅ | ✅ |
 | **Daily Reflection** | ✅ | ✅ | ✅ |
@@ -361,7 +459,7 @@ The ultimate weapon for those who want maximum performance and total life contro
 | **Predictive AI Insights** | ❌ | ❌ | ✅ |
 | **Advanced Analytics** | Basic | Complete | Complete + Custom |
 | **Vision Board** | 10 items | Unlimited | Unlimited |
-| **Integrations** (Trello, Calendar) | 1 integration | 3 integrations | Unlimited |
+| **Integrations** (Trello, Calendar) | ❌ | 3 integrations | Unlimited |
 | **Wearables Sync** | ❌ | ❌ | ✅ |
 | **Cherut Circle** | ❌ | ✅ | Elite ✅ |
 | **Mentoring & Feedback** | ❌ | ❌ | ✅ |
@@ -378,30 +476,70 @@ The ultimate weapon for those who want maximum performance and total life contro
 **What we're building first** (Months 1-3):
 
 ✅ **Included in MVP:**
-- User Profile & Identity (basic)
-- Mission Control Dashboard (essential widgets)
-- Life Areas (12 default with satisfaction tracking)
-- Goals & OKRs (up to 5 active with KRs)
+
+**Profile & Foundation:**
+- User Profile & Identity (basic info, settings)
+- **Life Purpose** (one sentence - editable)
+- **Master Goals** (vision across life areas - editable)
+
+**Core Planning System:**
+- Mission Control Dashboard (12 Life Areas with satisfaction tracking)
+- **Objectives** (OKR methodology, up to 5 active)
+  - User-configurable cycles (default: 3 months)
+  - Linked to Life Areas
+  - Status tracking (On Track / At Risk / Behind / Completed)
+- **Key Results** (minimum 3 per objective, user-defined maximum)
+  - Target values and progress tracking
+  - Completion % per KR
+- **Action Plans** (one per KR with 6 fields)
+  - What, Why, Where, How, How Much, Who
+  - Structured execution planning
+
+**Task Management (Trello-like):**
+- **Linked Tasks** (generated from Action Plans, up to 50 active)
+- **Standalone Tasks** (created independently)
+- Task features:
+  - Title, description, due dates
+  - Recurring tasks (daily, weekly, monthly, custom)
+  - Priority (Eisenhower Matrix, MoSCoW)
+  - **Parent/Child relationships** (unlimited nesting)
+  - **Subtasks** (unlimited per task)
+  - **Checklists** (multiple per task with items)
+  - Attachments (files, links, notes)
+  - Labels/tags (@work, @home, etc.)
+  - Status (To Do / In Progress / Done / Blocked)
+- Multiple views: Today, Kanban, Calendar, List, Hierarchy, GTD Inbox
+
+**Habits & Tracking:**
 - Habits (up to 10 active with streak tracking)
-- Tasks (up to 50 active with priorities)
+- Habit frequency (daily, weekly, custom)
 - Vision Board (up to 10 items)
 - Daily Reflection (mood, energy, gratitude)
 - Manual Time Tracker
+
+**Additional Features:**
 - Basic analytics (charts and progress tracking)
+- Social sharing (basic achievement sharing)
+- Stripe payment integration
+- Admin + Tester accounts
+- Cloud sync across devices
+- Mobile + Web access
 
 ❌ **NOT in MVP** (Coming in Pro/Master):
 - AI Coach & Suggestions
 - Predictive AI
 - Advanced Analytics
-- Social & Community features
+- Community features (Cherut Circle)
 - Integrations (Trello, Calendar, Wearables)
 - Automations (Zapier)
 - Smart Time Blocking
+- Enhanced social sharing with branding
 
 **Why this approach?**
 - ✅ $0 development cost (no AI infrastructure yet)
-- ✅ Core value validated with real users
-- ✅ Faster time to market (2-3 months vs 6+ months)
+- ✅ Complete strategic planning system (Life Purpose → Tasks)
+- ✅ Flexible task management (linked + standalone)
+- ✅ Faster time to market (3 months vs 6+ months)
 - ✅ Revenue from day 1 funds Pro/Master development
 - ✅ User feedback shapes AI features
 
@@ -702,7 +840,7 @@ Access the applications:
 
 ## Data Model
 
-### Core Entities
+### Core Entities & Hierarchy
 
 ```
 User
@@ -713,14 +851,50 @@ User
  │
  ├── Role: admin / tester / paid_user
  │
+ ├── Life Purpose (one sentence - editable)
+ │
+ ├── Master Goals (vision across life areas - editable)
+ │
  ├── LifeArea (12 default domains)
- │    ├── Goal (OKRs with key results)
- │    │    └── Task (actionable items)
+ │    │
+ │    ├── Objective (OKR methodology)
+ │    │    ├── Cycle: user-configurable (default: 3 months)
+ │    │    ├── Status: On Track / At Risk / Behind / Completed
+ │    │    │
+ │    │    └── KeyResult (minimum 3 per objective)
+ │    │         ├── Target value & Current progress
+ │    │         ├── Completion %
+ │    │         │
+ │    │         └── ActionPlan (one per KR)
+ │    │              ├── What (description)
+ │    │              ├── Why (rationale)
+ │    │              ├── Where (location)
+ │    │              ├── How (method)
+ │    │              ├── How Much (cost)
+ │    │              ├── Who (responsible)
+ │    │              │
+ │    │              └── Task (generated from action plan)
+ │    │                   ├── Title, Description, Due Date
+ │    │                   ├── Recurrence pattern
+ │    │                   ├── Priority, Status, Labels
+ │    │                   ├── Parent/Child relationships
+ │    │                   ├── Subtasks (unlimited nesting)
+ │    │                   ├── Checklists (multiple per task)
+ │    │                   └── Attachments (files, links, notes)
+ │    │
+ │    ├── Standalone Tasks (created independently)
+ │    │    ├── Can optionally link to Life Area
+ │    │    ├── Same structure as linked tasks
+ │    │    └── Not connected to Objectives/KRs
+ │    │
  │    └── Habit (recurring activities)
+ │         ├── Frequency, Time slots, Streaks
+ │         ├── Can link to Objectives and Life Areas
  │         └── HabitLog (completion tracking)
  │
  ├── VisionBoardItem (visual inspiration)
  ├── DailyReflection (emotional check-ins)
+ ├── TimeLog (manual time tracking)
  └── AIInsights (Pro/Master only)
       ├── Goal suggestions
       ├── Habit recommendations
@@ -751,15 +925,178 @@ const features = {
 
 ### Entity Relationships & Access Control
 
+**Data Hierarchy Rules:**
+- **Life Purpose** → Top-level user definition (editable anytime)
+- **Master Goals** → Vision across life areas (editable anytime)
+- **Objectives** → Must link to Life Areas (user-configurable cycles)
+- **Key Results** → Must link to parent Objective (minimum 3 per objective)
+- **Action Plans** → One per Key Result (6 required fields)
+- **Tasks (Linked)** → Generated from Action Plans, inherit context from KR and Objective
+- **Tasks (Standalone)** → Created independently, can optionally link to Life Area
+- **Habits** → Can link to Objectives and Life Areas, or exist independently
+- **Subtasks** → Unlimited nesting within any task (parent-child relationships)
+
+**Access Control:**
 - **Data Isolation**: Each user sees ONLY their own data
 - **Admin Access**: Admin user can view all users, manage system
 - **Tester Access**: Test data only, user-level view
 - **Paid Access**: Requires active subscription ($10+ minimum)
-- Goals must link to Life Areas
-- Habits can link to Goals and Life Areas
-- Tasks can reference Goals, Habits, or Life Areas
-- AI features gated by subscription plan
-- Deletion cascades with user confirmation
+- **AI features**: Gated by subscription plan (Pro/Master only)
+- **Deletion**: Cascades with user confirmation (deleting Objective deletes all KRs, Action Plans, and linked Tasks)
+
+**Flexibility:**
+- All entities (Life Purpose, Master Goals, Objectives, KRs, Action Plans, Tasks) are editable anytime
+- Objective cycles are user-configurable (default 3 months)
+- No hard limits on quantity of Objectives or KRs (minimum 3 KRs per Objective enforced)
+- Tasks can exist independently or as part of goal hierarchy
+
+---
+
+## 🎯 How It All Works: From Life Purpose to Daily Tasks
+
+### The Complete Hierarchy in Action
+
+Cherut uses a **top-down strategic planning approach** that connects your deepest purpose to your daily actions:
+
+**1. Define Your Foundation (One-Time Setup, Always Editable)**
+
+```
+Step 1: Life Purpose
+"To build products that empower people to reach their full potential"
+(One sentence - your "why" for everything)
+
+Step 2: Master Goals (Vision Across Life Areas)
+- Health: "Be in peak physical condition, energetic and strong"
+- Career: "Lead a successful tech company impacting millions"
+- Relationships: "Build deep, meaningful connections with family and friends"
+- Finance: "Achieve financial freedom and security"
+(Vision of your future self in each life area)
+```
+
+**2. Set Strategic Objectives (OKR Methodology)**
+
+```
+Objective: "Launch successful SaaS product"
+├── Linked to: Career & Purpose (Life Area)
+├── Cycle: 3 months (configurable to 1, 6, 12 months, etc.)
+└── Status: On Track
+
+Key Result 1: "Reach 500 paying users"
+├── Target: 500 users
+├── Current: 150 users
+└── Progress: 30%
+
+Key Result 2: "Achieve $7,500 MRR"
+├── Target: $7,500
+├── Current: $2,250
+└── Progress: 30%
+
+Key Result 3: "Maintain 95% uptime"
+├── Target: 95%
+├── Current: 98%
+└── Progress: 100% ✓
+```
+
+**3. Create Action Plans (Structured Execution)**
+
+```
+Action Plan for KR1 ("Reach 500 paying users")
+
+┌─────────────────────────────────────────────────┐
+│ What    │ Launch ProductHunt campaign          │
+│ Why     │ Get visibility and early adopters    │
+│ Where   │ ProductHunt, Twitter, LinkedIn       │
+│ How     │ Create demo video, launch post       │
+│ How Much│ $500 (video production)              │
+│ Who     │ Marketing team + CEO                 │
+└─────────────────────────────────────────────────┘
+```
+
+**4. Generate Tasks (Automatic + Manual)**
+
+From the Action Plan above, tasks are automatically generated:
+
+```
+✓ Linked Tasks (from Action Plan)
+  ├── "Create demo video script" (Due: Oct 15)
+  │   ├── Subtask: "Write script outline"
+  │   ├── Subtask: "Record voiceover"
+  │   └── Subtask: "Edit final video"
+  │
+  ├── "Design ProductHunt launch post" (Due: Oct 20)
+  │   └── Checklist: [ ] Banner image [ ] Screenshots [ ] Tagline
+  │
+  └── "Schedule Twitter/LinkedIn promotion" (Due: Oct 22)
+
+✓ Standalone Tasks (created manually)
+  ├── "Respond to customer emails" (Recurring: Daily)
+  ├── "Review analytics dashboard" (Recurring: Weekly)
+  └── "Fix bug #237" (Priority: Urgent)
+```
+
+**5. Daily Execution**
+
+Your **Today View** shows:
+- Tasks from Action Plans (linked to strategic objectives)
+- Standalone tasks (ad-hoc work)
+- Recurring tasks
+- Habits for the day
+- Time blocks for focused work
+
+### Example: Complete User Journey
+
+**Sarah, Startup Founder**
+
+```
+Life Purpose: "Build technology that helps people achieve more with less stress"
+
+Master Goal (Career): "Run a profitable SaaS company with 1000+ happy customers"
+
+↓
+
+Objective Q1 2025: "Launch MVP and acquire first 100 paying users"
+├── Cycle: 3 months
+└── Life Area: Career & Purpose
+
+  ↓
+
+  Key Result 1: "Ship Core plan with all features"
+  ├── Action Plan: What/Why/Where/How/How Much/Who
+  │   └── Tasks:
+  │       ├── "Build landing page" ✓ Done
+  │       ├── "Integrate Stripe" → In Progress
+  │       └── "Set up Firebase" → To Do
+
+  Key Result 2: "Acquire 100 paying users at $10/month"
+  ├── Action Plan: ProductHunt launch strategy
+  │   └── Tasks:
+  │       ├── "Create demo video" → In Progress
+  │       │   ├── Subtask: "Write script" ✓
+  │       │   └── Subtask: "Record video" → To Do
+  │       └── "Launch on ProductHunt" → To Do
+
+  Key Result 3: "Achieve $1,000 MRR"
+  ├── Progress: $250 / $1,000 (25%)
+  └── Status: On Track
+
+↓
+
+Daily Tasks (Today View - Oct 29):
+├── "Record demo video" (from KR2 Action Plan) [High Priority]
+├── "Finish Stripe integration" (from KR1 Action Plan) [High Priority]
+├── "Fix login bug" (Standalone task) [Urgent]
+├── "Review user feedback" (Standalone, Recurring: Daily)
+└── "Morning workout" (Habit: Health & Energy)
+```
+
+### Key Benefits of This Approach
+
+✅ **Strategic Alignment**: Every task connects to larger goals and life purpose
+✅ **Flexibility**: Can create standalone tasks for ad-hoc work
+✅ **Clarity**: See how daily work contributes to quarterly objectives
+✅ **Accountability**: Track progress from top (Life Purpose) to bottom (Tasks)
+✅ **Adaptability**: Edit any level anytime as priorities change
+✅ **Completeness**: Nothing falls through cracks - structured yet flexible
 
 ---
 
@@ -1045,46 +1382,71 @@ firebase deploy --only storage
 
 ## Roadmap
 
-### MVP Features (Launch - Month 1)
+### MVP Features (Launch - Months 1-3)
 
 | Feature | Priority | Status |
 |---------|----------|--------|
-| **Landing Page** | Critical | Planned |
-| **Stripe Integration** | Critical | Planned |
-| **User Auth (Firebase)** | Critical | Planned |
-| **Admin Dashboard** | Critical | Planned |
-| **Core Modules** (Life Areas, Goals, Habits, Tasks) | Critical | Planned |
-| **Mobile App (Expo)** | High | Planned |
+| **Landing Page** (pricing tiers, features) | Critical | Planned |
+| **Stripe Integration** (subscription management) | Critical | Planned |
+| **User Auth** (Firebase - Email/Google) | Critical | Planned |
+| **Life Purpose & Master Goals** | Critical | Planned |
+| **Life Areas Dashboard** (12 domains) | Critical | Planned |
+| **Objectives (OKR)** with configurable cycles | Critical | Planned |
+| **Key Results** (min 3 per objective) | Critical | Planned |
+| **Action Plans** (6-field structure per KR) | Critical | Planned |
+| **Task Management** (linked + standalone) | Critical | Planned |
+| **Task Features** (subtasks, checklists, recurring, parent/child) | Critical | Planned |
+| **Task Views** (Today, Kanban, Calendar, List, Hierarchy, GTD) | Critical | Planned |
+| **Habits** (tracking, streaks) | High | Planned |
 | **Vision Board** | High | Planned |
 | **Daily Reflection** | High | Planned |
+| **Manual Time Tracker** | High | Planned |
+| **Admin Dashboard** | High | Planned |
+| **Basic Analytics** | High | Planned |
+| **Social Sharing** (basic) | High | Planned |
+| **Mobile App (Expo)** | Medium | Planned |
 
-### Post-Launch Features (Months 2-6)
+### Post-Launch Features (Months 4-6)
 
 | Feature | Plan | Timeline |
 |---------|------|----------|
-| **Social Sharing** | Pro/Master | Month 2 |
-| **AI Goal Suggestions** | Pro/Master | Month 2 |
-| **Analytics Dashboard** | Pro/Master | Month 3 |
-| **Notion/Calendar Integration** | Pro | Month 4 |
-| **AI Journaling** | Pro/Master | Month 4 |
-| **Enhanced Social Cards** | Master | Month 5 |
-| **Predictive AI** | Master | Month 5 |
-| **Adaptive AI Coach** | Master | Month 6 |
+| **AI Infrastructure** | Pro/Master | Month 4 |
+| **AI Goal Suggestions** | Pro/Master | Month 4 |
+| **AI Habit Coaching** | Pro/Master | Month 4 |
+| **Advanced Analytics Dashboard** | Pro/Master | Month 5 |
+| **Trello Integration** | Pro | Month 5 |
+| **Google Calendar Integration** | Pro | Month 5 |
+| **Community Features** (Cherut Circle) | Pro | Month 6 |
+| **AI Journaling** | Pro/Master | Month 6 |
 
-### Future: Microservices (Months 7-12)
+### Phase 2: Advanced AI & Integrations (Months 7-12)
 
-| Service | Technology | Purpose |
-|---------|-----------|---------|
-| **AI Service** | Python/FastAPI | Goal suggestions, mood analysis, predictions |
-| **Analytics Service** | Node.js/NestJS | Advanced metrics, reports, insights |
-| **Notification Service** | Node.js | Email, push notifications, reminders |
+| Feature | Plan | Timeline |
+|---------|------|----------|
+| **Predictive AI** (performance forecasting) | Master | Month 7 |
+| **Adaptive AI Coach** (learns from you) | Master | Month 8 |
+| **Smart Time Blocking** | Pro/Master | Month 9 |
+| **Wearables Sync** (Apple Health, Fitbit) | Master | Month 10 |
+| **Zapier Integration** | Master | Month 11 |
+| **Elite Circle** (mentorship, peer feedback) | Master | Month 12 |
+| **Enhanced Social Cards** (branded) | Master | Month 12 |
+
+### Microservices Architecture (Months 7-12)
+
+| Service | Technology | Purpose | Launch |
+|---------|-----------|---------|--------|
+| **AI Service** | Python/FastAPI | Goal suggestions, mood analysis, predictions | Month 7 |
+| **Analytics Service** | Node.js/NestJS | Advanced metrics, reports, insights | Month 8 |
+| **Notification Service** | Node.js | Email, push notifications, reminders | Month 9 |
 
 ### Current Status
 
 - ✅ Business model defined
-- ✅ Pricing tiers established
-- ✅ Architecture designed (Modular Monolith)
-- ✅ Tech stack selected
+- ✅ Pricing tiers established ($10/$20/$30)
+- ✅ Complete feature hierarchy designed (Life Purpose → Tasks)
+- ✅ Architecture designed (Modular Monolith → Microservices)
+- ✅ Tech stack selected (Next.js, NestJS, Expo, Firebase)
+- ✅ Data model designed (OKR + Action Plans + Tasks)
 - 📋 Landing page design pending
 - 📋 Stripe integration pending
 - 📋 Admin dashboard pending
