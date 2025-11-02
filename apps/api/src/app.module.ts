@@ -6,6 +6,12 @@ import { FirebaseModule } from './config/firebase.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { LifeAreasModule } from './modules/life-areas/life-areas.module';
 import { ObjectivesModule } from './modules/objectives/objectives.module';
+import { KeyResultsModule } from './modules/key-results/key-results.module';
+import { ActionPlansModule } from './modules/action-plans/action-plans.module';
+import { ProfileModule } from './modules/profile/profile.module';
+import { HabitsModule } from './modules/habits/habits.module';
+import { TrackingModule } from './modules/tracking/tracking.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 
 /**
  * 📚 EXPLICAÇÃO: App Module (Módulo Raiz)
@@ -42,10 +48,22 @@ import { ObjectivesModule } from './modules/objectives/objectives.module';
     FirebaseModule,
     // Sistema de autenticação
     AuthModule,
+    // User Profile (perfil do usuário)
+    ProfileModule,
     // Life Areas (áreas da vida)
     LifeAreasModule,
     // Objectives (OKR methodology)
     ObjectivesModule,
+    // Key Results (measurable outcomes)
+    KeyResultsModule,
+    // Action Plans (5W2H method)
+    ActionPlansModule,
+    // Habits (rastreamento de hábitos)
+    HabitsModule,
+    // Tracking (métricas e progresso)
+    TrackingModule,
+    // Tasks (gerenciamento Kanban + Pomodoro)
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
