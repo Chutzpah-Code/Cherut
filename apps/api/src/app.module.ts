@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { FirebaseModule } from './config/firebase.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { LifeAreasModule } from './modules/life-areas/life-areas.module';
+import { GoalsModule } from './modules/goals/goals.module';
 
 /**
  * 📚 EXPLICAÇÃO: App Module (Módulo Raiz)
@@ -43,6 +44,8 @@ import { LifeAreasModule } from './modules/life-areas/life-areas.module';
     AuthModule,
     // Life Areas (áreas da vida)
     LifeAreasModule,
+    // Goals (metas/objetivos)
+    GoalsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
