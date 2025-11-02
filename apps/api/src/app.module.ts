@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FirebaseModule } from './config/firebase.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { LifeAreasModule } from './modules/life-areas/life-areas.module';
 
 /**
  * 📚 EXPLICAÇÃO: App Module (Módulo Raiz)
@@ -40,6 +41,8 @@ import { AuthModule } from './modules/auth/auth.module';
     FirebaseModule,
     // Sistema de autenticação
     AuthModule,
+    // Life Areas (áreas da vida)
+    LifeAreasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
