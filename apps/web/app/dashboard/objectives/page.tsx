@@ -317,6 +317,65 @@ export default function ObjectivesPage() {
     });
   };
 
+  const handleEditKR = (objectiveId: string, kr: KeyResult) => {
+    setEditingKR({ objectiveId, kr });
+  };
+
+  const handleCloseKRModal = () => {
+    setEditingKR(null);
+  };
+
+  const handleUpdateKR = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!editingKR) return;
+
+    const form = e.currentTarget;
+    const titleInput = form.elements.namedItem('title') as HTMLInputElement;
+    const descriptionInput = form.elements.namedItem('description') as HTMLTextAreaElement;
+    const dueDateInput = form.elements.namedItem('dueDate') as HTMLInputElement;
+
+    const title = titleInput.value;
+    const description = descriptionInput.value;
+    const dueDateStr = dueDateInput.value;
+
+    if (!title || !dueDateStr) {
+      notifications.show({
+        title: 'Error',
+        message: 'Title and due date are required',
+        color: 'red',
+      });
+      return;
+    }
+
+    try {
+      await updateKRMutation.mutateAsync({
+        objectiveId: editingKR.objectiveId,
+        keyResultId: editingKR.kr.id,
+        dto: {
+          title,
+          description: description || undefined,
+          dueDate: dueDateStr,
+        },
+      });
+
+      notifications.show({
+        title: 'Success',
+        message: 'Key result updated successfully',
+        color: 'green',
+      });
+
+      handleCloseKRModal();
+    } catch (error) {
+      console.error('Error updating key result:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to update key result',
+        color: 'red',
+      });
+    }
+  };
+
   const handleArchive = (id: string) => {
     modals.openConfirmModal({
       title: 'Archive Objective',
@@ -504,14 +563,28 @@ export default function ObjectivesPage() {
                                   </Text>
                                 </Group>
                               </Box>
-                              <ActionIcon
-                                size="sm"
-                                variant="subtle"
-                                color="red"
-                                onClick={() => handleDeleteKR(objective.id, kr.id)}
-                              >
-                                <Trash2 size={14} />
-                              </ActionIcon>
+                              <Group gap="xs">
+                                <Tooltip label="Edit key result">
+                                  <ActionIcon
+                                    size="sm"
+                                    variant="subtle"
+                                    color="blue"
+                                    onClick={() => handleEditKR(objective.id, kr)}
+                                  >
+                                    <Edit2 size={14} />
+                                  </ActionIcon>
+                                </Tooltip>
+                                <Tooltip label="Delete key result">
+                                  <ActionIcon
+                                    size="sm"
+                                    variant="subtle"
+                                    color="red"
+                                    onClick={() => handleDeleteKR(objective.id, kr.id)}
+                                  >
+                                    <Trash2 size={14} />
+                                  </ActionIcon>
+                                </Tooltip>
+                              </Group>
                             </Group>
                           </Paper>
                         ))}
@@ -768,6 +841,72 @@ export default function ObjectivesPage() {
                 leftSection={editingObjective ? <Edit2 size={16} /> : <Plus size={16} />}
               >
                 {editingObjective ? 'Update Objective' : 'Create Objective'}
+              </Button>
+            </Group>
+          </Stack>
+        </form>
+      </Modal>
+
+      {/* Edit Key Result Modal */}
+      <Modal
+        opened={!!editingKR}
+        onClose={handleCloseKRModal}
+        title={
+          <Group gap="sm">
+            <ThemeIcon size="lg" radius="md" color="blue" variant="light">
+              <Target size={20} />
+            </ThemeIcon>
+            <Text size="lg" fw={600}>
+              Edit Key Result
+            </Text>
+          </Group>
+        }
+        size="lg"
+      >
+        <form onSubmit={handleUpdateKR}>
+          <Stack gap="md">
+            <TextInput
+              label="Title"
+              placeholder="e.g., Reduce body fat to 10%"
+              name="title"
+              defaultValue={editingKR?.kr.title}
+              required
+              withAsterisk
+              leftSection={<Target size={16} />}
+            />
+
+            <Textarea
+              label="Description"
+              placeholder="Description (optional)"
+              name="description"
+              defaultValue={editingKR?.kr.description || ''}
+              rows={3}
+              autosize
+              minRows={3}
+              maxRows={6}
+            />
+
+            <DateInput
+              label="Due Date"
+              placeholder="Select due date"
+              name="dueDate"
+              defaultValue={editingKR?.kr.dueDate ? new Date(editingKR.kr.dueDate) : null}
+              required
+              withAsterisk
+              leftSection={<Calendar size={16} />}
+              valueFormat="YYYY-MM-DD"
+            />
+
+            <Group justify="flex-end" mt="md">
+              <Button variant="light" onClick={handleCloseKRModal}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                loading={updateKRMutation.isPending}
+                leftSection={<Edit2 size={16} />}
+              >
+                Update Key Result
               </Button>
             </Group>
           </Stack>
