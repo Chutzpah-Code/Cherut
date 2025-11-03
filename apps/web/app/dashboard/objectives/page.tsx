@@ -401,7 +401,7 @@ export default function ObjectivesPage() {
             Define and track your strategic objectives with measurable key results
           </Text>
         </div>
-        <Button leftSection={<Plus size={20} />} onClick={handleNew} size="md">
+        <Button leftSection={<Plus size={20} />} onClick={handleNew}>
           New Objective
         </Button>
       </Group>
