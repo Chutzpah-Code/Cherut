@@ -678,23 +678,23 @@ export default function Home() {
             <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xl" w="100%">
               <Stack align="center" gap="xs">
                 <Text size="60px" fw={900} c="white" style={{ lineHeight: 1 }}>
-                  500+
+                  10+
                 </Text>
                 <Text size="md" c="dimmed" fw={500}>
-                  Active Users
+                  Beta Testers
                 </Text>
               </Stack>
               <Stack align="center" gap="xs">
                 <Text size="60px" fw={900} c="white" style={{ lineHeight: 1 }}>
-                  10K+
+                  100+
                 </Text>
                 <Text size="md" c="dimmed" fw={500}>
-                  Goals Achieved
+                  Goals Set
                 </Text>
               </Stack>
               <Stack align="center" gap="xs">
                 <Text size="60px" fw={900} c="white" style={{ lineHeight: 1 }}>
-                  50K+
+                  1K+
                 </Text>
                 <Text size="md" c="dimmed" fw={500}>
                   Tasks Completed
