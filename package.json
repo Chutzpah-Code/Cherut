@@ -4,13 +4,11 @@
   "private": true,
   "description": "Cherut - Premium Personal Excellence Platform",
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/*"
   ],
   "scripts": {
     "api": "npm run start:dev --workspace=apps/api",
     "web": "npm run dev --workspace=apps/web",
-    "mobile": "npm run start --workspace=apps/mobile",
     "dev": "npm run api"
   },
   "keywords": [
