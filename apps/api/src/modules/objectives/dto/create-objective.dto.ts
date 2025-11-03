@@ -6,13 +6,20 @@ import {
   IsInt,
   Min,
   Max,
+  IsArray,
+  ValidateNested,
+  IsBoolean,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateKeyResultDto } from './create-key-result.dto';
 
 export enum ObjectiveStatus {
   ON_TRACK = 'on_track',
   AT_RISK = 'at_risk',
   BEHIND = 'behind',
   COMPLETED = 'completed',
+  ACTIVE = 'active',
+  CANCELLED = 'cancelled',
 }
 
 export class CreateObjectiveDto {
@@ -46,4 +53,14 @@ export class CreateObjectiveDto {
   @IsString()
   @IsOptional()
   endDate?: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateKeyResultDto)
+  @IsOptional()
+  keyResults?: CreateKeyResultDto[];
+
+  @IsBoolean()
+  @IsOptional()
+  isArchived?: boolean;
 }
