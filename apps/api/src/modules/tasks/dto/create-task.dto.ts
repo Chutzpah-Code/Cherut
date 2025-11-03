@@ -46,7 +46,7 @@ export class CreateTaskDto {
 
   // Pomodoro estimation (number of 25-min sessions)
   @IsNumber()
-  @Min(1)
+  @Min(0)
   @Max(16)
   @IsOptional()
   estimatedPomodoros?: number;
