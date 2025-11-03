@@ -16,13 +16,13 @@ apiClient.interceptors.request.use(
     const token = await getIdToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('[API Client] Token attached to request:', config.url);
-    } else {
-      console.warn('[API Client] No token available for request:', config.url);
+      // Removido console.log para melhorar performance
     }
+    // Removido console.warn - só em dev se necessário
     return config;
   },
   (error) => {
+    // Mantém apenas erro crítico
     console.error('[API Client] Request error:', error);
     return Promise.reject(error);
   }

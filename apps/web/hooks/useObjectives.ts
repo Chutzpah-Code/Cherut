@@ -110,14 +110,39 @@ export const useCompleteKeyResult = () => {
   });
 };
 
-// Toggle completion hooks
+// Toggle completion hooks - OTIMIZADO com Optimistic Updates
 export const useToggleObjectiveCompletion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => objectivesApi.toggleObjectiveCompletion(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    // Optimistic update - atualiza UI ANTES da requisição terminar
+    onMutate: async (id) => {
+      // Cancela queries em andamento
+      await queryClient.cancelQueries({ queryKey: ['objectives'] });
+
+      // Salva estado anterior para rollback
+      const previousObjectives = queryClient.getQueryData(['objectives', undefined]);
+
+      // Atualiza cache otimisticamente
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((obj: any) =>
+          obj.id === id ? { ...obj, status: obj.status === 'completed' ? 'active' : 'completed' } : obj
+        );
+      });
+
+      return { previousObjectives };
+    },
+    onError: (_err, _id, context: any) => {
+      // Reverte em caso de erro
+      if (context?.previousObjectives) {
+        queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
+      }
+    },
+    onSettled: () => {
+      // Revalida apenas essa query específica
+      queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
     },
   });
 };
@@ -128,20 +153,61 @@ export const useToggleKeyResultCompletion = () => {
   return useMutation({
     mutationFn: ({ objectiveId, keyResultId }: { objectiveId: string; keyResultId: string }) =>
       objectivesApi.toggleKeyResultCompletion(objectiveId, keyResultId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onMutate: async ({ objectiveId, keyResultId }) => {
+      await queryClient.cancelQueries({ queryKey: ['objectives'] });
+      const previousObjectives = queryClient.getQueryData(['objectives', undefined]);
+
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((obj: any) => {
+          if (obj.id !== objectiveId) return obj;
+          return {
+            ...obj,
+            keyResults: obj.keyResults?.map((kr: any) =>
+              kr.id === keyResultId ? { ...kr, isCompleted: !kr.isCompleted } : kr
+            ),
+          };
+        });
+      });
+
+      return { previousObjectives };
+    },
+    onError: (_err, _vars, context: any) => {
+      if (context?.previousObjectives) {
+        queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
     },
   });
 };
 
-// Archive hook
+// Archive hook - OTIMIZADO
 export const useArchiveObjective = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => objectivesApi.archiveObjective(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['objectives'] });
+      const previousObjectives = queryClient.getQueryData(['objectives', undefined]);
+
+      // Remove do cache imediatamente (aparece instantâneo)
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.filter((obj: any) => obj.id !== id);
+      });
+
+      return { previousObjectives };
+    },
+    onError: (_err, _id, context: any) => {
+      if (context?.previousObjectives) {
+        queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
     },
   });
 };

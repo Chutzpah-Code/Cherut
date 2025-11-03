@@ -830,6 +830,8 @@ export default function Home() {
               for organizations that want to scale elite performance across their entire workforce.
             </Text>
             <Button
+              component={Link}
+              href="/enterprise-waitlist"
               size="lg"
               radius="md"
               variant="gradient"

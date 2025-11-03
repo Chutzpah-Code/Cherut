@@ -12,6 +12,7 @@ import { ProfileModule } from './modules/profile/profile.module';
 import { HabitsModule } from './modules/habits/habits.module';
 import { TrackingModule } from './modules/tracking/tracking.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { EnterpriseWaitlistModule } from './enterprise-waitlist/enterprise-waitlist.module';
 
 /**
  * 📚 EXPLICAÇÃO: App Module (Módulo Raiz)
@@ -64,6 +65,8 @@ import { TasksModule } from './modules/tasks/tasks.module';
     TrackingModule,
     // Tasks (gerenciamento Kanban + Pomodoro)
     TasksModule,
+    // Enterprise Waitlist (formulário de interesse corporativo)
+    EnterpriseWaitlistModule,
   ],
   controllers: [AppController],
   providers: [AppService],

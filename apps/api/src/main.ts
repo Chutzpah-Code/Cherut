@@ -15,7 +15,7 @@ import { AppModule } from './app.module';
  * - transform: true → Converte tipos automaticamente (string → number, etc.)
  *
  * CORS (Cross-Origin Resource Sharing):
- * - Permite que frontend (localhost:3001) faça requisições para API (localhost:3000)
+ * - Permite que frontend (localhost:3002) faça requisições para API (localhost:3000)
  * - Sem CORS, navegador bloqueia requisições entre domínios diferentes
  */
 

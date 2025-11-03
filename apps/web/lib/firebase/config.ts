@@ -27,6 +27,13 @@ if (isFirebaseConfigured()) {
   try {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
     auth = getAuth(app);
+
+    // Configure persistence to keep user logged in
+    if (auth && typeof window !== 'undefined') {
+      setPersistence(auth, browserLocalPersistence).catch((error) => {
+        console.error('Error setting persistence:', error);
+      });
+    }
   } catch (error) {
     console.error('Firebase initialization error:', error);
   }

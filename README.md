@@ -315,7 +315,7 @@ npm run dev
 
 Access:
 - Web: http://localhost:3000
-- API: http://localhost:3001
+- API: http://localhost:3002
 
 ---
 
