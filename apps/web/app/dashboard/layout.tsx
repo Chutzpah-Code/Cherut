@@ -3,6 +3,8 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { AppShell, Burger, Group, Loader, Center } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
 
@@ -13,7 +15,8 @@ export default function DashboardLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] = useDisclosure();
+  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -21,19 +24,11 @@ export default function DashboardLayout({
     }
   }, [loading, user, router]);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
+      <Center h="100vh">
+        <Loader size="lg" />
+      </Center>
     );
   }
 
@@ -42,14 +37,31 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-900 overflow-hidden">
-      <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
-      <div className="flex-1 flex flex-col overflow-hidden w-full">
-        <Header onMenuClick={toggleSidebar} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          {children}
-        </main>
-      </div>
-    </div>
+    <AppShell
+      header={{ height: 60 }}
+      navbar={{
+        width: 260,
+        breakpoint: 'lg',
+        collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+      }}
+      padding="md"
+    >
+      <AppShell.Header>
+        <Header
+          mobileOpened={mobileOpened}
+          desktopOpened={desktopOpened}
+          toggleMobile={toggleMobile}
+          toggleDesktop={toggleDesktop}
+        />
+      </AppShell.Header>
+
+      <AppShell.Navbar>
+        <Sidebar onClose={closeMobile} />
+      </AppShell.Navbar>
+
+      <AppShell.Main>
+        {children}
+      </AppShell.Main>
+    </AppShell>
   );
 }

@@ -2,6 +2,26 @@
 
 import { useState } from 'react';
 import { Plus, Edit2, Trash2, CheckCircle, Circle, TrendingUp, Calendar } from 'lucide-react';
+import {
+  Title,
+  Text,
+  Button,
+  Card,
+  Group,
+  Stack,
+  SimpleGrid,
+  Modal,
+  TextInput,
+  Textarea,
+  Select,
+  NumberInput,
+  ThemeIcon,
+  Badge,
+  Loader,
+  Center,
+  Checkbox,
+} from '@mantine/core';
+import { modals } from '@mantine/modals';
 import { useHabits, useCreateHabit, useUpdateHabit, useDeleteHabit, useLogHabit } from '@/hooks/useHabits';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { CreateHabitDto, Habit, LogHabitDto } from '@/lib/api/services/habits';
@@ -71,14 +91,20 @@ export default function HabitsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this habit?')) {
-      try {
-        await deleteMutation.mutateAsync(id);
-      } catch (error) {
-        console.error('Error deleting habit:', error);
-      }
-    }
+  const handleDelete = (id: string) => {
+    modals.openConfirmModal({
+      title: 'Delete Habit',
+      children: <Text size="sm">Are you sure you want to delete this habit? This action cannot be undone.</Text>,
+      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        try {
+          await deleteMutation.mutateAsync(id);
+        } catch (error) {
+          console.error('Error deleting habit:', error);
+        }
+      },
+    });
   };
 
   const handleNew = () => {
@@ -139,20 +165,21 @@ export default function HabitsPage() {
     }
   };
 
-  const getLifeAreaName = (lifeAreaId: string) => {
+  const getLifeAreaName = (lifeAreaId: string | undefined) => {
+    if (!lifeAreaId) return 'Unknown';
     return lifeAreas?.find((area) => area.id === lifeAreaId)?.name || 'Unknown';
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'boolean':
-        return <CheckCircle className="w-5 h-5" />;
+        return <CheckCircle size={20} />;
       case 'counter':
-        return <span className="text-lg font-bold">123</span>;
+        return <Text size="lg" fw={700}>123</Text>;
       case 'duration':
-        return <Calendar className="w-5 h-5" />;
+        return <Calendar size={20} />;
       default:
-        return <Circle className="w-5 h-5" />;
+        return <Circle size={20} />;
     }
   };
 
@@ -171,359 +198,308 @@ export default function HabitsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-white">Loading...</div>
-      </div>
+      <Center h={300}>
+        <Loader size="lg" />
+      </Center>
     );
   }
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+    <Stack gap="lg">
+      <Group justify="space-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Habits</h1>
-          <p className="text-sm sm:text-base text-gray-400">Track your daily habits and build consistency</p>
+          <Title order={1} size="h2" mb="xs">Habits</Title>
+          <Text c="dimmed" size="sm">Track your daily habits and build consistency</Text>
         </div>
-        <button
-          onClick={handleNew}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors whitespace-nowrap"
-        >
-          <Plus className="w-5 h-5" />
-          <span className="hidden sm:inline">New Habit</span>
-          <span className="sm:hidden">New</span>
-        </button>
-      </div>
+        <Button leftSection={<Plus size={20} />} onClick={handleNew}>
+          New Habit
+        </Button>
+      </Group>
 
       {/* Habits Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
         {habits?.map((habit) => (
-          <div
-            key={habit.id}
-            className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:border-gray-600 transition-colors"
-          >
-            <div className="flex items-start justify-between mb-3 sm:mb-4">
-              <div className="flex items-start gap-2 sm:gap-3 flex-1">
-                <div className="p-2 sm:p-3 bg-green-600 rounded-lg text-white">
-                  {getTypeIcon(habit.type)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base sm:text-lg font-semibold text-white mb-1 truncate">{habit.title}</h3>
-                  {habit.description && (
-                    <p className="text-sm text-gray-400 mb-2">{habit.description}</p>
+          <Card key={habit.id} shadow="sm" padding="lg" withBorder>
+            <Group mb="md" wrap="nowrap" align="flex-start">
+              <ThemeIcon size="xl" radius="md" color="green" variant="light">
+                {getTypeIcon(habit.type)}
+              </ThemeIcon>
+              <Stack gap="xs" style={{ flex: 1 }}>
+                <Text fw={600} size="lg">{habit.title}</Text>
+                {habit.description && (
+                  <Text size="sm" c="dimmed" lineClamp={2}>{habit.description}</Text>
+                )}
+                <Group gap="xs">
+                  <Badge size="sm" variant="light" color="gray">
+                    {getTypeLabel(habit.type)}
+                  </Badge>
+                  <Badge size="sm" variant="light" color="gray" tt="capitalize">
+                    {habit.frequency}
+                  </Badge>
+                  {habit.targetValue && (
+                    <Badge size="sm" variant="light" color="blue">
+                      Target: {habit.targetValue} {habit.unit || ''}
+                    </Badge>
                   )}
-                  <div className="flex flex-wrap gap-2 text-xs">
-                    <span className="px-2 py-1 bg-gray-700 text-gray-300 rounded">
-                      {getTypeLabel(habit.type)}
-                    </span>
-                    <span className="px-2 py-1 bg-gray-700 text-gray-300 rounded capitalize">
-                      {habit.frequency}
-                    </span>
-                    {habit.targetValue && (
-                      <span className="px-2 py-1 bg-blue-600/20 text-blue-400 rounded">
-                        Target: {habit.targetValue} {habit.unit || ''}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+                </Group>
+              </Stack>
+            </Group>
 
-            <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-              <TrendingUp className="w-3 h-3" />
-              <span>{getLifeAreaName(habit.lifeAreaId)}</span>
-            </div>
+            <Group gap="xs" mb="md">
+              <TrendingUp size={14} />
+              <Text size="xs" c="dimmed">{getLifeAreaName(habit.lifeAreaId)}</Text>
+            </Group>
 
             {/* Actions */}
-            <div className="flex flex-col gap-2">
+            <Stack gap="xs">
               {habit.type === 'boolean' ? (
-                <button
+                <Button
+                  fullWidth
+                  color="green"
+                  leftSection={<CheckCircle size={16} />}
                   onClick={() => quickLogBoolean(habit)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
                 >
-                  <CheckCircle className="w-4 h-4" />
                   Mark as Done Today
-                </button>
+                </Button>
               ) : (
-                <button
+                <Button
+                  fullWidth
+                  color="green"
+                  leftSection={<Plus size={16} />}
                   onClick={() => handleLogClick(habit)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
                 >
-                  <Plus className="w-4 h-4" />
                   Log Entry
-                </button>
+                </Button>
               )}
 
-              <div className="flex items-center gap-2 pt-2 border-t border-gray-700">
-                <button
+              <Group gap="xs" mt="xs" pt="xs" style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
+                <Button
+                  variant="light"
+                  leftSection={<Edit2 size={16} />}
                   onClick={() => handleEdit(habit)}
-                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors"
+                  fullWidth
+                  size="sm"
                 >
-                  <Edit2 className="w-4 h-4" />
                   Edit
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="light"
+                  color="red"
+                  leftSection={<Trash2 size={16} />}
                   onClick={() => handleDelete(habit.id)}
-                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-colors"
+                  fullWidth
+                  size="sm"
                 >
-                  <Trash2 className="w-4 h-4" />
                   Delete
-                </button>
-              </div>
-            </div>
-          </div>
+                </Button>
+              </Group>
+            </Stack>
+          </Card>
         ))}
+      </SimpleGrid>
 
-        {habits?.length === 0 && (
-          <div className="col-span-full text-center py-12">
-            <p className="text-gray-400 mb-4">No habits yet</p>
-            <button onClick={handleNew} className="text-red-500 hover:text-red-400">
+      {habits?.length === 0 && (
+        <Card shadow="sm" padding="xl" withBorder>
+          <Stack align="center" gap="md">
+            <Text c="dimmed">No habits yet</Text>
+            <Button variant="light" onClick={handleNew}>
               Create your first habit
-            </button>
-          </div>
-        )}
-      </div>
+            </Button>
+          </Stack>
+        </Card>
+      )}
 
       {/* Habit Create/Edit Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-gray-800 rounded-xl max-w-md w-full p-4 sm:p-6 border border-gray-700 my-8 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">
-              {editingHabit ? 'Edit Habit' : 'New Habit'}
-            </h2>
+      <Modal
+        opened={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingHabit(null);
+        }}
+        title={editingHabit ? 'Edit Habit' : 'New Habit'}
+        size="md"
+      >
+        <form onSubmit={handleSubmit}>
+          <Stack gap="md">
+            <Select
+              label="Life Area"
+              placeholder="Select a life area"
+              value={formData.lifeAreaId}
+              onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
+              data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
+              required
+              withAsterisk
+            />
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Life Area *
-                </label>
-                <select
-                  value={formData.lifeAreaId}
-                  onChange={(e) => setFormData({ ...formData, lifeAreaId: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
-                  <option value="">Select a life area</option>
-                  {lifeAreas?.map((area) => (
-                    <option key={area.id} value={area.id}>
-                      {area.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <TextInput
+              label="Title"
+              placeholder="e.g., Morning meditation"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              required
+              withAsterisk
+            />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Title *</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="e.g., Morning meditation"
-                />
-              </div>
+            <Textarea
+              label="Description"
+              placeholder="Describe this habit..."
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3}
+            />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Description
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Describe this habit..."
-                />
-              </div>
+            <Select
+              label="Type"
+              value={formData.type}
+              onChange={(value) =>
+                setFormData({
+                  ...formData,
+                  type: value as 'boolean' | 'counter' | 'duration',
+                })
+              }
+              data={[
+                { value: 'boolean', label: 'Yes/No (Boolean)' },
+                { value: 'counter', label: 'Counter (Numbers)' },
+                { value: 'duration', label: 'Duration (Time)' },
+              ]}
+              required
+              withAsterisk
+            />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Type *</label>
-                <select
-                  value={formData.type}
-                  onChange={(e) =>
+            <Select
+              label="Frequency"
+              value={formData.frequency}
+              onChange={(value) =>
+                setFormData({
+                  ...formData,
+                  frequency: value as 'daily' | 'weekly' | 'monthly',
+                })
+              }
+              data={[
+                { value: 'daily', label: 'Daily' },
+                { value: 'weekly', label: 'Weekly' },
+                { value: 'monthly', label: 'Monthly' },
+              ]}
+              required
+              withAsterisk
+            />
+
+            {formData.type !== 'boolean' && (
+              <>
+                <NumberInput
+                  label="Target Value"
+                  placeholder="e.g., 10000 for steps"
+                  value={formData.targetValue}
+                  onChange={(value) =>
                     setFormData({
                       ...formData,
-                      type: e.target.value as 'boolean' | 'counter' | 'duration',
+                      targetValue: typeof value === 'number' ? value : undefined,
                     })
                   }
-                  required
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
-                  <option value="boolean">Yes/No (Boolean)</option>
-                  <option value="counter">Counter (Numbers)</option>
-                  <option value="duration">Duration (Time)</option>
-                </select>
-              </div>
+                  min={0}
+                />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Frequency *
-                </label>
-                <select
-                  value={formData.frequency}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      frequency: e.target.value as 'daily' | 'weekly' | 'monthly',
-                    })
-                  }
-                  required
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-              </div>
+                <TextInput
+                  label="Unit"
+                  placeholder="e.g., steps, minutes, pages"
+                  value={formData.unit || ''}
+                  onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                />
+              </>
+            )}
 
-              {formData.type !== 'boolean' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Target Value
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={formData.targetValue || ''}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          targetValue: parseInt(e.target.value) || undefined,
-                        })
-                      }
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                      placeholder="e.g., 10000 for steps"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Unit</label>
-                    <input
-                      type="text"
-                      value={formData.unit || ''}
-                      onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                      placeholder="e.g., steps, minutes, pages"
-                    />
-                  </div>
-                </>
-              )}
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    setEditingHabit(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50"
-                >
-                  {createMutation.isPending || updateMutation.isPending
-                    ? 'Saving...'
-                    : editingHabit
-                    ? 'Update'
-                    : 'Create'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <Group justify="flex-end" mt="md">
+              <Button
+                variant="light"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingHabit(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                loading={createMutation.isPending || updateMutation.isPending}
+              >
+                {editingHabit ? 'Update' : 'Create'}
+              </Button>
+            </Group>
+          </Stack>
+        </form>
+      </Modal>
 
       {/* Habit Log Modal */}
-      {logModalOpen && loggingHabit && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-xl max-w-md w-full p-4 sm:p-6 border border-gray-700">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">
-              Log: {loggingHabit.title}
-            </h2>
+      <Modal
+        opened={logModalOpen && !!loggingHabit}
+        onClose={() => {
+          setLogModalOpen(false);
+          setLoggingHabit(null);
+        }}
+        title={`Log: ${loggingHabit?.title}`}
+        size="md"
+      >
+        <form onSubmit={handleLogSubmit}>
+          <Stack gap="md">
+            <TextInput
+              label="Date"
+              type="date"
+              value={logFormData.date}
+              onChange={(e) => setLogFormData({ ...logFormData, date: e.target.value })}
+              required
+              withAsterisk
+            />
 
-            <form onSubmit={handleLogSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Date *</label>
-                <input
-                  type="date"
-                  value={logFormData.date}
-                  onChange={(e) => setLogFormData({ ...logFormData, date: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
-              </div>
+            {loggingHabit?.type === 'boolean' ? (
+              <Checkbox
+                label="Completed"
+                checked={logFormData.completed || false}
+                onChange={(e) =>
+                  setLogFormData({ ...logFormData, completed: e.currentTarget.checked })
+                }
+              />
+            ) : (
+              <NumberInput
+                label={`Value ${loggingHabit?.unit ? `(${loggingHabit.unit})` : ''}`}
+                value={logFormData.value || 0}
+                onChange={(value) =>
+                  setLogFormData({ ...logFormData, value: typeof value === 'number' ? value : 0 })
+                }
+                min={0}
+                required
+                withAsterisk
+              />
+            )}
 
-              {loggingHabit.type === 'boolean' ? (
-                <div>
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={logFormData.completed || false}
-                      onChange={(e) =>
-                        setLogFormData({ ...logFormData, completed: e.target.checked })
-                      }
-                      className="w-5 h-5 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500"
-                    />
-                    <span className="text-white">Completed</span>
-                  </label>
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Value {loggingHabit.unit && `(${loggingHabit.unit})`}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={logFormData.value || 0}
-                    onChange={(e) =>
-                      setLogFormData({ ...logFormData, value: parseFloat(e.target.value) })
-                    }
-                    required
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  />
-                </div>
-              )}
+            <Textarea
+              label="Notes"
+              placeholder="Add notes about this entry..."
+              value={logFormData.notes}
+              onChange={(e) => setLogFormData({ ...logFormData, notes: e.target.value })}
+              rows={3}
+            />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Notes</label>
-                <textarea
-                  value={logFormData.notes}
-                  onChange={(e) => setLogFormData({ ...logFormData, notes: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Add notes about this entry..."
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLogModalOpen(false);
-                    setLoggingHabit(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={logMutation.isPending}
-                  className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50"
-                >
-                  {logMutation.isPending ? 'Logging...' : 'Log Entry'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
+            <Group justify="flex-end" mt="md">
+              <Button
+                variant="light"
+                onClick={() => {
+                  setLogModalOpen(false);
+                  setLoggingHabit(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                color="green"
+                loading={logMutation.isPending}
+              >
+                Log Entry
+              </Button>
+            </Group>
+          </Stack>
+        </form>
+      </Modal>
+    </Stack>
   );
 }

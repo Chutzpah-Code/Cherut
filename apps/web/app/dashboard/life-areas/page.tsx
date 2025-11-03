@@ -2,6 +2,25 @@
 
 import { useState } from 'react';
 import { Plus, Edit2, Trash2, TrendingUp } from 'lucide-react';
+import {
+  Title,
+  Text,
+  Button,
+  Card,
+  Group,
+  Stack,
+  SimpleGrid,
+  Modal,
+  TextInput,
+  Textarea,
+  Slider,
+  ThemeIcon,
+  Progress,
+  Loader,
+  Center,
+  ActionIcon,
+} from '@mantine/core';
+import { modals } from '@mantine/modals';
 import { useLifeAreas, useCreateLifeArea, useUpdateLifeArea, useDeleteLifeArea } from '@/hooks/useLifeAreas';
 import { CreateLifeAreaDto, LifeArea } from '@/lib/api/services/lifeAreas';
 
@@ -47,14 +66,20 @@ export default function LifeAreasPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this life area?')) {
-      try {
-        await deleteMutation.mutateAsync(id);
-      } catch (error) {
-        console.error('Error deleting life area:', error);
-      }
-    }
+  const handleDelete = (id: string) => {
+    modals.openConfirmModal({
+      title: 'Delete Life Area',
+      children: <Text size="sm">Are you sure you want to delete this life area? This action cannot be undone.</Text>,
+      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        try {
+          await deleteMutation.mutateAsync(id);
+        } catch (error) {
+          console.error('Error deleting life area:', error);
+        }
+      },
+    });
   };
 
   const handleNew = () => {
@@ -65,175 +90,153 @@ export default function LifeAreasPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-white">Loading...</div>
-      </div>
+      <Center h={300}>
+        <Loader size="lg" />
+      </Center>
     );
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
+    <Stack gap="lg">
+      <Group justify="space-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Life Areas</h1>
-          <p className="text-gray-400">Manage the key areas of your life</p>
+          <Title order={1} size="h2" mb="xs">Life Areas</Title>
+          <Text c="dimmed" size="sm">Manage the key areas of your life</Text>
         </div>
-        <button
-          onClick={handleNew}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-        >
-          <Plus className="w-5 h-5" />
+        <Button leftSection={<Plus size={20} />} onClick={handleNew}>
           New Life Area
-        </button>
-      </div>
+        </Button>
+      </Group>
 
       {/* Life Areas Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
         {lifeAreas?.map((area) => (
-          <div
-            key={area.id}
-            className="bg-gray-800 border border-gray-700 rounded-xl p-6 hover:border-gray-600 transition-colors"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-purple-600 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-white">{area.name}</h3>
-                  {area.description && (
-                    <p className="text-sm text-gray-400 mt-1">{area.description}</p>
-                  )}
-                </div>
+          <Card key={area.id} shadow="sm" padding="lg" withBorder>
+            <Group mb="md" wrap="nowrap">
+              <ThemeIcon size="xl" radius="md" color="violet" variant="light">
+                <TrendingUp size={24} />
+              </ThemeIcon>
+              <div style={{ flex: 1 }}>
+                <Text fw={600} size="lg">{area.name}</Text>
+                {area.description && (
+                  <Text size="sm" c="dimmed" lineClamp={2}>{area.description}</Text>
+                )}
               </div>
-            </div>
+            </Group>
 
             {area.satisfactionLevel !== undefined && (
-              <div className="mb-4">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-gray-400">Satisfaction</span>
-                  <span className="text-white font-medium">{area.satisfactionLevel}/10</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-purple-600 h-2 rounded-full transition-all"
-                    style={{ width: `${(area.satisfactionLevel / 10) * 100}%` }}
-                  />
-                </div>
-              </div>
+              <Stack gap="xs" mb="md">
+                <Group justify="space-between">
+                  <Text size="sm" c="dimmed">Satisfaction</Text>
+                  <Text size="sm" fw={500}>{area.satisfactionLevel}/10</Text>
+                </Group>
+                <Progress value={area.satisfactionLevel * 10} color="violet" />
+              </Stack>
             )}
 
-            <div className="flex items-center gap-2 pt-4 border-t border-gray-700">
-              <button
+            <Group gap="xs" mt="md" pt="md" style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
+              <Button
+                variant="light"
+                leftSection={<Edit2 size={16} />}
                 onClick={() => handleEdit(area)}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+                fullWidth
+                size="sm"
               >
-                <Edit2 className="w-4 h-4" />
                 Edit
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="light"
+                color="red"
+                leftSection={<Trash2 size={16} />}
                 onClick={() => handleDelete(area.id)}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors"
+                fullWidth
+                size="sm"
               >
-                <Trash2 className="w-4 h-4" />
                 Delete
-              </button>
-            </div>
-          </div>
+              </Button>
+            </Group>
+          </Card>
         ))}
+      </SimpleGrid>
 
-        {lifeAreas?.length === 0 && (
-          <div className="col-span-full text-center py-12">
-            <p className="text-gray-400 mb-4">No life areas yet</p>
-            <button
-              onClick={handleNew}
-              className="text-red-500 hover:text-red-400"
-            >
+      {lifeAreas?.length === 0 && (
+        <Card shadow="sm" padding="xl" withBorder>
+          <Stack align="center" gap="md">
+            <Text c="dimmed">No life areas yet</Text>
+            <Button variant="light" onClick={handleNew}>
               Create your first life area
-            </button>
-          </div>
-        )}
-      </div>
+            </Button>
+          </Stack>
+        </Card>
+      )}
 
       {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-xl max-w-md w-full p-6 border border-gray-700">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              {editingArea ? 'Edit Life Area' : 'New Life Area'}
-            </h2>
+      <Modal
+        opened={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingArea(null);
+        }}
+        title={editingArea ? 'Edit Life Area' : 'New Life Area'}
+        size="md"
+      >
+        <form onSubmit={handleSubmit}>
+          <Stack gap="md">
+            <TextInput
+              label="Name"
+              placeholder="e.g., Health & Fitness"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+              withAsterisk
+            />
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="e.g., Health & Fitness"
-                />
-              </div>
+            <Textarea
+              label="Description"
+              placeholder="Describe this life area..."
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3}
+            />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Description
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Describe this life area..."
-                />
-              </div>
+            <div>
+              <Text size="sm" fw={500} mb="xs">
+                Satisfaction Level: {formData.satisfactionLevel}/10
+              </Text>
+              <Slider
+                value={formData.satisfactionLevel}
+                onChange={(value) => setFormData({ ...formData, satisfactionLevel: value })}
+                min={0}
+                max={10}
+                step={1}
+                marks={[
+                  { value: 0, label: '0' },
+                  { value: 5, label: '5' },
+                  { value: 10, label: '10' },
+                ]}
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Satisfaction Level: {formData.satisfactionLevel}/10
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="10"
-                  value={formData.satisfactionLevel}
-                  onChange={(e) =>
-                    setFormData({ ...formData, satisfactionLevel: parseInt(e.target.value) })
-                  }
-                  className="w-full"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    setEditingArea(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50"
-                >
-                  {createMutation.isPending || updateMutation.isPending
-                    ? 'Saving...'
-                    : editingArea
-                    ? 'Update'
-                    : 'Create'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
+            <Group justify="flex-end" mt="md">
+              <Button
+                variant="light"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingArea(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                loading={createMutation.isPending || updateMutation.isPending}
+              >
+                {editingArea ? 'Update' : 'Create'}
+              </Button>
+            </Group>
+          </Stack>
+        </form>
+      </Modal>
+    </Stack>
   );
 }

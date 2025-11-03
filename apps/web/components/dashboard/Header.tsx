@@ -1,42 +1,115 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { Bell, Menu } from 'lucide-react';
+import { Bell, Moon, Sun, Sparkles } from 'lucide-react';
+import { Group, Burger, Text, ActionIcon, Avatar, Box, useMantineColorScheme, useComputedColorScheme, Badge, Stack, Indicator } from '@mantine/core';
+import { useEffect, useState } from 'react';
 
 interface HeaderProps {
-  onMenuClick: () => void;
+  mobileOpened: boolean;
+  desktopOpened: boolean;
+  toggleMobile: () => void;
+  toggleDesktop: () => void;
 }
 
-export default function Header({ onMenuClick }: HeaderProps) {
+export default function Header({ mobileOpened, desktopOpened, toggleMobile, toggleDesktop }: HeaderProps) {
   const { user } = useAuth();
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light');
+  const [mounted, setMounted] = useState(false);
+  const [greeting, setGreeting] = useState('Welcome back');
+
+  useEffect(() => {
+    setMounted(true);
+    
+    // Define saudação baseada no horário
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      setGreeting('Good morning');
+    } else if (hour < 18) {
+      setGreeting('Good afternoon');
+    } else {
+      setGreeting('Good evening');
+    }
+  }, []);
+
+  const toggleColorScheme = () => {
+    const newScheme = computedColorScheme === 'dark' ? 'light' : 'dark';
+    setColorScheme(newScheme);
+    localStorage.setItem('mantine-color-scheme-cherut', newScheme);
+  };
+
+  const getFirstName = () => {
+    if (!user?.email) return 'there';
+    const name = user.email.split('@')[0];
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
 
   return (
-    <header className="bg-gray-800 border-b border-gray-700 h-16 flex items-center justify-between px-4 sm:px-6">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onMenuClick}
-          className="lg:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-        <div className="hidden sm:block">
-          <h2 className="text-lg sm:text-xl font-semibold text-white">Welcome back!</h2>
-          <p className="text-xs sm:text-sm text-gray-400">{user?.email || 'Loading...'}</p>
-        </div>
-        <div className="sm:hidden">
-          <h2 className="text-lg font-semibold text-white">Cherut</h2>
-        </div>
-      </div>
+    <Group h="100%" px="md" justify="space-between">
+      <Group gap="md">
+        <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="lg" size="sm" />
+        <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="lg" size="sm" />
+      </Group>
 
-      <div className="flex items-center gap-2 sm:gap-4">
-        <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
-          <Bell className="w-5 h-5" />
-        </button>
+      <Group gap="xs">
+        {mounted && (
+          <ActionIcon
+            variant="subtle"
+            size="lg"
+            radius="xl"
+            onClick={toggleColorScheme}
+            title={`Switch to ${computedColorScheme === 'dark' ? 'light' : 'dark'} mode`}
+            style={{
+              transition: 'all 0.3s ease',
+            }}
+          >
+            {computedColorScheme === 'dark' ? (
+              <Sun size={20} style={{ color: 'var(--mantine-color-yellow-5)' }} />
+            ) : (
+              <Moon size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            )}
+          </ActionIcon>
+        )}
 
-        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-semibold text-sm sm:text-base">
-          {user?.email?.[0].toUpperCase() || 'U'}
-        </div>
-      </div>
-    </header>
+        <Indicator inline color="red" size={8} offset={5} disabled>
+          <ActionIcon 
+            variant="subtle" 
+            size="lg" 
+            radius="xl"
+            title="Notifications"
+          >
+            <Bell size={20} />
+          </ActionIcon>
+        </Indicator>
+
+        <Group gap="xs" ml="xs">
+          <Avatar 
+            color="blue" 
+            radius="xl"
+            size="md"
+            styles={{
+              root: {
+                border: '2px solid var(--mantine-color-blue-6)',
+                cursor: 'pointer',
+              }
+            }}
+          >
+            {user?.email?.[0].toUpperCase() || 'U'}
+          </Avatar>
+          
+          <Box visibleFrom="sm">
+            <Stack gap={0}>
+              <Text size="sm" fw={600} lineClamp={1}>
+                {getFirstName()}
+              </Text>
+              <Badge size="xs" variant="light" color="green">
+                Active
+              </Badge>
+            </Stack>
+          </Box>
+        </Group>
+      </Group>
+    </Group>
   );
 }

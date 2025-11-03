@@ -1,4 +1,12 @@
 import type { Metadata } from 'next';
+import { ColorSchemeScript } from '@mantine/core';
+import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
+import '@mantine/dates/styles.css';
+import '@mantine/dropzone/styles.css';
+import '@mantine/carousel/styles.css';
+import '@mantine/spotlight/styles.css';
+import '@mantine/nprogress/styles.css';
 import './globals.css';
 import { Providers } from './providers';
 import Script from 'next/script';
@@ -15,6 +23,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <ColorSchemeScript defaultColorScheme="light" />
+      </head>
       <body className="antialiased" suppressHydrationWarning>
         <Script src="/debug-logger.js" strategy="beforeInteractive" />
         <Providers>

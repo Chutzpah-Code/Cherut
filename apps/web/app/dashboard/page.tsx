@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Target, CheckSquare, TrendingUp, Calendar, Clock } from 'lucide-react';
+import { Card, Title, Text, Button, Group, Stack, SimpleGrid, Loader, ThemeIcon } from '@mantine/core';
 import { useObjectives } from '@/hooks/useObjectives';
 import { useTasks } from '@/hooks/useTasks';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
@@ -21,10 +22,10 @@ export default function DashboardPage() {
   const activeHabits = habits?.filter((habit) => habit.isActive).length || 0;
 
   const stats = [
-    { name: 'Active Objectives', value: activeObjectives, icon: Target, color: 'bg-blue-600' },
-    { name: 'Open Tasks', value: openTasks, icon: CheckSquare, color: 'bg-green-600' },
-    { name: 'Life Areas', value: lifeAreasCount, icon: TrendingUp, color: 'bg-purple-600' },
-    { name: 'Active Habits', value: activeHabits, icon: Calendar, color: 'bg-orange-600' },
+    { name: 'Active Objectives', value: activeObjectives, icon: Target, color: 'blue' },
+    { name: 'Open Tasks', value: openTasks, icon: CheckSquare, color: 'green' },
+    { name: 'Life Areas', value: lifeAreasCount, icon: TrendingUp, color: 'violet' },
+    { name: 'Active Habits', value: activeHabits, icon: Calendar, color: 'orange' },
   ];
 
   // Get recent activity from all sources
@@ -69,100 +70,98 @@ export default function DashboardPage() {
   const isLoading = objectivesLoading || tasksLoading || lifeAreasLoading || habitsLoading;
 
   return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Dashboard</h1>
-        <p className="text-sm sm:text-base text-gray-400">Overview of your personal excellence journey</p>
+    <Stack gap="lg">
+      <div>
+        <Title order={1} size="h2" mb="xs">Dashboard</Title>
+        <Text c="dimmed" size="sm">Overview of your personal excellence journey</Text>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div
-              key={stat.name}
-              className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:border-gray-600 transition-colors"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`${stat.color} p-3 rounded-lg`}>
-                  <Icon className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <div className="mt-3 sm:mt-4">
-                <p className="text-gray-400 text-xs sm:text-sm font-medium">{stat.name}</p>
-                <p className="text-2xl sm:text-3xl font-bold text-white mt-1">
-                  {isLoading ? '...' : stat.value}
-                </p>
-              </div>
-            </div>
+            <Card key={stat.name} shadow="sm" padding="lg" withBorder>
+              <Group justify="space-between" mb="md">
+                <ThemeIcon size="xl" radius="md" color={stat.color}>
+                  <Icon size={24} />
+                </ThemeIcon>
+              </Group>
+              <Text size="sm" c="dimmed" fw={500}>{stat.name}</Text>
+              <Title order={2} mt="xs">
+                {isLoading ? <Loader size="sm" /> : stat.value}
+              </Title>
+            </Card>
           );
         })}
-      </div>
+      </SimpleGrid>
 
       {/* Quick Actions */}
-      <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
-        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-          <button
+      <Card shadow="sm" padding="lg" withBorder>
+        <Title order={3} size="h4" mb="md">Quick Actions</Title>
+        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+          <Button
+            leftSection={<Target size={20} />}
             onClick={() => router.push('/dashboard/objectives')}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            fullWidth
           >
-            <Target className="w-5 h-5" />
             New Objective
-          </button>
-          <button
+          </Button>
+          <Button
+            leftSection={<CheckSquare size={20} />}
             onClick={() => router.push('/dashboard/tasks')}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+            variant="light"
+            fullWidth
           >
-            <CheckSquare className="w-5 h-5" />
             Add Task
-          </button>
-          <button
+          </Button>
+          <Button
+            leftSection={<Calendar size={20} />}
             onClick={() => router.push('/dashboard/habits')}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+            variant="light"
+            fullWidth
           >
-            <Calendar className="w-5 h-5" />
             Track Habit
-          </button>
-        </div>
-      </div>
+          </Button>
+        </SimpleGrid>
+      </Card>
 
       {/* Recent Activity */}
-      <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Recent Activity</h2>
+      <Card shadow="sm" padding="lg" withBorder>
+        <Title order={3} size="h4" mb="md">Recent Activity</Title>
         {isLoading ? (
-          <div className="text-center py-8 text-gray-400">
-            <p>Loading...</p>
-          </div>
+          <Group justify="center" py="xl">
+            <Loader />
+          </Group>
         ) : recentActivity.length > 0 ? (
-          <div className="space-y-4">
+          <Stack gap="md">
             {recentActivity.map((activity, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-3 p-3 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-sm font-medium ${activity.color}`}>
-                      {activity.type}
-                    </span>
-                    <span className="text-gray-500">•</span>
-                    <span className="text-xs text-gray-500">{activity.time}</span>
+              <Card key={index} padding="md" withBorder style={{ cursor: 'pointer' }}>
+                <Group gap="md" wrap="nowrap">
+                  <ThemeIcon variant="light" size="lg" color="gray">
+                    <Clock size={20} />
+                  </ThemeIcon>
+                  <div style={{ flex: 1 }}>
+                    <Group gap="xs">
+                      <Text size="sm" fw={500} c={activity.color.replace('text-', '').replace('-400', '')}>
+                        {activity.type}
+                      </Text>
+                      <Text size="xs" c="dimmed">•</Text>
+                      <Text size="xs" c="dimmed">{activity.time}</Text>
+                    </Group>
+                    <Text size="sm" mt={4}>{activity.title}</Text>
                   </div>
-                  <p className="text-white mt-1">{activity.title}</p>
-                </div>
-              </div>
+                </Group>
+              </Card>
             ))}
-          </div>
+          </Stack>
         ) : (
-          <div className="text-center py-8 text-gray-400">
-            <p>No recent activity yet</p>
-            <p className="text-sm mt-2">Start by creating your first objective or task</p>
-          </div>
+          <Stack align="center" py="xl">
+            <Text c="dimmed">No recent activity yet</Text>
+            <Text size="sm" c="dimmed">Start by creating your first objective or task</Text>
+          </Stack>
         )}
-      </div>
-    </div>
+      </Card>
+    </Stack>
   );
 }

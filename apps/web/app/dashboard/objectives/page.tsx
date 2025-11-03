@@ -2,6 +2,27 @@
 
 import { useState } from 'react';
 import { Plus, Edit2, Trash2, Target, Calendar, TrendingUp } from 'lucide-react';
+import {
+  Title,
+  Text,
+  Button,
+  Card,
+  Group,
+  Stack,
+  SimpleGrid,
+  Modal,
+  TextInput,
+  Textarea,
+  Select,
+  ThemeIcon,
+  Progress,
+  Loader,
+  Center,
+  Badge,
+  Grid,
+} from '@mantine/core';
+import { DateInput } from '@mantine/dates';
+import { modals } from '@mantine/modals';
 import { useObjectives, useCreateObjective, useUpdateObjective, useDeleteObjective } from '@/hooks/useObjectives';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { CreateObjectiveDto, Objective } from '@/lib/api/services/objectives';
@@ -15,22 +36,38 @@ export default function ObjectivesPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingObjective, setEditingObjective] = useState<Objective | null>(null);
-  const [formData, setFormData] = useState<CreateObjectiveDto>({
+  const [formData, setFormData] = useState<{
+    lifeAreaId: string;
+    title: string;
+    description: string;
+    startDate: Date | null;
+    endDate: Date | null;
+  }>({
     lifeAreaId: '',
     title: '',
     description: '',
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: '',
+    startDate: new Date(),
+    endDate: null,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.startDate || !formData.endDate) return;
+
     try {
+      const dto: CreateObjectiveDto = {
+        lifeAreaId: formData.lifeAreaId,
+        title: formData.title,
+        description: formData.description,
+        startDate: formData.startDate.toISOString().split('T')[0],
+        endDate: formData.endDate.toISOString().split('T')[0],
+      };
+
       if (editingObjective) {
-        await updateMutation.mutateAsync({ id: editingObjective.id, dto: formData });
+        await updateMutation.mutateAsync({ id: editingObjective.id, dto });
       } else {
-        await createMutation.mutateAsync(formData);
+        await createMutation.mutateAsync(dto);
       }
 
       setIsModalOpen(false);
@@ -39,8 +76,8 @@ export default function ObjectivesPage() {
         lifeAreaId: '',
         title: '',
         description: '',
-        startDate: new Date().toISOString().split('T')[0],
-        endDate: '',
+        startDate: new Date(),
+        endDate: null,
       });
     } catch (error) {
       console.error('Error saving objective:', error);
@@ -53,20 +90,26 @@ export default function ObjectivesPage() {
       lifeAreaId: objective.lifeAreaId,
       title: objective.title,
       description: objective.description || '',
-      startDate: objective.startDate.split('T')[0],
-      endDate: objective.endDate.split('T')[0],
+      startDate: new Date(objective.startDate),
+      endDate: new Date(objective.endDate),
     });
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this objective?')) {
-      try {
-        await deleteMutation.mutateAsync(id);
-      } catch (error) {
-        console.error('Error deleting objective:', error);
-      }
-    }
+  const handleDelete = (id: string) => {
+    modals.openConfirmModal({
+      title: 'Delete Objective',
+      children: <Text size="sm">Are you sure you want to delete this objective? This action cannot be undone.</Text>,
+      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        try {
+          await deleteMutation.mutateAsync(id);
+        } catch (error) {
+          console.error('Error deleting objective:', error);
+        }
+      },
+    });
   };
 
   const handleNew = () => {
@@ -75,8 +118,8 @@ export default function ObjectivesPage() {
       lifeAreaId: '',
       title: '',
       description: '',
-      startDate: new Date().toISOString().split('T')[0],
-      endDate: '',
+      startDate: new Date(),
+      endDate: null,
     });
     setIsModalOpen(true);
   };
@@ -88,13 +131,13 @@ export default function ObjectivesPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-600';
+        return 'green';
       case 'completed':
-        return 'bg-blue-600';
+        return 'blue';
       case 'cancelled':
-        return 'bg-gray-600';
+        return 'gray';
       default:
-        return 'bg-gray-600';
+        return 'gray';
     }
   };
 
@@ -104,232 +147,190 @@ export default function ObjectivesPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-white">Loading...</div>
-      </div>
+      <Center h={300}>
+        <Loader size="lg" />
+      </Center>
     );
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
+    <Stack gap="lg">
+      <Group justify="space-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Objectives</h1>
-          <p className="text-gray-400">Manage your OKRs and objectives</p>
+          <Title order={1} size="h2" mb="xs">Objectives</Title>
+          <Text c="dimmed" size="sm">Manage your OKRs and objectives</Text>
         </div>
-        <button
-          onClick={handleNew}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-        >
-          <Plus className="w-5 h-5" />
+        <Button leftSection={<Plus size={20} />} onClick={handleNew}>
           New Objective
-        </button>
-      </div>
+        </Button>
+      </Group>
 
       {/* Objectives Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
         {objectives?.map((objective) => (
-          <div
-            key={objective.id}
-            className="bg-gray-800 border border-gray-700 rounded-xl p-6 hover:border-gray-600 transition-colors"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-start gap-3 flex-1">
-                <div className="p-3 bg-blue-600 rounded-lg">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg font-semibold text-white">{objective.title}</h3>
-                    <span
-                      className={`px-2 py-1 text-xs font-medium text-white rounded-full ${getStatusColor(
-                        objective.status
-                      )}`}
-                    >
-                      {getStatusText(objective.status)}
-                    </span>
-                  </div>
-                  {objective.description && (
-                    <p className="text-sm text-gray-400 mb-3">{objective.description}</p>
-                  )}
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <TrendingUp className="w-4 h-4" />
-                    <span>{getLifeAreaName(objective.lifeAreaId)}</span>
-                  </div>
-                </div>
+          <Card key={objective.id} shadow="sm" padding="lg" withBorder>
+            <Group mb="md" wrap="nowrap" align="flex-start">
+              <ThemeIcon size="xl" radius="md" color="blue" variant="light">
+                <Target size={24} />
+              </ThemeIcon>
+              <div style={{ flex: 1 }}>
+                <Group mb="xs" gap="xs">
+                  <Text fw={600} size="lg" style={{ flex: 1 }}>{objective.title}</Text>
+                  <Badge color={getStatusColor(objective.status)} size="sm">
+                    {getStatusText(objective.status)}
+                  </Badge>
+                </Group>
+                {objective.description && (
+                  <Text size="sm" c="dimmed" mb="sm" lineClamp={2}>{objective.description}</Text>
+                )}
+                <Group gap="xs">
+                  <TrendingUp size={14} />
+                  <Text size="xs" c="dimmed">{getLifeAreaName(objective.lifeAreaId)}</Text>
+                </Group>
               </div>
-            </div>
+            </Group>
 
             {/* Progress Bar */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-gray-400">Progress</span>
-                <span className="text-white font-medium">{objective.progress}%</span>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-blue-600 h-2 rounded-full transition-all"
-                  style={{ width: `${objective.progress}%` }}
-                />
-              </div>
-            </div>
+            <Stack gap="xs" mb="md">
+              <Group justify="space-between">
+                <Text size="sm" c="dimmed">Progress</Text>
+                <Text size="sm" fw={500}>{objective.progress}%</Text>
+              </Group>
+              <Progress value={objective.progress} color="blue" />
+            </Stack>
 
             {/* Dates */}
-            <div className="flex items-center gap-4 mb-4 text-sm text-gray-400">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>{new Date(objective.startDate).toLocaleDateString()}</span>
-              </div>
-              <span>→</span>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>{new Date(objective.endDate).toLocaleDateString()}</span>
-              </div>
-            </div>
+            <Group gap="sm" mb="md" wrap="nowrap">
+              <Group gap={4}>
+                <Calendar size={14} />
+                <Text size="xs" c="dimmed">{new Date(objective.startDate).toLocaleDateString()}</Text>
+              </Group>
+              <Text size="xs" c="dimmed">→</Text>
+              <Group gap={4}>
+                <Calendar size={14} />
+                <Text size="xs" c="dimmed">{new Date(objective.endDate).toLocaleDateString()}</Text>
+              </Group>
+            </Group>
 
             {/* Actions */}
-            <div className="flex items-center gap-2 pt-4 border-t border-gray-700">
-              <button
+            <Group gap="xs" mt="md" pt="md" style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
+              <Button
+                variant="light"
+                leftSection={<Edit2 size={16} />}
                 onClick={() => handleEdit(objective)}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+                fullWidth
+                size="sm"
               >
-                <Edit2 className="w-4 h-4" />
                 Edit
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="light"
+                color="red"
+                leftSection={<Trash2 size={16} />}
                 onClick={() => handleDelete(objective.id)}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors"
+                fullWidth
+                size="sm"
               >
-                <Trash2 className="w-4 h-4" />
                 Delete
-              </button>
-            </div>
-          </div>
+              </Button>
+            </Group>
+          </Card>
         ))}
+      </SimpleGrid>
 
-        {objectives?.length === 0 && (
-          <div className="col-span-full text-center py-12">
-            <p className="text-gray-400 mb-4">No objectives yet</p>
-            <button
-              onClick={handleNew}
-              className="text-red-500 hover:text-red-400"
-            >
+      {objectives?.length === 0 && (
+        <Card shadow="sm" padding="xl" withBorder>
+          <Stack align="center" gap="md">
+            <Text c="dimmed">No objectives yet</Text>
+            <Button variant="light" onClick={handleNew}>
               Create your first objective
-            </button>
-          </div>
-        )}
-      </div>
+            </Button>
+          </Stack>
+        </Card>
+      )}
 
       {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-xl max-w-md w-full p-6 border border-gray-700">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              {editingObjective ? 'Edit Objective' : 'New Objective'}
-            </h2>
+      <Modal
+        opened={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingObjective(null);
+        }}
+        title={editingObjective ? 'Edit Objective' : 'New Objective'}
+        size="md"
+      >
+        <form onSubmit={handleSubmit}>
+          <Stack gap="md">
+            <Select
+              label="Life Area"
+              placeholder="Select a life area"
+              value={formData.lifeAreaId}
+              onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
+              data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
+              required
+              withAsterisk
+            />
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Life Area *
-                </label>
-                <select
-                  value={formData.lifeAreaId}
-                  onChange={(e) => setFormData({ ...formData, lifeAreaId: e.target.value })}
+            <TextInput
+              label="Title"
+              placeholder="e.g., Achieve 10% body fat"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              required
+              withAsterisk
+            />
+
+            <Textarea
+              label="Description"
+              placeholder="Describe this objective..."
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3}
+            />
+
+            <Grid>
+              <Grid.Col span={6}>
+                <DateInput
+                  label="Start Date"
+                  placeholder="Select start date"
+                  value={formData.startDate}
+                  onChange={(value) => setFormData({ ...formData, startDate: value })}
                   required
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
-                  <option value="">Select a life area</option>
-                  {lifeAreas?.map((area) => (
-                    <option key={area.id} value={area.id}>
-                      {area.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Title *
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <DateInput
+                  label="End Date"
+                  placeholder="Select end date"
+                  value={formData.endDate}
+                  onChange={(value) => setFormData({ ...formData, endDate: value })}
                   required
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="e.g., Achieve 10% body fat"
+                  withAsterisk
                 />
-              </div>
+              </Grid.Col>
+            </Grid>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Description
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Describe this objective..."
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Start Date *
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    required
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    End Date *
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    required
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    setEditingObjective(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50"
-                >
-                  {createMutation.isPending || updateMutation.isPending
-                    ? 'Saving...'
-                    : editingObjective
-                    ? 'Update'
-                    : 'Create'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
+            <Group justify="flex-end" mt="md">
+              <Button
+                variant="light"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingObjective(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                loading={createMutation.isPending || updateMutation.isPending}
+              >
+                {editingObjective ? 'Update' : 'Create'}
+              </Button>
+            </Group>
+          </Stack>
+        </form>
+      </Modal>
+    </Stack>
   );
 }
