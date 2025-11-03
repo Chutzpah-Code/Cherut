@@ -1,12 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { registerUser } from '@/lib/firebase/auth';
 import apiClient from '@/lib/api/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEffect } from 'react';
+import {
+  Container,
+  Paper,
+  Title,
+  Text,
+  TextInput,
+  PasswordInput,
+  Button,
+  Stack,
+  Alert,
+  Anchor,
+  Box,
+} from '@mantine/core';
+import { ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -65,85 +78,229 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-gray-800 rounded-2xl shadow-2xl p-8 border border-gray-700">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-            <p className="text-gray-400">Start mastering your life today</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded-lg">
-                {error}
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                placeholder="you@example.com"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    <Box
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
+        padding: '20px',
+      }}
+    >
+      <Container size="xs" style={{ width: '100%' }}>
+        <Stack gap="xl">
+          {/* Logo/Brand */}
+          <Stack gap="xs" align="center">
+            <Box
+              style={{
+                width: 60,
+                height: 60,
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 32px rgba(59, 130, 246, 0.35)',
+              }}
             >
-              {loading ? 'Creating account...' : 'Create Account'}
-            </button>
-          </form>
+              <Sparkles size={32} color="white" />
+            </Box>
+            <Title
+              order={1}
+              ta="center"
+              style={{
+                fontSize: 'clamp(28px, 5vw, 36px)',
+                fontWeight: 900,
+                color: 'white',
+                lineHeight: 1.2,
+              }}
+            >
+              Create Account
+            </Title>
+            <Text size="md" c="dimmed" ta="center" fw={500}>
+              Start your journey to elite performance
+            </Text>
+          </Stack>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-400">
+          {/* Form Card */}
+          <Paper
+            radius="lg"
+            p="xl"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            }}
+          >
+            <form onSubmit={handleSubmit}>
+              <Stack gap="lg">
+                {error && (
+                  <Alert
+                    icon={<AlertCircle size={20} />}
+                    title="Error"
+                    color="red"
+                    radius="md"
+                    styles={{
+                      root: {
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                      },
+                      title: { color: '#fca5a5' },
+                      message: { color: '#fca5a5' },
+                    }}
+                  >
+                    {error}
+                  </Alert>
+                )}
+
+                <TextInput
+                  label="Email"
+                  placeholder="you@example.com"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  size="md"
+                  styles={{
+                    label: {
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      fontWeight: 500,
+                      marginBottom: 8,
+                    },
+                    input: {
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      color: 'white',
+                      '&::placeholder': {
+                        color: 'rgba(255, 255, 255, 0.4)',
+                      },
+                      '&:focus': {
+                        borderColor: '#3b82f6',
+                        boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
+                      },
+                    },
+                  }}
+                />
+
+                <PasswordInput
+                  label="Password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  size="md"
+                  styles={{
+                    label: {
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      fontWeight: 500,
+                      marginBottom: 8,
+                    },
+                    input: {
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      color: 'white',
+                      '&::placeholder': {
+                        color: 'rgba(255, 255, 255, 0.4)',
+                      },
+                      '&:focus': {
+                        borderColor: '#3b82f6',
+                        boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
+                      },
+                    },
+                    innerInput: {
+                      color: 'white',
+                    },
+                  }}
+                />
+
+                <PasswordInput
+                  label="Confirm Password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  size="md"
+                  styles={{
+                    label: {
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      fontWeight: 500,
+                      marginBottom: 8,
+                    },
+                    input: {
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      color: 'white',
+                      '&::placeholder': {
+                        color: 'rgba(255, 255, 255, 0.4)',
+                      },
+                      '&:focus': {
+                        borderColor: '#3b82f6',
+                        boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
+                      },
+                    },
+                    innerInput: {
+                      color: 'white',
+                    },
+                  }}
+                />
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  radius="md"
+                  fullWidth
+                  loading={loading}
+                  variant="gradient"
+                  gradient={{ from: 'blue', to: 'cyan', deg: 45 }}
+                  rightSection={<ArrowRight size={20} />}
+                  style={{
+                    boxShadow: '0 8px 32px rgba(59, 130, 246, 0.35)',
+                  }}
+                >
+                  Create Account
+                </Button>
+              </Stack>
+            </form>
+          </Paper>
+
+          {/* Footer Links */}
+          <Stack gap="md" align="center">
+            <Text size="sm" c="dimmed" ta="center">
               Already have an account?{' '}
-              <Link href="/auth/login" className="text-red-500 hover:text-red-400 font-medium">
+              <Anchor
+                component={Link}
+                href="/auth/login"
+                c="blue"
+                fw={600}
+                style={{
+                  textDecoration: 'none',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                  },
+                }}
+              >
                 Sign in
-              </Link>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+              </Anchor>
+            </Text>
+
+            <Anchor
+              component={Link}
+              href="/"
+              c="dimmed"
+              size="sm"
+              style={{
+                textDecoration: 'none',
+                '&:hover': {
+                  color: 'white',
+                },
+              }}
+            >
+              ← Back to home
+            </Anchor>
+          </Stack>
+        </Stack>
+      </Container>
+    </Box>
   );
 }
