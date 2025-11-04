@@ -21,6 +21,11 @@ export enum HabitType {
   DURATION = 'duration', // Time in minutes
 }
 
+export enum HabitCategory {
+  GOOD = 'good', // Hábitos para começar
+  BAD = 'bad',   // Hábitos para eliminar
+}
+
 export class CreateHabitDto {
   @IsString()
   @IsNotEmpty()
@@ -29,6 +34,10 @@ export class CreateHabitDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsEnum(HabitCategory)
+  @IsNotEmpty()
+  category: HabitCategory;
 
   @IsEnum(HabitType)
   @IsNotEmpty()
@@ -65,4 +74,9 @@ export class CreateHabitDto {
   @IsString()
   @IsOptional()
   lifeAreaId?: string;
+
+  // Due date (YYYY-MM-DD format) - Target date to complete the habit
+  @IsString()
+  @IsOptional()
+  dueDate?: string;
 }

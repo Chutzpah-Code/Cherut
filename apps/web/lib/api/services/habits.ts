@@ -6,12 +6,14 @@ export interface Habit {
   lifeAreaId?: string;
   title: string;
   description?: string;
+  category: 'good' | 'bad';
   type: 'boolean' | 'counter' | 'duration';
   frequency: 'daily' | 'weekly' | 'monthly';
   targetValue?: number;
   unit?: string;
   weekDays?: number[];
   reminderTime?: string;
+  dueDate?: string;
   isActive: boolean;
   streak: number;
   lastCompletedAt?: string;
@@ -34,6 +36,7 @@ export interface HabitLog {
 export interface CreateHabitDto {
   title: string;
   description?: string;
+  category: 'good' | 'bad';
   type: 'boolean' | 'counter' | 'duration';
   frequency: 'daily' | 'weekly' | 'monthly';
   targetValue?: number;
@@ -41,11 +44,13 @@ export interface CreateHabitDto {
   weekDays?: number[];
   reminderTime?: string;
   lifeAreaId?: string;
+  dueDate?: string;
 }
 
 export interface UpdateHabitDto {
   title?: string;
   description?: string;
+  category?: 'good' | 'bad';
   type?: 'boolean' | 'counter' | 'duration';
   frequency?: 'daily' | 'weekly' | 'monthly';
   targetValue?: number;
@@ -53,6 +58,7 @@ export interface UpdateHabitDto {
   weekDays?: number[];
   reminderTime?: string;
   lifeAreaId?: string;
+  dueDate?: string;
   isActive?: boolean;
 }
 

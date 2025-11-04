@@ -188,25 +188,32 @@ export class HabitsService {
     // Verify habit ownership
     await this.findOne(userId, habitId);
 
-    let query = db
-      .collection(this.logsCollection)
-      .where('userId', '==', userId)
-      .where('habitId', '==', habitId);
+    try {
+      let query = db
+        .collection(this.logsCollection)
+        .where('userId', '==', userId)
+        .where('habitId', '==', habitId);
 
-    if (startDate) {
-      query = query.where('date', '>=', startDate);
+      // Only add date filters if provided
+      if (startDate && endDate) {
+        query = query.where('date', '>=', startDate).where('date', '<=', endDate);
+      } else if (startDate) {
+        query = query.where('date', '>=', startDate);
+      } else if (endDate) {
+        query = query.where('date', '<=', endDate);
+      }
+
+      const snapshot = await query.orderBy('date', 'desc').get();
+
+      return snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+    } catch (error) {
+      // If query fails (e.g., no index), return empty array
+      this.logger.warn(`Failed to get habit logs for ${habitId}: ${error.message}`);
+      return [];
     }
-
-    if (endDate) {
-      query = query.where('date', '<=', endDate);
-    }
-
-    const snapshot = await query.orderBy('date', 'desc').get();
-
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
   }
 
   // Helper methods
