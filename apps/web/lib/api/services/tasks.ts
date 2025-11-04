@@ -1,18 +1,39 @@
 import { apiClient } from '../client';
 
+export interface ChecklistItem {
+  id: string;
+  title: string;
+  completed: boolean;
+  timeTracked?: number; // seconds
+}
+
+export interface TimeTrackingEntry {
+  id: string;
+  startTime: string;
+  endTime?: string;
+  duration?: number; // seconds
+  status: 'running' | 'paused' | 'completed' | 'cancelled';
+}
+
 export interface Task {
   id: string;
   userId: string;
   lifeAreaId: string;
   objectiveId?: string;
+  keyResultId?: string;
   actionPlanId?: string;
   title: string;
   description?: string;
   status: 'todo' | 'in_progress' | 'done';
-  priority: 'low' | 'medium' | 'high';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
   estimatedPomodoros?: number;
   completedPomodoros: number;
+  checklist?: ChecklistItem[];
+  timeTracking?: TimeTrackingEntry[];
+  totalTimeTracked?: number; // seconds
+  archived?: boolean;
+  tags?: string[];
   order: number;
   isActive: boolean;
   createdAt: string;
@@ -22,24 +43,30 @@ export interface Task {
 export interface CreateTaskDto {
   lifeAreaId: string;
   objectiveId?: string;
+  keyResultId?: string;
   actionPlanId?: string;
   title: string;
   description?: string;
-  priority?: 'low' | 'medium' | 'high';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
   estimatedPomodoros?: number;
+  checklist?: ChecklistItem[];
+  tags?: string[];
 }
 
 export interface UpdateTaskDto {
   lifeAreaId?: string;
   objectiveId?: string;
+  keyResultId?: string;
   actionPlanId?: string;
   title?: string;
   description?: string;
   status?: 'todo' | 'in_progress' | 'done';
-  priority?: 'low' | 'medium' | 'high';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
   estimatedPomodoros?: number;
+  checklist?: ChecklistItem[];
+  tags?: string[];
 }
 
 export interface UpdateTaskOrderDto {
@@ -93,5 +120,37 @@ export const tasksApi = {
 
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/tasks/${id}`);
+  },
+
+  // Time Tracking
+  startTimeTracking: async (id: string): Promise<Task> => {
+    const { data } = await apiClient.post(`/tasks/${id}/time-tracking/start`);
+    return data;
+  },
+
+  pauseTimeTracking: async (id: string, trackingId: string): Promise<Task> => {
+    const { data } = await apiClient.patch(`/tasks/${id}/time-tracking/${trackingId}/pause`);
+    return data;
+  },
+
+  stopTimeTracking: async (id: string, trackingId: string): Promise<Task> => {
+    const { data } = await apiClient.patch(`/tasks/${id}/time-tracking/${trackingId}/stop`);
+    return data;
+  },
+
+  cancelTimeTracking: async (id: string, trackingId: string): Promise<void> => {
+    await apiClient.delete(`/tasks/${id}/time-tracking/${trackingId}/cancel`);
+  },
+
+  // Checklist
+  toggleChecklistItem: async (id: string, checklistItemId: string): Promise<Task> => {
+    const { data } = await apiClient.patch(`/tasks/${id}/checklist/${checklistItemId}/toggle`);
+    return data;
+  },
+
+  // Archive
+  toggleArchive: async (id: string): Promise<Task> => {
+    const { data } = await apiClient.patch(`/tasks/${id}/archive`);
+    return data;
   },
 };

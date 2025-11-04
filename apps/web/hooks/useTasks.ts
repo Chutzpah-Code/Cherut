@@ -74,24 +74,66 @@ export const useUpdateTaskOrder = () => {
     mutationFn: ({ id, dto }: { id: string; dto: UpdateTaskOrderDto }) =>
       tasksApi.updateOrder(id, dto),
     onMutate: async ({ id, dto }) => {
+      // Cancel all outgoing queries
       await queryClient.cancelQueries({ queryKey: ['tasks'] });
-      const previousTasks = queryClient.getQueryData(['tasks', undefined]);
 
-      queryClient.setQueryData(['tasks', undefined], (old: any) => {
-        if (!old || !Array.isArray(old)) return old;
-        return old.map((task: any) =>
-          task.id === id ? { ...task, status: dto.newStatus || task.status, order: dto.newOrder } : task
-        );
+      // Save previous state for rollback
+      const previousKanban = queryClient.getQueryData(['tasks', 'kanban', undefined]);
+
+      // Optimistically update the kanban board
+      queryClient.setQueryData(['tasks', 'kanban', undefined], (old: any) => {
+        if (!old) return old;
+
+        const { newStatus, newOrder } = dto;
+
+        // Create a copy of the board
+        const newBoard = { ...old };
+
+        // Find the task in all columns
+        let taskToMove: any = null;
+        let sourceColumn: 'todo' | 'in_progress' | 'done' | null = null;
+
+        for (const col of ['todo', 'in_progress', 'done'] as const) {
+          const taskIndex = newBoard[col]?.findIndex((t: any) => t.id === id);
+          if (taskIndex !== -1) {
+            taskToMove = { ...newBoard[col][taskIndex] };
+            sourceColumn = col;
+            break;
+          }
+        }
+
+        if (!taskToMove || !sourceColumn) return old;
+
+        // Update task properties
+        if (newStatus) taskToMove.status = newStatus;
+        taskToMove.order = newOrder;
+
+        const targetColumn = newStatus || sourceColumn;
+
+        // Remove from source column
+        newBoard[sourceColumn] = newBoard[sourceColumn].filter((t: any) => t.id !== id);
+
+        // Add to target column at the correct position
+        if (!newBoard[targetColumn]) newBoard[targetColumn] = [];
+
+        // Insert at the correct index based on order
+        const targetTasks = [...newBoard[targetColumn], taskToMove];
+        targetTasks.sort((a: any, b: any) => a.order - b.order);
+        newBoard[targetColumn] = targetTasks;
+
+        return newBoard;
       });
 
-      return { previousTasks };
+      return { previousKanban };
     },
     onError: (_err, _vars, context: any) => {
-      if (context?.previousTasks) {
-        queryClient.setQueryData(['tasks', undefined], context.previousTasks);
+      // Rollback on error
+      if (context?.previousKanban) {
+        queryClient.setQueryData(['tasks', 'kanban', undefined], context.previousKanban);
       }
     },
     onSettled: () => {
+      // Refetch to sync with server
       queryClient.invalidateQueries({ queryKey: ['tasks'], exact: false });
     },
   });
@@ -154,6 +196,79 @@ export const useDeleteTask = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'], exact: false });
+    },
+  });
+};
+
+// Time Tracking Hooks
+export const useStartTimeTracking = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => tasksApi.startTimeTracking(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+  });
+};
+
+export const usePauseTimeTracking = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, trackingId }: { id: string; trackingId: string }) =>
+      tasksApi.pauseTimeTracking(id, trackingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+  });
+};
+
+export const useStopTimeTracking = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, trackingId }: { id: string; trackingId: string }) =>
+      tasksApi.stopTimeTracking(id, trackingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+  });
+};
+
+export const useCancelTimeTracking = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, trackingId }: { id: string; trackingId: string }) =>
+      tasksApi.cancelTimeTracking(id, trackingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+  });
+};
+
+// Checklist Hook
+export const useToggleChecklistItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, checklistItemId }: { id: string; checklistItemId: string }) =>
+      tasksApi.toggleChecklistItem(id, checklistItemId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+  });
+};
+
+// Archive Hook
+export const useToggleArchive = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => tasksApi.toggleArchive(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
   });
 };

@@ -187,8 +187,13 @@ export class TasksService {
   /**
    * Get tasks grouped by status (for Kanban board)
    */
-  async getKanbanBoard(userId: string, lifeAreaId?: string) {
-    const tasks: any[] = await this.findAll(userId, lifeAreaId);
+  async getKanbanBoard(userId: string, lifeAreaId?: string, includeArchived = false) {
+    let tasks: any[] = await this.findAll(userId, lifeAreaId);
+
+    // Filter out archived tasks by default
+    if (!includeArchived) {
+      tasks = tasks.filter((t) => !t.archived);
+    }
 
     const board = {
       todo: tasks.filter((t) => t.status === 'todo'),
@@ -197,5 +202,190 @@ export class TasksService {
     };
 
     return board;
+  }
+
+  /**
+   * Start time tracking for a task
+   */
+  async startTimeTracking(userId: string, taskId: string) {
+    const task: any = await this.findOne(userId, taskId);
+    const db = this.firebaseService.getFirestore();
+
+    // Check if there's already an active tracking session
+    const activeTracking = task.timeTracking?.find(
+      (t: any) => t.status === 'running',
+    );
+
+    if (activeTracking) {
+      throw new BadRequestException('Task already has an active tracking session');
+    }
+
+    const newEntry = {
+      id: db.collection('temp').doc().id, // Generate unique ID
+      startTime: new Date().toISOString(),
+      status: 'running',
+    };
+
+    const timeTracking = [...(task.timeTracking || []), newEntry];
+
+    await db.collection(this.collection).doc(taskId).update({
+      timeTracking,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Time tracking started for task: ${taskId}`);
+    return this.findOne(userId, taskId);
+  }
+
+  /**
+   * Pause time tracking for a task
+   */
+  async pauseTimeTracking(userId: string, taskId: string, trackingId: string) {
+    const task: any = await this.findOne(userId, taskId);
+    const db = this.firebaseService.getFirestore();
+
+    const tracking = task.timeTracking?.find((t: any) => t.id === trackingId);
+    if (!tracking) {
+      throw new NotFoundException('Time tracking entry not found');
+    }
+
+    if (tracking.status !== 'running') {
+      throw new BadRequestException('Time tracking is not running');
+    }
+
+    const endTime = new Date();
+    const duration = Math.floor(
+      (endTime.getTime() - new Date(tracking.startTime).getTime()) / 1000,
+    );
+
+    const updatedTracking = task.timeTracking.map((t: any) =>
+      t.id === trackingId
+        ? { ...t, endTime: endTime.toISOString(), duration, status: 'paused' }
+        : t,
+    );
+
+    const totalTimeTracked = (task.totalTimeTracked || 0) + duration;
+
+    await db.collection(this.collection).doc(taskId).update({
+      timeTracking: updatedTracking,
+      totalTimeTracked,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Time tracking paused for task: ${taskId}`);
+    return this.findOne(userId, taskId);
+  }
+
+  /**
+   * Stop time tracking for a task
+   */
+  async stopTimeTracking(userId: string, taskId: string, trackingId: string) {
+    const task: any = await this.findOne(userId, taskId);
+    const db = this.firebaseService.getFirestore();
+
+    const tracking = task.timeTracking?.find((t: any) => t.id === trackingId);
+    if (!tracking) {
+      throw new NotFoundException('Time tracking entry not found');
+    }
+
+    if (tracking.status === 'completed' || tracking.status === 'cancelled') {
+      throw new BadRequestException('Time tracking already stopped');
+    }
+
+    const endTime = new Date();
+    let duration = tracking.duration || 0;
+
+    if (tracking.status === 'running') {
+      duration += Math.floor(
+        (endTime.getTime() - new Date(tracking.startTime).getTime()) / 1000,
+      );
+    }
+
+    const updatedTracking = task.timeTracking.map((t: any) =>
+      t.id === trackingId
+        ? { ...t, endTime: endTime.toISOString(), duration, status: 'completed' }
+        : t,
+    );
+
+    const totalTimeTracked = (task.totalTimeTracked || 0) +
+      (duration - (tracking.duration || 0));
+
+    await db.collection(this.collection).doc(taskId).update({
+      timeTracking: updatedTracking,
+      totalTimeTracked,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Time tracking stopped for task: ${taskId}`);
+    return this.findOne(userId, taskId);
+  }
+
+  /**
+   * Cancel time tracking for a task
+   */
+  async cancelTimeTracking(userId: string, taskId: string, trackingId: string) {
+    const task: any = await this.findOne(userId, taskId);
+    const db = this.firebaseService.getFirestore();
+
+    const tracking = task.timeTracking?.find((t: any) => t.id === trackingId);
+    if (!tracking) {
+      throw new NotFoundException('Time tracking entry not found');
+    }
+
+    const updatedTracking = task.timeTracking.map((t: any) =>
+      t.id === trackingId
+        ? { ...t, status: 'cancelled', endTime: new Date().toISOString() }
+        : t,
+    );
+
+    await db.collection(this.collection).doc(taskId).update({
+      timeTracking: updatedTracking,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Time tracking cancelled for task: ${taskId}`);
+    return this.findOne(userId, taskId);
+  }
+
+  /**
+   * Toggle checklist item
+   */
+  async toggleChecklistItem(
+    userId: string,
+    taskId: string,
+    checklistItemId: string,
+  ) {
+    const task: any = await this.findOne(userId, taskId);
+    const db = this.firebaseService.getFirestore();
+
+    const updatedChecklist = task.checklist?.map((item: any) =>
+      item.id === checklistItemId
+        ? { ...item, completed: !item.completed }
+        : item,
+    );
+
+    await db.collection(this.collection).doc(taskId).update({
+      checklist: updatedChecklist,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Checklist item toggled for task: ${taskId}`);
+    return this.findOne(userId, taskId);
+  }
+
+  /**
+   * Archive/Unarchive task
+   */
+  async toggleArchive(userId: string, taskId: string) {
+    const task: any = await this.findOne(userId, taskId);
+    const db = this.firebaseService.getFirestore();
+
+    await db.collection(this.collection).doc(taskId).update({
+      archived: !task.archived,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Task archived status toggled: ${taskId}`);
+    return this.findOne(userId, taskId);
   }
 }
