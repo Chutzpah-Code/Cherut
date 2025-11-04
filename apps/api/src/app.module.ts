@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FirebaseModule } from './config/firebase.module';
+import cloudinaryConfig from './config/cloudinary.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { LifeAreasModule } from './modules/life-areas/life-areas.module';
 import { ObjectivesModule } from './modules/objectives/objectives.module';
@@ -13,6 +14,7 @@ import { HabitsModule } from './modules/habits/habits.module';
 import { TrackingModule } from './modules/tracking/tracking.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { EnterpriseWaitlistModule } from './enterprise-waitlist/enterprise-waitlist.module';
+import { VisionBoardModule } from './modules/vision-board/vision-board.module';
 
 /**
  * 📚 EXPLICAÇÃO: App Module (Módulo Raiz)
@@ -44,6 +46,7 @@ import { EnterpriseWaitlistModule } from './enterprise-waitlist/enterprise-waitl
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+      load: [cloudinaryConfig],
     }),
     // Inicializa Firebase Admin SDK
     FirebaseModule,
@@ -67,6 +70,8 @@ import { EnterpriseWaitlistModule } from './enterprise-waitlist/enterprise-waitl
     TasksModule,
     // Enterprise Waitlist (formulário de interesse corporativo)
     EnterpriseWaitlistModule,
+    // Vision Board (quadro de visualização de objetivos com imagens)
+    VisionBoardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

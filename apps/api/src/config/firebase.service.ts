@@ -101,6 +101,7 @@ export class FirebaseService implements OnModuleInit {
           privateKey: this.config.privateKey,
           clientEmail: this.config.clientEmail,
         }),
+        storageBucket: this.config.storageBucket || `${this.config.projectId}.appspot.com`,
       });
 
       return;
@@ -128,6 +129,17 @@ export class FirebaseService implements OnModuleInit {
    */
   getFirestore(): admin.firestore.Firestore {
     return admin.firestore(this.firebaseApp);
+  }
+
+  /**
+   * Retorna a instância do Firebase Storage
+   * Use para fazer upload/download de arquivos (imagens, documentos, etc.)
+   *
+   * IMPORTANTE: Firebase Storage guarda apenas os arquivos
+   * As URLs devem ser armazenadas no Firestore
+   */
+  getStorage(): admin.storage.Storage {
+    return admin.storage(this.firebaseApp);
   }
 
   /**

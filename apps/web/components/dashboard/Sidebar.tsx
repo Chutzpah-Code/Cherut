@@ -11,12 +11,14 @@ import {
   User,
   LogOut,
   Zap,
+  Sparkles,
 } from 'lucide-react';
 import { Stack, NavLink, ScrollArea, Box, Title, Divider, Button, Group } from '@mantine/core';
 import { logoutUser } from '@/lib/firebase/auth';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Vision Board', href: '/dashboard/vision-board', icon: Sparkles },
   { name: 'Life Areas', href: '/dashboard/life-areas', icon: TrendingUp },
   { name: 'Objectives', href: '/dashboard/objectives', icon: Target },
   { name: 'Tasks', href: '/dashboard/tasks', icon: CheckSquare },
