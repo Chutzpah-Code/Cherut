@@ -47,38 +47,47 @@ export function HabitCard({ habit, logs, onEdit, onDayClick }: HabitCardProps) {
 
   return (
     <Card shadow="sm" padding="md" withBorder>
-      <Group justify="space-between" align="flex-start" wrap="nowrap">
-        {/* Left: Habit info */}
-        <Stack gap="xs" style={{ flex: 1, minWidth: 0 }}>
-          <Group gap="sm">
-            <Text fw={600} size="lg">
-              {habit.title}
-            </Text>
-            {currentStreak > 0 && (
-              <Badge
-                size="lg"
-                variant="light"
-                color={habit.category === 'good' ? 'green' : 'red'}
-                leftSection={<Flame size={14} />}
-              >
-                {currentStreak} {currentStreak === 1 ? 'day' : 'days'}
-              </Badge>
+      <Stack gap="md">
+        {/* Header: Title, Badge, and Edit Button */}
+        <Group justify="space-between" align="flex-start" wrap="nowrap">
+          <Box style={{ flex: 1, minWidth: 0 }}>
+            <Group gap="sm" wrap="wrap">
+              <Text fw={600} size="lg">
+                {habit.title}
+              </Text>
+              {currentStreak > 0 && (
+                <Badge
+                  size="lg"
+                  variant="light"
+                  color={habit.category === 'good' ? 'green' : 'red'}
+                  leftSection={<Flame size={14} />}
+                >
+                  {currentStreak} {currentStreak === 1 ? 'day' : 'days'}
+                </Badge>
+              )}
+            </Group>
+
+            {habit.description && (
+              <Text size="sm" c="dimmed" lineClamp={2} mt="xs">
+                {habit.description}
+              </Text>
             )}
-          </Group>
+          </Box>
 
-          {habit.description && (
-            <Text size="sm" c="dimmed" lineClamp={2}>
-              {habit.description}
-            </Text>
-          )}
-        </Stack>
+          {/* Edit button - always visible on top right */}
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            size="lg"
+            onClick={() => onEdit(habit)}
+            style={{ flexShrink: 0 }}
+          >
+            <Edit2 size={20} />
+          </ActionIcon>
+        </Group>
 
-        {/* Center: Streak visualizer with horizontal scroll */}
-        <ScrollArea
-          type="auto"
-          style={{ maxWidth: '600px', flexShrink: 0 }}
-          scrollbarSize={6}
-        >
+        {/* Streak visualizer - full width with scroll */}
+        <ScrollArea type="auto" scrollbarSize={6}>
           <StreakVisualizer
             habitId={habit.id}
             category={habit.category}
@@ -89,18 +98,7 @@ export function HabitCard({ habit, logs, onEdit, onDayClick }: HabitCardProps) {
             habitDueDate={habit.dueDate}
           />
         </ScrollArea>
-
-        {/* Right: Edit button */}
-        <ActionIcon
-          variant="subtle"
-          color="gray"
-          size="lg"
-          onClick={() => onEdit(habit)}
-          style={{ flexShrink: 0 }}
-        >
-          <Edit2 size={20} />
-        </ActionIcon>
-      </Group>
+      </Stack>
     </Card>
   );
 }
