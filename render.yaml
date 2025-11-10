@@ -1,5 +1,4 @@
 services:
-  # Backend API (NestJS)
   - type: web
     name: cherut-api
     runtime: node
