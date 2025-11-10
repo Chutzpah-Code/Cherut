@@ -56,7 +56,7 @@ export default function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
+        background: '#ffffff',
         padding: '20px',
       }}
     >
@@ -68,12 +68,11 @@ export default function LoginPage() {
               style={{
                 width: 60,
                 height: 60,
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+                borderRadius: '16px',
+                background: '#3143B6',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 8px 32px rgba(59, 130, 246, 0.35)',
               }}
             >
               <Sparkles size={32} color="white" />
@@ -82,27 +81,33 @@ export default function LoginPage() {
               order={1}
               ta="center"
               style={{
-                fontSize: 'clamp(28px, 5vw, 36px)',
-                fontWeight: 900,
-                color: 'white',
+                fontSize: 'clamp(28px, 5vw, 40px)',
+                fontWeight: 800,
+                color: 'hsl(0 0% 0% / 0.87)',
                 lineHeight: 1.2,
+                letterSpacing: '-0.01em',
               }}
             >
               Welcome Back
             </Title>
-            <Text size="md" c="dimmed" ta="center" fw={500}>
+            <Text
+              size="md"
+              ta="center"
+              fw={500}
+              style={{ color: 'hsl(0 0% 0% / 0.6)' }}
+            >
               Sign in to continue your journey
             </Text>
           </Stack>
 
           {/* Form Card */}
           <Paper
-            radius="lg"
+            radius={20}
             p="xl"
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+              background: 'white',
+              border: '1px solid hsl(0 0% 0% / 0.08)',
+              boxShadow: 'none',
             }}
           >
             <form onSubmit={handleSubmit}>
@@ -112,14 +117,14 @@ export default function LoginPage() {
                     icon={<AlertCircle size={20} />}
                     title="Error"
                     color="red"
-                    radius="md"
+                    radius={16}
                     styles={{
                       root: {
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
                       },
-                      title: { color: '#fca5a5' },
-                      message: { color: '#fca5a5' },
+                      title: { color: '#dc2626', fontWeight: 600 },
+                      message: { color: '#dc2626' },
                     }}
                   >
                     {error}
@@ -134,22 +139,26 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   size="md"
+                  radius={48}
                   styles={{
                     label: {
-                      color: 'rgba(255, 255, 255, 0.8)',
-                      fontWeight: 500,
+                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontWeight: 600,
                       marginBottom: 8,
+                      fontSize: '14px',
                     },
                     input: {
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: 'white',
+                      backgroundColor: 'white',
+                      border: '1px solid hsl(0 0% 0% / 0.15)',
+                      color: 'hsl(0 0% 0% / 0.87)',
+                      height: '48px',
+                      fontSize: '16px',
                       '&::placeholder': {
-                        color: 'rgba(255, 255, 255, 0.4)',
+                        color: 'hsl(0 0% 0% / 0.38)',
                       },
                       '&:focus': {
-                        borderColor: '#3b82f6',
-                        boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
+                        borderColor: '#3143B6',
+                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
                       },
                     },
                   }}
@@ -162,26 +171,30 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   size="md"
+                  radius={48}
                   styles={{
                     label: {
-                      color: 'rgba(255, 255, 255, 0.8)',
-                      fontWeight: 500,
+                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontWeight: 600,
                       marginBottom: 8,
+                      fontSize: '14px',
                     },
                     input: {
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: 'white',
+                      backgroundColor: 'white',
+                      border: '1px solid hsl(0 0% 0% / 0.15)',
+                      color: 'hsl(0 0% 0% / 0.87)',
+                      height: '48px',
+                      fontSize: '16px',
                       '&::placeholder': {
-                        color: 'rgba(255, 255, 255, 0.4)',
+                        color: 'hsl(0 0% 0% / 0.38)',
                       },
                       '&:focus': {
-                        borderColor: '#3b82f6',
-                        boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
+                        borderColor: '#3143B6',
+                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
                       },
                     },
                     innerInput: {
-                      color: 'white',
+                      color: 'hsl(0 0% 0% / 0.87)',
                     },
                   }}
                 />
@@ -189,14 +202,23 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   size="lg"
-                  radius="md"
+                  radius={48}
                   fullWidth
                   loading={loading}
-                  variant="gradient"
-                  gradient={{ from: 'blue', to: 'cyan', deg: 45 }}
                   rightSection={<ArrowRight size={20} />}
                   style={{
-                    boxShadow: '0 8px 32px rgba(59, 130, 246, 0.35)',
+                    background: '#3143B6',
+                    border: 'none',
+                    height: '56px',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        background: '#2535a0',
+                      },
+                    },
                   }}
                 >
                   Sign In
@@ -207,18 +229,19 @@ export default function LoginPage() {
 
           {/* Footer Links */}
           <Stack gap="md" align="center">
-            <Text size="sm" c="dimmed" ta="center">
+            <Text
+              size="sm"
+              ta="center"
+              style={{ color: 'hsl(0 0% 0% / 0.6)' }}
+            >
               Don&apos;t have an account?{' '}
               <Anchor
                 component={Link}
                 href="/auth/register"
-                c="blue"
                 fw={600}
                 style={{
+                  color: '#3143B6',
                   textDecoration: 'none',
-                  '&:hover': {
-                    textDecoration: 'underline',
-                  },
                 }}
               >
                 Sign up
@@ -228,13 +251,10 @@ export default function LoginPage() {
             <Anchor
               component={Link}
               href="/"
-              c="dimmed"
               size="sm"
               style={{
+                color: 'hsl(0 0% 0% / 0.6)',
                 textDecoration: 'none',
-                '&:hover': {
-                  color: 'white',
-                },
               }}
             >
               ← Back to home

@@ -10,9 +10,7 @@ import {
   Textarea,
   Button,
   Stack,
-  Group,
   Select,
-  NumberInput,
   Box,
   Paper,
 } from '@mantine/core';
@@ -75,27 +73,34 @@ export default function EnterpriseWaitlistPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
+          background: '#ffffff',
         }}
       >
         <Container size="sm">
           <Paper
             p="xl"
-            radius="md"
+            radius={20}
             style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'white',
+              border: '1px solid hsl(0 0% 0% / 0.08)',
               textAlign: 'center',
             }}
           >
-            <CheckCircle size={64} color="#40c057" style={{ margin: '0 auto 20px' }} />
-            <Title order={2} c="white" mb="md">
+            <CheckCircle size={64} color="#2FB264" style={{ margin: '0 auto 20px' }} />
+            <Title
+              order={2}
+              mb="md"
+              style={{
+                color: 'hsl(0 0% 0% / 0.87)',
+                fontWeight: 700,
+              }}
+            >
               Obrigado pelo interesse!
             </Title>
-            <Text c="dimmed" size="lg">
+            <Text size="lg" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
               Recebemos sua solicitação e entraremos em contato em breve.
             </Text>
-            <Text c="dimmed" size="sm" mt="md">
+            <Text size="sm" mt="md" style={{ color: 'hsl(0 0% 0% / 0.38)' }}>
               Redirecionando para a página inicial...
             </Text>
           </Paper>
@@ -108,7 +113,7 @@ export default function EnterpriseWaitlistPage() {
     <Box
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
+        background: '#ffffff',
         paddingTop: '60px',
         paddingBottom: '60px',
       }}
@@ -116,45 +121,55 @@ export default function EnterpriseWaitlistPage() {
       <Container size="md">
         <Button
           variant="subtle"
-          color="gray"
           leftSection={<ArrowLeft size={18} />}
           onClick={() => router.push('/')}
           mb="xl"
+          style={{
+            color: 'hsl(0 0% 0% / 0.6)',
+          }}
         >
           Voltar
         </Button>
 
         <Paper
           p="xl"
-          radius="md"
+          radius={20}
           style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'white',
+            border: '1px solid hsl(0 0% 0% / 0.08)',
           }}
         >
-          <Group mb="xl">
+          <Stack gap="lg" mb="xl">
             <Box
               style={{
-                width: 48,
-                height: 48,
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+                width: 56,
+                height: 56,
+                borderRadius: '16px',
+                background: '#3143B6',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Building2 size={24} color="white" />
+              <Building2 size={28} color="white" />
             </Box>
             <div>
-              <Title order={2} c="white">
+              <Title
+                order={2}
+                style={{
+                  color: 'hsl(0 0% 0% / 0.87)',
+                  fontWeight: 700,
+                  fontSize: '32px',
+                  letterSpacing: '-0.01em',
+                }}
+              >
                 Enterprise Waitlist
               </Title>
-              <Text c="dimmed" size="sm">
+              <Text size="md" mt="xs" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
                 Preencha o formulário para receber mais informações
               </Text>
             </div>
-          </Group>
+          </Stack>
 
           <form onSubmit={handleSubmit}>
             <Stack gap="md">
@@ -164,12 +179,25 @@ export default function EnterpriseWaitlistPage() {
                 required
                 value={formData.contactName}
                 onChange={(e) => handleChange('contactName', e.currentTarget.value)}
+                radius={48}
+                size="md"
                 styles={{
-                  label: { color: 'white', marginBottom: 8 },
+                  label: {
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
+                  },
                   input: {
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white',
+                    background: 'white',
+                    border: '1px solid hsl(0 0% 0% / 0.15)',
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    height: '48px',
+                    fontSize: '16px',
+                    '&:focus': {
+                      borderColor: '#3143B6',
+                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                    },
                   },
                 }}
               />
@@ -180,12 +208,25 @@ export default function EnterpriseWaitlistPage() {
                 required
                 value={formData.phoneNumber}
                 onChange={(e) => handleChange('phoneNumber', e.currentTarget.value)}
+                radius={48}
+                size="md"
                 styles={{
-                  label: { color: 'white', marginBottom: 8 },
+                  label: {
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
+                  },
                   input: {
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white',
+                    background: 'white',
+                    border: '1px solid hsl(0 0% 0% / 0.15)',
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    height: '48px',
+                    fontSize: '16px',
+                    '&:focus': {
+                      borderColor: '#3143B6',
+                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                    },
                   },
                 }}
               />
@@ -196,12 +237,25 @@ export default function EnterpriseWaitlistPage() {
                 required
                 value={formData.companyName}
                 onChange={(e) => handleChange('companyName', e.currentTarget.value)}
+                radius={48}
+                size="md"
                 styles={{
-                  label: { color: 'white', marginBottom: 8 },
+                  label: {
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
+                  },
                   input: {
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white',
+                    background: 'white',
+                    border: '1px solid hsl(0 0% 0% / 0.15)',
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    height: '48px',
+                    fontSize: '16px',
+                    '&:focus': {
+                      borderColor: '#3143B6',
+                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                    },
                   },
                 }}
               />
@@ -218,12 +272,25 @@ export default function EnterpriseWaitlistPage() {
                   { value: '201-500', label: '201-500 funcionários' },
                   { value: '500+', label: '500+ funcionários' },
                 ]}
+                radius={48}
+                size="md"
                 styles={{
-                  label: { color: 'white', marginBottom: 8 },
+                  label: {
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
+                  },
                   input: {
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white',
+                    background: 'white',
+                    border: '1px solid hsl(0 0% 0% / 0.15)',
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    height: '48px',
+                    fontSize: '16px',
+                    '&:focus': {
+                      borderColor: '#3143B6',
+                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                    },
                   },
                 }}
               />
@@ -240,12 +307,25 @@ export default function EnterpriseWaitlistPage() {
                   { value: '10m-50m', label: 'R$ 10M - R$ 50M' },
                   { value: '50m+', label: 'Mais de R$ 50M' },
                 ]}
+                radius={48}
+                size="md"
                 styles={{
-                  label: { color: 'white', marginBottom: 8 },
+                  label: {
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
+                  },
                   input: {
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white',
+                    background: 'white',
+                    border: '1px solid hsl(0 0% 0% / 0.15)',
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    height: '48px',
+                    fontSize: '16px',
+                    '&:focus': {
+                      borderColor: '#3143B6',
+                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                    },
                   },
                 }}
               />
@@ -256,12 +336,24 @@ export default function EnterpriseWaitlistPage() {
                 minRows={3}
                 value={formData.intendedUse}
                 onChange={(e) => handleChange('intendedUse', e.currentTarget.value)}
+                radius={20}
+                size="md"
                 styles={{
-                  label: { color: 'white', marginBottom: 8 },
+                  label: {
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
+                  },
                   input: {
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white',
+                    background: 'white',
+                    border: '1px solid hsl(0 0% 0% / 0.15)',
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    fontSize: '16px',
+                    '&:focus': {
+                      borderColor: '#3143B6',
+                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                    },
                   },
                 }}
               />
@@ -272,18 +364,30 @@ export default function EnterpriseWaitlistPage() {
                 minRows={3}
                 value={formData.desiredFeatures}
                 onChange={(e) => handleChange('desiredFeatures', e.currentTarget.value)}
+                radius={20}
+                size="md"
                 styles={{
-                  label: { color: 'white', marginBottom: 8 },
+                  label: {
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
+                  },
                   input: {
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white',
+                    background: 'white',
+                    border: '1px solid hsl(0 0% 0% / 0.15)',
+                    color: 'hsl(0 0% 0% / 0.87)',
+                    fontSize: '16px',
+                    '&:focus': {
+                      borderColor: '#3143B6',
+                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                    },
                   },
                 }}
               />
 
               {error && (
-                <Text c="red" size="sm">
+                <Text size="sm" style={{ color: '#dc2626' }}>
                   {error}
                 </Text>
               )}
@@ -291,11 +395,22 @@ export default function EnterpriseWaitlistPage() {
               <Button
                 type="submit"
                 size="lg"
+                radius={48}
                 loading={loading}
                 style={{
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+                  background: '#3143B6',
                   border: 'none',
                   marginTop: '16px',
+                  height: '56px',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      background: '#2535a0',
+                    },
+                  },
                 }}
               >
                 Enviar Solicitação
