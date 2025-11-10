@@ -3,8 +3,8 @@ import {
   UnauthorizedException,
   ConflictException,
   Logger,
+  BadRequestException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { FirebaseService } from '../../config/firebase.service';
 import { RegisterDto, LoginDto } from './dto';
 
@@ -15,13 +15,12 @@ import { RegisterDto, LoginDto } from './dto';
  *
  * RESPONSABILIDADES:
  * 1. Criar usuários no Firebase Auth
- * 2. Validar credenciais de login
- * 3. Gerar tokens JWT
- * 4. Verificar tokens JWT
+ * 2. Validar Firebase ID tokens do cliente
+ * 3. Gerenciar dados do usuário no Firestore
+ * 4. Verificar tokens Firebase para autenticação
  *
  * DEPENDENCY INJECTION:
- * - FirebaseService → Acesso ao Firebase Auth
- * - JwtService → Criar/verificar tokens JWT
+ * - FirebaseService → Acesso ao Firebase Auth e Firestore
  *
  * FLUXO DE REGISTRO:
  * 1. Cliente: POST /auth/register { email, password, displayName }
@@ -30,19 +29,17 @@ import { RegisterDto, LoginDto } from './dto';
  * 4. Gera token JWT
  * 5. Retorna: { user, accessToken }
  *
- * FLUXO DE LOGIN:
- * 1. Cliente: POST /auth/login { email, password }
- * 2. login() → Busca usuário no Firebase Auth
- * 3. Verifica senha (Firebase faz isso internamente)
- * 4. Gera token JWT
- * 5. Retorna: { user, accessToken }
+ * FLUXO DE LOGIN (Firebase-Only):
+ * 1. Cliente autentica via Firebase Client SDK
+ * 2. Cliente envia Firebase ID token para POST /auth/login
+ * 3. Backend valida ID token com Firebase Admin SDK
+ * 4. Retorna dados do usuário do Firestore
  *
- * O QUE É JWT (JSON Web Token):
- * - Token criptografado que contém informações do usuário
- * - Cliente guarda este token
- * - Envia em toda requisição: Authorization: Bearer <token>
- * - Backend valida token e sabe quem é o usuário
- * - Expira em 7 dias (configurado no .env)
+ * SEGURANÇA:
+ * - Usa exclusivamente Firebase ID tokens (RS256)
+ * - Tokens validados pelo Google diretamente
+ * - Não geramos JWTs próprios - mais seguro
+ * - Cliente sempre autentica via Firebase Client SDK
  */
 
 @Injectable()
@@ -51,17 +48,19 @@ export class AuthService {
 
   constructor(
     private readonly firebaseService: FirebaseService,
-    private readonly jwtService: JwtService,
   ) {}
 
   /**
    * Registra novo usuário
    *
+   * IMPORTANTE: Esta rota ainda cria usuários direto no backend
+   * para compatibilidade. Em produção, considere fazer registro
+   * via Firebase Client SDK também.
+   *
    * PASSOS:
    * 1. Cria usuário no Firebase Auth
    * 2. Cria documento inicial no Firestore (users/{uid})
-   * 3. Gera token JWT
-   * 4. Retorna dados do usuário + token
+   * 3. Retorna dados do usuário (sem JWT próprio)
    */
   async register(registerDto: RegisterDto) {
     const { email, password, displayName } = registerDto;
@@ -107,17 +106,15 @@ export class AuthService {
 
       await db.collection('users').doc(userRecord.uid).set(userData);
 
-      // 3. Gerar token JWT
-      const accessToken = this.generateToken(userRecord.uid, email);
-
-      // 4. Retornar usuário + token
+      // 3. Retornar dados do usuário
+      // Cliente deve autenticar via Firebase Client SDK para obter ID token
       return {
         user: {
           uid: userRecord.uid,
           email: userRecord.email,
           displayName: userRecord.displayName,
         },
-        accessToken,
+        message: 'User registered successfully. Please authenticate via Firebase Client SDK.',
       };
     } catch (error) {
       this.logger.error('Registration error:', error);
@@ -136,73 +133,100 @@ export class AuthService {
   }
 
   /**
-   * Login de usuário
+   * Valida Firebase ID Token (Firebase-Only Login)
    *
-   * NOTA IMPORTANTE:
-   * Firebase Admin SDK NÃO tem método para verificar senha diretamente.
-   * Existem duas abordagens:
+   * FLUXO SEGURO:
+   * 1. Cliente autentica via Firebase Client SDK
+   * 2. Cliente envia Firebase ID token nesta rota
+   * 3. Backend valida token com Firebase Admin SDK
+   * 4. Retorna dados do usuário se token válido
    *
-   * ABORDAGEM 1 (recomendada): Cliente usa Firebase Client SDK
-   * - Cliente chama firebase.auth().signInWithEmailAndPassword()
-   * - Recebe ID token do Firebase
-   * - Envia ID token para backend
-   * - Backend verifica token e gera JWT próprio
-   *
-   * ABORDAGEM 2 (implementada aqui): Verificação via Firebase Auth REST API
-   * - Backend faz requisição para Firebase Auth REST API
-   * - Verifica credenciais
-   * - Gera JWT próprio
-   *
-   * Vamos usar Abordagem 2 para simplificar (tudo no backend)
+   * SEGURANÇA:
+   * - Token validado diretamente pelo Google
+   * - Não validamos senhas no backend
+   * - Evita problemas de segurança
    */
   async login(loginDto: LoginDto) {
-    const { email } = loginDto;
+    const { firebaseIdToken } = loginDto;
+
+    if (!firebaseIdToken) {
+      throw new BadRequestException(
+        'Firebase ID token required. Please authenticate via Firebase Client SDK first.'
+      );
+    }
 
     try {
-      // Verifica credenciais via Firebase Auth REST API
+      // 1. Valida Firebase ID token
       const auth = this.firebaseService.getAuth();
-      const user = await auth.getUserByEmail(email);
-
-      // NOTA: Aqui estamos apenas verificando se usuário existe
-      // A validação de senha seria feita pelo Firebase Client SDK no frontend
-      // Por ora, vamos gerar o token (em produção, use Firebase Client SDK)
-
-      // Buscar dados completos do Firestore
-      const db = this.firebaseService.getFirestore();
-      const userDoc = await db.collection('users').doc(user.uid).get();
-
-      if (!userDoc.exists) {
-        throw new UnauthorizedException('User not found in database');
+      if (!auth) {
+        throw new Error('Firebase Auth not initialized');
       }
 
-      const userData = userDoc.data()!; // Non-null assertion (já verificamos exists)
+      const decodedToken = await auth.verifyIdToken(firebaseIdToken);
+      this.logger.log(`Token validated for user: ${decodedToken.uid}`);
 
-      // Gerar token JWT
-      const accessToken = this.generateToken(user.uid, email);
+      // 2. Buscar dados completos do Firestore
+      const db = this.firebaseService.getFirestore();
+      if (!db) {
+        throw new Error('Firestore not initialized');
+      }
 
-      this.logger.log(`User logged in: ${user.uid} (${email})`);
+      const userDoc = await db.collection('users').doc(decodedToken.uid).get();
+
+      if (!userDoc.exists) {
+        // Se usuário não existe no Firestore, criar registro inicial
+        const userData = {
+          uid: decodedToken.uid,
+          email: decodedToken.email,
+          displayName: decodedToken.name || decodedToken.email?.split('@')[0],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          onboardingCompleted: false,
+          lifePurpose: null,
+          subscription: {
+            plan: 'free',
+            status: 'active',
+            startDate: new Date().toISOString(),
+          },
+        };
+
+        await db.collection('users').doc(decodedToken.uid).set(userData);
+        this.logger.log(`Created Firestore record for existing Firebase user: ${decodedToken.uid}`);
+
+        return {
+          user: {
+            uid: decodedToken.uid,
+            email: decodedToken.email,
+            displayName: userData.displayName,
+          },
+        };
+      }
+
+      const userData = userDoc.data()!;
+
+      this.logger.log(`User logged in: ${decodedToken.uid} (${decodedToken.email})`);
 
       return {
         user: {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName || userData.displayName || email.split('@')[0],
+          uid: decodedToken.uid,
+          email: decodedToken.email,
+          displayName: userData.displayName || decodedToken.name || decodedToken.email?.split('@')[0],
         },
-        accessToken,
       };
     } catch (error) {
-      if (error.code === 'auth/user-not-found') {
-        throw new UnauthorizedException('Invalid credentials');
+      this.logger.error('Login error:', error);
+
+      if (error.code?.includes('auth/')) {
+        throw new UnauthorizedException('Invalid Firebase ID token');
       }
 
-      this.logger.error('Login error:', error);
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Authentication failed');
     }
   }
 
   /**
-   * Verifica se token JWT é válido
-   * Usado pelo JwtStrategy para autenticar requisições
+   * Valida Firebase ID token e retorna dados do usuário
+   * Usado pelo FirebaseStrategy para autenticar requisições
    */
   async validateToken(uid: string) {
     try {
@@ -221,25 +245,5 @@ export class AuthService {
       this.logger.error('Token validation error:', error);
       return null;
     }
-  }
-
-  /**
-   * Gera token JWT
-   *
-   * PAYLOAD DO TOKEN:
-   * - sub: Subject (uid do usuário)
-   * - email: Email do usuário
-   *
-   * CONFIGURAÇÕES:
-   * - Expira em 7 dias (JWT_EXPIRES_IN no .env)
-   * - Assinado com JWT_SECRET
-   */
-  private generateToken(uid: string, email: string): string {
-    const payload = {
-      sub: uid, // "subject" - identificador único do usuário
-      email,
-    };
-
-    return this.jwtService.sign(payload);
   }
 }
