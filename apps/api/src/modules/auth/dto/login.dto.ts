@@ -25,6 +25,6 @@ export class LoginDto {
    * Este token é assinado pelo Google e validado pelo Firebase Admin SDK
    */
   @IsString()
-  @MinLength(100, { message: 'Firebase ID token must be valid' })
+  @MinLength(10, { message: 'Firebase ID token must be valid' })
   firebaseIdToken: string;
 }

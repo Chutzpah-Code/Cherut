@@ -149,6 +149,8 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const { firebaseIdToken } = loginDto;
 
+    this.logger.log(`🚀 Login attempt started. Token length: ${firebaseIdToken?.length || 0}`);
+
     if (!firebaseIdToken) {
       throw new BadRequestException(
         'Firebase ID token required. Please authenticate via Firebase Client SDK first.'
@@ -156,21 +158,27 @@ export class AuthService {
     }
 
     try {
+      this.logger.log(`📝 Getting Firebase Auth instance...`);
       // 1. Valida Firebase ID token
       const auth = this.firebaseService.getAuth();
       if (!auth) {
+        this.logger.error('❌ Firebase Auth not initialized');
         throw new Error('Firebase Auth not initialized');
       }
 
+      this.logger.log(`🔐 Verifying Firebase ID token...`);
       const decodedToken = await auth.verifyIdToken(firebaseIdToken);
-      this.logger.log(`Token validated for user: ${decodedToken.uid}`);
+      this.logger.log(`✅ Token validated for user: ${decodedToken.uid}`);
 
+      this.logger.log(`📄 Getting Firestore instance...`);
       // 2. Buscar dados completos do Firestore
       const db = this.firebaseService.getFirestore();
       if (!db) {
+        this.logger.error('❌ Firestore not initialized');
         throw new Error('Firestore not initialized');
       }
 
+      this.logger.log(`📖 Fetching user document for: ${decodedToken.uid}`);
       const userDoc = await db.collection('users').doc(decodedToken.uid).get();
 
       if (!userDoc.exists) {

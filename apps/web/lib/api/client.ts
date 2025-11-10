@@ -13,6 +13,12 @@ export const apiClient = axios.create({
 // Add auth token to requests
 apiClient.interceptors.request.use(
   async (config) => {
+    // Skip adding auth token for auth endpoints
+    if (config.url && (config.url.includes('/auth') || config.url.includes('/health'))) {
+      console.log('[DEBUG] Skipping token for auth endpoint:', config.url);
+      return config;
+    }
+
     try {
       const token = await getIdToken();
       if (token) {
@@ -20,18 +26,12 @@ apiClient.interceptors.request.use(
         console.log('[DEBUG] Token added to request:', config.url, 'Token length:', token.length);
       } else {
         console.warn('[DEBUG] No token available for request:', config.url);
-        // If no token is available, don't proceed with authenticated requests
-        if (config.url && !config.url.includes('/auth/') && !config.url.includes('/health')) {
-          console.warn('[DEBUG] Skipping authenticated request without token');
-          throw new Error('Authentication required - no token available');
-        }
+        console.warn('[DEBUG] Skipping authenticated request without token');
+        throw new Error('Authentication required - no token available');
       }
     } catch (error) {
       console.error('[DEBUG] Error getting token:', error);
-      // Don't proceed with authenticated requests if token retrieval fails
-      if (config.url && !config.url.includes('/auth/') && !config.url.includes('/health')) {
-        throw error;
-      }
+      throw error;
     }
     return config;
   },

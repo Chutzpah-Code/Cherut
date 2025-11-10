@@ -34,7 +34,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const authenticateWithBackend = async (firebaseUser: User) => {
     try {
       console.log('[Auth] Authenticating with backend for user:', firebaseUser.uid);
+      console.log('[Auth] Getting Firebase ID token...');
+
       const token = await getIdToken();
+      console.log('[Auth] Firebase token retrieved:', token ? `✅ (${token.length} chars)` : '❌ null');
 
       if (!token) {
         console.error('[Auth] No Firebase token available');
@@ -42,11 +45,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
+      console.log('[Auth] Calling backend login...');
       await loginWithBackend(token);
-      console.log('[Auth] Backend authentication successful');
+      console.log('[Auth] ✅ Backend authentication successful');
       setBackendAuthenticated(true);
     } catch (error) {
-      console.error('[Auth] Backend authentication failed:', error);
+      console.error('[Auth] ❌ Backend authentication failed:', error);
       setBackendAuthenticated(false);
     }
   };

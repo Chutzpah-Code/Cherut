@@ -22,9 +22,11 @@ export interface RegisterResponse {
  * This calls the backend /auth/login endpoint with a Firebase ID token
  */
 export const loginWithBackend = async (firebaseIdToken: string): Promise<LoginResponse> => {
+  console.log('[Auth API] Calling backend login with token length:', firebaseIdToken.length);
   const response = await apiClient.post('/auth/login', {
     firebaseIdToken,
   });
+  console.log('[Auth API] Backend login successful:', response.data);
   return response.data;
 };
 
