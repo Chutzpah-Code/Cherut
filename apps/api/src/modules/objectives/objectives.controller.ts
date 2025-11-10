@@ -9,6 +9,7 @@ import {
   UseGuards,
   Request,
   Query,
+  Logger,
 } from '@nestjs/common';
 import { ObjectivesService } from './objectives.service';
 import { CreateObjectiveDto, UpdateObjectiveDto, CreateKeyResultDto, UpdateKeyResultDto } from './dto';
@@ -17,11 +18,25 @@ import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
 @Controller('objectives')
 @UseGuards(FirebaseAuthGuard)
 export class ObjectivesController {
+  private readonly logger = new Logger(ObjectivesController.name);
+
   constructor(private readonly objectivesService: ObjectivesService) {}
 
   @Post()
-  create(@Request() req, @Body() createDto: CreateObjectiveDto) {
-    return this.objectivesService.create(req.user.uid, createDto);
+  async create(@Request() req, @Body() createDto: CreateObjectiveDto) {
+    try {
+      this.logger.log(`🎯 Creating objective for user: ${req.user.uid}`);
+      this.logger.log(`📝 Objective data: ${JSON.stringify(createDto, null, 2)}`);
+
+      const result = await this.objectivesService.create(req.user.uid, createDto);
+
+      this.logger.log(`✅ Objective created successfully: ${result.id}`);
+      return result;
+    } catch (error) {
+      this.logger.error(`❌ Error creating objective for user ${req.user.uid}:`, error);
+      this.logger.error(`📋 Failed data: ${JSON.stringify(createDto, null, 2)}`);
+      throw error;
+    }
   }
 
   @Get()
