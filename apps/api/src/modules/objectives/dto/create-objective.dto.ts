@@ -11,7 +11,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateKeyResultDto } from '../../key-results/dto/create-key-result.dto';
+import { CreateKeyResultInlineDto } from './create-key-result-inline.dto';
 
 export enum ObjectiveStatus {
   ON_TRACK = 'on_track',
@@ -56,9 +56,9 @@ export class CreateObjectiveDto {
 
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateKeyResultDto)
+  @Type(() => CreateKeyResultInlineDto)
   @IsOptional()
-  keyResults?: CreateKeyResultDto[];
+  keyResults?: CreateKeyResultInlineDto[];
 
   @IsBoolean()
   @IsOptional()

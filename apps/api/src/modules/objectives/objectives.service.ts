@@ -63,7 +63,12 @@ export class ObjectivesService {
     // Create key results if provided
     if (keyResults && keyResults.length > 0) {
       for (const kr of keyResults) {
-        await this.createKeyResult(userId, docRef.id, kr);
+        // Convert inline DTO to full DTO by adding the objectiveId
+        const keyResultDto = {
+          ...kr,
+          objectiveId: docRef.id,
+        };
+        await this.createKeyResult(userId, docRef.id, keyResultDto);
       }
     }
 
