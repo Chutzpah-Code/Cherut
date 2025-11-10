@@ -5,7 +5,7 @@ services:
     runtime: node
     region: oregon
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && cd apps/api && ../../node_modules/.bin/nest build
     startCommand: cd apps/api && npm run start:prod
     healthCheckPath: /
     envVars:
