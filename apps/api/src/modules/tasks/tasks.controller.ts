@@ -9,6 +9,7 @@ import {
   UseGuards,
   Request,
   Query,
+  Logger,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
@@ -27,6 +28,8 @@ import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
 @Controller('tasks')
 @UseGuards(FirebaseAuthGuard)
 export class TasksController {
+  private readonly logger = new Logger(TasksController.name);
+
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
@@ -65,6 +68,7 @@ export class TasksController {
     @Param('id') id: string,
     @Body() updateDto: UpdateTaskDto,
   ) {
+    this.logger.log(`PATCH /tasks/${id} - Received update:`, JSON.stringify(updateDto, null, 2));
     return this.tasksService.update(req.user.uid, id, updateDto);
   }
 

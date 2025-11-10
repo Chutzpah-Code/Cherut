@@ -190,10 +190,18 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
         <Group gap="sm" wrap="wrap" style={{ marginTop: '4px' }}>
           {getDueDateBadge()}
 
-          {task.objectiveId && (
+          {task.objectiveId && !task.keyResultId && (
             <Tooltip label="Linked to Objective">
               <Badge leftSection={<Target size={12} />} size="sm" variant="dot" color="blue">
-                OKR
+                Objective
+              </Badge>
+            </Tooltip>
+          )}
+
+          {task.keyResultId && (
+            <Tooltip label="Linked to Key Result">
+              <Badge leftSection={<Target size={12} />} size="sm" variant="filled" color="blue">
+                Key Result
               </Badge>
             </Tooltip>
           )}
