@@ -89,7 +89,7 @@ export class ObjectivesService {
         };
 
         // Fetch key results
-        const keyResults = await this.getKeyResultsForObjective(objective.id);
+        const keyResults = await this.getKeyResultsForObjective(userId, objective.id);
         return {
           ...objective,
           keyResults,
@@ -115,7 +115,7 @@ export class ObjectivesService {
     }
 
     // Fetch key results
-    const keyResults = await this.getKeyResultsForObjective(id);
+    const keyResults = await this.getKeyResultsForObjective(userId, id);
 
     return {
       id: doc.id,
@@ -181,8 +181,10 @@ export class ObjectivesService {
     const keyResult = {
       ...createDto,
       objectiveId,
-      isCompleted: createDto.isCompleted || false,
-      isArchived: createDto.isArchived || false,
+      userId, // Adicionar userId para segurança
+      currentValue: createDto.currentValue || 0,
+      isCompleted: (createDto.currentValue || 0) >= createDto.targetValue,
+      isArchived: false,
       completedAt: null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -193,7 +195,7 @@ export class ObjectivesService {
     this.logger.log(`Key Result created: ${docRef.id} for objective ${objectiveId}`);
 
     // Update objective progress
-    await this.updateObjectiveProgress(objectiveId);
+    await this.updateObjectiveProgress(userId, objectiveId);
 
     return {
       id: docRef.id,
@@ -201,12 +203,19 @@ export class ObjectivesService {
     };
   }
 
-  async getKeyResultsForObjective(objectiveId: string) {
+  async getKeyResultsForObjective(userId: string, objectiveId: string) {
     const db = this.firebaseService.getFirestore();
+
+    // Validar se o objetivo pertence ao usuário primeiro
+    const objectiveDoc = await db.collection(this.collection).doc(objectiveId).get();
+    if (!objectiveDoc.exists || objectiveDoc.data()?.userId !== userId) {
+      throw new NotFoundException('Objective not found');
+    }
 
     const snapshot = await db
       .collection(this.keyResultsCollection)
       .where('objectiveId', '==', objectiveId)
+      .where('userId', '==', userId) // Segurança adicional
       .get();
 
     return snapshot.docs.map((doc) => ({
@@ -221,78 +230,145 @@ export class ObjectivesService {
     keyResultId: string,
     updateDto: UpdateKeyResultDto,
   ) {
-    // Verify objective ownership
-    await this.findOne(userId, objectiveId);
-
     const db = this.firebaseService.getFirestore();
-    const doc = await db.collection(this.keyResultsCollection).doc(keyResultId).get();
 
-    if (!doc.exists) {
-      throw new NotFoundException(`Key Result ${keyResultId} not found`);
-    }
+    return await db.runTransaction(async (transaction) => {
+      // 1. Verify objective ownership in transaction
+      const objectiveRef = db.collection(this.collection).doc(objectiveId);
+      const objectiveDoc = await transaction.get(objectiveRef);
 
-    const data = doc.data()!;
-    if (data.objectiveId !== objectiveId) {
-      throw new NotFoundException(`Key Result ${keyResultId} not found for this objective`);
-    }
+      if (!objectiveDoc.exists || objectiveDoc.data()?.userId !== userId) {
+        throw new NotFoundException('Objective not found');
+      }
 
-    // Remove undefined values
-    const cleanedDto = Object.fromEntries(
-      Object.entries(updateDto).filter(([_, v]) => v !== undefined),
-    );
+      // 2. Get key result in transaction
+      const keyResultRef = db.collection(this.keyResultsCollection).doc(keyResultId);
+      const keyResultDoc = await transaction.get(keyResultRef);
 
-    const updates = {
-      ...cleanedDto,
-      updatedAt: new Date().toISOString(),
-    };
+      if (!keyResultDoc.exists) {
+        throw new NotFoundException(`Key Result ${keyResultId} not found`);
+      }
 
-    // If marking as completed, set completedAt
-    if (updateDto.isCompleted && !data.isCompleted) {
-      (updates as any).completedAt = new Date().toISOString();
-    }
+      const data = keyResultDoc.data()!;
+      if (data.objectiveId !== objectiveId || data.userId !== userId) {
+        throw new NotFoundException(`Key Result ${keyResultId} not found for this objective`);
+      }
 
-    await db.collection(this.keyResultsCollection).doc(keyResultId).update(updates);
+      // 3. Prepare updates
+      const cleanedDto = Object.fromEntries(
+        Object.entries(updateDto).filter(([_, v]) => v !== undefined),
+      );
 
-    this.logger.log(`Key Result updated: ${keyResultId}`);
+      const updates = {
+        ...cleanedDto,
+        updatedAt: new Date().toISOString(),
+      };
 
-    // Update objective progress
-    await this.updateObjectiveProgress(objectiveId);
+      // 4. If marking as completed, set completedAt
+      if (updateDto.isCompleted && !data.isCompleted) {
+        (updates as any).completedAt = new Date().toISOString();
+      }
 
-    return {
-      id: doc.id,
-      ...data,
-      ...updates,
-    };
+      // 5. Update key result in transaction
+      transaction.update(keyResultRef, updates);
+
+      // 6. Calculate and update objective progress
+      const keyResultsSnapshot = await transaction.get(
+        db.collection(this.keyResultsCollection)
+          .where('objectiveId', '==', objectiveId)
+          .where('userId', '==', userId)
+      );
+
+      const keyResults = keyResultsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        // Apply updates if this is the document being updated
+        ...(doc.id === keyResultId ? updates : {})
+      }));
+
+      if (keyResults.length > 0) {
+        const completedCount = keyResults.filter((kr: any) => kr.isCompleted).length;
+        const progress = Math.round((completedCount / keyResults.length) * 100);
+
+        transaction.update(objectiveRef, {
+          progress,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
+      this.logger.log(`Key Result updated: ${keyResultId}`);
+
+      return {
+        id: keyResultId,
+        ...data,
+        ...updates,
+      };
+    });
   }
 
   async deleteKeyResult(userId: string, objectiveId: string, keyResultId: string) {
-    // Verify objective ownership
-    await this.findOne(userId, objectiveId);
-
     const db = this.firebaseService.getFirestore();
-    const doc = await db.collection(this.keyResultsCollection).doc(keyResultId).get();
 
-    if (!doc.exists) {
-      throw new NotFoundException(`Key Result ${keyResultId} not found`);
-    }
+    return await db.runTransaction(async (transaction) => {
+      // 1. Verify objective ownership
+      const objectiveRef = db.collection(this.collection).doc(objectiveId);
+      const objectiveDoc = await transaction.get(objectiveRef);
 
-    const data = doc.data()!;
-    if (data.objectiveId !== objectiveId) {
-      throw new NotFoundException(`Key Result ${keyResultId} not found for this objective`);
-    }
+      if (!objectiveDoc.exists || objectiveDoc.data()?.userId !== userId) {
+        throw new NotFoundException('Objective not found');
+      }
 
-    await db.collection(this.keyResultsCollection).doc(keyResultId).delete();
+      // 2. Get key result
+      const keyResultRef = db.collection(this.keyResultsCollection).doc(keyResultId);
+      const keyResultDoc = await transaction.get(keyResultRef);
 
-    this.logger.log(`Key Result deleted: ${keyResultId}`);
+      if (!keyResultDoc.exists) {
+        throw new NotFoundException(`Key Result ${keyResultId} not found`);
+      }
 
-    // Update objective progress
-    await this.updateObjectiveProgress(objectiveId);
+      const data = keyResultDoc.data()!;
+      if (data.objectiveId !== objectiveId || data.userId !== userId) {
+        throw new NotFoundException(`Key Result ${keyResultId} not found for this objective`);
+      }
 
-    return { message: 'Key Result deleted successfully' };
+      // 3. Delete key result in transaction
+      transaction.delete(keyResultRef);
+
+      // 4. Update objective progress
+      const remainingKeyResultsSnapshot = await transaction.get(
+        db.collection(this.keyResultsCollection)
+          .where('objectiveId', '==', objectiveId)
+          .where('userId', '==', userId)
+      );
+
+      const remainingKeyResults = remainingKeyResultsSnapshot.docs
+        .filter(doc => doc.id !== keyResultId) // Exclude the one being deleted
+        .map(doc => ({ id: doc.id, ...doc.data() }));
+
+      if (remainingKeyResults.length > 0) {
+        const completedCount = remainingKeyResults.filter((kr: any) => kr.isCompleted).length;
+        const progress = Math.round((completedCount / remainingKeyResults.length) * 100);
+
+        transaction.update(objectiveRef, {
+          progress,
+          updatedAt: new Date().toISOString(),
+        });
+      } else {
+        // No key results left, set progress to 0
+        transaction.update(objectiveRef, {
+          progress: 0,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
+      this.logger.log(`Key Result deleted: ${keyResultId}`);
+
+      return { message: 'Key Result deleted successfully' };
+    });
   }
 
-  private async updateObjectiveProgress(objectiveId: string) {
-    const keyResults = await this.getKeyResultsForObjective(objectiveId);
+  private async updateObjectiveProgress(userId: string, objectiveId: string) {
+    const keyResults = await this.getKeyResultsForObjective(userId, objectiveId);
 
     if (keyResults.length === 0) {
       return;
@@ -391,7 +467,7 @@ export class ObjectivesService {
     this.logger.log(`Key Result ${keyResultId} completion toggled to ${newIsCompleted}`);
 
     // Update objective progress
-    await this.updateObjectiveProgress(objectiveId);
+    await this.updateObjectiveProgress(userId, objectiveId);
 
     return {
       id: doc.id,

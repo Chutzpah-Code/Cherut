@@ -1,31 +1,30 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsString, MinLength } from 'class-validator';
 
 /**
- * 📚 EXPLICAÇÃO: Login DTO
+ * 📚 EXPLICAÇÃO: Login DTO (Firebase-Only)
  *
- * Similar ao RegisterDto, mas mais simples.
- * Valida apenas email e senha para login.
+ * Para estratégia Firebase-Only, o cliente autentica
+ * via Firebase Client SDK e envia o ID token.
  *
- * FLUXO DE LOGIN:
- * 1. Cliente envia: POST /auth/login { email, password }
- * 2. NestJS valida com class-validator
- * 3. Se válido → Controller chama AuthService.login()
- * 4. AuthService verifica credenciais no Firebase
- * 5. Se correto → Retorna JWT token
- * 6. Cliente salva token e usa em requisições futuras
+ * FLUXO DE LOGIN SEGURO:
+ * 1. Cliente autentica via Firebase Client SDK
+ * 2. Cliente recebe Firebase ID token
+ * 3. Cliente envia: POST /auth/login { firebaseIdToken }
+ * 4. Backend valida token com Firebase Admin SDK
+ * 5. Se válido → Retorna dados do usuário
+ *
+ * VANTAGENS:
+ * - Senha nunca trafega para o backend
+ * - Token validado diretamente pelo Google
+ * - Mais seguro que validação manual
  */
 
 export class LoginDto {
   /**
-   * Email do usuário
-   */
-  @IsEmail()
-  email: string;
-
-  /**
-   * Senha do usuário
+   * Firebase ID Token obtido via Firebase Client SDK
+   * Este token é assinado pelo Google e validado pelo Firebase Admin SDK
    */
   @IsString()
-  @MinLength(6)
-  password: string;
+  @MinLength(100, { message: 'Firebase ID token must be valid' })
+  firebaseIdToken: string;
 }

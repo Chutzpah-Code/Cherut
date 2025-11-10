@@ -11,7 +11,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateKeyResultDto } from './create-key-result.dto';
+import { CreateKeyResultDto } from '../../key-results/dto/create-key-result.dto';
 
 export enum ObjectiveStatus {
   ON_TRACK = 'on_track',
