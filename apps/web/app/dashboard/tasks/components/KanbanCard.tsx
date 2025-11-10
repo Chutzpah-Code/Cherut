@@ -5,13 +5,14 @@ import { GripVertical, Target, CheckSquare, Clock, Archive } from 'lucide-react'
 import { Task } from '@/lib/api/services/tasks';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { memo, useMemo } from 'react';
 
 interface KanbanCardProps {
   task: Task;
   onClick: () => void;
 }
 
-export function KanbanCard({ task, onClick }: KanbanCardProps) {
+export const KanbanCard = memo(function KanbanCard({ task, onClick }: KanbanCardProps) {
   const {
     attributes,
     listeners,
@@ -33,8 +34,8 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
     opacity: isDragging ? 0 : 1,
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
+  const priorityColor = useMemo(() => {
+    switch (task.priority) {
       case 'urgent':
         return 'red';
       case 'high':
@@ -46,62 +47,59 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
       default:
         return 'gray';
     }
-  };
+  }, [task.priority]);
 
-  const getDaysUntilDue = () => {
+  const daysUntilDue = useMemo(() => {
     if (!task.dueDate) return null;
     const today = new Date();
     const dueDate = new Date(task.dueDate);
     const diffTime = dueDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
-  };
+  }, [task.dueDate]);
 
-  const getDueDateBadge = () => {
-    const days = getDaysUntilDue();
-    if (days === null) return null;
+  const dueDateBadge = useMemo(() => {
+    if (daysUntilDue === null) return null;
 
-    if (days < 0) {
+    if (daysUntilDue < 0) {
       return (
         <Badge color="red" size="xs" variant="filled">
-          Overdue ({Math.abs(days)}d)
+          Overdue ({Math.abs(daysUntilDue)}d)
         </Badge>
       );
-    } else if (days === 0) {
+    } else if (daysUntilDue === 0) {
       return (
         <Badge color="orange" size="xs" variant="filled">
           Today
         </Badge>
       );
-    } else if (days <= 3) {
+    } else if (daysUntilDue <= 3) {
       return (
         <Badge color="yellow" size="xs" variant="filled">
-          {days}d left
+          {daysUntilDue}d left
         </Badge>
       );
-    } else if (days <= 7) {
+    } else if (daysUntilDue <= 7) {
       return (
         <Badge color="blue" size="xs" variant="light">
-          {days}d
+          {daysUntilDue}d
         </Badge>
       );
     }
     return (
       <Badge color="gray" size="xs" variant="light">
-        {days}d
+        {daysUntilDue}d
       </Badge>
     );
-  };
+  }, [daysUntilDue]);
 
-  const getChecklistProgress = () => {
+  const checklistProgress = useMemo(() => {
     if (!task.checklist || task.checklist.length === 0) return null;
     const completed = task.checklist.filter((item) => item.completed).length;
     const total = task.checklist.length;
     const percentage = Math.round((completed / total) * 100);
     return { completed, total, percentage };
-  };
-
-  const checklistProgress = getChecklistProgress();
+  }, [task.checklist]);
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -112,9 +110,10 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
     return `${minutes}m`;
   };
 
-  const hasActiveTimeTracking = task.timeTracking?.some((t) => t.status === 'running');
-
-  const priorityColor = getPriorityColor(task.priority);
+  const hasActiveTimeTracking = useMemo(() =>
+    task.timeTracking?.some((t) => t.status === 'running'),
+    [task.timeTracking]
+  );
 
   return (
     <Card
@@ -150,7 +149,7 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
               <GripVertical size={16} />
             </ActionIcon>
 
-            <Badge color={getPriorityColor(task.priority)} size="xs" variant="light">
+            <Badge color={priorityColor} size="xs" variant="light">
               {task.priority}
             </Badge>
 
@@ -188,7 +187,7 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
 
         {/* Metadata badges */}
         <Group gap="sm" wrap="wrap" style={{ marginTop: '4px' }}>
-          {getDueDateBadge()}
+          {dueDateBadge}
 
           {task.objectiveId && !task.keyResultId && (
             <Tooltip label="Linked to Objective">
@@ -266,4 +265,4 @@ export function KanbanCard({ task, onClick }: KanbanCardProps) {
       }} />
     </Card>
   );
-}
+});

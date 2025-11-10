@@ -5,6 +5,8 @@ export const useHabits = (lifeAreaId?: string) => {
   return useQuery({
     queryKey: ['habits', lifeAreaId],
     queryFn: () => habitsApi.getAll(lifeAreaId),
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    gcTime: 8 * 60 * 1000, // 8 minutes
   });
 };
 
@@ -13,6 +15,8 @@ export const useHabit = (id: string) => {
     queryKey: ['habits', id],
     queryFn: () => habitsApi.getOne(id),
     enabled: !!id,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -67,5 +71,7 @@ export const useHabitLogs = (habitId: string, startDate?: string, endDate?: stri
     queryKey: ['habitLogs', habitId, startDate, endDate],
     queryFn: () => habitsApi.getHabitLogs(habitId, startDate, endDate),
     enabled: !!habitId,
+    staleTime: 1 * 60 * 1000, // 1 minute - logs change frequently
+    gcTime: 3 * 60 * 1000, // 3 minutes
   });
 };

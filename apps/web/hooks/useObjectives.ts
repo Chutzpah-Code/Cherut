@@ -5,6 +5,8 @@ export const useObjectives = (lifeAreaId?: string) => {
   return useQuery({
     queryKey: ['objectives', lifeAreaId],
     queryFn: () => objectivesApi.getAll(lifeAreaId),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
@@ -13,6 +15,8 @@ export const useObjective = (id: string) => {
     queryKey: ['objectives', id],
     queryFn: () => objectivesApi.getOne(id),
     enabled: !!id,
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 

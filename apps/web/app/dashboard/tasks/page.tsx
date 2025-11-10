@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { Title, Text, Stack, Box, Alert } from '@mantine/core';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { KanbanView } from './components/KanbanView';
 import { ViewSwitcher, TaskView } from './components/ViewSwitcher';
+import { OptimizedLoader } from '@/components/ui/OptimizedLoader';
 
 export default function TasksPage() {
   const [currentView, setCurrentView] = useState<TaskView>('kanban');
@@ -22,7 +23,11 @@ export default function TasksPage() {
       </Box>
 
       {/* Content based on view */}
-      {currentView === 'kanban' && <KanbanView />}
+      {currentView === 'kanban' && (
+        <Suspense fallback={<OptimizedLoader text="Loading tasks..." variant="skeleton" lines={4} />}>
+          <KanbanView />
+        </Suspense>
+      )}
 
       {currentView === 'calendar' && (
         <Alert icon={<CalendarIcon size={20} />} color="blue" variant="light">

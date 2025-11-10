@@ -5,6 +5,8 @@ export const useTasks = (lifeAreaId?: string) => {
   return useQuery({
     queryKey: ['tasks', lifeAreaId],
     queryFn: () => tasksApi.getAll(lifeAreaId),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
@@ -12,6 +14,8 @@ export const useKanbanBoard = (lifeAreaId?: string) => {
   return useQuery({
     queryKey: ['tasks', 'kanban', lifeAreaId],
     queryFn: () => tasksApi.getKanban(lifeAreaId),
+    staleTime: 2 * 60 * 1000, // 2 minutes - kanban needs fresher data
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -20,6 +24,8 @@ export const useTask = (id: string) => {
     queryKey: ['tasks', id],
     queryFn: () => tasksApi.getOne(id),
     enabled: !!id,
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
