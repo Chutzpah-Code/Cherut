@@ -5,7 +5,10 @@ export interface KeyResult {
   objectiveId: string;
   title: string;
   description?: string;
-  dueDate: string;
+  targetValue: number;
+  currentValue: number;
+  unit: string;
+  completionPercentage: number;
   isCompleted: boolean;
   isArchived?: boolean;
   completedAt?: string;
@@ -33,7 +36,9 @@ export interface Objective {
 export interface CreateKeyResultDto {
   title: string;
   description?: string;
-  dueDate: string;
+  targetValue: number;
+  currentValue?: number;
+  unit: string;
 }
 
 export interface CreateObjectiveDto {
@@ -48,7 +53,9 @@ export interface CreateObjectiveDto {
 export interface UpdateKeyResultDto {
   title?: string;
   description?: string;
-  dueDate?: string;
+  targetValue?: number;
+  currentValue?: number;
+  unit?: string;
   isCompleted?: boolean;
 }
 

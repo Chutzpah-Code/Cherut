@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Target, Calendar, TrendingUp, CheckCircle2, Circle, X, Archive } from 'lucide-react';
+import { Plus, Edit2, Trash2, Target, TrendingUp, CheckCircle2, Circle, X, Archive } from 'lucide-react';
 import {
   Title,
   Text,
@@ -28,6 +28,7 @@ import {
   Tooltip,
   Box,
   ScrollArea,
+  NumberInput,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { modals } from '@mantine/modals';
@@ -53,7 +54,9 @@ interface KeyResultFormData {
   id?: string;
   title: string;
   description: string;
-  dueDate: Date | null;
+  targetValue: number;
+  currentValue: number;
+  unit: string;
 }
 
 export default function ObjectivesPage() {
@@ -68,35 +71,35 @@ export default function ObjectivesPage() {
   const deleteKRMutation = useDeleteKeyResult();
   const completeKRMutation = useCompleteKeyResult();
   const toggleObjectiveCompletionMutation = useToggleObjectiveCompletion();
-  const toggleKRCompletionMutation = useToggleKeyResultCompletion();
-  const archiveObjectiveMutation = useArchiveObjective();
+  const toggleKeyResultCompletionMutation = useToggleKeyResultCompletion();
+  const archiveMutation = useArchiveObjective();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingObjective, setEditingObjective] = useState<Objective | null>(null);
-  const [formData, setFormData] = useState<{
-    lifeAreaId: string;
-    title: string;
-    description: string;
-    startDate: Date | null;
-    endDate: Date | null;
-  }>({
-    lifeAreaId: '',
+  const [isKRModalOpen, setIsKRModalOpen] = useState(false);
+  const [editingKR, setEditingKR] = useState<{
+    objective: Objective;
+    kr: KeyResult;
+  } | null>(null);
+  const [currentObjective, setCurrentObjective] = useState<string>('');
+
+  const [formData, setFormData] = useState({
     title: '',
     description: '',
+    lifeAreaId: '',
     startDate: new Date(),
-    endDate: null,
+    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
   });
 
   const [keyResults, setKeyResults] = useState<KeyResultFormData[]>([]);
-  const [editingKR, setEditingKR] = useState<{ objectiveId: string; kr: KeyResult } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.startDate || !formData.endDate) {
+    if (!formData.title || !formData.lifeAreaId) {
       notifications.show({
         title: 'Error',
-        message: 'Please select both start and end dates',
+        message: 'Please fill in all required fields',
         color: 'red',
       });
       return;
@@ -110,31 +113,29 @@ export default function ObjectivesPage() {
         startDate: formData.startDate.toISOString().split('T')[0],
         endDate: formData.endDate.toISOString().split('T')[0],
         keyResults: keyResults
-          .filter((kr) => kr.title && kr.dueDate)
+          .filter((kr) => kr.title && kr.targetValue && kr.unit)
           .map((kr) => ({
             title: kr.title,
             description: kr.description,
-            dueDate: kr.dueDate!.toISOString().split('T')[0],
+            targetValue: kr.targetValue,
+            currentValue: kr.currentValue || 0,
+            unit: kr.unit,
           })),
       };
 
       if (editingObjective) {
         await updateMutation.mutateAsync({ id: editingObjective.id, dto });
-        notifications.show({
-          title: 'Success',
-          message: 'Objective updated successfully',
-          color: 'green',
-        });
       } else {
         await createMutation.mutateAsync(dto);
-        notifications.show({
-          title: 'Success',
-          message: 'Objective created successfully',
-          color: 'green',
-        });
       }
 
-      handleCloseModal();
+      notifications.show({
+        title: 'Success',
+        message: `Objective ${editingObjective ? 'updated' : 'created'} successfully!`,
+        color: 'green',
+      });
+      setIsModalOpen(false);
+      resetForm();
     } catch (error) {
       console.error('Error saving objective:', error);
       notifications.show({
@@ -145,91 +146,16 @@ export default function ObjectivesPage() {
     }
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingObjective(null);
+  const resetForm = () => {
     setFormData({
-      lifeAreaId: '',
       title: '',
       description: '',
-      startDate: new Date(),
-      endDate: null,
-    });
-    setKeyResults([]);
-  };
-
-  const handleEdit = (objective: Objective) => {
-    setEditingObjective(objective);
-    setFormData({
-      lifeAreaId: objective.lifeAreaId,
-      title: objective.title,
-      description: objective.description || '',
-      startDate: new Date(objective.startDate),
-      endDate: new Date(objective.endDate),
-    });
-    setKeyResults([]);
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = (id: string) => {
-    modals.openConfirmModal({
-      title: 'Delete Objective',
-      children: (
-        <Text size="sm">
-          Are you sure you want to delete this objective? This will also delete all associated key results. This action cannot be undone.
-        </Text>
-      ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
-      onConfirm: async () => {
-        try {
-          await deleteMutation.mutateAsync(id);
-          notifications.show({
-            title: 'Success',
-            message: 'Objective deleted successfully',
-            color: 'green',
-          });
-        } catch (error) {
-          console.error('Error deleting objective:', error);
-          notifications.show({
-            title: 'Error',
-            message: 'Failed to delete objective',
-            color: 'red',
-          });
-        }
-      },
-    });
-  };
-
-  const handleToggleObjectiveCompletion = async (id: string) => {
-    try {
-      await toggleObjectiveCompletionMutation.mutateAsync(id);
-      notifications.show({
-        title: 'Success',
-        message: 'Objective status updated',
-        color: 'green',
-      });
-    } catch (error) {
-      console.error('Error toggling objective completion:', error);
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to update objective status',
-        color: 'red',
-      });
-    }
-  };
-
-  const handleNew = () => {
-    setEditingObjective(null);
-    setFormData({
       lifeAreaId: '',
-      title: '',
-      description: '',
       startDate: new Date(),
-      endDate: null,
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
     setKeyResults([]);
-    setIsModalOpen(true);
+    setEditingObjective(null);
   };
 
   const addKeyResult = () => {
@@ -238,7 +164,9 @@ export default function ObjectivesPage() {
       {
         title: '',
         description: '',
-        dueDate: null,
+        targetValue: 0,
+        currentValue: 0,
+        unit: '',
       },
     ]);
   };
@@ -253,742 +181,283 @@ export default function ObjectivesPage() {
     setKeyResults(updated);
   };
 
-  const handleAddKRToExisting = async (objectiveId: string) => {
-    modals.open({
-      title: 'Add Key Result',
-      size: 'lg',
-      children: (
-        <AddKeyResultModal
-          objectiveId={objectiveId}
-          onSuccess={() => {
-            modals.closeAll();
-            notifications.show({
-              title: 'Success',
-              message: 'Key result added successfully',
-              color: 'green',
-            });
-          }}
-        />
-      ),
-    });
-  };
-
-  const handleToggleKRCompletion = async (objectiveId: string, keyResultId: string) => {
-    try {
-      await toggleKRCompletionMutation.mutateAsync({ objectiveId, keyResultId });
-      notifications.show({
-        title: 'Success',
-        message: 'Key result status updated',
-        color: 'green',
-      });
-    } catch (error) {
-      console.error('Error toggling key result completion:', error);
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to update key result status',
-        color: 'red',
-      });
-    }
-  };
-
-  const handleDeleteKR = (objectiveId: string, keyResultId: string) => {
-    modals.openConfirmModal({
-      title: 'Delete Key Result',
-      children: <Text size="sm">Are you sure you want to delete this key result? This action cannot be undone.</Text>,
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
-      onConfirm: async () => {
-        try {
-          await deleteKRMutation.mutateAsync({ objectiveId, keyResultId });
-          notifications.show({
-            title: 'Success',
-            message: 'Key result deleted successfully',
-            color: 'green',
-          });
-        } catch (error) {
-          console.error('Error deleting key result:', error);
-          notifications.show({
-            title: 'Error',
-            message: 'Failed to delete key result',
-            color: 'red',
-          });
-        }
-      },
-    });
-  };
-
-  const handleEditKR = (objectiveId: string, kr: KeyResult) => {
-    setEditingKR({ objectiveId, kr });
-  };
-
-  const handleCloseKRModal = () => {
-    setEditingKR(null);
-  };
-
-  const handleUpdateKR = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!editingKR) return;
-
-    const form = e.currentTarget;
-    const titleInput = form.elements.namedItem('title') as HTMLInputElement;
-    const descriptionInput = form.elements.namedItem('description') as HTMLTextAreaElement;
-    const dueDateInput = form.elements.namedItem('dueDate') as HTMLInputElement;
-
-    const title = titleInput.value;
-    const description = descriptionInput.value;
-    const dueDateStr = dueDateInput.value;
-
-    if (!title || !dueDateStr) {
-      notifications.show({
-        title: 'Error',
-        message: 'Title and due date are required',
-        color: 'red',
-      });
-      return;
-    }
-
-    try {
-      await updateKRMutation.mutateAsync({
-        objectiveId: editingKR.objectiveId,
-        keyResultId: editingKR.kr.id,
-        dto: {
-          title,
-          description: description || undefined,
-          dueDate: dueDateStr,
-        },
-      });
-
-      notifications.show({
-        title: 'Success',
-        message: 'Key result updated successfully',
-        color: 'green',
-      });
-
-      handleCloseKRModal();
-    } catch (error) {
-      console.error('Error updating key result:', error);
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to update key result',
-        color: 'red',
-      });
-    }
-  };
-
-  const handleArchive = (id: string) => {
-    modals.openConfirmModal({
-      title: 'Archive Objective',
-      children: (
-        <Stack gap="md">
-          <Text size="sm">
-            Are you sure you want to archive this objective?
-          </Text>
-          <Text size="sm" c="dimmed">
-            Archived objectives and their key results will be stored for future reporting.
-            They will remain available in your data but won&apos;t appear in your active objectives list.
-          </Text>
-        </Stack>
-      ),
-      labels: { confirm: 'Archive', cancel: 'Cancel' },
-      confirmProps: { color: 'blue' },
-      onConfirm: async () => {
-        try {
-          await archiveObjectiveMutation.mutateAsync(id);
-          notifications.show({
-            title: 'Success',
-            message: 'Objective archived successfully',
-            color: 'green',
-          });
-        } catch (error) {
-          console.error('Error archiving objective:', error);
-          notifications.show({
-            title: 'Error',
-            message: 'Failed to archive objective',
-            color: 'red',
-          });
-        }
-      },
-    });
-  };
-
-  const getLifeAreaName = (lifeAreaId: string) => {
-    return lifeAreas?.find((area) => area.id === lifeAreaId)?.name || 'Unknown';
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'green';
-      case 'completed':
-        return 'blue';
-      case 'cancelled':
-        return 'gray';
-      default:
-        return 'gray';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  };
-
-  const calculateProgress = (objective: Objective) => {
-    if (!objective.keyResults || objective.keyResults.length === 0) {
-      return objective.progress || 0;
-    }
-    const completed = objective.keyResults.filter((kr) => kr.isCompleted).length;
-    return Math.round((completed / objective.keyResults.length) * 100);
-  };
-
   if (isLoading) {
     return (
-      <Center h={300}>
-        <Loader size="lg" />
+      <Center h={400}>
+        <Loader />
       </Center>
     );
   }
 
   return (
-    <Stack gap="lg">
-      <Group justify="space-between">
+    <div>
+      <Group justify="space-between" align="center" mb="xl">
         <div>
-          <Title order={1} size="h2" mb="xs">
-            Objectives & Key Results
-          </Title>
-          <Text c="dimmed" size="sm">
-            Define and track your strategic objectives with measurable key results
+          <Title order={1}>Objectives & Key Results</Title>
+          <Text c="dimmed" size="lg">
+            Define and track your strategic goals using the OKR methodology
           </Text>
         </div>
-        <Button leftSection={<Plus size={20} />} onClick={handleNew}>
-          New Objective
+        <Button leftSection={<Plus size={16} />} onClick={() => setIsModalOpen(true)}>
+          Create Objective
         </Button>
       </Group>
 
-      {/* Objectives Grid */}
-      <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
-        {objectives?.filter((obj) => !obj.isArchived).map((objective) => {
-          const progress = calculateProgress(objective);
-          const completedKRs = objective.keyResults?.filter((kr) => kr.isCompleted).length || 0;
-          const totalKRs = objective.keyResults?.length || 0;
-
-          return (
-            <Card key={objective.id} shadow="md" padding="lg" withBorder radius="md">
-              <Stack gap="md">
-                {/* Header */}
-                <Group wrap="nowrap" align="flex-start">
-                  <ThemeIcon size="xl" radius="md" color="blue" variant="light">
-                    <Target size={24} />
-                  </ThemeIcon>
-                  <Box style={{ flex: 1 }}>
-                    <Group justify="space-between" mb="xs">
-                      <Text fw={700} size="lg" style={{ flex: 1 }} lineClamp={1}>
-                        {objective.title}
-                      </Text>
-                      <Badge color={getStatusColor(objective.status)} size="sm" variant="filled">
-                        {getStatusText(objective.status)}
-                      </Badge>
-                    </Group>
-                    {objective.description && (
-                      <Text size="sm" c="dimmed" lineClamp={2} mb="sm">
-                        {objective.description}
-                      </Text>
-                    )}
-                    <Group gap="xs">
-                      <TrendingUp size={14} />
-                      <Text size="xs" c="dimmed" fw={500}>
-                        {getLifeAreaName(objective.lifeAreaId)}
-                      </Text>
-                    </Group>
-                  </Box>
-                </Group>
-
-                <Divider />
-
-                {/* Progress */}
-                <Stack gap="xs">
-                  <Group justify="space-between">
-                    <Text size="sm" fw={500}>
-                      Progress
+      {!objectives || objectives.length === 0 ? (
+        <Card p="xl" mt="lg">
+          <Center>
+            <Stack align="center">
+              <ThemeIcon size={60} radius="xl" variant="light">
+                <Target size={30} />
+              </ThemeIcon>
+              <div style={{ textAlign: 'center' }}>
+                <Text size="xl" fw={500} mb="xs">
+                  No objectives yet
+                </Text>
+                <Text c="dimmed" mb="md">
+                  Create your first objective to start tracking your progress towards your goals
+                </Text>
+                <Button leftSection={<Plus size={16} />} onClick={() => setIsModalOpen(true)}>
+                  Create Your First Objective
+                </Button>
+              </div>
+            </Stack>
+          </Center>
+        </Card>
+      ) : (
+        <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
+          {objectives.map((objective) => (
+            <Card key={objective.id} p="lg" withBorder>
+              <Group justify="space-between" align="flex-start" mb="md">
+                <div style={{ flex: 1 }}>
+                  <Group gap="xs" mb="xs">
+                    <Text fw={600} size="lg">
+                      {objective.title}
                     </Text>
-                    <Group gap="xs">
-                      <Text size="sm" c="dimmed">
-                        {completedKRs}/{totalKRs} KRs
-                      </Text>
-                      <Text size="sm" fw={600} c="blue">
-                        {progress}%
-                      </Text>
-                    </Group>
+                    <Badge
+                      color={
+                        objective.status === 'completed'
+                          ? 'green'
+                          : objective.status === 'active'
+                          ? 'blue'
+                          : 'gray'
+                      }
+                      size="sm"
+                    >
+                      {objective.status}
+                    </Badge>
                   </Group>
-                  <Progress value={progress} color="blue" size="md" radius="xl" />
-                </Stack>
-
-                {/* Key Results */}
-                {objective.keyResults && objective.keyResults.length > 0 && (
-                  <Stack gap="xs">
-                    <Text size="sm" fw={600} c="dimmed">
-                      Key Results
+                  {objective.description && (
+                    <Text size="sm" c="dimmed" mb="sm">
+                      {objective.description}
                     </Text>
-                    <ScrollArea.Autosize mah={200}>
-                      <Stack gap="xs">
-                        {objective.keyResults.map((kr) => (
-                          <Paper key={kr.id} p="sm" withBorder radius="md" bg="var(--mantine-color-gray-0)">
-                            <Group wrap="nowrap" gap="sm">
-                              <Tooltip label={kr.isCompleted ? 'Mark as incomplete' : 'Mark as complete'}>
-                                <ActionIcon
-                                  size="md"
-                                  variant="subtle"
-                                  color={kr.isCompleted ? 'green' : 'gray'}
-                                  onClick={() => handleToggleKRCompletion(objective.id, kr.id)}
-                                  style={{ cursor: 'pointer' }}
-                                >
-                                  {kr.isCompleted ? <CheckCircle2 size={18} /> : <Circle size={18} />}
-                                </ActionIcon>
-                              </Tooltip>
-                              <Box style={{ flex: 1 }}>
-                                <Text
-                                  size="sm"
-                                  fw={500}
-                                  style={{
-                                    textDecoration: kr.isCompleted ? 'line-through' : 'none',
-                                    color: kr.isCompleted ? 'var(--mantine-color-dimmed)' : 'inherit',
-                                  }}
-                                >
-                                  {kr.title}
-                                </Text>
-                                <Group gap="xs" mt={4}>
-                                  <Calendar size={12} />
-                                  <Text size="xs" c="dimmed">
-                                    Due: {new Date(kr.dueDate).toLocaleDateString()}
-                                  </Text>
-                                </Group>
-                              </Box>
-                              <Group gap="xs">
-                                <Tooltip label="Edit key result">
-                                  <ActionIcon
-                                    size="sm"
-                                    variant="subtle"
-                                    color="blue"
-                                    onClick={() => handleEditKR(objective.id, kr)}
-                                  >
-                                    <Edit2 size={14} />
-                                  </ActionIcon>
-                                </Tooltip>
-                                <Tooltip label="Delete key result">
-                                  <ActionIcon
-                                    size="sm"
-                                    variant="subtle"
-                                    color="red"
-                                    onClick={() => handleDeleteKR(objective.id, kr.id)}
-                                  >
-                                    <Trash2 size={14} />
-                                  </ActionIcon>
-                                </Tooltip>
-                              </Group>
-                            </Group>
-                          </Paper>
-                        ))}
-                      </Stack>
-                    </ScrollArea.Autosize>
-                  </Stack>
-                )}
-
-                {/* Dates */}
-                <Group gap="sm" wrap="nowrap">
-                  <Group gap={4}>
-                    <Calendar size={14} />
-                    <Text size="xs" c="dimmed">
-                      {new Date(objective.startDate).toLocaleDateString()}
-                    </Text>
-                  </Group>
-                  <Text size="xs" c="dimmed">
-                    →
-                  </Text>
-                  <Group gap={4}>
-                    <Calendar size={14} />
-                    <Text size="xs" c="dimmed">
-                      {new Date(objective.endDate).toLocaleDateString()}
-                    </Text>
-                  </Group>
-                </Group>
-
-                <Divider />
-
-                {/* Actions */}
+                  )}
+                </div>
                 <Group gap="xs">
-                  <Button
-                    variant="light"
-                    leftSection={<Plus size={16} />}
-                    onClick={() => handleAddKRToExisting(objective.id)}
-                    size="xs"
-                    flex={1}
-                  >
-                    Add KR
-                  </Button>
-                  <Button
-                    variant="light"
-                    color={objective.status === 'completed' ? 'gray' : 'green'}
-                    leftSection={<CheckCircle2 size={16} />}
-                    onClick={() => handleToggleObjectiveCompletion(objective.id)}
-                    size="xs"
-                    flex={1}
-                  >
-                    {objective.status === 'completed' ? 'Reopen' : 'Complete'}
-                  </Button>
-                  <Button
-                    variant="light"
-                    leftSection={<Edit2 size={16} />}
-                    onClick={() => handleEdit(objective)}
-                    size="xs"
-                    flex={1}
-                  >
-                    Edit
-                  </Button>
-                  <Tooltip label="Archive objective">
-                    <ActionIcon variant="light" color="blue" onClick={() => handleArchive(objective.id)} size="lg">
-                      <Archive size={18} />
-                    </ActionIcon>
-                  </Tooltip>
-                  <ActionIcon variant="light" color="red" onClick={() => handleDelete(objective.id)} size="lg">
-                    <Trash2 size={18} />
+                  <ActionIcon variant="light" color="blue" size="sm">
+                    <Edit2 size={14} />
+                  </ActionIcon>
+                  <ActionIcon variant="light" color="red" size="sm">
+                    <Trash2 size={14} />
                   </ActionIcon>
                 </Group>
-              </Stack>
-            </Card>
-          );
-        })}
-      </SimpleGrid>
+              </Group>
 
-      {objectives?.filter((obj) => !obj.isArchived).length === 0 && (
-        <Card shadow="sm" padding="xl" withBorder>
-          <Stack align="center" gap="md">
-            <ThemeIcon size={60} radius="md" variant="light" color="blue">
-              <Target size={32} />
-            </ThemeIcon>
-            <Text c="dimmed" size="lg" fw={500}>
-              No objectives yet
-            </Text>
-            <Text c="dimmed" size="sm" ta="center">
-              Start defining your strategic objectives with measurable key results
-            </Text>
-            <Button variant="light" onClick={handleNew} leftSection={<Plus size={20} />}>
-              Create your first objective
-            </Button>
-          </Stack>
-        </Card>
+              <Box mb="md">
+                <Group justify="space-between" align="center" mb="xs">
+                  <Text size="sm" fw={500}>
+                    Progress
+                  </Text>
+                  <Text size="sm" fw={500}>
+                    {objective.progress}%
+                  </Text>
+                </Group>
+                <Progress value={objective.progress} size="sm" radius="xl" />
+              </Box>
+
+              {objective.keyResults && objective.keyResults.length > 0 && (
+                <div>
+                  <Text size="sm" fw={500} mb="xs">
+                    Key Results ({objective.keyResults.length})
+                  </Text>
+                  <Stack gap="xs">
+                    {objective.keyResults.slice(0, 3).map((kr, index) => (
+                      <Paper key={kr.id} p="xs" withBorder>
+                        <Group justify="space-between" align="center">
+                          <Box style={{ flex: 1 }}>
+                            <Text size="xs" fw={500} lineClamp={1}>
+                              {kr.title}
+                            </Text>
+                            <Group gap="xs" mt={4}>
+                              <TrendingUp size={12} />
+                              <Text size="xs" c="dimmed">
+                                Progress: {kr.currentValue}/{kr.targetValue} {kr.unit} ({kr.completionPercentage.toFixed(0)}%)
+                              </Text>
+                            </Group>
+                          </Box>
+                          <ActionIcon
+                            size="sm"
+                            variant="subtle"
+                            color={kr.isCompleted ? 'green' : 'gray'}
+                          >
+                            {kr.isCompleted ? <CheckCircle2 size={14} /> : <Circle size={14} />}
+                          </ActionIcon>
+                        </Group>
+                      </Paper>
+                    ))}
+                    {objective.keyResults.length > 3 && (
+                      <Text size="xs" c="dimmed" ta="center">
+                        +{objective.keyResults.length - 3} more
+                      </Text>
+                    )}
+                  </Stack>
+                </div>
+              )}
+            </Card>
+          ))}
+        </SimpleGrid>
       )}
 
-      {/* Create/Edit Modal */}
       <Modal
         opened={isModalOpen}
-        onClose={handleCloseModal}
-        title={
-          <Group gap="sm">
-            <ThemeIcon size="lg" radius="md" color="blue" variant="light">
-              <Target size={20} />
-            </ThemeIcon>
-            <Text size="lg" fw={600}>
-              {editingObjective ? 'Edit Objective' : 'New Objective'}
-            </Text>
-          </Group>
-        }
-        size="xl"
-        scrollAreaComponent={ScrollArea.Autosize}
+        onClose={() => setIsModalOpen(false)}
+        title={editingObjective ? 'Edit Objective' : 'Create New Objective'}
+        size="lg"
+        scrollAreaComponent={ScrollArea}
       >
         <form onSubmit={handleSubmit}>
-          <Stack gap="md">
-            {/* Basic Info */}
-            <Paper p="md" withBorder radius="md">
-              <Stack gap="md">
-                <Text size="sm" fw={600} c="blue">
-                  Objective Details
-                </Text>
-
-                <Select
-                  label="Life Area"
-                  placeholder="Select a life area"
-                  value={formData.lifeAreaId}
-                  onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
-                  data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
-                  required
-                  withAsterisk
-                  leftSection={<TrendingUp size={16} />}
-                />
-
-                <TextInput
-                  label="Title"
-                  placeholder="e.g., Achieve 10% body fat"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  required
-                  withAsterisk
-                  leftSection={<Target size={16} />}
-                />
-
-                <Textarea
-                  label="Description"
-                  placeholder="Describe this objective..."
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  autosize
-                  minRows={3}
-                  maxRows={6}
-                />
-
-                <Grid>
-                  <Grid.Col span={6}>
-                    <DateInput
-                      label="Start Date"
-                      placeholder="Select start date"
-                      value={formData.startDate}
-                      onChange={(value) => setFormData({ ...formData, startDate: value })}
-                      required
-                      withAsterisk
-                      leftSection={<Calendar size={16} />}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={6}>
-                    <DateInput
-                      label="End Date"
-                      placeholder="Select end date"
-                      value={formData.endDate}
-                      onChange={(value) => setFormData({ ...formData, endDate: value })}
-                      required
-                      withAsterisk
-                      leftSection={<Calendar size={16} />}
-                      minDate={formData.startDate || undefined}
-                    />
-                  </Grid.Col>
-                </Grid>
-              </Stack>
-            </Paper>
-
-            {/* Key Results */}
-            {!editingObjective && (
-              <Paper p="md" withBorder radius="md">
-                <Stack gap="md">
-                  <Group justify="space-between">
-                    <Text size="sm" fw={600} c="blue">
-                      Key Results
-                    </Text>
-                    <Button variant="subtle" size="xs" leftSection={<Plus size={14} />} onClick={addKeyResult}>
-                      Add Key Result
-                    </Button>
-                  </Group>
-
-                  {keyResults.length === 0 ? (
-                    <Text size="sm" c="dimmed" ta="center" py="md">
-                      No key results added yet. Add measurable results to track your objective progress.
-                    </Text>
-                  ) : (
-                    <Stack gap="sm">
-                      {keyResults.map((kr, index) => (
-                        <Paper key={index} p="sm" withBorder radius="md" bg="var(--mantine-color-gray-0)">
-                          <Stack gap="sm">
-                            <Group justify="space-between" wrap="nowrap">
-                              <Text size="xs" fw={600} c="dimmed">
-                                Key Result {index + 1}
-                              </Text>
-                              <ActionIcon size="sm" variant="subtle" color="red" onClick={() => removeKeyResult(index)}>
-                                <X size={14} />
-                              </ActionIcon>
-                            </Group>
-
-                            <TextInput
-                              placeholder="e.g., Reduce body fat to 10%"
-                              value={kr.title}
-                              onChange={(e) => updateKeyResult(index, 'title', e.target.value)}
-                              size="sm"
-                              required
-                            />
-
-                            <Textarea
-                              placeholder="Description (optional)"
-                              value={kr.description}
-                              onChange={(e) => updateKeyResult(index, 'description', e.target.value)}
-                              rows={2}
-                              size="sm"
-                            />
-
-                            <DateInput
-                              placeholder="Due date"
-                              value={kr.dueDate}
-                              onChange={(value) => updateKeyResult(index, 'dueDate', value)}
-                              leftSection={<Calendar size={14} />}
-                              size="sm"
-                              required
-                              minDate={formData.startDate || undefined}
-                              maxDate={formData.endDate || undefined}
-                            />
-                          </Stack>
-                        </Paper>
-                      ))}
-                    </Stack>
-                  )}
-                </Stack>
-              </Paper>
-            )}
-
-            {/* Actions */}
-            <Group justify="flex-end" mt="md">
-              <Button variant="light" onClick={handleCloseModal}>
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                loading={createMutation.isPending || updateMutation.isPending}
-                leftSection={editingObjective ? <Edit2 size={16} /> : <Plus size={16} />}
-              >
-                {editingObjective ? 'Update Objective' : 'Create Objective'}
-              </Button>
-            </Group>
-          </Stack>
-        </form>
-      </Modal>
-
-      {/* Edit Key Result Modal */}
-      <Modal
-        opened={!!editingKR}
-        onClose={handleCloseKRModal}
-        title={
-          <Group gap="sm">
-            <ThemeIcon size="lg" radius="md" color="blue" variant="light">
-              <Target size={20} />
-            </ThemeIcon>
-            <Text size="lg" fw={600}>
-              Edit Key Result
-            </Text>
-          </Group>
-        }
-        size="lg"
-      >
-        <form onSubmit={handleUpdateKR}>
-          <Stack gap="md">
+          <Stack>
             <TextInput
               label="Title"
-              placeholder="e.g., Reduce body fat to 10%"
-              name="title"
-              defaultValue={editingKR?.kr.title}
+              placeholder="Enter objective title"
               required
-              withAsterisk
-              leftSection={<Target size={16} />}
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             />
 
             <Textarea
               label="Description"
-              placeholder="Description (optional)"
-              name="description"
-              defaultValue={editingKR?.kr.description || ''}
+              placeholder="Describe your objective"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              autosize
-              minRows={3}
-              maxRows={6}
             />
 
-            <DateInput
-              label="Due Date"
-              placeholder="Select due date"
-              name="dueDate"
-              defaultValue={editingKR?.kr.dueDate ? new Date(editingKR.kr.dueDate) : null}
+            <Select
+              label="Life Area"
+              placeholder="Select a life area"
               required
-              withAsterisk
-              leftSection={<Calendar size={16} />}
-              valueFormat="YYYY-MM-DD"
+              data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
+              value={formData.lifeAreaId}
+              onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
             />
+
+            <Group grow>
+              <DateInput
+                label="Start Date"
+                placeholder="Select start date"
+                value={formData.startDate}
+                onChange={(value) => setFormData({ ...formData, startDate: value || new Date() })}
+                required
+              />
+              <DateInput
+                label="End Date"
+                placeholder="Select end date"
+                value={formData.endDate}
+                onChange={(value) => setFormData({ ...formData, endDate: value || new Date() })}
+                required
+              />
+            </Group>
+
+            <Divider />
+
+            <div>
+              <Group justify="space-between" align="center" mb="md">
+                <Text fw={500}>Key Results</Text>
+                <Button variant="light" size="compact-sm" onClick={addKeyResult}>
+                  <Plus size={14} />
+                </Button>
+              </Group>
+
+              <Stack gap="md">
+                {keyResults.map((kr, index) => (
+                  <Paper key={index} p="md" withBorder>
+                    <Group justify="space-between" align="center" mb="sm">
+                      <Text size="sm" fw={500}>
+                        Key Result {index + 1}
+                      </Text>
+                      <ActionIcon
+                        variant="light"
+                        color="red"
+                        size="sm"
+                        onClick={() => removeKeyResult(index)}
+                      >
+                        <X size={14} />
+                      </ActionIcon>
+                    </Group>
+
+                    <Stack gap="sm">
+                      <TextInput
+                        placeholder="Key result title"
+                        value={kr.title}
+                        onChange={(e) => updateKeyResult(index, 'title', e.target.value)}
+                        size="sm"
+                        required
+                      />
+                      <Textarea
+                        placeholder="Key result description (optional)"
+                        value={kr.description}
+                        onChange={(e) => updateKeyResult(index, 'description', e.target.value)}
+                        size="sm"
+                        rows={2}
+                      />
+                      <Group grow>
+                        <NumberInput
+                          placeholder="Target value"
+                          value={kr.targetValue}
+                          onChange={(value) => updateKeyResult(index, 'targetValue', value || 0)}
+                          size="sm"
+                          min={0}
+                          required
+                        />
+                        <NumberInput
+                          placeholder="Current value"
+                          value={kr.currentValue}
+                          onChange={(value) => updateKeyResult(index, 'currentValue', value || 0)}
+                          size="sm"
+                          min={0}
+                        />
+                        <TextInput
+                          placeholder="Unit (e.g., users, %, points)"
+                          value={kr.unit}
+                          onChange={(e) => updateKeyResult(index, 'unit', e.target.value)}
+                          size="sm"
+                          required
+                        />
+                      </Group>
+                    </Stack>
+                  </Paper>
+                ))}
+
+                {keyResults.length === 0 && (
+                  <Text size="sm" c="dimmed" ta="center" py="md">
+                    No key results added yet. Click the + button to add some.
+                  </Text>
+                )}
+              </Stack>
+            </div>
 
             <Group justify="flex-end" mt="md">
-              <Button variant="light" onClick={handleCloseKRModal}>
+              <Button variant="light" onClick={() => setIsModalOpen(false)}>
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                loading={updateKRMutation.isPending}
-                leftSection={<Edit2 size={16} />}
-              >
-                Update Key Result
+              <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>
+                {editingObjective ? 'Update' : 'Create'} Objective
               </Button>
             </Group>
           </Stack>
         </form>
       </Modal>
-    </Stack>
-  );
-}
-
-// Component for adding KR to existing objective
-function AddKeyResultModal({ objectiveId, onSuccess }: { objectiveId: string; onSuccess: () => void }) {
-  const createKRMutation = useCreateKeyResult();
-  const [formData, setFormData] = useState<CreateKeyResultDto>({
-    title: '',
-    description: '',
-    dueDate: '',
-  });
-  const [dueDate, setDueDate] = useState<Date | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!dueDate) return;
-
-    try {
-      await createKRMutation.mutateAsync({
-        objectiveId,
-        dto: {
-          ...formData,
-          dueDate: dueDate.toISOString().split('T')[0],
-        },
-      });
-      onSuccess();
-    } catch (error) {
-      console.error('Error creating key result:', error);
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to create key result',
-        color: 'red',
-      });
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <Stack gap="md">
-        <TextInput
-          label="Title"
-          placeholder="e.g., Reduce body fat to 10%"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          required
-          withAsterisk
-          leftSection={<Target size={16} />}
-        />
-
-        <Textarea
-          label="Description"
-          placeholder="Describe this key result..."
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          rows={3}
-        />
-
-        <DateInput
-          label="Due Date"
-          placeholder="Select due date"
-          value={dueDate}
-          onChange={setDueDate}
-          required
-          withAsterisk
-          leftSection={<Calendar size={16} />}
-        />
-
-        <Group justify="flex-end" mt="md">
-          <Button variant="light" onClick={() => modals.closeAll()}>
-            Cancel
-          </Button>
-          <Button type="submit" loading={createKRMutation.isPending} leftSection={<Plus size={16} />}>
-            Add Key Result
-          </Button>
-        </Group>
-      </Stack>
-    </form>
+    </div>
   );
 }
