@@ -106,27 +106,35 @@ export default function ObjectivesPage() {
     }
 
     try {
-      const dto: CreateObjectiveDto = {
-        lifeAreaId: formData.lifeAreaId,
-        title: formData.title,
-        description: formData.description,
-        startDate: formData.startDate.toISOString().split('T')[0],
-        endDate: formData.endDate.toISOString().split('T')[0],
-        keyResults: keyResults
-          .filter((kr) => kr.title && kr.targetValue && kr.unit)
-          .map((kr) => ({
-            title: kr.title,
-            description: kr.description,
-            targetValue: kr.targetValue,
-            currentValue: kr.currentValue || 0,
-            unit: kr.unit,
-          })),
-      };
-
       if (editingObjective) {
-        await updateMutation.mutateAsync({ id: editingObjective.id, dto });
+        // For updates, only send objective fields (no keyResults)
+        const updateDto = {
+          lifeAreaId: formData.lifeAreaId,
+          title: formData.title,
+          description: formData.description,
+          startDate: formData.startDate.toISOString().split('T')[0],
+          endDate: formData.endDate.toISOString().split('T')[0],
+        };
+        await updateMutation.mutateAsync({ id: editingObjective.id, dto: updateDto });
       } else {
-        await createMutation.mutateAsync(dto);
+        // For creation, include keyResults
+        const createDto: CreateObjectiveDto = {
+          lifeAreaId: formData.lifeAreaId,
+          title: formData.title,
+          description: formData.description,
+          startDate: formData.startDate.toISOString().split('T')[0],
+          endDate: formData.endDate.toISOString().split('T')[0],
+          keyResults: keyResults
+            .filter((kr) => kr.title && kr.targetValue && kr.unit)
+            .map((kr) => ({
+              title: kr.title,
+              description: kr.description,
+              targetValue: kr.targetValue,
+              currentValue: kr.currentValue || 0,
+              unit: kr.unit,
+            })),
+        };
+        await createMutation.mutateAsync(createDto);
       }
 
       notifications.show({

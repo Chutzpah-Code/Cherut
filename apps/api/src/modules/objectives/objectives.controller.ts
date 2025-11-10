@@ -50,12 +50,24 @@ export class ObjectivesController {
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Request() req,
     @Param('id') id: string,
     @Body() updateDto: UpdateObjectiveDto,
   ) {
-    return this.objectivesService.update(req.user.uid, id, updateDto);
+    try {
+      this.logger.log(`🔄 Updating objective ${id} for user: ${req.user.uid}`);
+      this.logger.log(`📝 Update data: ${JSON.stringify(updateDto, null, 2)}`);
+
+      const result = await this.objectivesService.update(req.user.uid, id, updateDto);
+
+      this.logger.log(`✅ Objective updated successfully: ${result.id}`);
+      return result;
+    } catch (error) {
+      this.logger.error(`❌ Error updating objective ${id} for user ${req.user.uid}:`, error);
+      this.logger.error(`📋 Failed update data: ${JSON.stringify(updateDto, null, 2)}`);
+      throw error;
+    }
   }
 
   @Delete(':id')
