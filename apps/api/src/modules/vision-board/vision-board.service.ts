@@ -4,6 +4,7 @@ import { CloudinaryService } from '../../config/cloudinary.service';
 import { CreateVisionBoardItemDto } from './dto/create-vision-board-item.dto';
 import { UpdateVisionBoardItemDto } from './dto/update-vision-board-item.dto';
 import * as admin from 'firebase-admin';
+import type { Express } from 'express';
 
 /**
  * 🛡️ VISION BOARD SERVICE COM PROTEÇÕES DE SEGURANÇA

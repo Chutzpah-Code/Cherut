@@ -13,6 +13,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import type { Express } from 'express';
 import { VisionBoardService } from './vision-board.service';
 import { CreateVisionBoardItemDto } from './dto/create-vision-board-item.dto';
 import { UpdateVisionBoardItemDto } from './dto/update-vision-board-item.dto';
