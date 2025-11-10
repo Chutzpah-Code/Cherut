@@ -200,7 +200,7 @@ export function HabitModal({
               <Text size="lg">🎉</Text>
               <Box style={{ flex: 1 }}>
                 <Text size="sm" fw={600} c="green">Goal Completed!</Text>
-                <Text size="xs" c="dimmed">You've reached your target! Keep it up!</Text>
+                <Text size="xs" c="dimmed">You&apos;ve reached your target! Keep it up!</Text>
               </Box>
             </Group>
           </Box>

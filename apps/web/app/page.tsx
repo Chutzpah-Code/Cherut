@@ -471,8 +471,8 @@ export default function Home() {
                       lineHeight: 1.6,
                     }}
                   >
-                    You're good, but not elite. You know there's another level you haven't
-                    reached, but don't have the system to get there.
+                    You&apos;re good, but not elite. You know there&apos;s another level you haven&apos;t
+                    reached, but don&apos;t have the system to get there.
                   </Text>
                 </Stack>
               </Card>
@@ -546,7 +546,7 @@ export default function Home() {
                     lineHeight: 1.7,
                   }}
                 >
-                  Set objectives and key results like the world's top performers. Break down
+                  Set objectives and key results like the world&apos;s top performers. Break down
                   ambitious goals into measurable milestones that drive real progress.
                 </Text>
               </Stack>
@@ -1332,8 +1332,8 @@ export default function Home() {
                     lineHeight: 1.7,
                   }}
                 >
-                  "This system transformed how I approach my training goals. I've achieved more
-                  in 3 months than I did in the past year. The OKR framework is a game-changer."
+                  &quot;This system transformed how I approach my training goals. I&apos;ve achieved more
+                  in 3 months than I did in the past year. The OKR framework is a game-changer.&quot;
                 </Text>
               </Stack>
             </Card>
@@ -1382,8 +1382,8 @@ export default function Home() {
                     lineHeight: 1.7,
                   }}
                 >
-                  "Finally, a tool that matches the intensity of my ambitions. The structure it
-                  provides has helped me scale two companies while maintaining work-life balance."
+                  &quot;Finally, a tool that matches the intensity of my ambitions. The structure it
+                  provides has helped me scale two companies while maintaining work-life balance.&quot;
                 </Text>
               </Stack>
             </Card>
@@ -1432,8 +1432,8 @@ export default function Home() {
                     lineHeight: 1.7,
                   }}
                 >
-                  "I went from feeling overwhelmed to being in complete control. The habit tracking
-                  keeps me consistent, and I can see my progress across all areas of my life."
+                  &quot;I went from feeling overwhelmed to being in complete control. The habit tracking
+                  keeps me consistent, and I can see my progress across all areas of my life.&quot;
                 </Text>
               </Stack>
             </Card>
@@ -1485,7 +1485,7 @@ export default function Home() {
                   lineHeight: 1.7,
                 }}
               >
-                We're developing powerful team collaboration features and enterprise-grade security
+                We&apos;re developing powerful team collaboration features and enterprise-grade security
                 for organizations that want to scale elite performance across their entire workforce.
               </Text>
               <Button

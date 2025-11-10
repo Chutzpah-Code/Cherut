@@ -42,7 +42,7 @@ export default function TasksPage() {
             Time Tracker View - Coming Soon!
           </Text>
           <Text size="sm">
-            View and analyze your time tracking data. See how much time you've spent on each task and
+            View and analyze your time tracking data. See how much time you&apos;ve spent on each task and
             optimize your productivity.
           </Text>
         </Alert>
