@@ -11,7 +11,7 @@
     "web": "npm run dev --workspace=web",
     "dev": "npm run api",
     "install:workspaces": "npm install --workspaces",
-    "build": "npm install --workspace=api && npm run build --workspace=api"
+    "build": "npm run build --workspace=api"
   },
   "keywords": [
     "productivity",

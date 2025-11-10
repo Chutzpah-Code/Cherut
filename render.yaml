@@ -4,7 +4,7 @@ services:
     runtime: node
     region: oregon
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npm install --workspace=api && npm run build --workspace=api
     startCommand: npm run start:prod --workspace=api
     healthCheckPath: /
     envVars:
