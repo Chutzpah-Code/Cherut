@@ -86,33 +86,54 @@ export class KeyResultsService {
   }
 
   async update(userId: string, id: string, updateDto: UpdateKeyResultDto) {
-    const existing: any = await this.findOne(userId, id);
-
     const db = this.firebaseService.getFirestore();
 
-    // Remove undefined values (Firestore doesn't accept them)
-    const cleanedDto = Object.fromEntries(
-      Object.entries(updateDto).filter(([_, v]) => v !== undefined),
-    );
+    return await db.runTransaction(async (transaction) => {
+      // 1. Get current document in transaction
+      const docRef = db.collection(this.collection).doc(id);
+      const doc = await transaction.get(docRef);
 
-    // Recalculate completion if values changed
-    const newCurrentValue = updateDto.currentValue ?? existing.currentValue;
-    const newTargetValue = updateDto.targetValue ?? existing.targetValue;
+      if (!doc.exists) {
+        throw new NotFoundException(`Key Result ${id} not found`);
+      }
 
-    const updates = {
-      ...cleanedDto,
-      completionPercentage: this.calculateCompletion(
-        newCurrentValue,
-        newTargetValue,
-      ),
-      updatedAt: new Date().toISOString(),
-    };
+      const existing = doc.data()!;
 
-    await db.collection(this.collection).doc(id).update(updates);
+      if (existing.userId !== userId) {
+        throw new NotFoundException(`Key Result ${id} not found`);
+      }
 
-    this.logger.log(`Key Result updated: ${id}`);
+      // 2. Remove undefined values (Firestore doesn't accept them)
+      const cleanedDto = Object.fromEntries(
+        Object.entries(updateDto).filter(([_, v]) => v !== undefined),
+      );
 
-    return this.findOne(userId, id);
+      // 3. Recalculate completion if values changed
+      const newCurrentValue = updateDto.currentValue ?? existing.currentValue;
+      const newTargetValue = updateDto.targetValue ?? existing.targetValue;
+
+      const updates = {
+        ...cleanedDto,
+        completionPercentage: this.calculateCompletion(
+          newCurrentValue,
+          newTargetValue,
+        ),
+        updatedAt: new Date().toISOString(),
+      };
+
+      // 4. Update document in transaction
+      transaction.update(docRef, updates);
+
+      // 5. Return updated data
+      // 6. Log success
+      this.logger.log(`Key Result updated: ${id}`);
+
+      return {
+        id: doc.id,
+        ...existing,
+        ...updates,
+      };
+    });
   }
 
   async remove(userId: string, id: string) {
