@@ -69,6 +69,11 @@ export class AuthService {
     try {
       // 1. Criar usuário no Firebase Auth
       const auth = this.firebaseService.getAuth();
+      if (!auth) {
+        this.logger.error('Firebase Auth not initialized');
+        throw new Error('Firebase service not available');
+      }
+
       const userRecord = await auth.createUser({
         email,
         password,
@@ -79,6 +84,11 @@ export class AuthService {
 
       // 2. Criar documento no Firestore
       const db = this.firebaseService.getFirestore();
+      if (!db) {
+        this.logger.error('Firestore not initialized');
+        throw new Error('Database service not available');
+      }
+
       const userData = {
         uid: userRecord.uid,
         email: userRecord.email,
@@ -110,12 +120,17 @@ export class AuthService {
         accessToken,
       };
     } catch (error) {
+      this.logger.error('Registration error:', error);
+
       // Firebase error codes: https://firebase.google.com/docs/auth/admin/errors
       if (error.code === 'auth/email-already-exists') {
         throw new ConflictException('Email already registered');
       }
 
-      this.logger.error('Registration error:', error);
+      if (error.message?.includes('Firebase') || error.message?.includes('Database service')) {
+        throw new Error('Service temporarily unavailable. Please try again later.');
+      }
+
       throw error;
     }
   }
@@ -141,7 +156,7 @@ export class AuthService {
    * Vamos usar Abordagem 2 para simplificar (tudo no backend)
    */
   async login(loginDto: LoginDto) {
-    const { email, password } = loginDto;
+    const { email } = loginDto;
 
     try {
       // Verifica credenciais via Firebase Auth REST API

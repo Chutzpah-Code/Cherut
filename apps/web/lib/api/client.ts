@@ -13,16 +13,29 @@ export const apiClient = axios.create({
 // Add auth token to requests
 apiClient.interceptors.request.use(
   async (config) => {
-    const token = await getIdToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-      // Removido console.log para melhorar performance
+    try {
+      const token = await getIdToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log('[DEBUG] Token present:', !!token);
+      } else {
+        console.warn('[DEBUG] No token available for request:', config.url);
+        // If no token is available, don't proceed with authenticated requests
+        if (config.url && !config.url.includes('/auth/')) {
+          console.warn('[DEBUG] Skipping authenticated request without token');
+          throw new Error('Authentication required');
+        }
+      }
+    } catch (error) {
+      console.error('[DEBUG] Error getting token:', error);
+      // Don't proceed with authenticated requests if token retrieval fails
+      if (config.url && !config.url.includes('/auth/')) {
+        throw error;
+      }
     }
-    // Removido console.warn - só em dev se necessário
     return config;
   },
   (error) => {
-    // Mantém apenas erro crítico
     console.error('[API Client] Request error:', error);
     return Promise.reject(error);
   }

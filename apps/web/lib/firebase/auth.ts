@@ -59,9 +59,23 @@ export const getCurrentUser = () => {
 };
 
 export const getIdToken = async () => {
-  if (!auth) return null;
-  
+  if (!auth) {
+    console.warn('[Firebase] Auth not configured - returning null token');
+    return null;
+  }
+
   const user = auth.currentUser;
-  if (!user) return null;
-  return await user.getIdToken();
+  if (!user) {
+    console.warn('[Firebase] No current user - returning null token');
+    return null;
+  }
+
+  try {
+    const token = await user.getIdToken();
+    console.log('[Firebase] Successfully retrieved token');
+    return token;
+  } catch (error) {
+    console.error('[Firebase] Error getting ID token:', error);
+    return null;
+  }
 };
