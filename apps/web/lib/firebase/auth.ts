@@ -39,8 +39,11 @@ export const logoutUser = async () => {
   }
 
   try {
+    console.log('[Firebase] Signing out user...');
     await signOut(auth);
+    console.log('[Firebase] User signed out successfully');
   } catch (error: any) {
+    console.error('[Firebase] Sign out error:', error);
     throw new Error(error.message);
   }
 };

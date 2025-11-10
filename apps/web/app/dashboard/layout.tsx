@@ -13,7 +13,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
+  const { user, loading, backendAuthenticated } = useAuth();
   const router = useRouter();
   const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
@@ -34,6 +34,15 @@ export default function DashboardLayout({
 
   if (!user) {
     return null;
+  }
+
+  // Show loading while backend authentication is in progress
+  if (!backendAuthenticated) {
+    return (
+      <Center h="100vh">
+        <Loader size="lg" />
+      </Center>
+    );
   }
 
   return (
