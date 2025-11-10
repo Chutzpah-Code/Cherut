@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { AppShell, Burger, Group, Loader, Center } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Sidebar from '@/components/dashboard/Sidebar';
@@ -18,26 +18,18 @@ export default function DashboardLayout({
   const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
+  console.log('[Dashboard] Auth state:', { user: !!user, loading, backendAuthenticated });
+
+  // Redirect to home if not authenticated
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/auth/login');
+      router.push('/');
     }
   }, [loading, user, router]);
 
-  if (loading) {
-    return (
-      <Center h="100vh">
-        <Loader size="lg" />
-      </Center>
-    );
-  }
+  const shouldShowDashboard = !loading && user && backendAuthenticated;
 
-  if (!user) {
-    return null;
-  }
-
-  // Show loading while backend authentication is in progress
-  if (!backendAuthenticated) {
+  if (!shouldShowDashboard) {
     return (
       <Center h="100vh">
         <Loader size="lg" />

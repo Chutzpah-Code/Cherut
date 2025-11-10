@@ -16,8 +16,8 @@ export class CreateKeyResultDto {
   description?: string;
 
   @IsString()
-  @IsNotEmpty()
-  objectiveId: string;
+  @IsOptional()
+  objectiveId?: string;
 
   // Target value to achieve
   @IsNumber()

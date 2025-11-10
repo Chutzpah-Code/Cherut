@@ -19,7 +19,9 @@ export class KeyResultsService {
     const db = this.firebaseService.getFirestore();
 
     // Verify objective exists and belongs to user
-    await this.verifyObjectiveOwnership(userId, createDto.objectiveId);
+    if (createDto.objectiveId) {
+      await this.verifyObjectiveOwnership(userId, createDto.objectiveId);
+    }
 
     // Remove undefined values (Firestore doesn't accept them)
     const cleanedDto = Object.fromEntries(

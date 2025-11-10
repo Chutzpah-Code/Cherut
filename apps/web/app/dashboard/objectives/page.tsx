@@ -60,8 +60,24 @@ interface KeyResultFormData {
 }
 
 export default function ObjectivesPage() {
-  const { data: objectives, isLoading } = useObjectives();
+  console.log('[Objectives Page] Component rendering...');
+
+  const { data: objectives, isLoading, error } = useObjectives();
   const { data: lifeAreas } = useLifeAreas();
+
+  console.log('[Objectives Page] State:', {
+    objectives: objectives?.length || 0,
+    isLoading,
+    error: error?.message || 'none',
+    lifeAreas: lifeAreas?.length || 0
+  });
+
+  console.log('📊 Current objectives data:', objectives);
+  if (objectives && objectives.length > 0) {
+    objectives.forEach((obj, index) => {
+      console.log(`🎯 Objective ${index}: "${obj.title}" - keyResults:`, obj.keyResults);
+    });
+  }
   const createMutation = useCreateObjective();
   const updateMutation = useUpdateObjective();
   const deleteMutation = useDeleteObjective();
@@ -107,7 +123,7 @@ export default function ObjectivesPage() {
 
     try {
       if (editingObjective) {
-        // For updates, only send objective fields (no keyResults)
+        // For updates, handle objective and key results separately
         const updateDto = {
           lifeAreaId: formData.lifeAreaId,
           title: formData.title,
@@ -116,6 +132,80 @@ export default function ObjectivesPage() {
           endDate: formData.endDate.toISOString().split('T')[0],
         };
         await updateMutation.mutateAsync({ id: editingObjective.id, dto: updateDto });
+
+        // Handle Key Results updates (simplified approach)
+        console.log('🔄 Processing Key Results updates...');
+        console.log('📊 Current keyResults state:', keyResults);
+        console.log('📊 Original objective keyResults:', editingObjective.keyResults);
+
+        const existingKRs = editingObjective.keyResults || [];
+        const currentKRs = keyResults.filter(kr => kr.title && kr.targetValue && kr.unit);
+
+        // Process operations with error handling but don't stop on failures
+        let updateResults = { success: 0, errors: 0 };
+
+        // 1. Update existing Key Results
+        for (const kr of currentKRs.filter(kr => kr.id)) {
+          console.log(`🔄 Updating existing KR: ${kr.id} - ${kr.title}`);
+          try {
+            await updateKRMutation.mutateAsync({
+              objectiveId: editingObjective.id,
+              keyResultId: kr.id!,
+              dto: {
+                title: kr.title,
+                description: kr.description || '',
+                targetValue: kr.targetValue,
+                currentValue: kr.currentValue || 0,
+                unit: kr.unit,
+              },
+            });
+            updateResults.success++;
+          } catch (error) {
+            console.error(`❌ Error updating KR ${kr.id}:`, error);
+            updateResults.errors++;
+          }
+        }
+
+        // 2. Create new Key Results (those without id)
+        for (const kr of currentKRs.filter(kr => !kr.id)) {
+          console.log(`➕ Creating new KR: ${kr.title}`);
+          try {
+            await createKRMutation.mutateAsync({
+              objectiveId: editingObjective.id,
+              dto: {
+                title: kr.title,
+                description: kr.description || '',
+                targetValue: kr.targetValue,
+                currentValue: kr.currentValue || 0,
+                unit: kr.unit,
+              },
+            });
+            updateResults.success++;
+          } catch (error) {
+            console.error(`❌ Error creating KR:`, error);
+            updateResults.errors++;
+          }
+        }
+
+        // 3. Delete removed Key Results
+        const currentKRIds = currentKRs.filter(kr => kr.id).map(kr => kr.id);
+        for (const existingKR of existingKRs) {
+          if (!currentKRIds.includes(existingKR.id)) {
+            console.log(`🗑️ Deleting removed KR: ${existingKR.id} - ${existingKR.title}`);
+            try {
+              await deleteKRMutation.mutateAsync({
+                objectiveId: editingObjective.id,
+                keyResultId: existingKR.id!,
+              });
+              updateResults.success++;
+            } catch (error) {
+              console.error(`❌ Error deleting KR ${existingKR.id}:`, error);
+              updateResults.errors++;
+            }
+          }
+        }
+
+        console.log(`✅ Key Results update completed: ${updateResults.success} success, ${updateResults.errors} errors`);
       } else {
         // For creation, include keyResults
         const createDto: CreateObjectiveDto = {
@@ -167,6 +257,9 @@ export default function ObjectivesPage() {
   };
 
   const handleEditObjective = (objective: Objective) => {
+    console.log('🔍 handleEditObjective called with:', objective);
+    console.log('🔑 objective.keyResults:', objective.keyResults);
+
     setEditingObjective(objective);
     setFormData({
       title: objective.title,
@@ -186,8 +279,10 @@ export default function ObjectivesPage() {
         currentValue: kr.currentValue,
         unit: kr.unit,
       }));
+      console.log('✅ Setting keyResults to:', krFormData);
       setKeyResults(krFormData);
     } else {
+      console.log('❌ No keyResults found, setting to empty array');
       setKeyResults([]);
     }
 
@@ -514,6 +609,7 @@ export default function ObjectivesPage() {
               </Group>
 
               <Stack gap="md">
+                {(() => { console.log('🔍 Rendering keyResults in modal:', keyResults); return null; })()}
                 {keyResults.map((kr, index) => (
                   <Paper key={index} p="md" withBorder>
                     <Group justify="space-between" align="center" mb="sm">
@@ -532,43 +628,72 @@ export default function ObjectivesPage() {
 
                     <Stack gap="sm">
                       <TextInput
-                        placeholder="Key result title"
+                        label="What do you want to achieve?"
+                        placeholder="e.g., Increase monthly active users"
                         value={kr.title}
                         onChange={(e) => updateKeyResult(index, 'title', e.target.value)}
                         size="sm"
                         required
+                        description="A specific, measurable outcome you want to achieve"
                       />
                       <Textarea
-                        placeholder="Key result description (optional)"
+                        label="Additional details (optional)"
+                        placeholder="e.g., Focus on improving user engagement through new features"
                         value={kr.description}
                         onChange={(e) => updateKeyResult(index, 'description', e.target.value)}
                         size="sm"
                         rows={2}
+                        description="Any extra context or details about this key result"
                       />
+
+                      <Text size="sm" fw={500} mt="xs" mb="xs">Measurement</Text>
                       <Group grow>
                         <NumberInput
-                          placeholder="Target value"
+                          label="Target Goal"
+                          placeholder="1000"
                           value={kr.targetValue}
                           onChange={(value) => updateKeyResult(index, 'targetValue', value || 0)}
                           size="sm"
                           min={0}
                           required
+                          description="What number do you want to reach?"
                         />
                         <NumberInput
-                          placeholder="Current value"
+                          label="Current Progress"
+                          placeholder="250"
                           value={kr.currentValue}
                           onChange={(value) => updateKeyResult(index, 'currentValue', value || 0)}
                           size="sm"
                           min={0}
+                          description="Where are you now?"
                         />
                         <TextInput
-                          placeholder="Unit (e.g., users, %, points)"
+                          label="Unit of Measure"
+                          placeholder="users"
                           value={kr.unit}
                           onChange={(e) => updateKeyResult(index, 'unit', e.target.value)}
                           size="sm"
                           required
+                          description="How will you measure it? (users, %, $, etc.)"
                         />
                       </Group>
+
+                      {kr.targetValue > 0 && kr.currentValue >= 0 && (
+                        <Box mt="xs" p="xs" style={{ backgroundColor: '#f8f9fa', borderRadius: 4 }}>
+                          <Text size="xs" c="dimmed" mb="xs">Progress Preview:</Text>
+                          <Group gap="xs" align="center">
+                            <Progress
+                              value={Math.min((kr.currentValue / kr.targetValue) * 100, 100)}
+                              size="sm"
+                              style={{ flex: 1 }}
+                            />
+                            <Text size="xs" fw={500}>
+                              {kr.currentValue} / {kr.targetValue} {kr.unit}
+                              ({Math.min(Math.round((kr.currentValue / kr.targetValue) * 100), 100)}%)
+                            </Text>
+                          </Group>
+                        </Box>
+                      )}
                     </Stack>
                   </Paper>
                 ))}

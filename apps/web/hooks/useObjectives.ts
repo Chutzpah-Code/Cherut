@@ -4,9 +4,15 @@ import { objectivesApi, CreateObjectiveDto, UpdateObjectiveDto, CreateKeyResultD
 export const useObjectives = (lifeAreaId?: string) => {
   return useQuery({
     queryKey: ['objectives', lifeAreaId],
-    queryFn: () => objectivesApi.getAll(lifeAreaId),
+    queryFn: async () => {
+      console.log('[useObjectives] Fetching objectives...');
+      const result = await objectivesApi.getAll(lifeAreaId);
+      console.log('[useObjectives] Success:', result?.length || 0, 'objectives');
+      return result;
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
+    retry: 1, // Reduce retries to avoid hanging
   });
 };
 

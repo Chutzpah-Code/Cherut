@@ -40,8 +40,22 @@ export class ObjectivesController {
   }
 
   @Get()
-  findAll(@Request() req, @Query('lifeAreaId') lifeAreaId?: string) {
-    return this.objectivesService.findAll(req.user.uid, lifeAreaId);
+  async findAll(@Request() req, @Query('lifeAreaId') lifeAreaId?: string) {
+    try {
+      this.logger.log(`🔍 GET /objectives - User: ${req.user.uid}, LifeArea: ${lifeAreaId || 'all'}`);
+
+      const objectives = await this.objectivesService.findAll(req.user.uid, lifeAreaId);
+
+      this.logger.log(`✅ Found ${objectives.length} objectives for user ${req.user.uid}`);
+      objectives.forEach((obj: any) => {
+        this.logger.log(`📊 Objective ${obj.id}: "${obj.title}" - Key Results: ${obj.keyResults?.length || 0}`);
+      });
+
+      return objectives;
+    } catch (error) {
+      this.logger.error(`❌ Error fetching objectives for user ${req.user.uid}:`, error);
+      throw error;
+    }
   }
 
   @Get(':id')
