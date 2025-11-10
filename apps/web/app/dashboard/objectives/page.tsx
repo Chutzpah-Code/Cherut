@@ -158,6 +158,80 @@ export default function ObjectivesPage() {
     setEditingObjective(null);
   };
 
+  const handleEditObjective = (objective: Objective) => {
+    setEditingObjective(objective);
+    setFormData({
+      title: objective.title,
+      description: objective.description || '',
+      lifeAreaId: objective.lifeAreaId,
+      startDate: new Date(objective.startDate),
+      endDate: new Date(objective.endDate),
+    });
+
+    // Convert existing Key Results to form data
+    if (objective.keyResults) {
+      const krFormData = objective.keyResults.map(kr => ({
+        id: kr.id,
+        title: kr.title,
+        description: kr.description || '',
+        targetValue: kr.targetValue,
+        currentValue: kr.currentValue,
+        unit: kr.unit,
+      }));
+      setKeyResults(krFormData);
+    } else {
+      setKeyResults([]);
+    }
+
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteObjective = async (objective: Objective) => {
+    if (window.confirm(`Are you sure you want to delete "${objective.title}"? This action cannot be undone.`)) {
+      try {
+        await deleteMutation.mutateAsync(objective.id);
+        notifications.show({
+          title: 'Success',
+          message: 'Objective deleted successfully',
+          color: 'green',
+        });
+      } catch (error) {
+        console.error('Error deleting objective:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to delete objective',
+          color: 'red',
+        });
+      }
+    }
+  };
+
+  const handleToggleKeyResult = async (objective: Objective, keyResult: KeyResult) => {
+    try {
+      await toggleKeyResultCompletionMutation.mutateAsync({
+        objectiveId: objective.id,
+        keyResultId: keyResult.id,
+      });
+      notifications.show({
+        title: 'Success',
+        message: `Key result ${keyResult.isCompleted ? 'marked as incomplete' : 'completed'}`,
+        color: 'green',
+      });
+    } catch (error) {
+      console.error('Error toggling key result:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to update key result',
+        color: 'red',
+      });
+    }
+  };
+
+  const handleCreateNew = () => {
+    resetForm();
+    setIsModalOpen(true);
+  };
+
   const addKeyResult = () => {
     setKeyResults([
       ...keyResults,
@@ -198,7 +272,7 @@ export default function ObjectivesPage() {
             Define and track your strategic goals using the OKR methodology
           </Text>
         </div>
-        <Button leftSection={<Plus size={16} />} onClick={() => setIsModalOpen(true)}>
+        <Button leftSection={<Plus size={16} />} onClick={handleCreateNew}>
           Create Objective
         </Button>
       </Group>
@@ -217,7 +291,7 @@ export default function ObjectivesPage() {
                 <Text c="dimmed" mb="md">
                   Create your first objective to start tracking your progress towards your goals
                 </Text>
-                <Button leftSection={<Plus size={16} />} onClick={() => setIsModalOpen(true)}>
+                <Button leftSection={<Plus size={16} />} onClick={handleCreateNew}>
                   Create Your First Objective
                 </Button>
               </div>
@@ -254,10 +328,20 @@ export default function ObjectivesPage() {
                   )}
                 </div>
                 <Group gap="xs">
-                  <ActionIcon variant="light" color="blue" size="sm">
+                  <ActionIcon
+                    variant="light"
+                    color="blue"
+                    size="sm"
+                    onClick={() => handleEditObjective(objective)}
+                  >
                     <Edit2 size={14} />
                   </ActionIcon>
-                  <ActionIcon variant="light" color="red" size="sm">
+                  <ActionIcon
+                    variant="light"
+                    color="red"
+                    size="sm"
+                    onClick={() => handleDeleteObjective(objective)}
+                  >
                     <Trash2 size={14} />
                   </ActionIcon>
                 </Group>
@@ -299,6 +383,7 @@ export default function ObjectivesPage() {
                             size="sm"
                             variant="subtle"
                             color={kr.isCompleted ? 'green' : 'gray'}
+                            onClick={() => handleToggleKeyResult(objective, kr)}
                           >
                             {kr.isCompleted ? <CheckCircle2 size={14} /> : <Circle size={14} />}
                           </ActionIcon>
