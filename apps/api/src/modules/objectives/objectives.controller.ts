@@ -63,7 +63,7 @@ export class ObjectivesController {
     @Request() req,
     @Param('objectiveId') objectiveId: string,
   ) {
-    return this.objectivesService.getKeyResultsForObjective(objectiveId);
+    return this.objectivesService.getKeyResultsForObjective(req.user.uid, objectiveId);
   }
 
   @Patch(':objectiveId/key-results/:keyResultId')
