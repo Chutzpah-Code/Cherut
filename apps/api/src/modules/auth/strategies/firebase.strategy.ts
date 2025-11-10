@@ -30,35 +30,45 @@ export class FirebaseStrategy extends PassportStrategy(Strategy, 'firebase') {
   async validate(req: any) {
     const authHeader = req.headers.authorization;
 
+    this.logger.log(`Request headers: ${JSON.stringify(req.headers)}`);
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      this.logger.error('No token provided');
+      this.logger.error(`No valid auth header provided. Header: ${authHeader}`);
       throw new UnauthorizedException('No token provided');
     }
 
     const token = authHeader.split(' ')[1];
 
     try {
-      this.logger.log(`Validating Firebase token: ${token.substring(0, 20)}...`);
+      this.logger.log(`Validating Firebase token: ${token.substring(0, 20)}... (Length: ${token.length})`);
 
       // Verifica o token com Firebase Admin SDK
       const auth = this.firebaseService.getAuth();
+
+      if (!auth) {
+        this.logger.error('Firebase Auth not initialized');
+        throw new UnauthorizedException('Authentication service not available');
+      }
+
       const decodedToken = await auth.verifyIdToken(token);
 
-      this.logger.log(`Token validated for user: ${decodedToken.uid}`);
+      this.logger.log(`Token validated successfully for user: ${decodedToken.uid}`);
+      this.logger.log(`Token claims: ${JSON.stringify(decodedToken)}`);
 
       // Busca dados do usuário no Firestore
       const user = await this.authService.validateToken(decodedToken.uid);
 
       if (!user) {
-        this.logger.error(`User not found: ${decodedToken.uid}`);
+        this.logger.error(`User not found in database: ${decodedToken.uid}`);
         throw new UnauthorizedException('User not found');
       }
 
-      this.logger.log(`User authenticated: ${user.uid}`);
+      this.logger.log(`User authenticated successfully: ${user.uid}`);
       return user;
     } catch (error) {
       this.logger.error(`Token validation failed: ${error.message}`);
-      throw new UnauthorizedException('Invalid token');
+      this.logger.error(`Error details: ${JSON.stringify(error)}`);
+      throw new UnauthorizedException(`Invalid token: ${error.message}`);
     }
   }
 }

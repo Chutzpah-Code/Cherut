@@ -58,7 +58,7 @@ export const getCurrentUser = () => {
   return auth?.currentUser || null;
 };
 
-export const getIdToken = async () => {
+export const getIdToken = async (forceRefresh = false): Promise<string | null> => {
   if (!auth) {
     console.warn('[Firebase] Auth not configured - returning null token');
     return null;
@@ -71,11 +71,19 @@ export const getIdToken = async () => {
   }
 
   try {
-    const token = await user.getIdToken();
-    console.log('[Firebase] Successfully retrieved token');
+    // Force refresh if token is close to expiration or if forceRefresh is true
+    const token = await user.getIdToken(forceRefresh);
+    console.log('[Firebase] Successfully retrieved token', forceRefresh ? '(forced refresh)' : '');
     return token;
   } catch (error) {
     console.error('[Firebase] Error getting ID token:', error);
+
+    // Try to refresh token on error
+    if (!forceRefresh) {
+      console.log('[Firebase] Attempting token refresh after error...');
+      return getIdToken(true);
+    }
+
     return null;
   }
 };

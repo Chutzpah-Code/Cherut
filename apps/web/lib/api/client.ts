@@ -17,19 +17,19 @@ apiClient.interceptors.request.use(
       const token = await getIdToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('[DEBUG] Token present:', !!token);
+        console.log('[DEBUG] Token added to request:', config.url, 'Token length:', token.length);
       } else {
         console.warn('[DEBUG] No token available for request:', config.url);
         // If no token is available, don't proceed with authenticated requests
-        if (config.url && !config.url.includes('/auth/')) {
+        if (config.url && !config.url.includes('/auth/') && !config.url.includes('/health')) {
           console.warn('[DEBUG] Skipping authenticated request without token');
-          throw new Error('Authentication required');
+          throw new Error('Authentication required - no token available');
         }
       }
     } catch (error) {
       console.error('[DEBUG] Error getting token:', error);
       // Don't proceed with authenticated requests if token retrieval fails
-      if (config.url && !config.url.includes('/auth/')) {
+      if (config.url && !config.url.includes('/auth/') && !config.url.includes('/health')) {
         throw error;
       }
     }
@@ -44,12 +44,28 @@ apiClient.interceptors.request.use(
 // Handle errors
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      console.error('[API Client] 401 Unauthorized:', error.config?.url);
-      // Don't auto-redirect - let the component handle it
-      // The dashboard layout will redirect if user is null
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      console.error('[API Client] 401 Unauthorized, attempting token refresh:', error.config?.url);
+      originalRequest._retry = true;
+
+      try {
+        // Try to get a fresh token
+        const newToken = await getIdToken(true); // Force refresh
+        if (newToken) {
+          console.log('[API Client] Token refreshed, retrying request');
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return apiClient(originalRequest);
+        }
+      } catch (refreshError) {
+        console.error('[API Client] Token refresh failed:', refreshError);
+        // Don't auto-redirect - let the component handle it
+        // The dashboard layout will redirect if user is null
+      }
     }
+
     return Promise.reject(error);
   }
 );
