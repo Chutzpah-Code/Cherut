@@ -227,6 +227,24 @@ export default function ObjectivesPage() {
     }
   };
 
+  const handleToggleObjective = async (objective: Objective) => {
+    try {
+      await toggleObjectiveCompletionMutation.mutateAsync(objective.id);
+      notifications.show({
+        title: 'Success',
+        message: `Objective ${objective.status === 'completed' ? 'marked as active' : 'completed'}`,
+        color: 'green',
+      });
+    } catch (error) {
+      console.error('Error toggling objective:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to update objective',
+        color: 'red',
+      });
+    }
+  };
+
   const handleCreateNew = () => {
     resetForm();
     setIsModalOpen(true);
@@ -330,6 +348,14 @@ export default function ObjectivesPage() {
                 <Group gap="xs">
                   <ActionIcon
                     variant="light"
+                    color={objective.status === 'completed' ? 'green' : 'gray'}
+                    size="sm"
+                    onClick={() => handleToggleObjective(objective)}
+                  >
+                    {objective.status === 'completed' ? <CheckCircle2 size={14} /> : <Circle size={14} />}
+                  </ActionIcon>
+                  <ActionIcon
+                    variant="light"
                     color="blue"
                     size="sm"
                     onClick={() => handleEditObjective(objective)}
@@ -365,7 +391,7 @@ export default function ObjectivesPage() {
                     Key Results ({objective.keyResults.length})
                   </Text>
                   <Stack gap="xs">
-                    {objective.keyResults.slice(0, 3).map((kr, index) => (
+                    {objective.keyResults.slice(0, 3).map((kr) => (
                       <Paper key={kr.id} p="xs" withBorder>
                         <Group justify="space-between" align="center">
                           <Box style={{ flex: 1 }}>
