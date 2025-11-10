@@ -10,7 +10,7 @@
     "api": "npm run start:dev --workspace=api",
     "web": "npm run dev --workspace=web",
     "dev": "npm run api",
-    "build": "npm run build --workspace=api"
+    "build": "npx nest build --workspace=api"
   },
   "keywords": [
     "productivity",
@@ -20,5 +20,8 @@
     "tasks"
   ],
   "author": "",
-  "license": "PROPRIETARY"
+  "license": "PROPRIETARY",
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0"
+  }
 }
