@@ -30,7 +30,7 @@ export default registerAs('firebase', () => ({
    * Caminho para o arquivo JSON de credenciais do Firebase Admin SDK
    * Este arquivo é baixado do Firebase Console > Project Settings > Service Accounts
    */
-  serviceAccountPath: process.env.FIREBASE_SERVICE_ACCOUNT_PATH || './firebase-credentials.json',
+  serviceAccountPath: process.env.FIREBASE_SERVICE_ACCOUNT_PATH || './apps/api/firebase-credentials.json',
 
   /**
    * Configs alternativas (caso você queira passar as credenciais via env vars)

@@ -224,7 +224,11 @@ export class AuthService {
     } catch (error) {
       this.logger.error('Login error:', error);
 
-      if (error.code?.includes('auth/')) {
+      if (error.code && typeof error.code === 'string' && error.code.includes('auth/')) {
+        throw new UnauthorizedException('Invalid Firebase ID token');
+      }
+
+      if (error.errorInfo && error.errorInfo.code && error.errorInfo.code.includes('auth/')) {
         throw new UnauthorizedException('Invalid Firebase ID token');
       }
 
