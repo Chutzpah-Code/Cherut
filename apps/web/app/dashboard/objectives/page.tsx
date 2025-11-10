@@ -283,17 +283,22 @@ export default function ObjectivesPage() {
 
   return (
     <div>
-      <Group justify="space-between" align="center" mb="xl">
-        <div>
-          <Title order={1}>Objectives & Key Results</Title>
-          <Text c="dimmed" size="lg">
-            Define and track your strategic goals using the OKR methodology
-          </Text>
-        </div>
-        <Button leftSection={<Plus size={16} />} onClick={handleCreateNew}>
-          Create Objective
-        </Button>
-      </Group>
+      <Stack mb="xl" gap="md">
+        <Group justify="space-between" align="flex-start" gap="md">
+          <div style={{ flex: 1 }}>
+            <Title order={1}>Objectives & Key Results</Title>
+            <Text c="dimmed" size="lg" mt="xs">
+              Define and track your strategic goals using the OKR methodology
+            </Text>
+          </div>
+          <Button
+            leftSection={<Plus size={16} />}
+            onClick={handleCreateNew}
+          >
+            Create Objective
+          </Button>
+        </Group>
+      </Stack>
 
       {!objectives || objectives.length === 0 ? (
         <Card p="xl" mt="lg">
@@ -317,113 +322,117 @@ export default function ObjectivesPage() {
           </Center>
         </Card>
       ) : (
-        <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
+        <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 3 }} spacing={{ base: "md", md: "lg" }}>
           {objectives.map((objective) => (
             <Card key={objective.id} p="lg" withBorder>
-              <Group justify="space-between" align="flex-start" mb="md">
-                <div style={{ flex: 1 }}>
-                  <Group gap="xs" mb="xs">
-                    <Text fw={600} size="lg">
-                      {objective.title}
-                    </Text>
-                    <Badge
-                      color={
-                        objective.status === 'completed'
-                          ? 'green'
-                          : objective.status === 'active'
-                          ? 'blue'
-                          : 'gray'
-                      }
+              <Stack gap="md">
+                <Group justify="space-between" align="flex-start">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Stack gap="xs">
+                      <Group gap="xs">
+                        <Text fw={600} size="lg" style={{ wordBreak: "break-word" }}>
+                          {objective.title}
+                        </Text>
+                        <Badge
+                          color={
+                            objective.status === 'completed'
+                              ? 'green'
+                              : objective.status === 'active'
+                              ? 'blue'
+                              : 'gray'
+                          }
+                          size="sm"
+                        >
+                          {objective.status}
+                        </Badge>
+                      </Group>
+                      {objective.description && (
+                        <Text size="sm" c="dimmed" style={{ wordBreak: "break-word" }}>
+                          {objective.description}
+                        </Text>
+                      )}
+                    </Stack>
+                  </div>
+                  <Group gap="xs">
+                    <ActionIcon
+                      variant="light"
+                      color={objective.status === 'completed' ? 'green' : 'gray'}
                       size="sm"
+                      onClick={() => handleToggleObjective(objective)}
                     >
-                      {objective.status}
-                    </Badge>
+                      {objective.status === 'completed' ? <CheckCircle2 size={14} /> : <Circle size={14} />}
+                    </ActionIcon>
+                    <ActionIcon
+                      variant="light"
+                      color="blue"
+                      size="sm"
+                      onClick={() => handleEditObjective(objective)}
+                    >
+                      <Edit2 size={14} />
+                    </ActionIcon>
+                    <ActionIcon
+                      variant="light"
+                      color="red"
+                      size="sm"
+                      onClick={() => handleDeleteObjective(objective)}
+                    >
+                      <Trash2 size={14} />
+                    </ActionIcon>
                   </Group>
-                  {objective.description && (
-                    <Text size="sm" c="dimmed" mb="sm">
-                      {objective.description}
+                </Group>
+
+                <Box>
+                  <Group justify="space-between" align="center" mb="xs">
+                    <Text size="sm" fw={500}>
+                      Progress
                     </Text>
-                  )}
-                </div>
-                <Group gap="xs">
-                  <ActionIcon
-                    variant="light"
-                    color={objective.status === 'completed' ? 'green' : 'gray'}
-                    size="sm"
-                    onClick={() => handleToggleObjective(objective)}
-                  >
-                    {objective.status === 'completed' ? <CheckCircle2 size={14} /> : <Circle size={14} />}
-                  </ActionIcon>
-                  <ActionIcon
-                    variant="light"
-                    color="blue"
-                    size="sm"
-                    onClick={() => handleEditObjective(objective)}
-                  >
-                    <Edit2 size={14} />
-                  </ActionIcon>
-                  <ActionIcon
-                    variant="light"
-                    color="red"
-                    size="sm"
-                    onClick={() => handleDeleteObjective(objective)}
-                  >
-                    <Trash2 size={14} />
-                  </ActionIcon>
-                </Group>
-              </Group>
+                    <Text size="sm" fw={500}>
+                      {objective.progress}%
+                    </Text>
+                  </Group>
+                  <Progress value={objective.progress} size="sm" radius="xl" />
+                </Box>
 
-              <Box mb="md">
-                <Group justify="space-between" align="center" mb="xs">
-                  <Text size="sm" fw={500}>
-                    Progress
-                  </Text>
-                  <Text size="sm" fw={500}>
-                    {objective.progress}%
-                  </Text>
-                </Group>
-                <Progress value={objective.progress} size="sm" radius="xl" />
-              </Box>
-
-              {objective.keyResults && objective.keyResults.length > 0 && (
-                <div>
-                  <Text size="sm" fw={500} mb="xs">
-                    Key Results ({objective.keyResults.length})
-                  </Text>
-                  <Stack gap="xs">
-                    {objective.keyResults.slice(0, 3).map((kr) => (
-                      <Paper key={kr.id} p="xs" withBorder>
-                        <Group justify="space-between" align="center">
-                          <Box style={{ flex: 1 }}>
-                            <Text size="xs" fw={500} lineClamp={1}>
-                              {kr.title}
-                            </Text>
-                            <Group gap="xs" mt={4}>
-                              <TrendingUp size={12} />
-                              <Text size="xs" c="dimmed">
-                                Progress: {kr.currentValue || 0}/{kr.targetValue || 0} {kr.unit || ''} ({(kr.completionPercentage || 0).toFixed(0)}%)
+                {objective.keyResults && objective.keyResults.length > 0 && (
+                  <div>
+                    <Text size="sm" fw={500} mb="xs">
+                      Key Results ({objective.keyResults.length})
+                    </Text>
+                    <Stack gap="xs">
+                      {objective.keyResults.slice(0, 3).map((kr) => (
+                        <Paper key={kr.id} p="xs" withBorder>
+                          <Group justify="space-between" align="center">
+                            <Box style={{ flex: 1 }}>
+                              <Text size="xs" fw={500} lineClamp={1}>
+                                {kr.title}
                               </Text>
-                            </Group>
-                          </Box>
-                          <ActionIcon
-                            size="sm"
-                            variant="subtle"
-                            color={kr.isCompleted ? 'green' : 'gray'}
-                            onClick={() => handleToggleKeyResult(objective, kr)}
-                          >
-                            {kr.isCompleted ? <CheckCircle2 size={14} /> : <Circle size={14} />}
-                          </ActionIcon>
-                        </Group>
-                      </Paper>
-                    ))}
-                    {objective.keyResults.length > 3 && (
-                      <Text size="xs" c="dimmed" ta="center">
-                        +{objective.keyResults.length - 3} more
-                      </Text>
-                    )}
-                  </Stack>
-                </div>
-              )}
+                              <Group gap="xs" mt={4}>
+                                <TrendingUp size={12} />
+                                <Text size="xs" c="dimmed">
+                                  Progress: {kr.currentValue || 0}/{kr.targetValue || 0} {kr.unit || ''} ({(kr.completionPercentage || 0).toFixed(0)}%)
+                                </Text>
+                              </Group>
+                            </Box>
+                            <ActionIcon
+                              size="sm"
+                              variant="subtle"
+                              color={kr.isCompleted ? 'green' : 'gray'}
+                              onClick={() => handleToggleKeyResult(objective, kr)}
+                            >
+                              {kr.isCompleted ? <CheckCircle2 size={14} /> : <Circle size={14} />}
+                            </ActionIcon>
+                          </Group>
+                        </Paper>
+                      ))}
+                      {objective.keyResults.length > 3 && (
+                        <Text size="xs" c="dimmed" ta="center">
+                          +{objective.keyResults.length - 3} more
+                        </Text>
+                      )}
+                    </Stack>
+                  </div>
+                )}
+              </Stack>
             </Card>
           ))}
         </SimpleGrid>
@@ -434,7 +443,13 @@ export default function ObjectivesPage() {
         onClose={() => setIsModalOpen(false)}
         title={editingObjective ? 'Edit Objective' : 'Create New Objective'}
         size="lg"
-        scrollAreaComponent={ScrollArea}
+        scrollAreaComponent={ScrollArea.Autosize}
+        styles={{
+          body: {
+            maxHeight: 'calc(100vh - 120px)',
+            overflowY: 'auto',
+          },
+        }}
       >
         <form onSubmit={handleSubmit}>
           <Stack>
