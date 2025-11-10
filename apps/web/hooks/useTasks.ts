@@ -43,9 +43,10 @@ export const useUpdateTask = () => {
       tasksApi.update(id, dto),
     onMutate: async ({ id, dto }) => {
       await queryClient.cancelQueries({ queryKey: ['tasks'] });
-      const previousTasks = queryClient.getQueryData(['tasks']);
+      const previousTasks = queryClient.getQueryData(['tasks', undefined]);
+      const previousTask = queryClient.getQueryData(['tasks', id]);
 
-      // Atualiza cache otimisticamente apenas na query principal
+      // Atualiza cache otimisticamente na query principal
       queryClient.setQueryData(['tasks', undefined], (old: any) => {
         if (!old || !Array.isArray(old)) return old;
         return old.map((task: any) =>
@@ -53,11 +54,35 @@ export const useUpdateTask = () => {
         );
       });
 
-      return { previousTasks };
+      // Atualiza cache otimisticamente na query individual da task
+      queryClient.setQueryData(['tasks', id], (old: any) => {
+        if (!old) return old;
+        return { ...old, ...dto };
+      });
+
+      // Atualiza cache otimisticamente no kanban board
+      queryClient.setQueryData(['tasks', 'kanban', undefined], (old: any) => {
+        if (!old) return old;
+
+        const newBoard = { ...old };
+        for (const col of ['todo', 'in_progress', 'done'] as const) {
+          if (newBoard[col]) {
+            newBoard[col] = newBoard[col].map((task: any) =>
+              task.id === id ? { ...task, ...dto } : task
+            );
+          }
+        }
+        return newBoard;
+      });
+
+      return { previousTasks, previousTask };
     },
     onError: (_err, _vars, context: any) => {
       if (context?.previousTasks) {
         queryClient.setQueryData(['tasks', undefined], context.previousTasks);
+      }
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', _vars.id], context.previousTask);
       }
     },
     onSettled: () => {

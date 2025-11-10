@@ -103,16 +103,24 @@ export class TasksService {
       Object.entries(updateDto).filter(([_, v]) => v !== undefined),
     );
 
+    // Convert DTOs to plain objects for Firestore compatibility
+    // Firestore doesn't support objects with custom prototypes (class instances)
+    const plainDto = JSON.parse(JSON.stringify(cleanedDto));
+
     const updatedData = {
-      ...cleanedDto,
+      ...plainDto,
       updatedAt: new Date().toISOString(),
     };
 
-    await db.collection(this.collection).doc(id).update(updatedData);
-
-    this.logger.log(`Task updated: ${id}`);
-
-    return this.findOne(userId, id);
+    try {
+      await db.collection(this.collection).doc(id).update(updatedData);
+      this.logger.log(`Task updated: ${id}`);
+      return this.findOne(userId, id);
+    } catch (error) {
+      this.logger.error(`Error updating task ${id}:`, error);
+      this.logger.error(`Update data:`, JSON.stringify(updatedData, null, 2));
+      throw error;
+    }
   }
 
   async remove(userId: string, id: string) {
@@ -136,7 +144,7 @@ export class TasksService {
     newOrder: number,
     newStatus?: string,
   ) {
-    const task = await this.findOne(userId, taskId);
+    await this.findOne(userId, taskId);
 
     const updateData: any = {
       order: newOrder,

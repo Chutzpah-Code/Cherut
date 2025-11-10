@@ -22,7 +22,7 @@ import { useState, useEffect } from 'react';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { useObjectives } from '@/hooks/useObjectives';
 import { useKeyResults } from '@/hooks/useKeyResults';
-import { useTask } from '@/hooks/useTasks';
+import { useTask, useUpdateTask } from '@/hooks/useTasks';
 
 interface TaskModalProps {
   task: Task | null;
@@ -50,14 +50,17 @@ export function TaskModal({
   onToggleChecklistItem,
 }: TaskModalProps) {
   const { data: lifeAreas } = useLifeAreas();
-  const { data: allObjectives } = useObjectives();
-  const { data: allKeyResults } = useKeyResults();
+  const { data: allObjectives } = useObjectives(undefined); // Get all objectives
+  const { data: allKeyResults } = useKeyResults(undefined); // Get all key results
 
   // Fetch live data for the current task
   const { data: liveTask } = useTask(task?.id || '');
 
   // Use live task data if available, otherwise use prop task
   const currentTask = liveTask || task;
+
+  // Use mutation for direct updates (checklist operations)
+  const updateTaskMutation = useUpdateTask();
 
   const [formData, setFormData] = useState<UpdateTaskDto>({});
   const [newChecklistItem, setNewChecklistItem] = useState('');
@@ -108,9 +111,10 @@ export function TaskModal({
 
     const updatedChecklist = [...(currentTask.checklist || []), newItem];
 
-    // Save immediately to backend
-    onSave(currentTask.id, {
-      checklist: updatedChecklist,
+    // Save immediately to backend without closing modal
+    updateTaskMutation.mutate({
+      id: currentTask.id,
+      dto: { checklist: updatedChecklist },
     });
 
     setNewChecklistItem('');
@@ -119,9 +123,10 @@ export function TaskModal({
   const handleRemoveChecklistItem = (itemId: string) => {
     const updatedChecklist = currentTask.checklist?.filter((item) => item.id !== itemId) || [];
 
-    // Save immediately to backend
-    onSave(currentTask.id, {
-      checklist: updatedChecklist,
+    // Save immediately to backend without closing modal
+    updateTaskMutation.mutate({
+      id: currentTask.id,
+      dto: { checklist: updatedChecklist },
     });
   };
 
