@@ -8,7 +8,7 @@ export interface KeyResult {
   targetValue: number;
   currentValue: number;
   unit: string;
-  completionPercentage: number;
+  completionPercentage?: number; // Make optional for safety
   isCompleted: boolean;
   isArchived?: boolean;
   completedAt?: string;

@@ -291,7 +291,7 @@ export default function ObjectivesPage() {
                             <Group gap="xs" mt={4}>
                               <TrendingUp size={12} />
                               <Text size="xs" c="dimmed">
-                                Progress: {kr.currentValue}/{kr.targetValue} {kr.unit} ({kr.completionPercentage.toFixed(0)}%)
+                                Progress: {kr.currentValue || 0}/{kr.targetValue || 0} {kr.unit || ''} ({(kr.completionPercentage || 0).toFixed(0)}%)
                               </Text>
                             </Group>
                           </Box>
