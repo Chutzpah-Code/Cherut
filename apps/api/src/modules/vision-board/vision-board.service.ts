@@ -189,10 +189,20 @@ export class VisionBoardService {
       //   throw new BadRequestException('Invalid image URL. Must be a Cloudinary URL.');
       // }
 
-      await docRef.update({
-        ...dto,
+      // Remove campos undefined (Firestore não aceita undefined)
+      const updateData: any = {
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
+      };
+
+      // Só adiciona campos que não são undefined
+      if (dto.title !== undefined) updateData.title = dto.title;
+      if (dto.description !== undefined) updateData.description = dto.description;
+      if (dto.fullDescription !== undefined) updateData.fullDescription = dto.fullDescription;
+      if (dto.imageUrl !== undefined) updateData.imageUrl = dto.imageUrl;
+      if (dto.dueDate !== undefined) updateData.dueDate = dto.dueDate;
+      if (dto.order !== undefined) updateData.order = dto.order;
+
+      await docRef.update(updateData);
 
       const updatedDoc = await docRef.get();
 
