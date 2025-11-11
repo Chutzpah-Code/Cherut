@@ -75,6 +75,11 @@ export class CreateHabitDto {
   @IsOptional()
   lifeAreaId?: string;
 
+  // Start date (YYYY-MM-DD format) - When to start tracking this habit
+  @IsString()
+  @IsOptional()
+  startDate?: string;
+
   // Due date (YYYY-MM-DD format) - Target date to complete the habit
   @IsString()
   @IsOptional()
