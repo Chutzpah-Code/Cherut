@@ -545,13 +545,30 @@ export default function ObjectivesPage() {
         opened={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingObjective ? 'Edit Objective' : 'Create New Objective'}
-        size="lg"
+        size={{ base: 'full', xs: 'lg', sm: 'xl' }}
+        fullScreen={{ base: true, xs: false }}
         scrollAreaComponent={ScrollArea.Autosize}
-        styles={{
+        styles={(theme) => ({
+          content: {
+            maxHeight: { base: '100vh', xs: 'calc(100vh - 120px)' },
+          },
           body: {
-            maxHeight: 'calc(100vh - 120px)',
+            padding: { base: theme.spacing.xs, xs: theme.spacing.md },
+            maxHeight: { base: 'calc(100vh - 60px)', xs: 'calc(100vh - 120px)' },
             overflowY: 'auto',
           },
+          header: {
+            padding: { base: theme.spacing.xs, xs: theme.spacing.md },
+            borderBottom: `1px solid ${theme.colors.gray[2]}`,
+          },
+          title: {
+            fontSize: { base: theme.fontSizes.md, xs: theme.fontSizes.lg },
+            fontWeight: 600,
+          },
+        })}
+        overlayProps={{
+          backgroundOpacity: 0.55,
+          blur: 3,
         }}
       >
         <form onSubmit={handleSubmit}>
@@ -581,22 +598,28 @@ export default function ObjectivesPage() {
               onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
             />
 
-            <Group grow>
-              <DateInput
-                label="Start Date"
-                placeholder="Select start date"
-                value={formData.startDate}
-                onChange={(value) => setFormData({ ...formData, startDate: value || new Date() })}
-                required
-              />
-              <DateInput
-                label="End Date"
-                placeholder="Select end date"
-                value={formData.endDate}
-                onChange={(value) => setFormData({ ...formData, endDate: value || new Date() })}
-                required
-              />
-            </Group>
+            <Stack gap="sm">
+              <Grid grow>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <DateInput
+                    label="Start Date"
+                    placeholder="Select start date"
+                    value={formData.startDate}
+                    onChange={(value) => setFormData({ ...formData, startDate: value || new Date() })}
+                    required
+                  />
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <DateInput
+                    label="End Date"
+                    placeholder="Select end date"
+                    value={formData.endDate}
+                    onChange={(value) => setFormData({ ...formData, endDate: value || new Date() })}
+                    required
+                  />
+                </Grid.Col>
+              </Grid>
+            </Stack>
 
             <Divider />
 
@@ -647,36 +670,44 @@ export default function ObjectivesPage() {
                       />
 
                       <Text size="sm" fw={500} mt="xs" mb="xs">Measurement</Text>
-                      <Group grow>
-                        <NumberInput
-                          label="Target Goal"
-                          placeholder="1000"
-                          value={kr.targetValue}
-                          onChange={(value) => updateKeyResult(index, 'targetValue', value || 0)}
-                          size="sm"
-                          min={0}
-                          required
-                          description="What number do you want to reach?"
-                        />
-                        <NumberInput
-                          label="Current Progress"
-                          placeholder="250"
-                          value={kr.currentValue}
-                          onChange={(value) => updateKeyResult(index, 'currentValue', value || 0)}
-                          size="sm"
-                          min={0}
-                          description="Where are you now?"
-                        />
-                        <TextInput
-                          label="Unit of Measure"
-                          placeholder="users"
-                          value={kr.unit}
-                          onChange={(e) => updateKeyResult(index, 'unit', e.target.value)}
-                          size="sm"
-                          required
-                          description="How will you measure it? (users, %, $, etc.)"
-                        />
-                      </Group>
+                      <Stack gap="sm">
+                        <Grid grow>
+                          <Grid.Col span={{ base: 12, sm: 4 }}>
+                            <NumberInput
+                              label="Target Goal"
+                              placeholder="1000"
+                              value={kr.targetValue}
+                              onChange={(value) => updateKeyResult(index, 'targetValue', value || 0)}
+                              size="sm"
+                              min={0}
+                              required
+                              description="What number do you want to reach?"
+                            />
+                          </Grid.Col>
+                          <Grid.Col span={{ base: 12, sm: 4 }}>
+                            <NumberInput
+                              label="Current Progress"
+                              placeholder="250"
+                              value={kr.currentValue}
+                              onChange={(value) => updateKeyResult(index, 'currentValue', value || 0)}
+                              size="sm"
+                              min={0}
+                              description="Where are you now?"
+                            />
+                          </Grid.Col>
+                          <Grid.Col span={{ base: 12, sm: 4 }}>
+                            <TextInput
+                              label="Unit of Measure"
+                              placeholder="users"
+                              value={kr.unit}
+                              onChange={(e) => updateKeyResult(index, 'unit', e.target.value)}
+                              size="sm"
+                              required
+                              description="How will you measure it? (users, %, $, etc.)"
+                            />
+                          </Grid.Col>
+                        </Grid>
+                      </Stack>
 
                       {kr.targetValue > 0 && kr.currentValue >= 0 && (
                         <Box mt="xs" p="xs" style={{ backgroundColor: '#f8f9fa', borderRadius: 4 }}>
@@ -706,14 +737,26 @@ export default function ObjectivesPage() {
               </Stack>
             </div>
 
-            <Group justify="flex-end" mt="md">
-              <Button variant="light" onClick={() => setIsModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>
-                {editingObjective ? 'Update' : 'Create'} Objective
-              </Button>
-            </Group>
+            <Grid justify="flex-end" align="center" mt="md">
+              <Grid.Col span={{ base: 6, sm: 'content' }}>
+                <Button
+                  variant="light"
+                  onClick={() => setIsModalOpen(false)}
+                  fullWidth={{ base: true, sm: false }}
+                >
+                  Cancel
+                </Button>
+              </Grid.Col>
+              <Grid.Col span={{ base: 6, sm: 'content' }}>
+                <Button
+                  type="submit"
+                  loading={createMutation.isPending || updateMutation.isPending}
+                  fullWidth={{ base: true, sm: false }}
+                >
+                  {editingObjective ? 'Update' : 'Create'} Objective
+                </Button>
+              </Grid.Col>
+            </Grid>
           </Stack>
         </form>
       </Modal>

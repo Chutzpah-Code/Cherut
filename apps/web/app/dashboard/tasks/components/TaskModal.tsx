@@ -15,6 +15,7 @@ import {
   Divider,
   Progress,
   Alert,
+  Grid,
 } from '@mantine/core';
 import { Plus, X, Play, Pause, Square, Trash2, Archive, Clock } from 'lucide-react';
 import { Task, ChecklistItem, UpdateTaskDto } from '@/lib/api/services/tasks';
@@ -152,9 +153,29 @@ export function TaskModal({
       opened={opened}
       onClose={onClose}
       title={<Text fw={600} size="lg">Edit Task</Text>}
-      size="xl"
-      styles={{
-        body: { maxHeight: '80vh', overflowY: 'auto' },
+      size={{ base: 'full', xs: 'lg', sm: 'xl' }}
+      fullScreen={{ base: true, xs: false }}
+      styles={(theme) => ({
+        content: {
+          maxHeight: { base: '100vh', xs: 'calc(100vh - 120px)' },
+        },
+        body: {
+          padding: { base: theme.spacing.xs, xs: theme.spacing.md },
+          maxHeight: { base: 'calc(100vh - 60px)', xs: 'calc(100vh - 120px)' },
+          overflowY: 'auto',
+        },
+        header: {
+          padding: { base: theme.spacing.xs, xs: theme.spacing.md },
+          borderBottom: `1px solid ${theme.colors.gray[2]}`,
+        },
+        title: {
+          fontSize: { base: theme.fontSizes.md, xs: theme.fontSizes.lg },
+          fontWeight: 600,
+        },
+      })}
+      overlayProps={{
+        backgroundOpacity: 0.55,
+        blur: 3,
       }}
     >
       <Stack gap="md">
@@ -177,42 +198,48 @@ export function TaskModal({
         />
 
         {/* Life Area, Objective, Key Result */}
-        <Group grow>
-          <Select
-            label="Life Area"
-            placeholder="Select life area"
-            value={formData.lifeAreaId}
-            onChange={(value) => {
-              // Clear objective and key result when life area changes
-              setFormData({
-                ...formData,
-                lifeAreaId: value || undefined,
-                objectiveId: undefined,
-                keyResultId: undefined
-              });
-            }}
-            data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
-            searchable
-          />
+        <Stack gap="sm">
+          <Grid grow>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label="Life Area"
+                placeholder="Select life area"
+                value={formData.lifeAreaId}
+                onChange={(value) => {
+                  // Clear objective and key result when life area changes
+                  setFormData({
+                    ...formData,
+                    lifeAreaId: value || undefined,
+                    objectiveId: undefined,
+                    keyResultId: undefined
+                  });
+                }}
+                data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
+                searchable
+              />
+            </Grid.Col>
 
-          <Select
-            label="Objective (Optional)"
-            placeholder="Link to objective"
-            value={formData.objectiveId}
-            onChange={(value) => {
-              // Clear key result when objective changes
-              setFormData({
-                ...formData,
-                objectiveId: value || undefined,
-                keyResultId: undefined
-              });
-            }}
-            data={filteredObjectives?.map((obj) => ({ value: obj.id, label: obj.title })) || []}
-            searchable
-            clearable
-            disabled={!formData.lifeAreaId}
-          />
-        </Group>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label="Objective (Optional)"
+                placeholder="Link to objective"
+                value={formData.objectiveId}
+                onChange={(value) => {
+                  // Clear key result when objective changes
+                  setFormData({
+                    ...formData,
+                    objectiveId: value || undefined,
+                    keyResultId: undefined
+                  });
+                }}
+                data={filteredObjectives?.map((obj) => ({ value: obj.id, label: obj.title })) || []}
+                searchable
+                clearable
+                disabled={!formData.lifeAreaId}
+              />
+            </Grid.Col>
+          </Grid>
+        </Stack>
 
         <Select
           label="Key Result (Optional)"
@@ -226,26 +253,30 @@ export function TaskModal({
         />
 
         {/* Priority and Due Date */}
-        <Group grow>
-          <Select
-            label="Priority"
-            value={formData.priority}
-            onChange={(value) => setFormData({ ...formData, priority: value as any })}
-            data={[
-              { value: 'low', label: 'Low' },
-              { value: 'medium', label: 'Medium' },
-              { value: 'high', label: 'High' },
-              { value: 'urgent', label: 'Urgent' },
-            ]}
-          />
+        <Grid grow>
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Select
+              label="Priority"
+              value={formData.priority}
+              onChange={(value) => setFormData({ ...formData, priority: value as any })}
+              data={[
+                { value: 'low', label: 'Low' },
+                { value: 'medium', label: 'Medium' },
+                { value: 'high', label: 'High' },
+                { value: 'urgent', label: 'Urgent' },
+              ]}
+            />
+          </Grid.Col>
 
-          <TextInput
-            label="Due Date"
-            type="date"
-            value={formData.dueDate}
-            onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-          />
-        </Group>
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <TextInput
+              label="Due Date"
+              type="date"
+              value={formData.dueDate}
+              onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+            />
+          </Grid.Col>
+        </Grid>
 
         {/* Estimated Pomodoros */}
         <TextInput
@@ -266,34 +297,43 @@ export function TaskModal({
           </Alert>
         )}
 
-        <Group>
+        <Grid>
           {!activeTracking ? (
-            <Button
-              leftSection={<Play size={16} />}
-              color="green"
-              onClick={() => onStartTimeTracking(currentTask.id)}
-            >
-              Start Tracking
-            </Button>
+            <Grid.Col span={{ base: 12, xs: 'content' }}>
+              <Button
+                leftSection={<Play size={16} />}
+                color="green"
+                onClick={() => onStartTimeTracking(currentTask.id)}
+                fullWidth={{ base: true, xs: false }}
+              >
+                Start Tracking
+              </Button>
+            </Grid.Col>
           ) : (
             <>
-              <Button
-                leftSection={<Pause size={16} />}
-                color="yellow"
-                onClick={() => onPauseTimeTracking(currentTask.id, activeTracking.id)}
-              >
-                Pause
-              </Button>
-              <Button
-                leftSection={<Square size={16} />}
-                color="red"
-                onClick={() => onStopTimeTracking(currentTask.id, activeTracking.id)}
-              >
-                Stop
-              </Button>
+              <Grid.Col span={{ base: 6, xs: 'content' }}>
+                <Button
+                  leftSection={<Pause size={16} />}
+                  color="yellow"
+                  onClick={() => onPauseTimeTracking(currentTask.id, activeTracking.id)}
+                  fullWidth={{ base: true, xs: false }}
+                >
+                  Pause
+                </Button>
+              </Grid.Col>
+              <Grid.Col span={{ base: 6, xs: 'content' }}>
+                <Button
+                  leftSection={<Square size={16} />}
+                  color="red"
+                  onClick={() => onStopTimeTracking(currentTask.id, activeTracking.id)}
+                  fullWidth={{ base: true, xs: false }}
+                >
+                  Stop
+                </Button>
+              </Grid.Col>
             </>
           )}
-        </Group>
+        </Grid>
 
         <Divider label="Checklist" labelPosition="center" />
 
@@ -342,59 +382,83 @@ export function TaskModal({
           ))}
         </Stack>
 
-        <Group gap="xs">
-          <TextInput
-            placeholder="Add checklist item"
-            value={newChecklistItem}
-            onChange={(e) => setNewChecklistItem(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleAddChecklistItem();
-              }
-            }}
-            style={{ flex: 1 }}
-          />
-          <Button leftSection={<Plus size={16} />} onClick={handleAddChecklistItem}>
-            Add
-          </Button>
-        </Group>
+        <Grid align="end">
+          <Grid.Col span={{ base: 8, xs: 10 }}>
+            <TextInput
+              placeholder="Add checklist item"
+              value={newChecklistItem}
+              onChange={(e) => setNewChecklistItem(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddChecklistItem();
+                }
+              }}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 4, xs: 2 }}>
+            <Button
+              leftSection={<Plus size={16} />}
+              onClick={handleAddChecklistItem}
+              fullWidth
+            >
+              Add
+            </Button>
+          </Grid.Col>
+        </Grid>
 
         <Divider />
 
         {/* Actions */}
-        <Group justify="space-between">
-          <Group>
-            <Button
-              leftSection={<Archive size={16} />}
-              variant="light"
-              color={currentTask.archived ? 'gray' : 'yellow'}
-              onClick={() => onArchive(currentTask.id)}
-            >
-              {currentTask.archived ? 'Unarchive' : 'Archive'}
-            </Button>
-            <Button
-              leftSection={<Trash2 size={16} />}
-              variant="light"
-              color="red"
-              onClick={() => {
-                onDelete(currentTask.id);
-                onClose();
-              }}
-            >
-              Delete
-            </Button>
-          </Group>
+        <Stack gap="md">
+          <Grid>
+            <Grid.Col span={{ base: 6, sm: 'content' }}>
+              <Button
+                leftSection={<Archive size={16} />}
+                variant="light"
+                color={currentTask.archived ? 'gray' : 'yellow'}
+                onClick={() => onArchive(currentTask.id)}
+                fullWidth={{ base: true, sm: false }}
+              >
+                {currentTask.archived ? 'Unarchive' : 'Archive'}
+              </Button>
+            </Grid.Col>
+            <Grid.Col span={{ base: 6, sm: 'content' }}>
+              <Button
+                leftSection={<Trash2 size={16} />}
+                variant="light"
+                color="red"
+                onClick={() => {
+                  onDelete(currentTask.id);
+                  onClose();
+                }}
+                fullWidth={{ base: true, sm: false }}
+              >
+                Delete
+              </Button>
+            </Grid.Col>
+          </Grid>
 
-          <Group>
-            <Button variant="light" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>
-              Save Changes
-            </Button>
-          </Group>
-        </Group>
+          <Grid justify="flex-end">
+            <Grid.Col span={{ base: 6, sm: 'content' }}>
+              <Button
+                variant="light"
+                onClick={onClose}
+                fullWidth={{ base: true, sm: false }}
+              >
+                Cancel
+              </Button>
+            </Grid.Col>
+            <Grid.Col span={{ base: 6, sm: 'content' }}>
+              <Button
+                onClick={handleSave}
+                fullWidth={{ base: true, sm: false }}
+              >
+                Save Changes
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </Stack>
       </Stack>
     </Modal>
   );
