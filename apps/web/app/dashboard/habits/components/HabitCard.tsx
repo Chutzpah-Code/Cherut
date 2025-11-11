@@ -94,6 +94,7 @@ export function HabitCard({ habit, logs, onEdit, onDayClick }: HabitCardProps) {
             logs={logs}
             onDayClick={(date) => onDayClick(habit.id, date)}
             compact={true}
+            habitStartDate={habit.startDate}
             habitCreatedAt={habit.createdAt}
             habitDueDate={habit.dueDate}
           />

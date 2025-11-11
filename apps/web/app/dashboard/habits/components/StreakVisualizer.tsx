@@ -9,7 +9,8 @@ interface StreakVisualizerProps {
   logs: HabitLog[];
   onDayClick: (date: string) => void;
   compact?: boolean; // Para mostrar inline ou na modal
-  habitCreatedAt?: string; // Data de criação do hábito
+  habitStartDate?: string; // Data de início do hábito (quando começou a praticar)
+  habitCreatedAt?: string; // Data de criação do hábito (fallback)
   habitDueDate?: string; // Data alvo de conclusão do hábito
 }
 
@@ -36,10 +37,11 @@ export function StreakVisualizer({
   logs,
   onDayClick,
   compact = true,
+  habitStartDate,
   habitCreatedAt,
   habitDueDate,
 }: StreakVisualizerProps) {
-  const days = getAllDaysSinceStart(logs, habitCreatedAt, habitDueDate);
+  const days = getAllDaysSinceStart(logs, habitStartDate, habitCreatedAt, habitDueDate);
 
   const isCompleted = (date: string): boolean => {
     return logs.some((log) => log.date === date && log.completed);
@@ -119,23 +121,21 @@ export function StreakVisualizer({
   );
 }
 
-function getAllDaysSinceStart(logs: HabitLog[], habitCreatedAt?: string, habitDueDate?: string): string[] {
+function getAllDaysSinceStart(logs: HabitLog[], habitStartDate?: string, habitCreatedAt?: string, habitDueDate?: string): string[] {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Start date: habit creation date (MUST be provided for proper tracking)
+  // Start date: prioritize habit start date, fallback to creation date
   let startDate: Date;
 
-  if (habitCreatedAt) {
-    // Use habit creation date as the start
+  if (habitStartDate) {
+    // Use habit start date (when user decided to start practicing)
+    startDate = new Date(habitStartDate.split('T')[0] + 'T00:00:00');
+  } else if (habitCreatedAt) {
+    // Fallback: use habit creation date
     startDate = new Date(habitCreatedAt.split('T')[0] + 'T00:00:00');
   } else {
-    // Fallback: use today if no creation date
-    startDate = new Date(today);
-  }
-
-  // Ensure start date is not in the future
-  if (startDate > today) {
+    // Last resort: use today if no dates available
     startDate = new Date(today);
   }
 

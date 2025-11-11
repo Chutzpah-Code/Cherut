@@ -287,6 +287,7 @@ export function HabitModal({
               logs={logs}
               onDayClick={(date) => onDayClick(habit.id, date)}
               compact={false}
+              habitStartDate={habit.startDate}
               habitCreatedAt={habit.createdAt}
               habitDueDate={habit.dueDate}
             />
