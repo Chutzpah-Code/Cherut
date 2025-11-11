@@ -545,30 +545,13 @@ export default function ObjectivesPage() {
         opened={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingObjective ? 'Edit Objective' : 'Create New Objective'}
-        size={{ base: 'full', xs: 'lg', sm: 'xl' }}
-        fullScreen={{ base: true, xs: false }}
+        size="lg"
         scrollAreaComponent={ScrollArea.Autosize}
-        styles={(theme) => ({
-          content: {
-            maxHeight: { base: '100vh', xs: 'calc(100vh - 120px)' },
-          },
+        styles={{
           body: {
-            padding: { base: theme.spacing.xs, xs: theme.spacing.md },
-            maxHeight: { base: 'calc(100vh - 60px)', xs: 'calc(100vh - 120px)' },
+            maxHeight: 'calc(100vh - 120px)',
             overflowY: 'auto',
           },
-          header: {
-            padding: { base: theme.spacing.xs, xs: theme.spacing.md },
-            borderBottom: `1px solid ${theme.colors.gray[2]}`,
-          },
-          title: {
-            fontSize: { base: theme.fontSizes.md, xs: theme.fontSizes.lg },
-            fontWeight: 600,
-          },
-        })}
-        overlayProps={{
-          backgroundOpacity: 0.55,
-          blur: 3,
         }}
       >
         <form onSubmit={handleSubmit}>
@@ -742,7 +725,7 @@ export default function ObjectivesPage() {
                 <Button
                   variant="light"
                   onClick={() => setIsModalOpen(false)}
-                  fullWidth={{ base: true, sm: false }}
+                  fullWidth
                 >
                   Cancel
                 </Button>
@@ -751,7 +734,7 @@ export default function ObjectivesPage() {
                 <Button
                   type="submit"
                   loading={createMutation.isPending || updateMutation.isPending}
-                  fullWidth={{ base: true, sm: false }}
+                  fullWidth
                 >
                   {editingObjective ? 'Update' : 'Create'} Objective
                 </Button>

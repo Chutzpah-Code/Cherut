@@ -153,26 +153,13 @@ export function TaskModal({
       opened={opened}
       onClose={onClose}
       title={<Text fw={600} size="lg">Edit Task</Text>}
-      size={{ base: 'full', xs: 'lg', sm: 'xl' }}
-      fullScreen={{ base: true, xs: false }}
-      styles={(theme) => ({
-        content: {
-          maxHeight: { base: '100vh', xs: 'calc(100vh - 120px)' },
-        },
+      size="xl"
+      styles={{
         body: {
-          padding: { base: theme.spacing.xs, xs: theme.spacing.md },
-          maxHeight: { base: 'calc(100vh - 60px)', xs: 'calc(100vh - 120px)' },
+          maxHeight: '80vh',
           overflowY: 'auto',
         },
-        header: {
-          padding: { base: theme.spacing.xs, xs: theme.spacing.md },
-          borderBottom: `1px solid ${theme.colors.gray[2]}`,
-        },
-        title: {
-          fontSize: { base: theme.fontSizes.md, xs: theme.fontSizes.lg },
-          fontWeight: 600,
-        },
-      })}
+      }}
       overlayProps={{
         backgroundOpacity: 0.55,
         blur: 3,
@@ -304,7 +291,7 @@ export function TaskModal({
                 leftSection={<Play size={16} />}
                 color="green"
                 onClick={() => onStartTimeTracking(currentTask.id)}
-                fullWidth={{ base: true, xs: false }}
+                fullWidth
               >
                 Start Tracking
               </Button>
@@ -316,7 +303,7 @@ export function TaskModal({
                   leftSection={<Pause size={16} />}
                   color="yellow"
                   onClick={() => onPauseTimeTracking(currentTask.id, activeTracking.id)}
-                  fullWidth={{ base: true, xs: false }}
+                  fullWidth
                 >
                   Pause
                 </Button>
@@ -326,7 +313,7 @@ export function TaskModal({
                   leftSection={<Square size={16} />}
                   color="red"
                   onClick={() => onStopTimeTracking(currentTask.id, activeTracking.id)}
-                  fullWidth={{ base: true, xs: false }}
+                  fullWidth
                 >
                   Stop
                 </Button>
@@ -418,7 +405,7 @@ export function TaskModal({
                 variant="light"
                 color={currentTask.archived ? 'gray' : 'yellow'}
                 onClick={() => onArchive(currentTask.id)}
-                fullWidth={{ base: true, sm: false }}
+                fullWidth
               >
                 {currentTask.archived ? 'Unarchive' : 'Archive'}
               </Button>
@@ -432,7 +419,7 @@ export function TaskModal({
                   onDelete(currentTask.id);
                   onClose();
                 }}
-                fullWidth={{ base: true, sm: false }}
+                fullWidth
               >
                 Delete
               </Button>
@@ -444,7 +431,7 @@ export function TaskModal({
               <Button
                 variant="light"
                 onClick={onClose}
-                fullWidth={{ base: true, sm: false }}
+                fullWidth
               >
                 Cancel
               </Button>
@@ -452,7 +439,7 @@ export function TaskModal({
             <Grid.Col span={{ base: 6, sm: 'content' }}>
               <Button
                 onClick={handleSave}
-                fullWidth={{ base: true, sm: false }}
+                fullWidth
               >
                 Save Changes
               </Button>

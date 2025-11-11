@@ -139,26 +139,14 @@ export function HabitModal({
           </Badge>
         </Group>
       }
-      size={{ base: 'full', xs: 'lg', sm: 'xl' }}
-      fullScreen={{ base: true, xs: false }}
-      styles={(theme) => ({
-        content: {
-          maxHeight: { base: '100vh', xs: 'calc(100vh - 120px)' },
-        },
+      size="lg"
+      fullScreen
+      styles={{
         body: {
-          padding: { base: theme.spacing.xs, xs: theme.spacing.md },
-          maxHeight: { base: 'calc(100vh - 60px)', xs: 'calc(100vh - 120px)' },
+          maxHeight: '80vh',
           overflowY: 'auto',
         },
-        header: {
-          padding: { base: theme.spacing.xs, xs: theme.spacing.md },
-          borderBottom: `1px solid ${theme.colors.gray[2]}`,
-        },
-        title: {
-          fontSize: { base: theme.fontSizes.md, xs: theme.fontSizes.lg },
-          fontWeight: 600,
-        },
-      })}
+      }}
       overlayProps={{
         backgroundOpacity: 0.55,
         blur: 3,
@@ -293,7 +281,7 @@ export function HabitModal({
                 color="red"
                 leftSection={<Trash2 size={16} />}
                 onClick={() => onDelete(habit.id)}
-                fullWidth={{ base: true, sm: false }}
+                fullWidth
               >
                 Delete Habit
               </Button>
@@ -305,7 +293,7 @@ export function HabitModal({
               <Button
                 variant="light"
                 onClick={onClose}
-                fullWidth={{ base: true, sm: false }}
+                fullWidth
               >
                 Cancel
               </Button>
@@ -315,7 +303,7 @@ export function HabitModal({
                 onClick={handleSave}
                 loading={isSaving}
                 color={categoryColor}
-                fullWidth={{ base: true, sm: false }}
+                fullWidth
               >
                 Save Changes
               </Button>

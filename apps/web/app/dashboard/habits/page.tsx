@@ -305,31 +305,7 @@ export default function HabitsPage() {
             {creatingCategory === 'good' ? 'New Good Habit' : 'New Bad Habit'}
           </Text>
         }
-        size={{ base: 'full', xs: 'lg', sm: 'xl' }}
-        fullScreen={{ base: true, xs: false }}
-        scrollAreaComponent={ScrollArea.Autosize}
-        styles={(theme) => ({
-          content: {
-            maxHeight: { base: '100vh', xs: 'calc(100vh - 120px)' },
-          },
-          body: {
-            padding: { base: theme.spacing.xs, xs: theme.spacing.md },
-            maxHeight: { base: 'calc(100vh - 60px)', xs: 'calc(100vh - 120px)' },
-            overflowY: 'auto',
-          },
-          header: {
-            padding: { base: theme.spacing.xs, xs: theme.spacing.md },
-            borderBottom: `1px solid ${theme.colors.gray[2]}`,
-          },
-          title: {
-            fontSize: { base: theme.fontSizes.md, xs: theme.fontSizes.lg },
-            fontWeight: 600,
-          },
-        })}
-        overlayProps={{
-          backgroundOpacity: 0.55,
-          blur: 3,
-        }}
+        size="md"
       >
         <form onSubmit={handleCreateSubmit}>
           <Stack gap="md">
@@ -385,7 +361,7 @@ export default function HabitsPage() {
                 <Button
                   variant="light"
                   onClick={() => setIsCreateModalOpen(false)}
-                  fullWidth={{ base: true, sm: false }}
+                  fullWidth
                 >
                   Cancel
                 </Button>
@@ -395,7 +371,7 @@ export default function HabitsPage() {
                   type="submit"
                   loading={createMutation.isPending}
                   color={creatingCategory === 'good' ? 'green' : 'red'}
-                  fullWidth={{ base: true, sm: false }}
+                  fullWidth
                 >
                   Create Habit
                 </Button>
