@@ -40,8 +40,20 @@ export default function Home() {
       }}
     >
       {/* Hero Section */}
-      <Container size="lg" py={120}>
-        <style jsx>{`
+      <Container
+        size="lg"
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 2rem',
+        }}
+      >
+        <style jsx global>{`
+          html {
+            scroll-behavior: smooth;
+          }
+
           @keyframes fadeInUp {
             from {
               opacity: 0;
@@ -117,12 +129,8 @@ export default function Home() {
           .hero-title {
             animation: fadeInUp 0.6s ease-out 0.2s both;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(135deg, #000000 0%, #3143B6 100%);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: fadeInUp 0.6s ease-out 0.2s both, gradient 8s ease infinite;
+            color: #1a1a1a;
+            font-weight: 600;
           }
 
           .hero-subtitle {
@@ -272,13 +280,13 @@ export default function Home() {
             className="hero-title"
             style={{
               lineHeight: 1.05,
-              fontSize: 'clamp(48px, 9vw, 96px)',
+              fontSize: 'clamp(40px, 7vw, 72px)',
               fontWeight: 700,
               letterSpacing: '-0.04em',
               maxWidth: '1000px',
             }}
           >
-            Your Elite Performance System
+            Your Elite <span style={{ fontStyle: 'italic', fontWeight: 300, color: '#888', opacity: 0.8 }}>Performance</span> System
           </Title>
 
           <Box className="hero-subtitle-wrapper">
@@ -301,10 +309,9 @@ export default function Home() {
           >
             Transform your{' '}
             <span className="description-highlight">ambition</span> into{' '}
-            <span className="description-highlight">achievement</span>. Built for{' '}
-            <span className="description-highlight">elite athletes</span>,{' '}
-            ambitious professionals, and anyone ready to unlock their full potential
-            through structured goal setting and systematic execution.
+            <span className="description-highlight">reality</span>. Built for{' '}
+            <span className="description-highlight">ambitious individuals</span>{' '}
+            who refuse to settle for ordinary.
           </Text>
 
           <Group className="hero-buttons" gap="md" mt={32}>
@@ -351,7 +358,15 @@ export default function Home() {
       </Container>
 
       {/* Pain Points Section */}
-      <Box style={{ background: '#F5F5F5', paddingTop: 80, paddingBottom: 80 }}>
+      <Box
+        style={{
+          background: '#F5F5F5',
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '80px 0',
+        }}
+      >
         <Container size="lg">
           <Stack align="center" gap={60}>
             <Title
@@ -482,7 +497,17 @@ export default function Home() {
       </Box>
 
       {/* Features Section */}
-      <Container size="lg" py={100} id="features">
+      <Box
+        id="features"
+        style={{
+          background: '#ffffff',
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '100px 0',
+        }}
+      >
+        <Container size="lg">
         <Stack align="center" gap={60}>
           <Stack align="center" gap="md">
             <Title
@@ -673,10 +698,19 @@ export default function Home() {
             </Card>
           </SimpleGrid>
         </Stack>
-      </Container>
+        </Container>
+      </Box>
 
       {/* Pricing Section */}
-      <Box style={{ background: '#F5F5F5', paddingTop: 100, paddingBottom: 100 }}>
+      <Box
+        style={{
+          background: '#F5F5F5',
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '100px 0',
+        }}
+      >
         <Container size="lg">
           <Stack align="center" gap={60}>
             <Stack align="center" gap="md">
