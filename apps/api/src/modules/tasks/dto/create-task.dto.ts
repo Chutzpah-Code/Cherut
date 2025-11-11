@@ -99,11 +99,6 @@ export class CreateTaskDto {
   @IsOptional()
   estimatedPomodoros?: number;
 
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  completedPomodoros?: number;
-
   // Link to Life Area
   @IsString()
   @IsOptional()

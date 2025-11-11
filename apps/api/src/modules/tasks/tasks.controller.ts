@@ -87,10 +87,6 @@ export class TasksController {
     return this.tasksService.updateOrder(req.user.uid, id, order, status);
   }
 
-  @Post(':id/pomodoro')
-  incrementPomodoro(@Request() req, @Param('id') id: string) {
-    return this.tasksService.incrementPomodoro(req.user.uid, id);
-  }
 
   @Post(':id/time-tracking/start')
   startTimeTracking(@Request() req, @Param('id') id: string) {

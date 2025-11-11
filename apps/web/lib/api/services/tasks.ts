@@ -28,7 +28,6 @@ export interface Task {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
   estimatedPomodoros?: number;
-  completedPomodoros: number;
   checklist?: ChecklistItem[];
   timeTracking?: TimeTrackingEntry[];
   totalTimeTracked?: number; // seconds

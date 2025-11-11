@@ -28,7 +28,6 @@ export class TasksService {
       userId,
       status: createDto.status || 'todo',
       priority: createDto.priority || 'medium',
-      completedPomodoros: createDto.completedPomodoros || 0,
       order: createDto.order ?? 0,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -163,34 +162,6 @@ export class TasksService {
     return this.findOne(userId, taskId);
   }
 
-  /**
-   * Increment completed pomodoros
-   */
-  async incrementPomodoro(userId: string, taskId: string) {
-    const task: any = await this.findOne(userId, taskId);
-
-    const currentPomodoros = task.completedPomodoros || 0;
-    const estimatedPomodoros = task.estimatedPomodoros || 0;
-
-    if (estimatedPomodoros > 0 && currentPomodoros >= estimatedPomodoros) {
-      throw new BadRequestException(
-        'Task has already reached estimated pomodoros',
-      );
-    }
-
-    const db = this.firebaseService.getFirestore();
-    await db
-      .collection(this.collection)
-      .doc(taskId)
-      .update({
-        completedPomodoros: currentPomodoros + 1,
-        updatedAt: new Date().toISOString(),
-      });
-
-    this.logger.log(`Pomodoro incremented for task: ${taskId}`);
-
-    return this.findOne(userId, taskId);
-  }
 
   /**
    * Get tasks grouped by status (for Kanban board)

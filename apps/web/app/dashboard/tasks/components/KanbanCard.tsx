@@ -238,20 +238,6 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick }: KanbanCard
           />
         )}
 
-        {/* Pomodoro Progress */}
-        {task.estimatedPomodoros && task.estimatedPomodoros > 0 && (
-          <Group gap="xs" wrap="nowrap">
-            <Text size="xs" c="dimmed">
-              Pomodoros: {task.completedPomodoros}/{task.estimatedPomodoros}
-            </Text>
-            <Progress
-              value={(task.completedPomodoros / task.estimatedPomodoros) * 100}
-              size="xs"
-              color="red"
-              style={{ flex: 1 }}
-            />
-          </Group>
-        )}
       </Stack>
 
       {/* Global styles for pulse animation */}
