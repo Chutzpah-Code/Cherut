@@ -314,7 +314,7 @@ export default function Home() {
             who refuse to settle for ordinary.
           </Text>
 
-          <Group className="hero-buttons" gap="md" mt={32}>
+          <Group className="hero-buttons" gap="md" mt={32} justify="center">
             <Button
               className="btn-primary"
               component={Link}
