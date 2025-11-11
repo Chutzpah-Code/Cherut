@@ -13,9 +13,7 @@ import {
   Modal,
   TextInput,
   Textarea,
-  Slider,
   ThemeIcon,
-  Progress,
   Loader,
   Center,
   ActionIcon,
@@ -35,7 +33,6 @@ export default function LifeAreasPage() {
   const [formData, setFormData] = useState<CreateLifeAreaDto>({
     name: '',
     description: '',
-    satisfactionLevel: 5,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,7 +47,7 @@ export default function LifeAreasPage() {
 
       setIsModalOpen(false);
       setEditingArea(null);
-      setFormData({ name: '', description: '', satisfactionLevel: 5 });
+      setFormData({ name: '', description: '' });
     } catch (error) {
       console.error('Error saving life area:', error);
     }
@@ -61,7 +58,6 @@ export default function LifeAreasPage() {
     setFormData({
       name: area.name,
       description: area.description || '',
-      satisfactionLevel: area.satisfactionLevel || 5,
     });
     setIsModalOpen(true);
   };
@@ -84,7 +80,7 @@ export default function LifeAreasPage() {
 
   const handleNew = () => {
     setEditingArea(null);
-    setFormData({ name: '', description: '', satisfactionLevel: 5 });
+    setFormData({ name: '', description: '' });
     setIsModalOpen(true);
   };
 
@@ -123,16 +119,6 @@ export default function LifeAreasPage() {
                 )}
               </div>
             </Group>
-
-            {area.satisfactionLevel !== undefined && (
-              <Stack gap="xs" mb="md">
-                <Group justify="space-between">
-                  <Text size="sm" c="dimmed">Satisfaction</Text>
-                  <Text size="sm" fw={500}>{area.satisfactionLevel}/10</Text>
-                </Group>
-                <Progress value={area.satisfactionLevel * 10} color="violet" />
-              </Stack>
-            )}
 
             <Group gap="xs" mt="md" pt="md" style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
               <Button
@@ -198,24 +184,6 @@ export default function LifeAreasPage() {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
             />
-
-            <div>
-              <Text size="sm" fw={500} mb="xs">
-                Satisfaction Level: {formData.satisfactionLevel}/10
-              </Text>
-              <Slider
-                value={formData.satisfactionLevel}
-                onChange={(value) => setFormData({ ...formData, satisfactionLevel: value })}
-                min={0}
-                max={10}
-                step={1}
-                marks={[
-                  { value: 0, label: '0' },
-                  { value: 5, label: '5' },
-                  { value: 10, label: '10' },
-                ]}
-              />
-            </div>
 
             <Group justify="flex-end" mt="md">
               <Button

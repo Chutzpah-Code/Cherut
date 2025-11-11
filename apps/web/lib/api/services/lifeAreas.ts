@@ -6,7 +6,6 @@ export interface LifeArea {
   description?: string;
   icon?: string;
   color?: string;
-  satisfactionLevel?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,7 +15,6 @@ export interface CreateLifeAreaDto {
   description?: string;
   icon?: string;
   color?: string;
-  satisfactionLevel?: number;
 }
 
 export interface UpdateLifeAreaDto extends Partial<CreateLifeAreaDto> {}
