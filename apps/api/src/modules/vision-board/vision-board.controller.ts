@@ -119,9 +119,6 @@ export class VisionBoardController {
     @Request() req,
   ) {
     const userId = req.user.uid;
-    console.log('UPDATE REQUEST - ID:', id);
-    console.log('UPDATE REQUEST - DTO:', JSON.stringify(updateDto, null, 2));
-    console.log('UPDATE REQUEST - USER:', userId);
     return this.visionBoardService.update(userId, id, updateDto);
   }
 

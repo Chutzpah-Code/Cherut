@@ -17,6 +17,8 @@ import {
   Group,
   Divider,
   Alert,
+  Grid,
+  ScrollArea,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { modals } from '@mantine/modals';
@@ -303,7 +305,31 @@ export default function HabitsPage() {
             {creatingCategory === 'good' ? 'New Good Habit' : 'New Bad Habit'}
           </Text>
         }
-        size="md"
+        size={{ base: 'full', xs: 'lg', sm: 'xl' }}
+        fullScreen={{ base: true, xs: false }}
+        scrollAreaComponent={ScrollArea.Autosize}
+        styles={(theme) => ({
+          content: {
+            maxHeight: { base: '100vh', xs: 'calc(100vh - 120px)' },
+          },
+          body: {
+            padding: { base: theme.spacing.xs, xs: theme.spacing.md },
+            maxHeight: { base: 'calc(100vh - 60px)', xs: 'calc(100vh - 120px)' },
+            overflowY: 'auto',
+          },
+          header: {
+            padding: { base: theme.spacing.xs, xs: theme.spacing.md },
+            borderBottom: `1px solid ${theme.colors.gray[2]}`,
+          },
+          title: {
+            fontSize: { base: theme.fontSizes.md, xs: theme.fontSizes.lg },
+            fontWeight: 600,
+          },
+        })}
+        overlayProps={{
+          backgroundOpacity: 0.55,
+          blur: 3,
+        }}
       >
         <form onSubmit={handleCreateSubmit}>
           <Stack gap="md">
@@ -354,18 +380,27 @@ export default function HabitsPage() {
               withAsterisk
             />
 
-            <Group justify="flex-end" mt="md">
-              <Button variant="light" onClick={() => setIsCreateModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                loading={createMutation.isPending}
-                color={creatingCategory === 'good' ? 'green' : 'red'}
-              >
-                Create Habit
-              </Button>
-            </Group>
+            <Grid justify="flex-end" align="center" mt="md">
+              <Grid.Col span={{ base: 6, sm: 'content' }}>
+                <Button
+                  variant="light"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  fullWidth={{ base: true, sm: false }}
+                >
+                  Cancel
+                </Button>
+              </Grid.Col>
+              <Grid.Col span={{ base: 6, sm: 'content' }}>
+                <Button
+                  type="submit"
+                  loading={createMutation.isPending}
+                  color={creatingCategory === 'good' ? 'green' : 'red'}
+                  fullWidth={{ base: true, sm: false }}
+                >
+                  Create Habit
+                </Button>
+              </Grid.Col>
+            </Grid>
           </Stack>
         </form>
       </Modal>

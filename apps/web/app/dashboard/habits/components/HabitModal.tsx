@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Modal, Stack, TextInput, Textarea, Button, Group, Divider, Text, Box, ScrollArea, Badge } from '@mantine/core';
+import { Modal, Stack, TextInput, Textarea, Button, Group, Divider, Text, Box, ScrollArea, Badge, Grid } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { Habit, HabitLog } from '@/lib/api/services/habits';
 import { StreakVisualizer } from './StreakVisualizer';
@@ -139,7 +139,30 @@ export function HabitModal({
           </Badge>
         </Group>
       }
-      size="lg"
+      size={{ base: 'full', xs: 'lg', sm: 'xl' }}
+      fullScreen={{ base: true, xs: false }}
+      styles={(theme) => ({
+        content: {
+          maxHeight: { base: '100vh', xs: 'calc(100vh - 120px)' },
+        },
+        body: {
+          padding: { base: theme.spacing.xs, xs: theme.spacing.md },
+          maxHeight: { base: 'calc(100vh - 60px)', xs: 'calc(100vh - 120px)' },
+          overflowY: 'auto',
+        },
+        header: {
+          padding: { base: theme.spacing.xs, xs: theme.spacing.md },
+          borderBottom: `1px solid ${theme.colors.gray[2]}`,
+        },
+        title: {
+          fontSize: { base: theme.fontSizes.md, xs: theme.fontSizes.lg },
+          fontWeight: 600,
+        },
+      })}
+      overlayProps={{
+        backgroundOpacity: 0.55,
+        blur: 3,
+      }}
     >
       <Stack gap="md">
         {/* Form */}
@@ -207,32 +230,38 @@ export function HabitModal({
         )}
 
         {/* Stats */}
-        <Group grow>
-          <Box ta="center">
-            <Text size="xl" fw={700} c={categoryColor}>
-              {stats.currentStreak}
-            </Text>
-            <Text size="xs" c="dimmed">
-              Current Streak
-            </Text>
-          </Box>
-          <Box ta="center">
-            <Text size="xl" fw={700} c="blue">
-              {stats.bestStreak}
-            </Text>
-            <Text size="xs" c="dimmed">
-              Best Streak
-            </Text>
-          </Box>
-          <Box ta="center">
-            <Text size="xl" fw={700} c="grape">
-              {stats.completionRate}%
-            </Text>
-            <Text size="xs" c="dimmed">
-              Completion Rate
-            </Text>
-          </Box>
-        </Group>
+        <Grid grow>
+          <Grid.Col span={{ base: 4, sm: 4 }}>
+            <Box ta="center">
+              <Text size="xl" fw={700} c={categoryColor}>
+                {stats.currentStreak}
+              </Text>
+              <Text size="xs" c="dimmed">
+                Current Streak
+              </Text>
+            </Box>
+          </Grid.Col>
+          <Grid.Col span={{ base: 4, sm: 4 }}>
+            <Box ta="center">
+              <Text size="xl" fw={700} c="blue">
+                {stats.bestStreak}
+              </Text>
+              <Text size="xs" c="dimmed">
+                Best Streak
+              </Text>
+            </Box>
+          </Grid.Col>
+          <Grid.Col span={{ base: 4, sm: 4 }}>
+            <Box ta="center">
+              <Text size="xl" fw={700} c="grape">
+                {stats.completionRate}%
+              </Text>
+              <Text size="xs" c="dimmed">
+                Completion Rate
+              </Text>
+            </Box>
+          </Grid.Col>
+        </Grid>
 
         <Divider label="Complete History" labelPosition="center" />
 
@@ -256,25 +285,43 @@ export function HabitModal({
         </Text>
 
         {/* Action buttons */}
-        <Group justify="space-between" mt="md">
-          <Button
-            variant="light"
-            color="red"
-            leftSection={<Trash2 size={16} />}
-            onClick={() => onDelete(habit.id)}
-          >
-            Delete Habit
-          </Button>
+        <Stack gap="md" mt="md">
+          <Grid>
+            <Grid.Col span={{ base: 12, sm: 'content' }}>
+              <Button
+                variant="light"
+                color="red"
+                leftSection={<Trash2 size={16} />}
+                onClick={() => onDelete(habit.id)}
+                fullWidth={{ base: true, sm: false }}
+              >
+                Delete Habit
+              </Button>
+            </Grid.Col>
+          </Grid>
 
-          <Group>
-            <Button variant="light" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave} loading={isSaving} color={categoryColor}>
-              Save Changes
-            </Button>
-          </Group>
-        </Group>
+          <Grid justify="flex-end">
+            <Grid.Col span={{ base: 6, sm: 'content' }}>
+              <Button
+                variant="light"
+                onClick={onClose}
+                fullWidth={{ base: true, sm: false }}
+              >
+                Cancel
+              </Button>
+            </Grid.Col>
+            <Grid.Col span={{ base: 6, sm: 'content' }}>
+              <Button
+                onClick={handleSave}
+                loading={isSaving}
+                color={categoryColor}
+                fullWidth={{ base: true, sm: false }}
+              >
+                Save Changes
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </Stack>
       </Stack>
     </Modal>
   );
