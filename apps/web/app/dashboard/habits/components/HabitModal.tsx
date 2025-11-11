@@ -12,7 +12,7 @@ interface HabitModalProps {
   onClose: () => void;
   habit: Habit | null;
   logs: HabitLog[];
-  onSave: (habitId: string, updates: { title: string; description?: string; dueDate?: string }) => Promise<void>;
+  onSave: (habitId: string, updates: { title: string; description?: string; startDate?: string; dueDate?: string }) => Promise<void>;
   onDelete: (habitId: string) => void;
   onDayClick: (habitId: string, date: string) => void;
   isSaving: boolean;
@@ -83,12 +83,18 @@ export function HabitModal({
 }: HabitModalProps) {
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
+  const [startDateValue, setStartDateValue] = React.useState<Date | null>(null);
   const [dueDateValue, setDueDateValue] = React.useState<Date | null>(null);
 
   React.useEffect(() => {
     if (habit) {
       setTitle(habit.title);
       setDescription(habit.description || '');
+      if (habit.startDate) {
+        setStartDateValue(new Date(habit.startDate + 'T00:00:00'));
+      } else {
+        setStartDateValue(null);
+      }
       if (habit.dueDate) {
         setDueDateValue(new Date(habit.dueDate + 'T00:00:00'));
       } else {
@@ -103,11 +109,15 @@ export function HabitModal({
   const categoryColor = habit.category === 'good' ? 'green' : 'red';
   const categoryLabel = habit.category === 'good' ? 'Good Habit' : 'Bad Habit';
 
-  // Calculate total days from creation to due date
+  // Calculate total days from start date to due date
   const getTotalDays = () => {
-    if (!habit.dueDate || !habit.createdAt) return 21; // Default to 21 if no dates
+    if (!habit.dueDate) return 21; // Default to 21 if no due date
 
-    const start = new Date(habit.createdAt.split('T')[0]);
+    // Use startDate if available, otherwise fall back to createdAt
+    const startDate = habit.startDate || habit.createdAt;
+    if (!startDate) return 21;
+
+    const start = new Date(startDate.split('T')[0]);
     const end = new Date(habit.dueDate);
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
@@ -121,6 +131,7 @@ export function HabitModal({
     await onSave(habit.id, {
       title,
       description,
+      startDate: startDateValue ? startDateValue.toISOString().split('T')[0] : undefined,
       dueDate: dueDateValue ? dueDateValue.toISOString().split('T')[0] : undefined,
     });
   };
@@ -170,15 +181,29 @@ export function HabitModal({
           rows={3}
         />
 
-        <DateInput
-          label="Due Date"
-          description="Target completion date for this habit"
-          placeholder="Select date"
-          value={dueDateValue}
-          onChange={setDueDateValue}
-          minDate={new Date()}
-          clearable
-        />
+        <Grid grow>
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <DateInput
+              label="Start Date"
+              description="When did you start this habit?"
+              placeholder="Select start date"
+              value={startDateValue}
+              onChange={setStartDateValue}
+              clearable
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <DateInput
+              label="Due Date"
+              description="Target completion date for this habit"
+              placeholder="Select end date"
+              value={dueDateValue}
+              onChange={setDueDateValue}
+              minDate={startDateValue || new Date()}
+              clearable
+            />
+          </Grid.Col>
+        </Grid>
 
         <Divider label="Statistics" labelPosition="center" />
 

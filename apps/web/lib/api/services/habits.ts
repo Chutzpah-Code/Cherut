@@ -13,6 +13,7 @@ export interface Habit {
   unit?: string;
   weekDays?: number[];
   reminderTime?: string;
+  startDate?: string;
   dueDate?: string;
   isActive: boolean;
   streak: number;
@@ -44,6 +45,7 @@ export interface CreateHabitDto {
   weekDays?: number[];
   reminderTime?: string;
   lifeAreaId?: string;
+  startDate?: string;
   dueDate?: string;
 }
 
@@ -58,6 +60,7 @@ export interface UpdateHabitDto {
   weekDays?: number[];
   reminderTime?: string;
   lifeAreaId?: string;
+  startDate?: string;
   dueDate?: string;
   isActive?: boolean;
 }

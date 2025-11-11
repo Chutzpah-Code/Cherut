@@ -50,8 +50,10 @@ export default function HabitsPage() {
     type: 'boolean',
     frequency: 'daily',
     lifeAreaId: '',
+    startDate: '',
     dueDate: '',
   });
+  const [startDateValue, setStartDateValue] = useState<Date | null>(null);
   const [dueDateValue, setDueDateValue] = useState<Date | null>(null);
 
   // Separar hábitos por categoria
@@ -87,9 +89,13 @@ export default function HabitsPage() {
 
   const handleOpenCreateModal = (category: 'good' | 'bad') => {
     setCreatingCategory(category);
+    // Default start date: today
+    const defaultStartDate = new Date();
     // Default due date: 21 days from today
     const defaultDueDate = new Date();
     defaultDueDate.setDate(defaultDueDate.getDate() + 21);
+
+    setStartDateValue(defaultStartDate);
     setDueDateValue(defaultDueDate);
 
     setFormData({
@@ -99,6 +105,7 @@ export default function HabitsPage() {
       type: 'boolean',
       frequency: 'daily',
       lifeAreaId: '',
+      startDate: defaultStartDate.toISOString().split('T')[0],
       dueDate: defaultDueDate.toISOString().split('T')[0],
     });
     setIsCreateModalOpen(true);
@@ -120,7 +127,7 @@ export default function HabitsPage() {
     setEditModalOpen(true);
   };
 
-  const handleSaveEdit = async (habitId: string, updates: { title: string; description?: string }) => {
+  const handleSaveEdit = async (habitId: string, updates: { title: string; description?: string; startDate?: string; dueDate?: string }) => {
     try {
       await updateMutation.mutateAsync({
         id: habitId,
@@ -340,21 +347,42 @@ export default function HabitsPage() {
               rows={3}
             />
 
-            <DateInput
-              label="Due Date"
-              description="Set your target completion date (default: 21 days from today)"
-              placeholder="Select date"
-              value={dueDateValue}
-              onChange={(date) => {
-                setDueDateValue(date);
-                setFormData({
-                  ...formData,
-                  dueDate: date ? date.toISOString().split('T')[0] : '',
-                });
-              }}
-              minDate={new Date()}
-              withAsterisk
-            />
+            <Grid grow>
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <DateInput
+                  label="Start Date"
+                  description="When do you want to start this habit?"
+                  placeholder="Select start date"
+                  value={startDateValue}
+                  onChange={(date) => {
+                    setStartDateValue(date);
+                    setFormData({
+                      ...formData,
+                      startDate: date ? date.toISOString().split('T')[0] : '',
+                    });
+                  }}
+                  minDate={new Date()}
+                  withAsterisk
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <DateInput
+                  label="Due Date"
+                  description="Set your target completion date (21-day challenge)"
+                  placeholder="Select end date"
+                  value={dueDateValue}
+                  onChange={(date) => {
+                    setDueDateValue(date);
+                    setFormData({
+                      ...formData,
+                      dueDate: date ? date.toISOString().split('T')[0] : '',
+                    });
+                  }}
+                  minDate={startDateValue || new Date()}
+                  withAsterisk
+                />
+              </Grid.Col>
+            </Grid>
 
             <Grid justify="flex-end" align="center" mt="md">
               <Grid.Col span={{ base: 6, sm: 'content' }}>
