@@ -164,29 +164,37 @@ export class VisionBoardService {
    * Atualizar item
    */
   async update(userId: string, id: string, dto: UpdateVisionBoardItemDto) {
+    console.log('SERVICE UPDATE - Starting update for:', { userId, id, dto });
+
     const db = this.firebaseService.getFirestore();
     const docRef = db.collection(this.COLLECTION_NAME).doc(id);
     const doc = await docRef.get();
 
     if (!doc.exists) {
+      console.log('SERVICE UPDATE - Document not found');
       throw new BadRequestException('Vision board item not found');
     }
 
     const data = doc.data();
 
     if (!data) {
+      console.log('SERVICE UPDATE - Document data not found');
       throw new BadRequestException('Vision board item data not found');
     }
 
     // Verificar permissão
     if (data.userId !== userId) {
+      console.log('SERVICE UPDATE - Permission denied:', { dataUserId: data.userId, requestUserId: userId });
       throw new ForbiddenException('You do not have permission to update this item');
     }
 
     // Se está atualizando a imagem, validar URL
-    if (dto.imageUrl && !dto.imageUrl.includes('googleapis.com') && !dto.imageUrl.includes('firebasestorage.app')) {
-      throw new BadRequestException('Invalid image URL. Must be a Firebase Storage URL.');
+    if (dto.imageUrl && !dto.imageUrl.includes('cloudinary.com')) {
+      console.log('SERVICE UPDATE - Invalid image URL:', dto.imageUrl);
+      throw new BadRequestException('Invalid image URL. Must be a Cloudinary URL.');
     }
+
+    console.log('SERVICE UPDATE - All validations passed, updating document');
 
     await docRef.update({
       ...dto,

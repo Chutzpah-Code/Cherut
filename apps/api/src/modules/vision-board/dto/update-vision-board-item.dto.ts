@@ -1,4 +1,29 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateVisionBoardItemDto } from './create-vision-board-item.dto';
+import { IsString, IsOptional, MaxLength, IsDateString } from 'class-validator';
 
-export class UpdateVisionBoardItemDto extends PartialType(CreateVisionBoardItemDto) {}
+export class UpdateVisionBoardItemDto {
+  @IsString()
+  @IsOptional()
+  @MaxLength(100)
+  title?: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(500)
+  description?: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(2000)
+  fullDescription?: string;
+
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
+
+  @IsDateString()
+  @IsOptional()
+  dueDate?: string;
+
+  @IsOptional()
+  order?: number;
+}

@@ -99,8 +99,8 @@ export function VisionBoardModal({
   const handleSave = async () => {
     await onSave(item.id, {
       title,
-      description,
-      fullDescription,
+      description: description.trim() || undefined,
+      fullDescription: fullDescription.trim() || undefined,
       dueDate: dueDateValue ? dueDateValue.toISOString().split('T')[0] : undefined,
       imageUrl: newImageUrl || undefined,
     });
