@@ -43,14 +43,14 @@ export default function EnterpriseWaitlistPage() {
     setLoading(true);
 
     try {
-      // Validação básica
+      // Basic validation
       if (!formData.contactName || !formData.phoneNumber || !formData.companyName) {
-        setError('Por favor, preencha todos os campos obrigatórios.');
+        setError('Please fill in all required fields.');
         setLoading(false);
         return;
       }
 
-      // Envia para o backend (mais seguro)
+      // Submit to backend (more secure)
       await enterpriseWaitlistApi.create(formData);
 
       setSuccess(true);
@@ -59,7 +59,7 @@ export default function EnterpriseWaitlistPage() {
       }, 3000);
     } catch (err: any) {
       console.error('Error submitting waitlist:', err);
-      setError(err.response?.data?.message || 'Erro ao enviar formulário. Tente novamente.');
+      setError(err.response?.data?.message || 'Error submitting form. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -95,13 +95,13 @@ export default function EnterpriseWaitlistPage() {
                 fontWeight: 700,
               }}
             >
-              Obrigado pelo interesse!
+              Thank you for your interest!
             </Title>
             <Text size="lg" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-              Recebemos sua solicitação e entraremos em contato em breve.
+              We have received your request and will contact you soon.
             </Text>
             <Text size="sm" mt="md" style={{ color: 'hsl(0 0% 0% / 0.38)' }}>
-              Redirecionando para a página inicial...
+              Redirecting to homepage...
             </Text>
           </Paper>
         </Container>
@@ -128,7 +128,7 @@ export default function EnterpriseWaitlistPage() {
             color: 'hsl(0 0% 0% / 0.6)',
           }}
         >
-          Voltar
+          Back
         </Button>
 
         <Paper
@@ -166,7 +166,7 @@ export default function EnterpriseWaitlistPage() {
                 Enterprise Waitlist
               </Title>
               <Text size="md" mt="xs" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                Preencha o formulário para receber mais informações
+                Fill out the form to receive more information
               </Text>
             </div>
           </Stack>
@@ -174,8 +174,8 @@ export default function EnterpriseWaitlistPage() {
           <form onSubmit={handleSubmit}>
             <Stack gap="md">
               <TextInput
-                label="Nome do Contato"
-                placeholder="João Silva"
+                label="Contact Name"
+                placeholder="John Smith"
                 required
                 value={formData.contactName}
                 onChange={(e) => handleChange('contactName', e.currentTarget.value)}
@@ -203,8 +203,8 @@ export default function EnterpriseWaitlistPage() {
               />
 
               <TextInput
-                label="Número de Telefone"
-                placeholder="+55 (11) 99999-9999"
+                label="Phone Number"
+                placeholder="+1 (555) 123-4567"
                 required
                 value={formData.phoneNumber}
                 onChange={(e) => handleChange('phoneNumber', e.currentTarget.value)}
@@ -232,8 +232,8 @@ export default function EnterpriseWaitlistPage() {
               />
 
               <TextInput
-                label="Nome da Empresa"
-                placeholder="Minha Empresa LTDA"
+                label="Company Name"
+                placeholder="My Company Inc."
                 required
                 value={formData.companyName}
                 onChange={(e) => handleChange('companyName', e.currentTarget.value)}
@@ -261,16 +261,16 @@ export default function EnterpriseWaitlistPage() {
               />
 
               <Select
-                label="Quantidade de Funcionários"
-                placeholder="Selecione"
+                label="Number of Employees"
+                placeholder="Select"
                 value={formData.numberOfEmployees}
                 onChange={(value) => handleChange('numberOfEmployees', value || '')}
                 data={[
-                  { value: '1-10', label: '1-10 funcionários' },
-                  { value: '11-50', label: '11-50 funcionários' },
-                  { value: '51-200', label: '51-200 funcionários' },
-                  { value: '201-500', label: '201-500 funcionários' },
-                  { value: '500+', label: '500+ funcionários' },
+                  { value: '1-10', label: '1-10 employees' },
+                  { value: '11-50', label: '11-50 employees' },
+                  { value: '51-200', label: '51-200 employees' },
+                  { value: '201-500', label: '201-500 employees' },
+                  { value: '500+', label: '500+ employees' },
                 ]}
                 radius={48}
                 size="md"
@@ -296,16 +296,16 @@ export default function EnterpriseWaitlistPage() {
               />
 
               <Select
-                label="Renda Anual da Empresa"
-                placeholder="Selecione"
+                label="Annual Company Revenue"
+                placeholder="Select"
                 value={formData.companyRevenue}
                 onChange={(value) => handleChange('companyRevenue', value || '')}
                 data={[
-                  { value: 'under-1m', label: 'Menos de R$ 1M' },
-                  { value: '1m-5m', label: 'R$ 1M - R$ 5M' },
-                  { value: '5m-10m', label: 'R$ 5M - R$ 10M' },
-                  { value: '10m-50m', label: 'R$ 10M - R$ 50M' },
-                  { value: '50m+', label: 'Mais de R$ 50M' },
+                  { value: 'under-1m', label: 'Under $1M' },
+                  { value: '1m-5m', label: '$1M - $5M' },
+                  { value: '5m-10m', label: '$5M - $10M' },
+                  { value: '10m-50m', label: '$10M - $50M' },
+                  { value: '50m+', label: 'Over $50M' },
                 ]}
                 radius={48}
                 size="md"
@@ -331,8 +331,8 @@ export default function EnterpriseWaitlistPage() {
               />
 
               <Textarea
-                label="Qual a finalidade desejada?"
-                placeholder="Como você planeja usar o Cherut na sua empresa?"
+                label="What is your intended use?"
+                placeholder="How do you plan to use Cherut in your company?"
                 minRows={3}
                 value={formData.intendedUse}
                 onChange={(e) => handleChange('intendedUse', e.currentTarget.value)}
@@ -359,8 +359,8 @@ export default function EnterpriseWaitlistPage() {
               />
 
               <Textarea
-                label="Quais features você acha que seriam importantes?"
-                placeholder="Descreva funcionalidades que você gostaria de ver no produto..."
+                label="What features do you think would be important?"
+                placeholder="Describe features you would like to see in the product..."
                 minRows={3}
                 value={formData.desiredFeatures}
                 onChange={(e) => handleChange('desiredFeatures', e.currentTarget.value)}
@@ -413,7 +413,7 @@ export default function EnterpriseWaitlistPage() {
                   },
                 }}
               >
-                Enviar Solicitação
+                Submit Request
               </Button>
             </Stack>
           </form>
