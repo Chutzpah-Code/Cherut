@@ -337,6 +337,7 @@ Access:
 - Implement the Values module (personal values, alignment tracking, insights, metrics).
 - Create the Journal module (text/audio/image entries, templates, AI insights, semantic search).
 - Implement the Reports module (productivity, time tracking, calendar, values, journal, export formats).
+- Adjust task label sizes (resize label UI components, responsive behavior, scalable design).
 
 ## Post-MVP
 
