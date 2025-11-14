@@ -321,34 +321,40 @@ export default function WelcomeModal({ opened, onClose }: WelcomeModalProps) {
           <Divider />
 
           {/* Footer with navigation */}
-          <Group p="xl" pt="md" justify="space-between">
-            <Button
-              variant="subtle"
-              onClick={handlePrevious}
-              disabled={currentStep === 0}
-              c="dimmed"
-            >
-              Previous
-            </Button>
-
-            <Group gap="xs">
+          <Stack p="xl" pt="md" gap="md">
+            <Group justify="space-between" w="100%">
               <Button
-                variant="outline"
-                onClick={handleSkip}
+                variant="subtle"
+                onClick={handlePrevious}
+                disabled={currentStep === 0}
                 c="dimmed"
-                style={{ borderColor: 'var(--mantine-color-gray-3)' }}
+                style={{ flex: 1, maxWidth: '120px' }}
               >
-                Skip tutorial
+                Previous
               </Button>
               <Button
                 onClick={handleNext}
                 rightSection={currentStep === steps.length - 1 ? <CheckCircle2 size={16} /> : <ArrowRight size={16} />}
-                style={{ background: '#3143B6' }}
+                style={{ background: '#3143B6', flex: 1, maxWidth: '120px' }}
               >
                 {currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
               </Button>
             </Group>
-          </Group>
+
+            <Button
+              variant="outline"
+              onClick={handleSkip}
+              c="dimmed"
+              style={{
+                borderColor: 'var(--mantine-color-gray-3)',
+                alignSelf: 'center',
+                width: 'fit-content'
+              }}
+              size="sm"
+            >
+              Skip tutorial
+            </Button>
+          </Stack>
         </Stack>
       </Box>
     </Modal>
