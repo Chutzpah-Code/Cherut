@@ -303,10 +303,10 @@ export default function WelcomeModal({ opened, onClose }: WelcomeModalProps) {
               </Group>
             </Group>
 
-            <Title order={2} size="h3" mb={4}>
+            <Title order={2} size="h2" mb={4} style={{ fontSize: '24px', fontWeight: 700 }}>
               {currentStepData.title}
             </Title>
-            <Text c="dimmed" size="sm">
+            <Text c="dimmed" size="md" style={{ fontSize: '16px' }}>
               {currentStepData.subtitle}
             </Text>
           </Box>
@@ -314,7 +314,7 @@ export default function WelcomeModal({ opened, onClose }: WelcomeModalProps) {
           <Divider />
 
           {/* Content */}
-          <Box p="xl" style={{ minHeight: 400 }}>
+          <Box p="xl" style={{ minHeight: 400, fontSize: '16px' }}>
             {currentStepData.content}
           </Box>
 
@@ -322,20 +322,33 @@ export default function WelcomeModal({ opened, onClose }: WelcomeModalProps) {
 
           {/* Footer with navigation */}
           <Stack p="xl" pt="md" gap="md">
-            <Group justify="space-between" w="100%">
+            <Group justify="space-between" w="100%" gap="md">
               <Button
                 variant="subtle"
                 onClick={handlePrevious}
                 disabled={currentStep === 0}
                 c="dimmed"
-                style={{ flex: 1, maxWidth: '120px' }}
+                style={{
+                  flex: 1,
+                  minWidth: '100px',
+                  maxWidth: '150px',
+                  whiteSpace: 'nowrap'
+                }}
+                size="md"
               >
                 Previous
               </Button>
               <Button
                 onClick={handleNext}
                 rightSection={currentStep === steps.length - 1 ? <CheckCircle2 size={16} /> : <ArrowRight size={16} />}
-                style={{ background: '#3143B6', flex: 1, maxWidth: '120px' }}
+                style={{
+                  background: '#3143B6',
+                  flex: 1,
+                  minWidth: '120px',
+                  maxWidth: '150px',
+                  whiteSpace: 'nowrap'
+                }}
+                size="md"
               >
                 {currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
               </Button>
