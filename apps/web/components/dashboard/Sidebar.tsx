@@ -133,7 +133,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
 
           <Divider my="md" />
 
-          <Text size="xs" fw={600} c="dimmed" mb="xs" px="sm">
+          <Text size="sm" fw={600} c="dimmed" mb="xs" px="sm" style={{ fontSize: '13px' }}>
             COMING SOON
           </Text>
 
@@ -145,8 +145,8 @@ export default function Sidebar({ onClose }: SidebarProps) {
                 <NavLink
                   label={
                     <Group justify="space-between" w="100%">
-                      <Text size="sm">{item.name}</Text>
-                      <Badge size="xs" color="yellow" variant="light">
+                      <Text size="md" style={{ fontSize: '15px', fontWeight: 500 }}>{item.name}</Text>
+                      <Badge size="sm" color="yellow" variant="light" style={{ fontSize: '11px' }}>
                         Soon
                       </Badge>
                     </Group>
@@ -158,7 +158,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
                     cursor: 'not-allowed',
                   }}
                   description={
-                    <Text size="xs" c="dimmed" mt={4} lineClamp={2}>
+                    <Text size="sm" c="dimmed" mt={4} lineClamp={2} style={{ fontSize: '13px' }}>
                       {item.description}
                     </Text>
                   }
