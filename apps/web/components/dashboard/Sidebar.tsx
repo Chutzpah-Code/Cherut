@@ -13,8 +13,12 @@ import {
   LogOut,
   Zap,
   Sparkles,
+  BarChart3,
+  BookOpen,
+  Heart,
+  Bot,
 } from 'lucide-react';
-import { Stack, NavLink, ScrollArea, Box, Title, Divider, Button, Group } from '@mantine/core';
+import { Stack, NavLink, ScrollArea, Box, Title, Divider, Button, Group, Badge, Text } from '@mantine/core';
 import { logoutUser } from '@/lib/firebase/auth';
 
 const navigation = [
@@ -25,6 +29,33 @@ const navigation = [
   { name: 'Tasks', href: '/dashboard/tasks', icon: CheckSquare },
   { name: 'Habits', href: '/dashboard/habits', icon: Calendar },
   { name: 'Profile', href: '/dashboard/profile', icon: User },
+];
+
+const comingSoonItems = [
+  {
+    name: 'Reports',
+    href: '#',
+    icon: BarChart3,
+    description: 'Analytics dashboards showing your evolution and progress insights'
+  },
+  {
+    name: 'Journal',
+    href: '#',
+    icon: BookOpen,
+    description: 'Personal space for daily reflections and thoughts'
+  },
+  {
+    name: 'Values',
+    href: '#',
+    icon: Heart,
+    description: 'Define and align with your core personal values'
+  },
+  {
+    name: 'CherutOS',
+    href: '#',
+    icon: Bot,
+    description: 'AI-powered personal assistant for conscious decision making'
+  },
 ];
 
 interface SidebarProps {
@@ -97,6 +128,42 @@ export default function Sidebar({ onClose }: SidebarProps) {
                 onClick={handleLinkClick}
                 color="blue"
               />
+            );
+          })}
+
+          <Divider my="md" />
+
+          <Text size="xs" fw={600} c="dimmed" mb="xs" px="sm">
+            COMING SOON
+          </Text>
+
+          {comingSoonItems.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <Box key={item.name}>
+                <NavLink
+                  label={
+                    <Group justify="space-between" w="100%">
+                      <Text size="sm">{item.name}</Text>
+                      <Badge size="xs" color="yellow" variant="light">
+                        Soon
+                      </Badge>
+                    </Group>
+                  }
+                  leftSection={<Icon size={20} />}
+                  disabled
+                  style={{
+                    opacity: 0.6,
+                    cursor: 'not-allowed',
+                  }}
+                  description={
+                    <Text size="xs" c="dimmed" mt={4} lineClamp={2}>
+                      {item.description}
+                    </Text>
+                  }
+                />
+              </Box>
             );
           })}
         </Stack>
