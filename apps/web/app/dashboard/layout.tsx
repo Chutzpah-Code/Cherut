@@ -7,6 +7,8 @@ import { AppShell, Burger, Group, Loader, Center } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
+import WelcomeModal from '@/components/ui/WelcomeModal';
+import { useWelcomeModal } from '@/hooks/useWelcomeModal';
 
 export default function DashboardLayout({
   children,
@@ -17,6 +19,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+  const { isOpen: isWelcomeOpen, openModal: openWelcome, closeModal: closeWelcome } = useWelcomeModal();
 
   console.log('[Dashboard] Auth state:', { user: !!user, loading, backendAuthenticated });
 
@@ -53,6 +56,7 @@ export default function DashboardLayout({
           desktopOpened={desktopOpened}
           toggleMobile={toggleMobile}
           toggleDesktop={toggleDesktop}
+          onOpenWelcome={openWelcome}
         />
       </AppShell.Header>
 
@@ -63,6 +67,11 @@ export default function DashboardLayout({
       <AppShell.Main>
         {children}
       </AppShell.Main>
+
+      <WelcomeModal
+        opened={isWelcomeOpen}
+        onClose={closeWelcome}
+      />
     </AppShell>
   );
 }

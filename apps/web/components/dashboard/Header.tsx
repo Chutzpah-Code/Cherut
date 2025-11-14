@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { Bell, Moon, Sun, Sparkles } from 'lucide-react';
+import { Bell, Moon, Sun, Sparkles, HelpCircle } from 'lucide-react';
 import { Group, Burger, Text, ActionIcon, Avatar, Box, useMantineColorScheme, useComputedColorScheme, Badge, Stack, Indicator } from '@mantine/core';
 import { useEffect, useState } from 'react';
 
@@ -10,9 +10,10 @@ interface HeaderProps {
   desktopOpened: boolean;
   toggleMobile: () => void;
   toggleDesktop: () => void;
+  onOpenWelcome?: () => void;
 }
 
-export default function Header({ mobileOpened, desktopOpened, toggleMobile, toggleDesktop }: HeaderProps) {
+export default function Header({ mobileOpened, desktopOpened, toggleMobile, toggleDesktop, onOpenWelcome }: HeaderProps) {
   const { user } = useAuth();
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light');
@@ -69,6 +70,21 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
             ) : (
               <Moon size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
             )}
+          </ActionIcon>
+        )}
+
+        {mounted && onOpenWelcome && (
+          <ActionIcon
+            variant="subtle"
+            size="lg"
+            radius="xl"
+            onClick={onOpenWelcome}
+            title="Ajuda e instruções"
+            style={{
+              transition: 'all 0.3s ease',
+            }}
+          >
+            <HelpCircle size={20} style={{ color: 'var(--mantine-color-gray-6)' }} />
           </ActionIcon>
         )}
 
