@@ -321,51 +321,52 @@ Access:
 
 ## Development Progress
 
-### ✅ Completed Phases
 
-- **Phase 0:** Project setup (monorepo, Firebase)
-- **Phase 1:** Authentication (Firebase Auth, JWT)
-- **Phase 2:** Life Areas CRUD (12 domains, satisfaction tracking)
-- **Phase 3:** Goals CRUD (basic objectives)
+# Future Roadmap
 
-### 📋 Current Phase
 
-**Phase 4:** Expanding Goals → Objectives + Key Results + Action Plans
+# Cherut Web – Generic Feature Roadmap
 
-### 🔜 Upcoming Phases
+- Implement a complete notification system (web push, in-app notifications, notification center, user preferences).
+- Add profile photo CRUD (upload, update, delete, preview, compression, validation).
+- Implement a full LGPD-compliant account deletion flow, removing all user-related data and generating anonymized internal logs.
+- Integrate task visualization with the Time Tracker, enabling time-per-task tracking and automatic synchronization.
+- Integrate task visualization with the Calendar, enabling creation and manipulation of events based on tasks.
+- Build the payment system (credit card, debit card, Pix, boleto) with external API integrations, plan management, billing, and webhooks.
+- Develop the CherutOS module (modular workspace, internal apps, customizable dashboard, extensions system, customizable layout).
+- Implement the Values module (personal values, alignment tracking, insights, metrics).
+- Create the Journal module (text/audio/image entries, templates, AI insights, semantic search).
+- Implement the Reports module (productivity, time tracking, calendar, values, journal, export formats).
 
-- **Phase 5:** Tasks Module (Linked + Standalone, Trello-like features)
-- **Phase 6:** Habits Module (tracking, streaks)
-- **Phase 7:** Profile & Foundation (Life Purpose, Master Goals)
-- **Phase 8:** Vision Board Module
-- **Phase 9:** Daily Reflection Module
-- **Phase 10:** Time Tracker Module
-- **Phase 11:** BTCPay Integration (payments)
-- **Phase 12:** Landing Page & Web UI (Next.js)
+## Post-MVP
 
----
+- Analytics & Reports (advanced analytics, dashboards, user behavior insights).
+- Mobile App (Expo – iOS/Android).
+- Admin Dashboard (user management, metrics, billing control).
+- Pro/Master Plans (advanced AI features, automation, predictive analytics).
+- Community Features (groups, shared boards, accountability partners, comments).
+- Integrations (Google Calendar, Notion, Slack, GitHub, Zapier, etc.).
 
-## Roadmap
+## All Features (Complete List)
 
-### MVP Timeline (Months 1-3)
+(MVP + Post-MVP)
 
-| Week | Focus | Deliverables |
-|------|-------|--------------|
-| **1-4** | Backend Core | Auth, Life Areas, Objectives, KRs, Action Plans |
-| **5-8** | Backend Features | Tasks, Habits, Vision Board, Reflection, Time Tracker |
-| **9-10** | Payment & Landing | BTCPay integration, Landing page |
-| **11-12** | Web App & Polish | Next.js dashboard, testing, launch |
-
-**Target:** Core plan ($10/month, Bitcoin) - Web only
-
-### Post-MVP (Months 4-12)
-
-- Analytics & Reports
-- Mobile App (Expo - iOS/Android)
-- Admin Dashboard
-- Pro/Master Plans (AI features)
-- Community Features
-- Integrations
+- Notification system (web push + in-app + preferences).
+- Profile photo CRUD.
+- LGPD-compliant account deletion (full data wipe).
+- Tasks integrated with Time Tracker.
+- Tasks integrated with Calendar.
+- Full payment system (cards, Pix, boleto, plans, billing, webhooks).
+- CherutOS (workspace, apps, dashboard, extensions, customization).
+- Values module (personal values, alignment scoring, insights).
+- Journal module (text/audio/image, templates, AI insights, semantic search).
+- Reports module (productivity, time tracking, values, journal, exports).
+- Analytics & Reports (advanced).
+- Mobile App (Expo).
+- Admin Dashboard.
+- Pro/Master Plans with advanced AI capabilities.
+- Community features.
+- Integrations with external platforms.
 
 ---
 
