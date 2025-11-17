@@ -48,6 +48,7 @@ export function CreateVisionBoardModal({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const resetForm = () => {
     setTitle('');
@@ -57,6 +58,7 @@ export function CreateVisionBoardModal({
     setImageUrl(null);
     setImageFile(null);
     setUploadError(null);
+    setCreateError(null);
   };
 
   const handleImageChange = async (file: File | null) => {
@@ -92,15 +94,29 @@ export function CreateVisionBoardModal({
       return;
     }
 
-    await onCreate({
-      title,
-      description: description || undefined,
-      fullDescription: fullDescription || undefined,
-      imageUrl,
-      dueDate: dueDateValue ? dueDateValue.toISOString().split('T')[0] : undefined,
-    });
+    setCreateError(null);
 
-    resetForm();
+    try {
+      await onCreate({
+        title,
+        description: description || undefined,
+        fullDescription: fullDescription || undefined,
+        imageUrl,
+        dueDate: dueDateValue ? dueDateValue.toISOString().split('T')[0] : undefined,
+      });
+
+      resetForm();
+    } catch (error: any) {
+      let errorMessage = 'Failed to create vision board item. Please try again.';
+
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      setCreateError(errorMessage);
+    }
   };
 
   const handleClose = () => {
@@ -234,7 +250,10 @@ export function CreateVisionBoardModal({
           label="Title"
           placeholder="E.g., Trip to Kyoto, Run a 5K, Read 20 Books"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            setCreateError(null); // Clear error when user types
+          }}
           required
           withAsterisk
           maxLength={100}
@@ -267,6 +286,13 @@ export function CreateVisionBoardModal({
           clearable
           minDate={new Date()}
         />
+
+        {/* Create Error Alert */}
+        {createError && (
+          <Alert icon={<AlertCircle size={16} />} color="red" mt="xs">
+            {createError}
+          </Alert>
+        )}
 
         {/* Action buttons */}
         <Group justify="flex-end" mt="md">

@@ -50,6 +50,8 @@ export default function VisionBoardPage() {
       setIsCreateModalOpen(false);
     } catch (error) {
       console.error('Error creating vision board item:', error);
+      // Don't close modal on error - let user fix the issue
+      throw error;
     }
   };
 
