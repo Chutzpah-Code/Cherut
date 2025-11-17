@@ -107,6 +107,19 @@ export class ObjectivesController {
     return this.objectivesService.getKeyResultsForObjective(req.user.uid, objectiveId);
   }
 
+  @Patch(':objectiveId/key-results/batch')
+  batchUpdateKeyResults(
+    @Request() req,
+    @Param('objectiveId') objectiveId: string,
+    @Body() batchUpdateDto: { updates: Array<{id: string, dto: any}> },
+  ) {
+    return this.objectivesService.batchUpdateKeyResults(
+      req.user.uid,
+      objectiveId,
+      batchUpdateDto.updates,
+    );
+  }
+
   @Patch(':objectiveId/key-results/:keyResultId')
   updateKeyResult(
     @Request() req,
@@ -132,19 +145,6 @@ export class ObjectivesController {
       req.user.uid,
       objectiveId,
       keyResultId,
-    );
-  }
-
-  @Patch(':objectiveId/key-results/batch')
-  batchUpdateKeyResults(
-    @Request() req,
-    @Param('objectiveId') objectiveId: string,
-    @Body() batchUpdateDto: { updates: Array<{id: string, dto: any}> },
-  ) {
-    return this.objectivesService.batchUpdateKeyResults(
-      req.user.uid,
-      objectiveId,
-      batchUpdateDto.updates,
     );
   }
 
