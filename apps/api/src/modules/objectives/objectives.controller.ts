@@ -135,6 +135,19 @@ export class ObjectivesController {
     );
   }
 
+  @Patch(':objectiveId/key-results/batch')
+  batchUpdateKeyResults(
+    @Request() req,
+    @Param('objectiveId') objectiveId: string,
+    @Body() batchUpdateDto: { updates: Array<{id: string, dto: any}> },
+  ) {
+    return this.objectivesService.batchUpdateKeyResults(
+      req.user.uid,
+      objectiveId,
+      batchUpdateDto.updates,
+    );
+  }
+
   // Toggle completion endpoints
   @Patch(':id/toggle-completion')
   toggleObjectiveCompletion(@Request() req, @Param('id') id: string) {

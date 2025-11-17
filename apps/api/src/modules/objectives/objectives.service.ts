@@ -581,6 +581,66 @@ export class ObjectivesService {
     };
   }
 
+  // Batch update key results method
+  async batchUpdateKeyResults(
+    userId: string,
+    objectiveId: string,
+    updates: Array<{id: string, dto: any}>
+  ) {
+    if (updates.length === 0) {
+      return { success: 0, errors: 0, results: [] };
+    }
+
+    const db = this.firebaseService.getFirestore();
+    const batch = db.batch();
+    const results = [];
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const update of updates) {
+      try {
+        const keyResultRef = db.collection(this.keyResultsCollection).doc(update.id);
+
+        // Verify key result exists and belongs to user/objective
+        const keyResultDoc = await keyResultRef.get();
+        if (!keyResultDoc.exists) {
+          throw new Error(`Key result ${update.id} not found`);
+        }
+
+        const keyResultData = keyResultDoc.data();
+        if (keyResultData?.userId !== userId || keyResultData?.objectiveId !== objectiveId) {
+          throw new Error(`Key result ${update.id} access denied`);
+        }
+
+        // Add to batch
+        batch.update(keyResultRef, {
+          ...update.dto,
+          updatedAt: new Date().toISOString(),
+        });
+
+        results.push({ id: update.id, success: true });
+        successCount++;
+      } catch (error) {
+        this.logger.error(`Error preparing batch update for KR ${update.id}:`, error);
+        results.push({ id: update.id, success: false, error: error.message });
+        errorCount++;
+      }
+    }
+
+    // Execute batch
+    if (successCount > 0) {
+      try {
+        await batch.commit();
+        this.logger.log(`✅ Batch updated ${successCount} key results for objective ${objectiveId}`);
+      } catch (error) {
+        this.logger.error(`Error executing batch update:`, error);
+        throw new Error(`Batch update failed: ${error.message}`);
+      }
+    }
+
+    return { success: successCount, errors: errorCount, results };
+  }
+
   // Archive method
   async archiveObjective(userId: string, id: string) {
     await this.findOne(userId, id);
