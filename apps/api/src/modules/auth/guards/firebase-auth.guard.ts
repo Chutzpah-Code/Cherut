@@ -13,10 +13,13 @@ export class FirebaseAuthGuard extends AuthGuard('firebase') {
 
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization?.replace('Bearer ', '');
 
-    this.logger.log(`Validating request to: ${request.url}`);
-    this.logger.log(`Token: ${token ? token.substring(0, 50) + '...' : 'NO TOKEN'}`);
+    // Log apenas quando não é token válido ou em desenvolvimento
+    if (process.env.NODE_ENV !== 'production' || !request.headers.authorization?.startsWith('Bearer ')) {
+      const token = request.headers.authorization?.replace('Bearer ', '');
+      this.logger.log(`Validating request to: ${request.url}`);
+      this.logger.log(`Token: ${token ? token.substring(0, 20) + '...' : 'NO TOKEN'}`);
+    }
 
     return super.canActivate(context);
   }
@@ -30,7 +33,8 @@ export class FirebaseAuthGuard extends AuthGuard('firebase') {
       this.logger.warn(`Authentication info: ${info.message}`);
     }
 
-    if (user) {
+    // Log autenticação bem-sucedida apenas em desenvolvimento
+    if (user && process.env.NODE_ENV !== 'production') {
       this.logger.log(`User authenticated: ${user.uid}`);
     }
 
