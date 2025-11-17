@@ -174,7 +174,30 @@ export default function ObjectivesPage() {
             console.log(`✅ Batch update completed: ${batchResult.success} success, ${batchResult.errors} errors`);
           } catch (error) {
             console.error(`❌ Batch update failed:`, error);
-            updateResults.errors += existingKRsToUpdate.length;
+            console.log(`🔄 Falling back to individual updates for ${existingKRsToUpdate.length} Key Results`);
+
+            // Fallback: Update each Key Result individually
+            for (const kr of existingKRsToUpdate) {
+              try {
+                await updateKRMutation.mutateAsync({
+                  objectiveId: editingObjective.id,
+                  keyResultId: kr.id!,
+                  dto: {
+                    title: kr.title,
+                    description: kr.description || '',
+                    targetValue: kr.targetValue,
+                    currentValue: kr.currentValue || 0,
+                    unit: kr.unit,
+                  },
+                  skipInvalidation: true,
+                });
+                updateResults.success++;
+                console.log(`✅ Individual update success for KR: ${kr.title}`);
+              } catch (individualError) {
+                console.error(`❌ Individual update failed for KR ${kr.id}:`, individualError);
+                updateResults.errors++;
+              }
+            }
           }
         }
 
@@ -223,6 +246,27 @@ export default function ObjectivesPage() {
 
         // Manually invalidate queries ONCE at the end for better performance
         queryClient.invalidateQueries({ queryKey: ['objectives'] });
+
+        // Show notification based on Key Results update results
+        if (updateResults.errors === 0) {
+          notifications.show({
+            title: 'Success',
+            message: 'Objective and all Key Results updated successfully!',
+            color: 'green',
+          });
+        } else if (updateResults.success > 0) {
+          notifications.show({
+            title: 'Partial Success',
+            message: `Objective updated successfully! ${updateResults.success} Key Results updated, ${updateResults.errors} failed.`,
+            color: 'yellow',
+          });
+        } else {
+          notifications.show({
+            title: 'Warning',
+            message: 'Objective updated successfully, but all Key Results failed to update.',
+            color: 'orange',
+          });
+        }
       } else {
         // For creation, include keyResults
         const createDto: CreateObjectiveDto = {
@@ -242,13 +286,15 @@ export default function ObjectivesPage() {
             })),
         };
         await createMutation.mutateAsync(createDto);
+
+        // For creation, always show success since creation includes KRs
+        notifications.show({
+          title: 'Success',
+          message: 'Objective created successfully!',
+          color: 'green',
+        });
       }
 
-      notifications.show({
-        title: 'Success',
-        message: `Objective ${editingObjective ? 'updated' : 'created'} successfully!`,
-        color: 'green',
-      });
       setIsModalOpen(false);
       resetForm();
     } catch (error: any) {
