@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     buildCommand: npm install && npm install --workspace=api && npm run build --workspace=api
-    startCommand: cd apps/api && npm run start:prod
+    startCommand: npm run start:prod:render --workspace=api
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
