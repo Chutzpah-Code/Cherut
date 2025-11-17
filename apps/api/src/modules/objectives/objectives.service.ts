@@ -132,18 +132,20 @@ export class ObjectivesService {
         .orderBy('createdAt', 'asc')
         .get();
 
-      allKeyResults = keyResultsSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        const completionPercentage = data.targetValue > 0
-          ? Math.min(Math.round((data.currentValue / data.targetValue) * 100), 100)
-          : 0;
+      allKeyResults = keyResultsSnapshot.docs
+        .map((doc) => {
+          const data = doc.data();
+          const completionPercentage = data.targetValue > 0
+            ? Math.min(Math.round((data.currentValue / data.targetValue) * 100), 100)
+            : 0;
 
-        return {
-          id: doc.id,
-          ...data,
-          completionPercentage,
-        };
-      });
+          return {
+            id: doc.id,
+            ...data,
+            completionPercentage,
+          };
+        })
+;
     }
 
     // Group key results by objectiveId
