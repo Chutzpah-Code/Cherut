@@ -12,7 +12,7 @@
     "start:dev": "npx nest start --watch",
     "start:debug": "npx nest start --debug --watch",
     "start:prod": "node dist/main.js",
-    "start:prod:render": "cd ../../ && node apps/api/dist/main.js",
+    "start:prod:render": "cd ../../ && ls -la apps/api/dist/ && node apps/api/dist/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",

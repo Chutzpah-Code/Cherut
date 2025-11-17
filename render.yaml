@@ -4,13 +4,9 @@ services:
     runtime: node
     region: oregon
     plan: free
-    buildCommand: npm ci && npm ci --workspace=api && npm run build --workspace=api
+    buildCommand: npm install && npm run build && ls -la apps/api/dist/
     startCommand: npm run start:prod:render --workspace=api
     healthCheckPath: /
-    disk:
-      name: cherut-api-disk
-      mountPath: /opt/render/project/tmp
-      sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
