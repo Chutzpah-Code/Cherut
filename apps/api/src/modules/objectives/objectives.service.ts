@@ -51,23 +51,52 @@ export class ObjectivesService {
 
     this.logger.log(`Objective created: ${docRef.id} for user ${userId}`);
 
-    // Create key results if provided
+    // Create key results if provided - IN PARALLEL
     if (keyResults && keyResults.length > 0) {
       this.logger.log(`📋 Creating ${keyResults.length} Key Results for objective ${docRef.id}`);
-      for (const kr of keyResults) {
-        // Convert inline DTO to full DTO by adding the objectiveId
+
+      const keyResultPromises = keyResults.map(async (kr) => {
         const keyResultDto = {
           ...kr,
           objectiveId: docRef.id,
         };
-        this.logger.log(`🔑 Creating Key Result: ${JSON.stringify(keyResultDto)}`);
-        await this.createKeyResult(userId, docRef.id, keyResultDto);
-      }
+        return this.createKeyResult(userId, docRef.id, keyResultDto);
+      });
+
+      await Promise.all(keyResultPromises);
     } else {
       this.logger.log(`📋 No Key Results to create for objective ${docRef.id}`);
     }
 
-    return this.findOne(userId, docRef.id);
+    // Return the created objective with key results directly (avoid extra query)
+    const createdKeyResults: any[] = [];
+    if (keyResults && keyResults.length > 0) {
+      // Get the created key results
+      const keyResultsSnapshot = await db
+        .collection(this.keyResultsCollection)
+        .where('objectiveId', '==', docRef.id)
+        .where('userId', '==', userId)
+        .get();
+
+      keyResultsSnapshot.docs.forEach((doc) => {
+        const data = doc.data();
+        const completionPercentage = data.targetValue > 0
+          ? Math.min(Math.round((data.currentValue / data.targetValue) * 100), 100)
+          : 0;
+
+        createdKeyResults.push({
+          id: doc.id,
+          ...data,
+          completionPercentage,
+        });
+      });
+    }
+
+    return {
+      id: docRef.id,
+      ...objective,
+      keyResults: createdKeyResults,
+    };
   }
 
   async findAll(userId: string, lifeAreaId?: string) {
@@ -81,24 +110,57 @@ export class ObjectivesService {
 
     const snapshot = await query.get();
 
-    const objectives = await Promise.all(
-      snapshot.docs.map(async (doc) => {
-        const objective = {
-          id: doc.id,
-          ...doc.data(),
-        };
+    // Get all objectives first
+    const objectives = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-        // Fetch key results
-        const keyResults = await this.getKeyResultsForObjective(userId, objective.id);
-        this.logger.log(`🔍 Found ${keyResults.length} Key Results for objective ${objective.id}`);
+    // Get all key results for these objectives in a single query
+    const objectiveIds = objectives.map(obj => obj.id);
+
+    let allKeyResults: any[] = [];
+    if (objectiveIds.length > 0) {
+      const keyResultsSnapshot = await db
+        .collection(this.keyResultsCollection)
+        .where('objectiveId', 'in', objectiveIds)
+        .where('userId', '==', userId)
+        .get();
+
+      allKeyResults = keyResultsSnapshot.docs.map((doc) => {
+        const data = doc.data();
+        const completionPercentage = data.targetValue > 0
+          ? Math.min(Math.round((data.currentValue / data.targetValue) * 100), 100)
+          : 0;
+
         return {
-          ...objective,
-          keyResults,
+          id: doc.id,
+          ...data,
+          completionPercentage,
         };
-      }),
-    );
+      });
+    }
 
-    return objectives;
+    // Group key results by objectiveId
+    const keyResultsByObjective: { [key: string]: any[] } = allKeyResults.reduce((acc: { [key: string]: any[] }, kr: any) => {
+      if (!acc[kr.objectiveId]) {
+        acc[kr.objectiveId] = [];
+      }
+      acc[kr.objectiveId].push(kr);
+      return acc;
+    }, {});
+
+    // Combine objectives with their key results
+    const objectivesWithKeyResults = objectives.map((objective) => {
+      const keyResults = keyResultsByObjective[objective.id] || [];
+      this.logger.log(`🔍 Found ${keyResults.length} Key Results for objective ${objective.id}`);
+      return {
+        ...objective,
+        keyResults,
+      };
+    });
+
+    return objectivesWithKeyResults;
   }
 
   async findOne(userId: string, id: string) {
@@ -115,8 +177,25 @@ export class ObjectivesService {
       throw new NotFoundException(`Objective ${id} not found`);
     }
 
-    // Fetch key results
-    const keyResults = await this.getKeyResultsForObjective(userId, id);
+    // Fetch key results - optimized version without extra validation
+    const keyResultsSnapshot = await db
+      .collection(this.keyResultsCollection)
+      .where('objectiveId', '==', id)
+      .where('userId', '==', userId)
+      .get();
+
+    const keyResults = keyResultsSnapshot.docs.map((doc) => {
+      const data = doc.data();
+      const completionPercentage = data.targetValue > 0
+        ? Math.min(Math.round((data.currentValue / data.targetValue) * 100), 100)
+        : 0;
+
+      return {
+        id: doc.id,
+        ...data,
+        completionPercentage,
+      };
+    });
 
     return {
       id: doc.id,
