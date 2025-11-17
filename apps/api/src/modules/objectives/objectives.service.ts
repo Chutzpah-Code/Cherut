@@ -77,6 +77,7 @@ export class ObjectivesService {
         .collection(this.keyResultsCollection)
         .where('objectiveId', '==', docRef.id)
         .where('userId', '==', userId)
+        .orderBy('order', 'asc')
         .orderBy('createdAt', 'asc')
         .get();
 
@@ -127,6 +128,7 @@ export class ObjectivesService {
         .collection(this.keyResultsCollection)
         .where('objectiveId', 'in', objectiveIds)
         .where('userId', '==', userId)
+        .orderBy('order', 'asc')
         .orderBy('createdAt', 'asc')
         .get();
 
