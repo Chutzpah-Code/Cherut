@@ -4,9 +4,8 @@ services:
     runtime: node
     region: oregon
     plan: free
-    rootDir: apps/api
-    buildCommand: npm install && npm run build
-    startCommand: npm run start:prod
+    buildCommand: npm install && npm install --workspace=api && npm run build --workspace=api
+    startCommand: cd apps/api && npm run start:prod
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
