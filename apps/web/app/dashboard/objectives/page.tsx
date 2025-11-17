@@ -234,11 +234,20 @@ export default function ObjectivesPage() {
       });
       setIsModalOpen(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving objective:', error);
+
+      // Extract error message from API response
+      let errorMessage = 'Failed to save objective';
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
       notifications.show({
         title: 'Error',
-        message: 'Failed to save objective',
+        message: errorMessage,
         color: 'red',
       });
     }
