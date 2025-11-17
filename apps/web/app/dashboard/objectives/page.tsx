@@ -48,6 +48,7 @@ import {
   useArchiveObjective,
 } from '@/hooks/useObjectives';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
+import { useQueryClient } from '@tanstack/react-query';
 import { CreateObjectiveDto, Objective, KeyResult, CreateKeyResultDto } from '@/lib/api/services/objectives';
 
 interface KeyResultFormData {
@@ -89,6 +90,7 @@ export default function ObjectivesPage() {
   const toggleObjectiveCompletionMutation = useToggleObjectiveCompletion();
   const toggleKeyResultCompletionMutation = useToggleKeyResultCompletion();
   const archiveMutation = useArchiveObjective();
+  const queryClient = useQueryClient();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingObjective, setEditingObjective] = useState<Objective | null>(null);
@@ -144,7 +146,7 @@ export default function ObjectivesPage() {
         // Process operations with error handling but don't stop on failures
         let updateResults = { success: 0, errors: 0 };
 
-        // 1. Update existing Key Results
+        // 1. Update existing Key Results - WITH BATCH OPTIMIZATION
         for (const kr of currentKRs.filter(kr => kr.id)) {
           console.log(`🔄 Updating existing KR: ${kr.id} - ${kr.title}`);
           try {
@@ -158,6 +160,7 @@ export default function ObjectivesPage() {
                 currentValue: kr.currentValue || 0,
                 unit: kr.unit,
               },
+              skipInvalidation: true, // Skip individual invalidations
             });
             updateResults.success++;
           } catch (error) {
@@ -166,7 +169,7 @@ export default function ObjectivesPage() {
           }
         }
 
-        // 2. Create new Key Results (those without id)
+        // 2. Create new Key Results (those without id) - WITH BATCH OPTIMIZATION
         for (const kr of currentKRs.filter(kr => !kr.id)) {
           console.log(`➕ Creating new KR: ${kr.title}`);
           try {
@@ -179,6 +182,7 @@ export default function ObjectivesPage() {
                 currentValue: kr.currentValue || 0,
                 unit: kr.unit,
               },
+              skipInvalidation: true, // Skip individual invalidations
             });
             updateResults.success++;
           } catch (error) {
@@ -196,6 +200,7 @@ export default function ObjectivesPage() {
               await deleteKRMutation.mutateAsync({
                 objectiveId: editingObjective.id,
                 keyResultId: existingKR.id!,
+                skipInvalidation: true, // Skip individual invalidations
               });
               updateResults.success++;
             } catch (error) {
@@ -206,6 +211,9 @@ export default function ObjectivesPage() {
         }
 
         console.log(`✅ Key Results update completed: ${updateResults.success} success, ${updateResults.errors} errors`);
+
+        // Manually invalidate queries ONCE at the end for better performance
+        queryClient.invalidateQueries({ queryKey: ['objectives'] });
       } else {
         // For creation, include keyResults
         const createDto: CreateObjectiveDto = {

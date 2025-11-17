@@ -76,10 +76,17 @@ export const useCreateKeyResult = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ objectiveId, dto }: { objectiveId: string; dto: CreateKeyResultDto }) =>
+    mutationFn: ({ objectiveId, dto, skipInvalidation }: {
+      objectiveId: string;
+      dto: CreateKeyResultDto;
+      skipInvalidation?: boolean;
+    }) =>
       objectivesApi.createKeyResult(objectiveId, dto),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onSuccess: (data, variables) => {
+      // Only invalidate if not explicitly skipped
+      if (!variables.skipInvalidation) {
+        queryClient.invalidateQueries({ queryKey: ['objectives'] });
+      }
     },
   });
 };
@@ -88,10 +95,18 @@ export const useUpdateKeyResult = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ objectiveId, keyResultId, dto }: { objectiveId: string; keyResultId: string; dto: UpdateKeyResultDto }) =>
+    mutationFn: ({ objectiveId, keyResultId, dto, skipInvalidation }: {
+      objectiveId: string;
+      keyResultId: string;
+      dto: UpdateKeyResultDto;
+      skipInvalidation?: boolean;
+    }) =>
       objectivesApi.updateKeyResult(objectiveId, keyResultId, dto),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onSuccess: (data, variables) => {
+      // Only invalidate if not explicitly skipped
+      if (!variables.skipInvalidation) {
+        queryClient.invalidateQueries({ queryKey: ['objectives'] });
+      }
     },
   });
 };
@@ -100,10 +115,17 @@ export const useDeleteKeyResult = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ objectiveId, keyResultId }: { objectiveId: string; keyResultId: string }) =>
+    mutationFn: ({ objectiveId, keyResultId, skipInvalidation }: {
+      objectiveId: string;
+      keyResultId: string;
+      skipInvalidation?: boolean;
+    }) =>
       objectivesApi.deleteKeyResult(objectiveId, keyResultId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onSuccess: (data, variables) => {
+      // Only invalidate if not explicitly skipped
+      if (!variables.skipInvalidation) {
+        queryClient.invalidateQueries({ queryKey: ['objectives'] });
+      }
     },
   });
 };
