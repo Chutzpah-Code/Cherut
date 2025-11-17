@@ -52,6 +52,7 @@ export function VisionBoardModal({
   const [newImageUrl, setNewImageUrl] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     if (item) {
@@ -60,6 +61,7 @@ export function VisionBoardModal({
       setFullDescription(item.fullDescription || '');
       setNewImageUrl(null);
       setUploadError(null);
+      setSaveError(null);
 
       if (item.dueDate) {
         setDueDateValue(new Date(item.dueDate + 'T00:00:00'));
@@ -97,13 +99,27 @@ export function VisionBoardModal({
   };
 
   const handleSave = async () => {
-    await onSave(item.id, {
-      title,
-      description: description.trim() || undefined,
-      fullDescription: fullDescription.trim() || undefined,
-      dueDate: dueDateValue ? dueDateValue.toISOString().split('T')[0] : undefined,
-      imageUrl: newImageUrl || undefined,
-    });
+    setSaveError(null);
+
+    try {
+      await onSave(item.id, {
+        title,
+        description: description.trim() || undefined,
+        fullDescription: fullDescription.trim() || undefined,
+        dueDate: dueDateValue ? dueDateValue.toISOString().split('T')[0] : undefined,
+        imageUrl: newImageUrl || undefined,
+      });
+    } catch (error: any) {
+      let errorMessage = 'Failed to save changes. Please try again.';
+
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      setSaveError(errorMessage);
+    }
   };
 
   const currentImageUrl = newImageUrl || item.imageUrl;
@@ -181,7 +197,10 @@ export function VisionBoardModal({
           label="Title"
           placeholder="E.g., Trip to Kyoto"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            setSaveError(null); // Clear error when user types
+          }}
           required
           withAsterisk
         />
@@ -212,6 +231,13 @@ export function VisionBoardModal({
           onChange={setDueDateValue}
           clearable
         />
+
+        {/* Save Error Alert */}
+        {saveError && (
+          <Alert icon={<AlertCircle size={16} />} color="red" mt="xs">
+            {saveError}
+          </Alert>
+        )}
 
         {/* Action buttons */}
         <Group justify="space-between" mt="md">

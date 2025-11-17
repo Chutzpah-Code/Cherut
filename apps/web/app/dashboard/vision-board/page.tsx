@@ -76,6 +76,8 @@ export default function VisionBoardPage() {
       setEditingItem(null);
     } catch (error) {
       console.error('Error updating vision board item:', error);
+      // Don't close modal on error - let user fix the issue
+      throw error;
     }
   };
 
