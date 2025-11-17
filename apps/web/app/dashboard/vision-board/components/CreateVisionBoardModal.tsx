@@ -89,18 +89,25 @@ export function CreateVisionBoardModal({
   };
 
   const handleCreate = async () => {
-    if (!imageUrl) {
-      setUploadError('Please upload an image');
+    setCreateError(null);
+    setUploadError(null);
+
+    // Frontend validation before making API call
+    if (!title.trim()) {
+      setCreateError('Please enter a title');
       return;
     }
 
-    setCreateError(null);
+    if (!imageUrl) {
+      setCreateError('Please upload an image');
+      return;
+    }
 
     try {
       await onCreate({
-        title,
-        description: description || undefined,
-        fullDescription: fullDescription || undefined,
+        title: title.trim(),
+        description: description.trim() || undefined,
+        fullDescription: fullDescription.trim() || undefined,
         imageUrl,
         dueDate: dueDateValue ? dueDateValue.toISOString().split('T')[0] : undefined,
       });
