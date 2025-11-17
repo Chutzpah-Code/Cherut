@@ -2,7 +2,6 @@ import {
   Injectable,
   NotFoundException,
   Logger,
-  BadRequestException,
 } from '@nestjs/common';
 import { FirebaseService } from '../../config/firebase.service';
 import { CreateObjectiveDto, UpdateObjectiveDto, ObjectiveStatus, CreateKeyResultDto, UpdateKeyResultDto } from './dto';
@@ -12,20 +11,12 @@ export class ObjectivesService {
   private readonly logger = new Logger(ObjectivesService.name);
   private readonly collection = 'objectives';
   private readonly keyResultsCollection = 'keyResults';
-  private readonly MAX_ACTIVE_OBJECTIVES = 5;
 
   constructor(private readonly firebaseService: FirebaseService) {}
 
   async create(userId: string, createDto: CreateObjectiveDto) {
     const db = this.firebaseService.getFirestore();
 
-    // Check active objectives limit (max 5)
-    const activeCount = await this.countActiveObjectives(userId);
-    if (activeCount >= this.MAX_ACTIVE_OBJECTIVES) {
-      throw new BadRequestException(
-        `Maximum ${this.MAX_ACTIVE_OBJECTIVES} active objectives allowed. Please complete or archive existing objectives.`,
-      );
-    }
 
     // Separate key results from objective data
     const { keyResults, ...objectiveData } = createDto;
@@ -427,22 +418,6 @@ export class ObjectivesService {
   }
 
   // Helper methods
-  private async countActiveObjectives(userId: string): Promise<number> {
-    const db = this.firebaseService.getFirestore();
-
-    const snapshot = await db
-      .collection(this.collection)
-      .where('userId', '==', userId)
-      .where('status', 'in', [
-        ObjectiveStatus.ON_TRACK,
-        ObjectiveStatus.AT_RISK,
-        ObjectiveStatus.BEHIND,
-        ObjectiveStatus.ACTIVE,
-      ])
-      .get();
-
-    return snapshot.size;
-  }
 
   private calculateEndDate(startDate: string, cycleMonths: number): string {
     const start = new Date(startDate);
