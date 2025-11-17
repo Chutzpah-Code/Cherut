@@ -1,18 +1,45 @@
 import * as admin from 'firebase-admin';
+import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as fs from 'fs';
+
+// Load environment variables
+dotenv.config();
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
-  const serviceAccountPath = path.join(__dirname, '../service-account.json');
   try {
-    const serviceAccount = require(serviceAccountPath);
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
+    // Try service account file first
+    const serviceAccountPath = path.join(__dirname, '../service-account.json');
+    if (fs.existsSync(serviceAccountPath)) {
+      console.log('🔑 Using service account file...');
+      const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+    }
+    // Try environment variables (production setup)
+    else if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
+      console.log('🔑 Using environment variables...');
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        }),
+      });
+    }
+    else {
+      throw new Error(
+        'Firebase credentials not found. Please provide either:\n' +
+        '1. service-account.json file in api directory\n' +
+        '2. Environment variables: FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL'
+      );
+    }
+
     console.log('✅ Firebase Admin initialized successfully');
   } catch (error) {
     console.error('❌ Error initializing Firebase Admin:', error);
-    console.log('📝 Make sure service-account.json exists in the api directory');
     process.exit(1);
   }
 }
