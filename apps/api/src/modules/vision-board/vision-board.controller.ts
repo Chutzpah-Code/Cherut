@@ -49,6 +49,7 @@ export class VisionBoardController {
    * - Validação no backend (NUNCA confie só no frontend!)
    */
   @Post('upload')
+  @UseGuards(FirebaseAuthGuard)
   @UseInterceptors(
     FileInterceptor('image', {
       limits: {
