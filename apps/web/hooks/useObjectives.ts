@@ -142,6 +142,19 @@ export const useCompleteKeyResult = () => {
   });
 };
 
+// Batch update key results hook
+export const useBatchUpdateKeyResults = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ objectiveId, updates }: { objectiveId: string; updates: Array<{id: string, dto: UpdateKeyResultDto}> }) =>
+      objectivesApi.batchUpdateKeyResults(objectiveId, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    },
+  });
+};
+
 // Toggle completion hooks - OTIMIZADO com Optimistic Updates
 export const useToggleObjectiveCompletion = () => {
   const queryClient = useQueryClient();

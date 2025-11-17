@@ -43,6 +43,7 @@ import {
   useUpdateKeyResult,
   useDeleteKeyResult,
   useCompleteKeyResult,
+  useBatchUpdateKeyResults,
   useToggleObjectiveCompletion,
   useToggleKeyResultCompletion,
   useArchiveObjective,
@@ -85,6 +86,7 @@ export default function ObjectivesPage() {
   const completeMutation = useCompleteObjective();
   const createKRMutation = useCreateKeyResult();
   const updateKRMutation = useUpdateKeyResult();
+  const batchUpdateKRMutation = useBatchUpdateKeyResults();
   const deleteKRMutation = useDeleteKeyResult();
   const completeKRMutation = useCompleteKeyResult();
   const toggleObjectiveCompletionMutation = useToggleObjectiveCompletion();
@@ -146,26 +148,33 @@ export default function ObjectivesPage() {
         // Process operations with error handling but don't stop on failures
         let updateResults = { success: 0, errors: 0 };
 
-        // 1. Update existing Key Results - WITH BATCH OPTIMIZATION
-        for (const kr of currentKRs.filter(kr => kr.id)) {
-          console.log(`🔄 Updating existing KR: ${kr.id} - ${kr.title}`);
+        // 1. Update existing Key Results - BATCH OPTIMIZATION
+        const existingKRsToUpdate = currentKRs.filter(kr => kr.id);
+        if (existingKRsToUpdate.length > 0) {
+          console.log(`🚀 Batch updating ${existingKRsToUpdate.length} existing Key Results`);
           try {
-            await updateKRMutation.mutateAsync({
-              objectiveId: editingObjective.id,
-              keyResultId: kr.id!,
+            const batchUpdates = existingKRsToUpdate.map(kr => ({
+              id: kr.id!,
               dto: {
                 title: kr.title,
                 description: kr.description || '',
                 targetValue: kr.targetValue,
                 currentValue: kr.currentValue || 0,
                 unit: kr.unit,
-              },
-              skipInvalidation: true, // Skip individual invalidations
+              }
+            }));
+
+            const batchResult = await batchUpdateKRMutation.mutateAsync({
+              objectiveId: editingObjective.id,
+              updates: batchUpdates,
             });
-            updateResults.success++;
+
+            updateResults.success += batchResult.success;
+            updateResults.errors += batchResult.errors;
+            console.log(`✅ Batch update completed: ${batchResult.success} success, ${batchResult.errors} errors`);
           } catch (error) {
-            console.error(`❌ Error updating KR ${kr.id}:`, error);
-            updateResults.errors++;
+            console.error(`❌ Batch update failed:`, error);
+            updateResults.errors += existingKRsToUpdate.length;
           }
         }
 

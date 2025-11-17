@@ -136,6 +136,12 @@ export const objectivesApi = {
     return data;
   },
 
+  // Batch update key results
+  batchUpdateKeyResults: async (objectiveId: string, updates: Array<{id: string, dto: UpdateKeyResultDto}>): Promise<{success: number, errors: number, results: Array<{id: string, success: boolean, error?: string}>}> => {
+    const { data } = await apiClient.patch(`/objectives/${objectiveId}/key-results/batch`, { updates });
+    return data;
+  },
+
   // Archive operation
   archiveObjective: async (id: string): Promise<Objective> => {
     const { data } = await apiClient.patch(`/objectives/${id}/archive`);
