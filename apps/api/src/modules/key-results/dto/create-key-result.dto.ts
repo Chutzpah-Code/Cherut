@@ -34,4 +34,10 @@ export class CreateKeyResultDto {
   @IsString()
   @IsNotEmpty()
   unit: string;
+
+  // Order/position in the list (optional, will be set automatically if not provided)
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  order?: number;
 }

@@ -36,6 +36,7 @@ export class KeyResultsService {
         createDto.currentValue || 0,
         createDto.targetValue,
       ),
+      order: createDto.order ?? 0, // Default order if not provided
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

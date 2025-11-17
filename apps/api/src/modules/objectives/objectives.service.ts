@@ -55,10 +55,11 @@ export class ObjectivesService {
     if (keyResults && keyResults.length > 0) {
       this.logger.log(`📋 Creating ${keyResults.length} Key Results for objective ${docRef.id}`);
 
-      const keyResultPromises = keyResults.map(async (kr) => {
+      const keyResultPromises = keyResults.map(async (kr, index) => {
         const keyResultDto = {
           ...kr,
           objectiveId: docRef.id,
+          order: kr.order ?? index, // Use provided order or array index
         };
         return this.createKeyResult(userId, docRef.id, keyResultDto);
       });
@@ -76,6 +77,8 @@ export class ObjectivesService {
         .collection(this.keyResultsCollection)
         .where('objectiveId', '==', docRef.id)
         .where('userId', '==', userId)
+        .orderBy('order', 'asc')
+        .orderBy('createdAt', 'asc')
         .get();
 
       keyResultsSnapshot.docs.forEach((doc) => {
@@ -125,6 +128,8 @@ export class ObjectivesService {
         .collection(this.keyResultsCollection)
         .where('objectiveId', 'in', objectiveIds)
         .where('userId', '==', userId)
+        .orderBy('order', 'asc')
+        .orderBy('createdAt', 'asc')
         .get();
 
       allKeyResults = keyResultsSnapshot.docs.map((doc) => {
@@ -182,6 +187,8 @@ export class ObjectivesService {
       .collection(this.keyResultsCollection)
       .where('objectiveId', '==', id)
       .where('userId', '==', userId)
+      .orderBy('order', 'asc')
+      .orderBy('createdAt', 'asc')
       .get();
 
     const keyResults = keyResultsSnapshot.docs.map((doc) => {
@@ -304,6 +311,8 @@ export class ObjectivesService {
       .collection(this.keyResultsCollection)
       .where('objectiveId', '==', objectiveId)
       .where('userId', '==', userId) // Segurança adicional
+      .orderBy('order', 'asc')
+      .orderBy('createdAt', 'asc')
       .get();
 
     return snapshot.docs.map((doc) => {
