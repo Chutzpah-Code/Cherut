@@ -171,9 +171,7 @@ export const useToggleObjectiveCompletion = () => {
       if (context?.previousObjectives) {
         queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
       }
-    },
-    onSettled: () => {
-      // Revalida apenas essa query específica
+      // Só invalida em caso de erro para sincronizar
       queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
     },
   });
@@ -208,8 +206,7 @@ export const useToggleKeyResultCompletion = () => {
       if (context?.previousObjectives) {
         queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
       }
-    },
-    onSettled: () => {
+      // Só invalida em caso de erro para sincronizar
       queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
     },
   });
@@ -237,8 +234,7 @@ export const useArchiveObjective = () => {
       if (context?.previousObjectives) {
         queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
       }
-    },
-    onSettled: () => {
+      // Só invalida em caso de erro para sincronizar
       queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
     },
   });
