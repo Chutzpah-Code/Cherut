@@ -593,7 +593,7 @@ export class ObjectivesService {
 
     const db = this.firebaseService.getFirestore();
     const batch = db.batch();
-    const results = [];
+    const results: Array<{id: string, success: boolean, error?: string}> = [];
     let successCount = 0;
     let errorCount = 0;
 
