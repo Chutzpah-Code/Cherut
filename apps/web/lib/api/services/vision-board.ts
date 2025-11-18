@@ -65,8 +65,10 @@ export const visionBoardApi = {
     const { data } = await apiClient.post('/vision-board/upload', formData, {
       // Timeout de 30 segundos para upload
       timeout: 30000,
-      // Let axios set Content-Type automatically for multipart/form-data
-      // This preserves the boundary parameter and other headers
+      // Remove o Content-Type para permitir que o browser defina multipart/form-data
+      headers: {
+        'Content-Type': undefined,
+      },
     });
 
     return data;
