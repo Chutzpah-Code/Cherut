@@ -204,22 +204,36 @@ export const useToggleKeyResultCompletion = () => {
         if (!old || !Array.isArray(old)) return old;
         return old.map((obj: any) => {
           if (obj.id !== objectiveId) return obj;
+
+          // Update key results with toggled completion
+          const updatedKeyResults = obj.keyResults?.map((kr: any) =>
+            kr.id === keyResultId ? { ...kr, isCompleted: !kr.isCompleted } : kr
+          );
+
+          // Calculate new progress based on updated key results
+          const completedCount = updatedKeyResults?.filter((kr: any) => kr.isCompleted).length || 0;
+          const totalCount = updatedKeyResults?.length || 1;
+          const progress = Math.round((completedCount / totalCount) * 100);
+
           return {
             ...obj,
-            keyResults: obj.keyResults?.map((kr: any) =>
-              kr.id === keyResultId ? { ...kr, isCompleted: !kr.isCompleted } : kr
-            ),
+            keyResults: updatedKeyResults,
+            progress, // Update progress optimistically
           };
         });
       });
 
       return { previousObjectives };
     },
+    onSuccess: () => {
+      // Invalidate to ensure sync with server (hybrid approach)
+      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    },
     onError: (_err, _vars, context: any) => {
       if (context?.previousObjectives) {
         queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
       }
-      // Só invalida em caso de erro para sincronizar
+      // Invalida em caso de erro para sincronizar
       queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
     },
   });
