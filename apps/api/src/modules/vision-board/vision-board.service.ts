@@ -12,10 +12,9 @@ import type { Express } from 'express';
  * PROTEÇÕES IMPLEMENTADAS:
  * 1. Validação de tipo de arquivo (apenas imagens)
  * 2. Limite de tamanho: 1MB
- * 3. Rate limiting: máximo 50 imagens por usuário
- * 4. Autenticação obrigatória
- * 5. Sanitização de metadados
- * 6. URLs assinadas do Firebase Storage
+ * 3. Autenticação obrigatória
+ * 4. Sanitização de metadados
+ * 5. URLs assinadas do Firebase Storage
  *
  * FLUXO DE UPLOAD:
  * 1. Cliente envia arquivo (validado no frontend primeiro)
@@ -29,7 +28,6 @@ import type { Express } from 'express';
 export class VisionBoardService {
   private readonly logger = new Logger(VisionBoardService.name);
   private readonly COLLECTION_NAME = 'vision-board-items';
-  private readonly MAX_ITEMS_PER_USER = 50; // Proteção contra quota attack
   private readonly MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB em bytes
   private readonly ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
@@ -45,7 +43,6 @@ export class VisionBoardService {
    * - Tipo de arquivo (MIME type real, não só extensão)
    * - Tamanho máximo 1MB
    * - Usuário autenticado
-   * - Limite de imagens por usuário
    */
   async uploadImage(
     userId: string,
@@ -65,13 +62,7 @@ export class VisionBoardService {
       );
     }
 
-    // 3. Verificar limite de imagens por usuário (proteção DoS/Quota)
-    const userItemsCount = await this.getUserItemsCount(userId);
-    if (userItemsCount >= this.MAX_ITEMS_PER_USER) {
-      throw new ForbiddenException(
-        `You have reached the maximum limit of ${this.MAX_ITEMS_PER_USER} vision board items`,
-      );
-    }
+    // 3. Limite removido - permite quantidade ilimitada de itens no vision board
 
     try {
       // Upload para o Cloudinary
@@ -292,19 +283,6 @@ export class VisionBoardService {
     return { message: 'Order updated successfully' };
   }
 
-  /**
-   * Helper: Contar itens do usuário
-   */
-  private async getUserItemsCount(userId: string): Promise<number> {
-    const db = this.firebaseService.getFirestore();
-    const snapshot = await db
-      .collection(this.COLLECTION_NAME)
-      .where('userId', '==', userId)
-      .count()
-      .get();
-
-    return snapshot.data().count;
-  }
 
   /**
    * Helper: Deletar imagem do Cloudinary
