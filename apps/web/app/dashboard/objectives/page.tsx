@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Target, TrendingUp, CheckCircle2, Circle, X, Archive } from 'lucide-react';
+import { Plus, Edit2, Trash2, Target, TrendingUp, CheckCircle2, Circle, X, Archive, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   Title,
   Text,
@@ -102,6 +102,7 @@ export default function ObjectivesPage() {
     kr: KeyResult;
   } | null>(null);
   const [currentObjective, setCurrentObjective] = useState<string>('');
+  const [expandedObjectives, setExpandedObjectives] = useState<Set<string>>(new Set());
 
   const [formData, setFormData] = useState({
     title: '',
@@ -420,6 +421,18 @@ export default function ObjectivesPage() {
     }
   };
 
+  const toggleExpanded = (objectiveId: string) => {
+    setExpandedObjectives(prev => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(objectiveId)) {
+        newExpanded.delete(objectiveId);
+      } else {
+        newExpanded.add(objectiveId);
+      }
+      return newExpanded;
+    });
+  };
+
   const handleCreateNew = () => {
     resetForm();
     setIsModalOpen(true);
@@ -570,11 +583,29 @@ export default function ObjectivesPage() {
 
                 {objective.keyResults && objective.keyResults.length > 0 && (
                   <div>
-                    <Text size="sm" fw={500} mb="xs">
-                      Key Results ({objective.keyResults.length})
-                    </Text>
+                    <Group justify="space-between" align="center" mb="xs">
+                      <Text size="sm" fw={500}>
+                        Key Results ({objective.keyResults.length})
+                      </Text>
+                      {objective.keyResults.length > 3 && (
+                        <ActionIcon
+                          size="sm"
+                          variant="subtle"
+                          onClick={() => toggleExpanded(objective.id)}
+                        >
+                          {expandedObjectives.has(objective.id) ? (
+                            <ChevronUp size={16} />
+                          ) : (
+                            <ChevronDown size={16} />
+                          )}
+                        </ActionIcon>
+                      )}
+                    </Group>
                     <Stack gap="xs">
-                      {objective.keyResults.slice(0, 3).map((kr) => (
+                      {(expandedObjectives.has(objective.id)
+                        ? objective.keyResults
+                        : objective.keyResults.slice(0, 3)
+                      ).map((kr) => (
                         <Paper key={kr.id} p="xs" withBorder>
                           <Group justify="space-between" align="center">
                             <Box style={{ flex: 1 }}>
@@ -599,7 +630,7 @@ export default function ObjectivesPage() {
                           </Group>
                         </Paper>
                       ))}
-                      {objective.keyResults.length > 3 && (
+                      {!expandedObjectives.has(objective.id) && objective.keyResults.length > 3 && (
                         <Text size="xs" c="dimmed" ta="center">
                           +{objective.keyResults.length - 3} more
                         </Text>
@@ -766,7 +797,23 @@ export default function ObjectivesPage() {
 
                       {kr.targetValue > 0 && kr.currentValue >= 0 && (
                         <Box mt="xs" p="xs" style={{ backgroundColor: '#f8f9fa', borderRadius: 4 }}>
-                          <Text size="xs" c="dimmed" mb="xs">Progress Preview:</Text>
+                          <Group justify="space-between" align="center" mb="xs">
+                            <Text size="xs" c="dimmed">Progress Preview:</Text>
+                            {kr.id && (
+                              <ActionIcon
+                                size="xs"
+                                variant="subtle"
+                                color={kr.isCompleted ? 'green' : 'gray'}
+                                onClick={() => {
+                                  if (editingObjective) {
+                                    handleToggleKeyResult(editingObjective, kr as KeyResult);
+                                  }
+                                }}
+                              >
+                                {kr.isCompleted ? <CheckCircle2 size={12} /> : <Circle size={12} />}
+                              </ActionIcon>
+                            )}
+                          </Group>
                           <Group gap="xs" align="center">
                             <Progress
                               value={Math.min((kr.currentValue / kr.targetValue) * 100, 100)}
