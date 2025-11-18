@@ -11,15 +11,15 @@ import {
   Calendar,
   User,
   LogOut,
-  Zap,
   Sparkles,
   BarChart3,
   BookOpen,
   Heart,
   Bot,
 } from 'lucide-react';
-import { Stack, NavLink, ScrollArea, Box, Title, Divider, Button, Group, Badge, Text } from '@mantine/core';
+import { Stack, NavLink, ScrollArea, Box, Divider, Button, Group, Badge, Text } from '@mantine/core';
 import { logoutUser } from '@/lib/firebase/auth';
+import CherutLogo from '@/components/ui/CherutLogo';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -91,28 +91,16 @@ export default function Sidebar({ onClose }: SidebarProps) {
 
   return (
     <Stack h="100%" gap={0}>
-      <Box p="md">
-        <Group gap="xs">
-          <Box
-            style={{
-              background: 'linear-gradient(135deg, var(--mantine-color-blue-6) 0%, var(--mantine-color-violet-6) 100%)',
-              borderRadius: '8px',
-              padding: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Zap size={24} color="white" fill="white" />
+      <ScrollArea style={{ flex: 1 }} px="md" py="sm">
+        <Stack gap="md">
+          {/* Logo agora está dentro do ScrollArea */}
+          <Box style={{ width: '100%' }}>
+            <CherutLogo size={160} />
           </Box>
-          <Title order={2}>Cherut</Title>
-        </Group>
-      </Box>
 
-      <Divider />
+          <Divider />
 
-      <ScrollArea style={{ flex: 1 }} p="md">
-        <Stack gap="xs">
+          <Stack gap="xs">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -166,22 +154,23 @@ export default function Sidebar({ onClose }: SidebarProps) {
               </Box>
             );
           })}
+          </Stack>
+
+          <Divider my="md" />
+
+          <Box>
+            <Button
+              leftSection={<LogOut size={20} />}
+              onClick={handleLogout}
+              variant="subtle"
+              color="red"
+              fullWidth
+            >
+              Logout
+            </Button>
+          </Box>
         </Stack>
       </ScrollArea>
-
-      <Divider />
-
-      <Box p="md">
-        <Button
-          leftSection={<LogOut size={20} />}
-          onClick={handleLogout}
-          variant="subtle"
-          color="red"
-          fullWidth
-        >
-          Logout
-        </Button>
-      </Box>
     </Stack>
   );
 }
