@@ -1,7 +1,9 @@
 'use client';
 
 import { ActionIcon, Group, Tooltip } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { LayoutGrid, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { useSidebar } from '@/contexts/SidebarContext';
 
 export type TaskView = 'kanban' | 'calendar' | 'timetracker';
 
@@ -11,6 +13,14 @@ interface ViewSwitcherProps {
 }
 
 export function ViewSwitcher({ currentView, onViewChange }: ViewSwitcherProps) {
+  const { mobileOpened } = useSidebar();
+  const isMobile = useMediaQuery('(max-width: 1023px)');
+
+  // Hide buttons when mobile sidebar is open to avoid overlap
+  if (isMobile && mobileOpened) {
+    return null;
+  }
+
   return (
     <Group
       gap="xs"

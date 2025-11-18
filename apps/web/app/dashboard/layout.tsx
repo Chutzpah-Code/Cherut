@@ -9,6 +9,7 @@ import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
 import WelcomeModal from '@/components/ui/WelcomeModal';
 import { useWelcomeModal } from '@/hooks/useWelcomeModal';
+import { SidebarProvider } from '@/contexts/SidebarContext';
 
 export default function DashboardLayout({
   children,
@@ -30,6 +31,22 @@ export default function DashboardLayout({
     }
   }, [loading, user, router]);
 
+  // Block body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (mobileOpened) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+
+      // Cleanup on unmount
+      return () => {
+        document.body.style.overflow = 'auto';
+      };
+    }
+  }, [mobileOpened]);
+
   const shouldShowDashboard = !loading && user && backendAuthenticated;
 
   if (!shouldShowDashboard) {
@@ -41,37 +58,39 @@ export default function DashboardLayout({
   }
 
   return (
-    <AppShell
-      header={{ height: 60 }}
-      navbar={{
-        width: 260,
-        breakpoint: 'lg',
-        collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
-      }}
-      padding="md"
-    >
-      <AppShell.Header>
-        <Header
-          mobileOpened={mobileOpened}
-          desktopOpened={desktopOpened}
-          toggleMobile={toggleMobile}
-          toggleDesktop={toggleDesktop}
-          onOpenWelcome={openWelcome}
+    <SidebarProvider mobileOpened={mobileOpened} desktopOpened={desktopOpened}>
+      <AppShell
+        header={{ height: 60 }}
+        navbar={{
+          width: 260,
+          breakpoint: 'lg',
+          collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+        }}
+        padding="md"
+      >
+        <AppShell.Header>
+          <Header
+            mobileOpened={mobileOpened}
+            desktopOpened={desktopOpened}
+            toggleMobile={toggleMobile}
+            toggleDesktop={toggleDesktop}
+            onOpenWelcome={openWelcome}
+          />
+        </AppShell.Header>
+
+        <AppShell.Navbar>
+          <Sidebar onClose={closeMobile} />
+        </AppShell.Navbar>
+
+        <AppShell.Main>
+          {children}
+        </AppShell.Main>
+
+        <WelcomeModal
+          opened={isWelcomeOpen}
+          onClose={closeWelcome}
         />
-      </AppShell.Header>
-
-      <AppShell.Navbar>
-        <Sidebar onClose={closeMobile} />
-      </AppShell.Navbar>
-
-      <AppShell.Main>
-        {children}
-      </AppShell.Main>
-
-      <WelcomeModal
-        opened={isWelcomeOpen}
-        onClose={closeWelcome}
-      />
-    </AppShell>
+      </AppShell>
+    </SidebarProvider>
   );
 }
