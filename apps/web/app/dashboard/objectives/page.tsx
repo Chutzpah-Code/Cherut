@@ -59,6 +59,7 @@ interface KeyResultFormData {
   targetValue: number;
   currentValue: number;
   unit: string;
+  isCompleted?: boolean;
 }
 
 export default function ObjectivesPage() {
@@ -351,6 +352,7 @@ export default function ObjectivesPage() {
         targetValue: kr.targetValue,
         currentValue: kr.currentValue,
         unit: kr.unit,
+        isCompleted: kr.isCompleted,
       }));
       console.log('✅ Setting keyResults to:', krFormData);
       setKeyResults(krFormData);
@@ -447,6 +449,7 @@ export default function ObjectivesPage() {
         targetValue: 0,
         currentValue: 0,
         unit: '',
+        isCompleted: false,
       },
     ]);
   };
