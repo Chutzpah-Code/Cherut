@@ -120,10 +120,7 @@ export default function VisionBoardPage() {
       {/* Header */}
       <Box>
         <Title order={1} size="h2" mb="xs">
-          <Group gap="sm" style={{ display: 'inline-flex', alignItems: 'center' }}>
-            <Sparkles size={32} />
-            My Vision Board
-          </Group>
+          My Vision Board
         </Title>
         <Text c="dimmed" size="sm">
           Drag and drop to organize your goals
