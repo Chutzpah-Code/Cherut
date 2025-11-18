@@ -592,14 +592,16 @@ export default function ObjectivesPage() {
                       </Text>
                       {objective.keyResults.length > 3 && (
                         <ActionIcon
-                          size="sm"
-                          variant="subtle"
+                          size="md"
+                          variant="light"
+                          color="gray"
                           onClick={() => toggleExpanded(objective.id)}
+                          style={{ border: '1px solid #e0e0e0' }}
                         >
                           {expandedObjectives.has(objective.id) ? (
-                            <ChevronUp size={16} />
+                            <ChevronUp size={18} />
                           ) : (
-                            <ChevronDown size={16} />
+                            <ChevronDown size={18} />
                           )}
                         </ActionIcon>
                       )}
