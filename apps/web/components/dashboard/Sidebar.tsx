@@ -66,7 +66,6 @@ export default function Sidebar({ onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Prefetch todas as rotas assim que o sidebar é montado
   useEffect(() => {
     navigation.forEach((item) => {
       router.prefetch(item.href);
@@ -83,7 +82,6 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
 
   const handleLinkClick = () => {
-    // Close mobile menu when a link is clicked on mobile
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       onClose();
     }
@@ -93,67 +91,66 @@ export default function Sidebar({ onClose }: SidebarProps) {
     <Stack h="100%" gap={0}>
       <ScrollArea style={{ flex: 1 }} px="md" py="sm">
         <Stack gap="md">
-          {/* Logo agora está dentro do ScrollArea */}
           <Box style={{ width: '100%' }}>
-            <CherutLogo size={160} />
+            <CherutLogo size={180} />
           </Box>
 
           <Divider />
 
           <Stack gap="xs">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href;
-            const Icon = item.icon;
+            {navigation.map((item) => {
+              const isActive = pathname === item.href;
+              const Icon = item.icon;
 
-            return (
-              <NavLink
-                key={item.name}
-                component={Link}
-                href={item.href}
-                label={item.name}
-                leftSection={<Icon size={20} />}
-                active={isActive}
-                onClick={handleLinkClick}
-                color="blue"
-              />
-            );
-          })}
-
-          <Divider my="md" />
-
-          <Text size="sm" fw={600} c="dimmed" mb="xs" px="sm" style={{ fontSize: '13px' }}>
-            COMING SOON
-          </Text>
-
-          {comingSoonItems.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <Box key={item.name}>
+              return (
                 <NavLink
-                  label={
-                    <Group justify="space-between" w="100%">
-                      <Text size="md" style={{ fontSize: '15px', fontWeight: 500 }}>{item.name}</Text>
-                      <Badge size="sm" color="yellow" variant="light" style={{ fontSize: '11px' }}>
-                        Soon
-                      </Badge>
-                    </Group>
-                  }
+                  key={item.name}
+                  component={Link}
+                  href={item.href}
+                  label={item.name}
                   leftSection={<Icon size={20} />}
-                  disabled
-                  style={{
-                    opacity: 0.6,
-                    cursor: 'not-allowed',
-                  }}
-                  description={
-                    <Text size="sm" c="dimmed" mt={4} lineClamp={2} style={{ fontSize: '13px' }}>
-                      {item.description}
-                    </Text>
-                  }
+                  active={isActive}
+                  onClick={handleLinkClick}
+                  color="blue"
                 />
-              </Box>
-            );
-          })}
+              );
+            })}
+
+            <Divider my="md" />
+
+            <Text size="sm" fw={600} c="dimmed" mb="xs" px="sm" style={{ fontSize: '13px' }}>
+              COMING SOON
+            </Text>
+
+            {comingSoonItems.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <Box key={item.name}>
+                  <NavLink
+                    label={
+                      <Group justify="space-between" w="100%">
+                        <Text size="md" style={{ fontSize: '15px', fontWeight: 500 }}>{item.name}</Text>
+                        <Badge size="sm" color="yellow" variant="light" style={{ fontSize: '11px' }}>
+                          Soon
+                        </Badge>
+                      </Group>
+                    }
+                    leftSection={<Icon size={20} />}
+                    disabled
+                    style={{
+                      opacity: 0.6,
+                      cursor: 'not-allowed',
+                    }}
+                    description={
+                      <Text size="sm" c="dimmed" mt={4} lineClamp={2} style={{ fontSize: '13px' }}>
+                        {item.description}
+                      </Text>
+                    }
+                  />
+                </Box>
+              );
+            })}
           </Stack>
 
           <Divider my="md" />
