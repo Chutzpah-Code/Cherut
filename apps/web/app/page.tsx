@@ -682,7 +682,7 @@ export default function Home() {
                   fw={700}
                   style={{ color: 'hsl(0 0% 0% / 0.87)' }}
                 >
-                  Life Areas Balance
+                  Strategic Area of Focus
                 </Text>
                 <Text
                   size="md"
