@@ -17,6 +17,7 @@ import { TrackingModule } from './modules/tracking/tracking.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { EnterpriseWaitlistModule } from './enterprise-waitlist/enterprise-waitlist.module';
 import { VisionBoardModule } from './modules/vision-board/vision-board.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 /**
  * 📚 EXPLICAÇÃO: App Module (Módulo Raiz)
@@ -74,6 +75,8 @@ import { VisionBoardModule } from './modules/vision-board/vision-board.module';
     EnterpriseWaitlistModule,
     // Vision Board (quadro de visualização de objetivos com imagens)
     VisionBoardModule,
+    // Admin (dashboard administrativo)
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,10 +1,15 @@
 import axios from 'axios';
 import { getIdToken } from '@/lib/firebase/auth';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
+// Debug logging
+console.log('[API Client] Environment API URL:', process.env.NEXT_PUBLIC_API_URL);
+console.log('[API Client] Using API URL:', API_URL);
 
 export const apiClient = axios.create({
   baseURL: API_URL,
+  timeout: 10000, // 10 seconds timeout
   headers: {
     'Content-Type': 'application/json',
   },

@@ -1,5 +1,6 @@
 'use client';
 
+import { useAdminRedirect } from '@/hooks/useAdminRedirect';
 import {
   Container,
   Title,
@@ -32,6 +33,8 @@ import {
 import Link from 'next/link';
 
 export default function Home() {
+  // Redirecionar automaticamente usuários logados para área apropriada
+  useAdminRedirect();
   return (
     <Box
       style={{

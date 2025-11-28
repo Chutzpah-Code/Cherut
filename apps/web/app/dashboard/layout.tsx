@@ -3,6 +3,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useAdminRedirect } from '@/hooks/useAdminRedirect';
 import { AppShell, Burger, Group, Loader, Center } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Sidebar from '@/components/dashboard/Sidebar';
@@ -16,17 +17,26 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading, backendAuthenticated } = useAuth();
+  const { user, loading, backendAuthenticated, isAdmin } = useAuth();
   const router = useRouter();
   const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const { isOpen: isWelcomeOpen, openModal: openWelcome, closeModal: closeWelcome } = useWelcomeModal();
 
-  console.log('[Dashboard] Auth state:', { user: !!user, loading, backendAuthenticated });
+  // Usar hook de redirecionamento automático
+  useAdminRedirect();
+
+  console.log('[Dashboard] Auth state:', {
+    user: !!user,
+    loading,
+    backendAuthenticated,
+    isAdmin
+  });
 
   // Redirect to home if not authenticated
   useEffect(() => {
     if (!loading && !user) {
+      console.log('[Dashboard] No user, redirecting to home');
       router.push('/');
     }
   }, [loading, user, router]);
