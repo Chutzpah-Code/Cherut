@@ -224,7 +224,7 @@ export default function AdminSettingsPage() {
       )}
 
       {/* Settings Tabs */}
-      <Tabs value={activeTab} onChange={setActiveTab}>
+      <Tabs value={activeTab} onChange={(value) => setActiveTab(value || 'general')}>
         <Tabs.List>
           <Tabs.Tab value="general" leftSection={<IconSettings size={16} />}>
             General

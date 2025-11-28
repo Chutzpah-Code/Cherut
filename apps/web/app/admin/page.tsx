@@ -54,8 +54,9 @@ interface DashboardData {
   };
   planDistribution: {
     free: number;
-    premium: number;
-    enterprise: number;
+    core: number;
+    pro: number;
+    elite: number;
   };
   lastUpdated: string;
 }
@@ -63,8 +64,9 @@ interface DashboardData {
 interface SalesData {
   monthlyRevenue: number;
   salesByPlan: {
-    premium: number;
-    enterprise: number;
+    core: number;
+    pro: number;
+    elite: number;
   };
   totalPaidUsers: number;
   averageRevenuePerUser: number;

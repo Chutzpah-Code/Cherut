@@ -13,7 +13,7 @@ const getSecureApiUrl = (): string => {
   }
   return apiUrl;
 };
-import { AppShell, Navbar, Header, Group, Title, Button, Loader, Center, Alert, Burger } from '@mantine/core';
+import { AppShell, Group, Title, Button, Loader, Center, Alert, Burger } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconDashboard,

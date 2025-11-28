@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   Title,
   Table,
@@ -104,11 +104,7 @@ export default function AdminUsersPage() {
     role: 'user' as 'user' | 'admin',
   });
 
-  useEffect(() => {
-    loadUsers();
-  }, [filters]);
-
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -144,7 +140,11 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [user, filters]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   async function createAdmin() {
     if (!user || !newAdminEmail || !newAdminPassword) return;
