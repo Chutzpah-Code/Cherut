@@ -23,6 +23,8 @@ import {
   ArrowRight,
   Sparkles,
   X,
+  Heart,
+  BookOpen,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -61,6 +63,18 @@ const features = [
     title: 'Vision Board',
     description: 'Visualize your dreams and maintain motivation through inspiring imagery.',
     color: '#a855f7',
+  },
+  {
+    icon: Heart,
+    title: 'Personal Values',
+    description: 'Define and align with your core values. Track behaviors that reinforce your principles.',
+    color: '#e11d48',
+  },
+  {
+    icon: BookOpen,
+    title: 'Journal',
+    description: 'Daily reflections and thoughts. Search entries by date or content for insights.',
+    color: '#8b5cf6',
   },
 ];
 
@@ -206,6 +220,36 @@ const steps = [
               <Text size="xs" c="dimmed">
                 Upload inspiring images that represent your goals and dreams. Visual motivation helps maintain
                 focus and emotional connection to your objectives during challenging times.
+              </Text>
+            </Box>
+          </Group>
+        </Paper>
+
+        <Paper p="md" radius="md" style={{ border: '1px solid #e11d4820', background: '#e11d4810' }}>
+          <Group gap="sm" align="flex-start">
+            <ThemeIcon size={24} radius="xl" style={{ background: '#e11d48', color: 'white', flexShrink: 0 }}>
+              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>6</span>
+            </ThemeIcon>
+            <Box>
+              <Text fw={600} size="sm">Define Your Personal Values</Text>
+              <Text size="xs" c="dimmed">
+                Identify your core principles and define behaviors that reinforce them. Values serve as your
+                moral compass and decision-making framework for consistent character development.
+              </Text>
+            </Box>
+          </Group>
+        </Paper>
+
+        <Paper p="md" radius="md" style={{ border: '1px solid #8b5cf620', background: '#8b5cf610' }}>
+          <Group gap="sm" align="flex-start">
+            <ThemeIcon size={24} radius="xl" style={{ background: '#8b5cf6', color: 'white', flexShrink: 0 }}>
+              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>7</span>
+            </ThemeIcon>
+            <Box>
+              <Text fw={600} size="sm">Daily Journaling & Reflection</Text>
+              <Text size="xs" c="dimmed">
+                Capture daily thoughts, insights, and reflections. Use search functionality to find patterns
+                and track your mental and emotional growth over time.
               </Text>
             </Box>
           </Group>
