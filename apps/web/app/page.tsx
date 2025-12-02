@@ -32,6 +32,7 @@ import {
   Sparkles,
   Menu,
   X,
+  BookOpen,
 } from 'lucide-react';
 import Link from 'next/link';
 import CherutLogo from '@/components/ui/CherutLogo';
@@ -939,7 +940,7 @@ export default function Home() {
               padding: '0 1rem',
             }}
           >
-            Transform your ambition into{' '}
+            Turn Dreams Into{' '}
             <span style={{
               background: 'linear-gradient(135deg, #3143B6 0%, #A855F7 50%, #EC4899 100%)',
               backgroundClip: 'text',
@@ -949,7 +950,7 @@ export default function Home() {
               textShadow: 'none',
               position: 'relative',
             }}>
-              unstoppable results
+              Reality
             </span>
             . Built for ambitious individuals who refuse to settle for{' '}
             <span style={{
@@ -1261,7 +1262,7 @@ export default function Home() {
             </Text>
           </Stack>
 
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing={40} w="100%">
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={40} w="100%">
             <Card
               padding="xl"
               radius={24}
@@ -1287,7 +1288,7 @@ export default function Home() {
                 </ThemeIcon>
                 <div className="feature-content">
                   <Text
-                    size="26px"
+                    size="24px"
                     fw={700}
                     style={{
                       color: 'hsl(0 0% 0% / 0.87)',
@@ -1308,7 +1309,111 @@ export default function Home() {
                     }}
                   >
                     Set objectives and key results like the world&apos;s top performers. Break down
-                    ambitious goals into measurable milestones that drive real progress.
+                    ambitious goals into measurable milestones.
+                  </Text>
+                </div>
+              </Stack>
+            </Card>
+
+            <Card
+              padding="xl"
+              radius={24}
+              className="feature-card"
+              style={{
+                background: 'white',
+                border: '1px solid hsl(0 0% 0% / 0.08)',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+              }}
+            >
+              <Stack gap="lg">
+                <ThemeIcon
+                  size={72}
+                  radius={20}
+                  className="feature-icon"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%)',
+                    color: '#A855F7',
+                    border: '2px solid rgba(168, 85, 247, 0.1)',
+                  }}
+                >
+                  <Star size={36} />
+                </ThemeIcon>
+                <div className="feature-content">
+                  <Text
+                    size="24px"
+                    fw={700}
+                    style={{
+                      color: 'hsl(0 0% 0% / 0.87)',
+                      marginBottom: '12px',
+                      background: 'linear-gradient(135deg, #1a1a1a 0%, #A855F7 100%)',
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    Core Values
+                  </Text>
+                  <Text
+                    size="md"
+                    style={{
+                      color: 'hsl(0 0% 0% / 0.6)',
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    Define and align with your personal values. Create reinforcing behaviors
+                    that keep you authentic to what matters most.
+                  </Text>
+                </div>
+              </Stack>
+            </Card>
+
+            <Card
+              padding="xl"
+              radius={24}
+              className="feature-card"
+              style={{
+                background: 'white',
+                border: '1px solid hsl(0 0% 0% / 0.08)',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+              }}
+            >
+              <Stack gap="lg">
+                <ThemeIcon
+                  size={72}
+                  radius={20}
+                  className="feature-icon"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%)',
+                    color: '#EC4899',
+                    border: '2px solid rgba(236, 72, 153, 0.1)',
+                  }}
+                >
+                  <Users size={36} />
+                </ThemeIcon>
+                <div className="feature-content">
+                  <Text
+                    size="24px"
+                    fw={700}
+                    style={{
+                      color: 'hsl(0 0% 0% / 0.87)',
+                      marginBottom: '12px',
+                      background: 'linear-gradient(135deg, #1a1a1a 0%, #EC4899 100%)',
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    Vision Board
+                  </Text>
+                  <Text
+                    size="md"
+                    style={{
+                      color: 'hsl(0 0% 0% / 0.6)',
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    Visualize your dreams with powerful imagery. Create inspiring boards
+                    that keep your aspirations front and center daily.
                   </Text>
                 </div>
               </Stack>
@@ -1335,11 +1440,11 @@ export default function Home() {
                     border: '2px solid rgba(6, 182, 212, 0.1)',
                   }}
                 >
-                  <CheckCircle2 size={36} />
+                  <BookOpen size={36} />
                 </ThemeIcon>
                 <div className="feature-content">
                   <Text
-                    size="26px"
+                    size="24px"
                     fw={700}
                     style={{
                       color: 'hsl(0 0% 0% / 0.87)',
@@ -1350,7 +1455,7 @@ export default function Home() {
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    Task Management
+                    Daily Journal
                   </Text>
                   <Text
                     size="md"
@@ -1359,8 +1464,8 @@ export default function Home() {
                       lineHeight: 1.7,
                     }}
                   >
-                    Organize your work with intuitive task boards. Track progress, set priorities,
-                    and never lose sight of what matters most.
+                    Reflect, plan, and grow through guided journaling. Track thoughts,
+                    insights, and breakthroughs on your journey to excellence.
                   </Text>
                 </div>
               </Stack>
@@ -1391,7 +1496,7 @@ export default function Home() {
                 </ThemeIcon>
                 <div className="feature-content">
                   <Text
-                    size="26px"
+                    size="24px"
                     fw={700}
                     style={{
                       color: 'hsl(0 0% 0% / 0.87)',
@@ -1443,7 +1548,7 @@ export default function Home() {
                 </ThemeIcon>
                 <div className="feature-content">
                   <Text
-                    size="26px"
+                    size="24px"
                     fw={700}
                     style={{
                       color: 'hsl(0 0% 0% / 0.87)',
@@ -1454,7 +1559,7 @@ export default function Home() {
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    Strategic Area of Focus
+                    Strategic Focus Areas
                   </Text>
                   <Text
                     size="md"
@@ -1463,8 +1568,8 @@ export default function Home() {
                       lineHeight: 1.7,
                     }}
                   >
-                    Achieve holistic excellence. Organize goals across health, career, relationships,
-                    and personal growth for balanced peak performance.
+                    Achieve holistic excellence. Organize goals across health, career,
+                    relationships, and personal growth for balanced peak performance.
                   </Text>
                 </div>
               </Stack>
