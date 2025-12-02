@@ -19,7 +19,8 @@ import {
   Anchor,
   Box,
 } from '@mantine/core';
-import { ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
+import { ArrowRight, AlertCircle } from 'lucide-react';
+import CherutLogo from '@/components/ui/CherutLogo';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -92,19 +93,7 @@ export default function RegisterPage() {
         <Stack gap="xl">
           {/* Logo/Brand */}
           <Stack gap="xs" align="center">
-            <Box
-              style={{
-                width: 60,
-                height: 60,
-                borderRadius: '16px',
-                background: '#3143B6',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Sparkles size={32} color="white" />
-            </Box>
+            <CherutLogo size={120} />
             <Title
               order={1}
               ta="center"

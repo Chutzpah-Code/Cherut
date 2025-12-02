@@ -16,6 +16,7 @@ import {
 } from '@mantine/core';
 import { Building2, ArrowLeft, CheckCircle } from 'lucide-react';
 import { enterpriseWaitlistApi } from '@/lib/api/services/enterprise-waitlist';
+import CherutLogo from '@/components/ui/CherutLogo';
 
 export default function EnterpriseWaitlistPage() {
   const router = useRouter();
@@ -140,19 +141,7 @@ export default function EnterpriseWaitlistPage() {
           }}
         >
           <Stack gap="lg" mb="xl">
-            <Box
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: '16px',
-                background: '#3143B6',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Building2 size={28} color="white" />
-            </Box>
+            <CherutLogo size={100} />
             <div>
               <Title
                 order={2}

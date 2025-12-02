@@ -238,8 +238,8 @@ export default function ValuesPage() {
               </Group>
             </Stack>
           </Card>
-          );
-        })}
+        );
+      })}
       </SimpleGrid>
 
       {values?.length === 0 && (

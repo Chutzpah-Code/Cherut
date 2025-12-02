@@ -31,6 +31,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
+import CherutLogo from '@/components/ui/CherutLogo';
 
 export default function Home() {
   // Redirecionar automaticamente usuários logados para área apropriada
@@ -1631,19 +1632,24 @@ export default function Home() {
           <Divider mb={40} style={{ borderColor: 'hsl(0 0% 0% / 0.1)' }} />
           <Group justify="space-between" align="flex-start">
             <Stack gap="xs">
-              <Text
-                size="lg"
-                fw={700}
-                style={{ color: 'hsl(0 0% 0% / 0.87)' }}
-              >
-                Cherut
-              </Text>
-              <Text
-                size="xs"
-                style={{ color: 'hsl(0 0% 0% / 0.6)' }}
-              >
-                All in, all the time
-              </Text>
+              <Group gap="sm" align="center">
+                <CherutLogo size={80} />
+                <Stack gap={2}>
+                  <Text
+                    size="lg"
+                    fw={700}
+                    style={{ color: 'hsl(0 0% 0% / 0.87)' }}
+                  >
+                    Cherut
+                  </Text>
+                  <Text
+                    size="xs"
+                    style={{ color: 'hsl(0 0% 0% / 0.6)' }}
+                  >
+                    All in, all the time
+                  </Text>
+                </Stack>
+              </Group>
               <Text
                 size="xs"
                 mt="md"
