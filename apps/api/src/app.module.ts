@@ -18,6 +18,8 @@ import { TasksModule } from './modules/tasks/tasks.module';
 import { EnterpriseWaitlistModule } from './enterprise-waitlist/enterprise-waitlist.module';
 import { VisionBoardModule } from './modules/vision-board/vision-board.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { JournalModule } from './modules/journal/journal.module';
+import { ValuesModule } from './modules/values/values.module';
 
 /**
  * 📚 EXPLICAÇÃO: App Module (Módulo Raiz)
@@ -77,6 +79,10 @@ import { AdminModule } from './modules/admin/admin.module';
     VisionBoardModule,
     // Admin (dashboard administrativo)
     AdminModule,
+    // Journal (personal journaling for daily reflections)
+    JournalModule,
+    // Values (core personal values definition and alignment)
+    ValuesModule,
   ],
   controllers: [AppController],
   providers: [

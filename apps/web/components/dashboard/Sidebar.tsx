@@ -25,9 +25,11 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Vision Board', href: '/dashboard/vision-board', icon: Sparkles },
   { name: 'Life Areas', href: '/dashboard/life-areas', icon: TrendingUp },
+  { name: 'Values', href: '/dashboard/values', icon: Heart },
   { name: 'Objectives', href: '/dashboard/objectives', icon: Target },
   { name: 'Tasks', href: '/dashboard/tasks', icon: CheckSquare },
   { name: 'Habits', href: '/dashboard/habits', icon: Calendar },
+  { name: 'Journal', href: '/dashboard/journal', icon: BookOpen },
   { name: 'Profile', href: '/dashboard/profile', icon: User },
 ];
 
@@ -37,18 +39,6 @@ const comingSoonItems = [
     href: '#',
     icon: BarChart3,
     description: 'Analytics dashboards showing your evolution and progress insights'
-  },
-  {
-    name: 'Journal',
-    href: '#',
-    icon: BookOpen,
-    description: 'Personal space for daily reflections and thoughts'
-  },
-  {
-    name: 'Values',
-    href: '#',
-    icon: Heart,
-    description: 'Define and align with your core personal values'
   },
   {
     name: 'CherutOS',
