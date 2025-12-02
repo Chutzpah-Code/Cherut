@@ -113,11 +113,10 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
     <Modal
       opened={opened}
       onClose={onClose}
-      size={{ base: 'full', sm: 'xl' }}
-      fullScreen={{ base: true, sm: false }}
+      size="xl"
       title={
         <Group justify="space-between" w="100%" wrap="wrap">
-          <Text fw={600} size={{ base: 'md', sm: 'lg' }} lineClamp={1} style={{ flex: 1 }}>
+          <Text fw={600} size="lg" lineClamp={1} style={{ flex: 1 }}>
             {entry.title || 'Untitled Entry'}
           </Text>
           {!isEditing && (
@@ -141,7 +140,6 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
           )}
         </Group>
       }
-      size="lg"
       centered
     >
       <Stack gap="md">

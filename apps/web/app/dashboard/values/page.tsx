@@ -178,11 +178,11 @@ export default function ValuesPage() {
           <Title order={1} size="h2" mb="xs">Values</Title>
           <Text c="dimmed" size="sm">Define and align with your core personal values</Text>
         </div>
-        <Group justify={{ base: "center", sm: "flex-end" }}>
+        <Group justify="flex-end">
           <Button
             leftSection={<Plus size={20} />}
             onClick={handleNew}
-            fullWidth={{ base: true, sm: false }}
+            fullWidth
           >
             New Value
           </Button>
@@ -261,8 +261,8 @@ export default function ValuesPage() {
         opened={isModalOpen}
         onClose={handleCancel}
         title={editingValue ? 'Edit Value' : 'New Value'}
-        size={{ base: 'full', sm: 'md' }}
-        fullScreen={{ base: true, sm: false }}
+        size="md"
+        fullScreen={false}
       >
         <form onSubmit={handleSubmit}>
           <Stack gap="md">

@@ -99,7 +99,7 @@ export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntr
               {characterCount.toLocaleString()} / 20,000 characters
             </Text>
 
-            <Group gap="sm" grow={{ base: true, sm: false }} justify={{ base: "stretch", sm: "flex-end" }}>
+            <Group gap="sm" grow justify="flex-end">
               <Button
                 variant="light"
                 onClick={onCancel}

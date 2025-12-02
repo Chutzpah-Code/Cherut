@@ -182,7 +182,7 @@ export default function JournalPage() {
           leftSection={<Plus size={20} />}
           onClick={() => setIsCreateFormOpen(true)}
           color="blue"
-          fullWidth={{ base: true, sm: false }}
+          fullWidth
         >
           New Entry
         </Button>
