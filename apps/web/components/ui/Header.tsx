@@ -13,11 +13,12 @@ import {
   Menu,
   X,
 } from 'lucide-react';
-import Link from 'next/link';
 import CherutLogo from '@/components/ui/CherutLogo';
+import { useClientNavigation } from '@/hooks/useClientNavigation';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { navigate } = useClientNavigation();
   return (
     <Box
       style={{
@@ -34,18 +35,15 @@ export default function Header() {
       <Container size="lg">
         <Group justify="space-between" h={100}>
           {/* Logo */}
-          <Link href="/" style={{ textDecoration: 'none' }}>
-            <Group style={{ cursor: 'pointer' }}>
-              <CherutLogo size={100} />
-            </Group>
-          </Link>
+          <Group style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+            <CherutLogo size={100} />
+          </Group>
 
           {/* Desktop Navigation Links */}
           <Group gap="xl" visibleFrom="md">
             <Button
               variant="subtle"
-              component={Link}
-              href="/about"
+              onClick={() => navigate('/about')}
               style={{ color: '#374151', fontWeight: 500 }}
               styles={{
                 root: {
@@ -60,8 +58,7 @@ export default function Header() {
             </Button>
             <Button
               variant="subtle"
-              component={Link}
-              href="/#pricing"
+              onClick={() => navigate('/#pricing')}
               style={{ color: '#374151', fontWeight: 500 }}
               styles={{
                 root: {
@@ -76,8 +73,7 @@ export default function Header() {
             </Button>
             <Button
               variant="subtle"
-              component={Link}
-              href="/#testimonials"
+              onClick={() => navigate('/#testimonials')}
               style={{ color: '#374151', fontWeight: 500 }}
               styles={{
                 root: {
@@ -112,9 +108,8 @@ export default function Header() {
           {/* Desktop Auth Buttons */}
           <Group gap="md" visibleFrom="md">
             <Button
-              component={Link}
-              href="/auth/login"
               variant="subtle"
+              onClick={() => navigate('/auth/login')}
               style={{ color: '#374151', fontWeight: 600 }}
               styles={{
                 root: {
@@ -128,9 +123,8 @@ export default function Header() {
               Login
             </Button>
             <Button
-              component={Link}
-              href="/auth/register"
               radius={8}
+              onClick={() => navigate('/auth/register')}
               style={{
                 background: '#3143B6',
                 color: 'white',
@@ -181,9 +175,7 @@ export default function Header() {
               {/* Mobile Navigation Links */}
               <Button
                 variant="subtle"
-                component={Link}
-                href="/about"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => { navigate('/about'); setMobileMenuOpen(false); }}
                 style={{
                   color: '#374151',
                   fontWeight: 500,
@@ -196,9 +188,7 @@ export default function Header() {
               </Button>
               <Button
                 variant="subtle"
-                component={Link}
-                href="/#pricing"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => { navigate('/#pricing'); setMobileMenuOpen(false); }}
                 style={{
                   color: '#374151',
                   fontWeight: 500,
@@ -211,9 +201,7 @@ export default function Header() {
               </Button>
               <Button
                 variant="subtle"
-                component={Link}
-                href="/#testimonials"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => { navigate('/#testimonials'); setMobileMenuOpen(false); }}
                 style={{
                   color: '#374151',
                   fontWeight: 500,
@@ -245,10 +233,8 @@ export default function Header() {
 
               {/* Mobile Auth Buttons */}
               <Button
-                component={Link}
-                href="/auth/login"
                 variant="outline"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => { navigate('/auth/login'); setMobileMenuOpen(false); }}
                 style={{
                   borderColor: '#3143B6',
                   color: '#3143B6',
@@ -260,10 +246,8 @@ export default function Header() {
                 Login
               </Button>
               <Button
-                component={Link}
-                href="/auth/register"
-                onClick={() => setMobileMenuOpen(false)}
                 radius={8}
+                onClick={() => { navigate('/auth/register'); setMobileMenuOpen(false); }}
                 style={{
                   background: '#3143B6',
                   color: 'white',
