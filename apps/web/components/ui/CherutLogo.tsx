@@ -1,15 +1,10 @@
-'use client';
-
-import { useMantineColorScheme } from '@mantine/core';
-
 interface CherutLogoProps {
   size?: number;
   className?: string;
+  fillColor?: string;
 }
 
-export default function CherutLogo({ size = 120, className }: CherutLogoProps) {
-  const { colorScheme } = useMantineColorScheme();
-  const fillColor = colorScheme === 'dark' ? '#ffffff' : '#000000';
+export default function CherutLogo({ size = 120, className, fillColor = '#000000' }: CherutLogoProps) {
 
   return (
     <svg
