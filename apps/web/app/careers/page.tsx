@@ -28,7 +28,7 @@ export default function Careers() {
               Build the Future with Us
             </Title>
             <Text size="xl" ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-              Join a team of exceptional individuals building the world's most comprehensive
+              Join a team of exceptional individuals building the world&apos;s most comprehensive
               personal excellence platform. Shape the future of human performance.
             </Text>
           </Stack>
@@ -43,7 +43,7 @@ export default function Careers() {
                 Our Mission
               </Title>
               <Text size="lg" ta="center" maw={800} style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-                We're building more than just software - we're creating a movement. Our mission is to empower
+                We&apos;re building more than just software - we&apos;re creating a movement. Our mission is to empower
                 every ambitious individual with the tools and insights they need to achieve extraordinary results
                 and live their highest potential.
               </Text>
@@ -66,7 +66,7 @@ export default function Careers() {
                     <Text size="lg" fw={700}>Elite Performance Culture</Text>
                     <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
                       We practice what we preach. Our team uses Cherut daily and embodies the principles of
-                      high performance in everything we do. You'll work alongside passionate, driven individuals
+                      high performance in everything we do. You&apos;ll work alongside passionate, driven individuals
                       committed to excellence.
                     </Text>
                   </Stack>
@@ -82,7 +82,7 @@ export default function Careers() {
                     <Text size="lg" fw={700}>Cutting-Edge Innovation</Text>
                     <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
                       Work with the latest technologies and methodologies. From AI-powered insights to
-                      revolutionary UX design, you'll be at the forefront of performance technology innovation.
+                      revolutionary UX design, you&apos;ll be at the forefront of performance technology innovation.
                     </Text>
                   </Stack>
                 </Group>
@@ -145,8 +145,8 @@ export default function Careers() {
                 Building Our Core Team
               </Title>
               <Text ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-                We're currently in our pre-launch phase, carefully building our core team of exceptional
-                individuals. While we don't have open positions right now, we're always looking for
+                We&apos;re currently in our pre-launch phase, carefully building our core team of exceptional
+                individuals. While we don&apos;t have open positions right now, we&apos;re always looking for
                 extraordinary talent to join our mission.
               </Text>
             </Stack>
@@ -165,13 +165,13 @@ export default function Careers() {
                 </Title>
                 <Stack gap="md">
                   <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    • <strong>Excellence Mindset:</strong> You're not satisfied with "good enough" - you strive for mastery in everything you do
+                    • <strong>Excellence Mindset:</strong> You&apos;re not satisfied with &quot;good enough&quot; - you strive for mastery in everything you do
                   </Text>
                   <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
                     • <strong>Growth Orientation:</strong> You see challenges as opportunities and are constantly learning and evolving
                   </Text>
                   <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    • <strong>Impact Focus:</strong> You want your work to matter and make a meaningful difference in people's lives
+                    • <strong>Impact Focus:</strong> You want your work to matter and make a meaningful difference in people&apos;s lives
                   </Text>
                   <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
                     • <strong>Collaborative Spirit:</strong> You thrive in team environments and lift others up while pursuing excellence
@@ -191,7 +191,7 @@ export default function Careers() {
             </Title>
 
             <Text ta="center" maw={600} mx="auto" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-              As we grow, we'll be looking for exceptional talent in these areas:
+              As we grow, we&apos;ll be looking for exceptional talent in these areas:
             </Text>
 
             <Stack gap="md">
@@ -237,8 +237,8 @@ export default function Careers() {
             <Stack align="center" gap="lg">
               <Title order={3} ta="center">Ready to Shape the Future?</Title>
               <Text ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.7 }}>
-                Even if we don't have open positions right now, we'd love to hear from exceptional
-                individuals who share our vision. Send us your story, and let's explore how we
+                Even if we don&apos;t have open positions right now, we&apos;d love to hear from exceptional
+                individuals who share our vision. Send us your story, and let&apos;s explore how we
                 can build something extraordinary together.
               </Text>
               <Group gap="md">

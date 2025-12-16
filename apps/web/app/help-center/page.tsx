@@ -29,7 +29,7 @@ export default function HelpCenter() {
             </Title>
             <Text size="xl" ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
               Find answers, get support, and master your Cherut performance system.
-              We're here to help you achieve extraordinary results.
+              We&apos;re here to help you achieve extraordinary results.
             </Text>
           </Stack>
 
@@ -202,7 +202,7 @@ export default function HelpCenter() {
                   <Text fw={600} size="lg">How do I get started with Cherut?</Text>
                   <Divider />
                   <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.6 }}>
-                    After creating your account, you'll be guided through our onboarding process. Start by setting up
+                    After creating your account, you&apos;ll be guided through our onboarding process. Start by setting up
                     your life areas (like Health, Career, Relationships), then create your first objective with
                     measurable key results. The system will guide you through each step.
                   </Text>
@@ -211,12 +211,12 @@ export default function HelpCenter() {
 
               <Card padding="lg" radius={16} style={{ background: 'white', border: '1px solid rgba(168, 85, 247, 0.1)' }}>
                 <Stack gap="md">
-                  <Text fw={600} size="lg">What's the difference between objectives and key results?</Text>
+                  <Text fw={600} size="lg">What&apos;s the difference between objectives and key results?</Text>
                   <Divider />
                   <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.6 }}>
-                    Objectives are qualitative, inspirational goals (e.g., "Become financially independent").
+                    Objectives are qualitative, inspirational goals (e.g., &quot;Become financially independent&quot;).
                     Key Results are specific, measurable outcomes that indicate progress toward the objective
-                    (e.g., "Save $50,000", "Increase monthly income to $10,000"). Each objective should have 2-5 key results.
+                    (e.g., &quot;Save $50,000&quot;, &quot;Increase monthly income to $10,000&quot;). Each objective should have 2-5 key results.
                   </Text>
                 </Stack>
               </Card>
@@ -329,7 +329,7 @@ export default function HelpCenter() {
               <Title order={3} ta="center">Help Us Improve</Title>
               <Text ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.7 }}>
                 During our beta phase, your feedback is invaluable. If you encounter any issues or have
-                suggestions for improvement, please don't hesitate to reach out. Your input shapes the
+                suggestions for improvement, please don&apos;t hesitate to reach out. Your input shapes the
                 future of Cherut.
               </Text>
             </Stack>

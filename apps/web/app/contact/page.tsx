@@ -28,7 +28,7 @@ export default function Contact() {
               Contact Us
             </Title>
             <Text size="xl" ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-              Have questions, feedback, or need support? We'd love to hear from you.
+              Have questions, feedback, or need support? We&apos;d love to hear from you.
               Our team is here to help you achieve extraordinary results.
             </Text>
           </Stack>
@@ -298,7 +298,7 @@ export default function Contact() {
               </Badge>
               <Title order={3} ta="center">Your Feedback Shapes Our Future</Title>
               <Text ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.7 }}>
-                During our beta phase, your input is incredibly valuable. Whether you've found a bug,
+                During our beta phase, your input is incredibly valuable. Whether you&apos;ve found a bug,
                 have a feature request, or just want to share your experience, we want to hear from you.
                 Every piece of feedback helps us build a better Cherut.
               </Text>

@@ -28,7 +28,7 @@ export default function Roadmap() {
               Product Roadmap
             </Title>
             <Text size="xl" ta="center" maw={600} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-              Our journey to building the world's most comprehensive performance system
+              Our journey to building the world&apos;s most comprehensive performance system
             </Text>
           </Stack>
 
@@ -42,7 +42,7 @@ export default function Roadmap() {
                 <Text size="xl" fw={700}>Current Status - Beta Testing</Text>
               </Group>
               <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                We're currently in private beta with select users, refining the core features and gathering feedback
+                We&apos;re currently in private beta with select users, refining the core features and gathering feedback
                 to ensure we deliver an exceptional experience at launch.
               </Text>
             </Stack>

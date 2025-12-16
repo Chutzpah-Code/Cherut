@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
             </Title>
             <Text size="xl" ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
               Your privacy and data security are fundamental to everything we do at Cherut.
-              Here's how we protect and handle your information.
+              Here&apos;s how we protect and handle your information.
             </Text>
             <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.5)' }}>
               Last updated: December 15, 2025
@@ -47,7 +47,7 @@ export default function PrivacyPolicy() {
               </Title>
               <Text size="lg" ta="center" maw={800} style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
                 We believe privacy is a fundamental right. Your personal data belongs to you, and we act as
-                its guardian. We collect only what's necessary, protect it rigorously, and never sell it to anyone.
+                its guardian. We collect only what&apos;s necessary, protect it rigorously, and never sell it to anyone.
               </Text>
             </Stack>
           </Card>
@@ -338,7 +338,7 @@ export default function PrivacyPolicy() {
           {/* Children's Privacy */}
           <Stack gap="xl">
             <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
-              Children's Privacy
+              Children&apos;s Privacy
             </Title>
 
             <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
@@ -368,8 +368,8 @@ export default function PrivacyPolicy() {
             </Title>
 
             <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-              We may update this privacy policy from time to time. When we do, we'll notify you via email
-              and update the "Last updated" date at the top of this policy. We encourage you to review
+              We may update this privacy policy from time to time. When we do, we&apos;ll notify you via email
+              and update the &quot;Last updated&quot; date at the top of this policy. We encourage you to review
               this policy periodically to stay informed about how we protect your privacy.
             </Text>
           </Stack>
@@ -387,7 +387,7 @@ export default function PrivacyPolicy() {
                 <Text fw={700} size="lg">Contact Our Privacy Team</Text>
                 <Text ta="center" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
                   If you have any questions about this privacy policy or how we handle your data,
-                  we're here to help.
+                  we&apos;re here to help.
                 </Text>
                 <Group gap="md">
                   <Text fw={600} style={{ color: '#3143B6' }}>

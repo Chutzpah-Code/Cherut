@@ -28,7 +28,7 @@ export default function About() {
               About Cherut
             </Title>
             <Text size="xl" ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-              We're building the world's most comprehensive personal excellence platform,
+              We&apos;re building the world&apos;s most comprehensive personal excellence platform,
               designed for ambitious individuals who refuse to settle for ordinary.
             </Text>
           </Stack>
@@ -64,7 +64,7 @@ export default function About() {
                   </ThemeIcon>
                   <Text size="lg" fw={700}>Excellence First</Text>
                   <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-                    We're obsessed with creating tools that don't just work, but work exceptionally well.
+                    We&apos;re obsessed with creating tools that don&apos;t just work, but work exceptionally well.
                     Every feature is designed with elite performance in mind.
                   </Text>
                 </Stack>
@@ -90,7 +90,7 @@ export default function About() {
                   </ThemeIcon>
                   <Text size="lg" fw={700}>Global Impact</Text>
                   <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-                    By empowering individuals to reach their full potential, we're contributing to a world
+                    By empowering individuals to reach their full potential, we&apos;re contributing to a world
                     where excellence becomes the norm, not the exception.
                   </Text>
                 </Stack>
@@ -126,12 +126,12 @@ export default function About() {
                   Built for Elite Performance
                 </Text>
                 <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-                  Every aspect of Cherut is designed with one question in mind: "How would the world's top
-                  performers approach this?" From our OKR framework inspired by Google and Intel, to our
+                  Every aspect of Cherut is designed with one question in mind: &quot;How would the world&apos;s top
+                  performers approach this?&quot; From our OKR framework inspired by Google and Intel, to our
                   values-based decision making system, we study excellence to create excellence.
                 </Text>
                 <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-                  We're not building another productivity app. We're crafting a performance operating system
+                  We&apos;re not building another productivity app. We&apos;re crafting a performance operating system
                   for the next generation of leaders, entrepreneurs, athletes, and change-makers.
                 </Text>
               </Stack>
@@ -142,12 +142,12 @@ export default function About() {
           <Card padding="xl" radius={20} style={{ background: 'white', border: '1px solid rgba(0, 0, 0, 0.08)' }}>
             <Stack gap="lg">
               <Title order={3} ta="center" style={{ fontSize: '24px', fontWeight: 700 }}>
-                Why "Cherut"?
+                Why &quot;Cherut&quot;?
               </Title>
               <Text size="md" ta="center" maw={700} mx="auto" style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-                "Cherut" (חרות) is a Hebrew word meaning "freedom" or "liberty" - not just political freedom,
+                &quot;Cherut&quot; (חרות) is a Hebrew word meaning &quot;freedom&quot; or &quot;liberty&quot; - not just political freedom,
                 but the deeper freedom that comes from self-mastery and the ability to shape your own destiny.
-                It represents the liberation you feel when you're operating at your highest potential.
+                It represents the liberation you feel when you&apos;re operating at your highest potential.
               </Text>
               <Text size="md" ta="center" maw={700} mx="auto" style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
                 This is the freedom we want to give you - the freedom to pursue your biggest dreams with
@@ -172,7 +172,7 @@ export default function About() {
                     <Text size="lg" fw={700}>No Compromises</Text>
                   </Group>
                   <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    We don't build for the masses. We build for people who demand excellence and are willing
+                    We don&apos;t build for the masses. We build for people who demand excellence and are willing
                     to invest in their growth. Every feature is crafted for peak performance.
                   </Text>
                 </Stack>
@@ -202,7 +202,7 @@ export default function About() {
                     <Text size="lg" fw={700}>Holistic Approach</Text>
                   </Group>
                   <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    We understand that peak performance isn't just about productivity. It's about aligning
+                    We understand that peak performance isn&apos;t just about productivity. It&apos;s about aligning
                     your actions with your values and creating sustainable excellence.
                   </Text>
                 </Stack>
@@ -217,7 +217,7 @@ export default function About() {
                     <Text size="lg" fw={700}>Future-Ready</Text>
                   </Group>
                   <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    We're building for tomorrow's challenges today. Our platform evolves with you and
+                    We&apos;re building for tomorrow&apos;s challenges today. Our platform evolves with you and
                     incorporates cutting-edge insights from performance science.
                   </Text>
                 </Stack>

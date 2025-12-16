@@ -191,8 +191,8 @@ export default function GettingStarted() {
                   <Text fw={600} size="lg">What to do:</Text>
                   <Stack gap="xs">
                     <Text>• Start with 1-2 objectives per life area (keep it focused)</Text>
-                    <Text>• Write inspiring, qualitative objectives (e.g., "Achieve exceptional physical fitness")</Text>
-                    <Text>• Add 2-4 measurable key results per objective (e.g., "Run a 10K in under 50 minutes")</Text>
+                    <Text>• Write inspiring, qualitative objectives (e.g., &quot;Achieve exceptional physical fitness&quot;)</Text>
+                    <Text>• Add 2-4 measurable key results per objective (e.g., &quot;Run a 10K in under 50 minutes&quot;)</Text>
                     <Text>• Set realistic but challenging targets with specific deadlines</Text>
                     <Text>• Link each OKR to your core values</Text>
                   </Stack>
@@ -226,7 +226,7 @@ export default function GettingStarted() {
                   <Text fw={600} size="lg">What to do:</Text>
                   <Stack gap="xs">
                     <Text>• Create 3-5 keystone habits that support multiple objectives</Text>
-                    <Text>• Start small (e.g., "Meditate for 5 minutes" vs "Meditate for 1 hour")</Text>
+                    <Text>• Start small (e.g., &quot;Meditate for 5 minutes&quot; vs &quot;Meditate for 1 hour&quot;)</Text>
                     <Text>• Set specific times and triggers for each habit</Text>
                     <Text>• Link habits to your life areas and OKRs</Text>
                     <Text>• Enable habit tracking and streaks for motivation</Text>
@@ -325,7 +325,7 @@ export default function GettingStarted() {
                   <Stack gap="xs" style={{ flex: 1 }}>
                     <Text fw={600}>Start Small, Think Big</Text>
                     <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                      It's better to consistently achieve smaller goals than to fail at overly ambitious ones.
+                      It&apos;s better to consistently achieve smaller goals than to fail at overly ambitious ones.
                       Build momentum with early wins.
                     </Text>
                   </Stack>
@@ -354,7 +354,7 @@ export default function GettingStarted() {
                   <Stack gap="xs" style={{ flex: 1 }}>
                     <Text fw={600}>Connect Everything to Values</Text>
                     <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                      When goals align with your core values, motivation becomes automatic. Always ask: "Why does this matter to me?"
+                      When goals align with your core values, motivation becomes automatic. Always ask: &quot;Why does this matter to me?&quot;
                     </Text>
                   </Stack>
                 </Group>
@@ -408,7 +408,7 @@ export default function GettingStarted() {
             <Stack align="center" gap="md">
               <Text fw={600} size="lg">Need Help Getting Started?</Text>
               <Text ta="center" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                Our support team is here to help you succeed. Don't hesitate to reach out if you have questions.
+                Our support team is here to help you succeed. Don&apos;t hesitate to reach out if you have questions.
               </Text>
               <Button
                 component="a"
