@@ -1,6 +1,7 @@
+'use client';
+
 import { Container, Title, Text, Stack, Card, Group, Button, SimpleGrid, ThemeIcon, Box, Badge } from '@mantine/core';
 import { Mail, MessageSquare, Clock, Users, HelpCircle } from 'lucide-react';
-import Link from 'next/link';
 import Header from '@/components/ui/Header';
 import Footer from '@/components/ui/Footer';
 
@@ -190,7 +191,7 @@ export default function Contact() {
 
             <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="xl">
               <Card
-                component={Link}
+                component="a"
                 href="/help-center"
                 padding="xl"
                 radius={20}
@@ -223,7 +224,7 @@ export default function Contact() {
               </Card>
 
               <Card
-                component={Link}
+                component="a"
                 href="/careers"
                 padding="xl"
                 radius={20}

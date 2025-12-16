@@ -225,7 +225,7 @@ export default function LoginPage() {
             >
               Don&apos;t have an account?{' '}
               <Anchor
-                component={Link}
+                component="a"
                 href="/auth/register"
                 fw={600}
                 style={{
@@ -238,7 +238,7 @@ export default function LoginPage() {
             </Text>
 
             <Anchor
-              component={Link}
+              component="a"
               href="/"
               size="sm"
               style={{

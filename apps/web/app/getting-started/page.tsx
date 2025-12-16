@@ -1,6 +1,7 @@
+'use client';
+
 import { Container, Title, Text, Stack, Card, Group, ThemeIcon, Box, Badge, Button, Divider } from '@mantine/core';
 import { CheckCircle2, Target, Calendar, Zap, Heart, BarChart, BookOpen, Star, ArrowRight, Clock } from 'lucide-react';
-import Link from 'next/link';
 import Header from '@/components/ui/Header';
 import Footer from '@/components/ui/Footer';
 
@@ -372,7 +373,7 @@ export default function GettingStarted() {
               </Text>
               <Group gap="md">
                 <Button
-                  component={Link}
+                  component="a"
                   href="/auth/register"
                   size="lg"
                   radius={12}
@@ -386,7 +387,7 @@ export default function GettingStarted() {
                   Sign Up
                 </Button>
                 <Button
-                  component={Link}
+                  component="a"
                   href="/help-center"
                   size="lg"
                   radius={12}

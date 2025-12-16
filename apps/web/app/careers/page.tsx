@@ -1,6 +1,7 @@
+'use client';
+
 import { Container, Title, Text, Stack, Card, Group, Badge, ThemeIcon, Box, Button } from '@mantine/core';
 import { Briefcase, Users, Zap, Heart, Trophy, Globe, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
 import Header from '@/components/ui/Header';
 import Footer from '@/components/ui/Footer';
 
@@ -257,7 +258,7 @@ export default function Careers() {
                   Get in Touch
                 </Button>
                 <Button
-                  component={Link}
+                  component="a"
                   href="/contact"
                   size="lg"
                   radius={12}

@@ -1,6 +1,7 @@
+'use client';
+
 import { Container, Title, Text, Stack, Badge, Card, Group, SimpleGrid, ThemeIcon, Divider, Box } from '@mantine/core';
 import { CheckCircle2, Clock, Target, Calendar, Sparkles, Zap } from 'lucide-react';
-import Link from 'next/link';
 import Header from '@/components/ui/Header';
 import Footer from '@/components/ui/Footer';
 
@@ -240,11 +241,11 @@ export default function Roadmap() {
                 Get early access to Cherut and help shape the future of performance systems.
                 Your feedback during beta will directly influence our final product.
               </Text>
-              <Link href="/auth/register" style={{ textDecoration: 'none' }}>
+              <a href="/auth/register" style={{ textDecoration: 'none' }}>
                 <Text style={{ color: '#3143B6', fontWeight: 600, fontSize: '18px' }}>
                   Start Your Journey →
                 </Text>
-              </Link>
+              </a>
             </Stack>
           </Card>
 

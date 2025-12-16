@@ -706,7 +706,7 @@ export default function Home() {
           <Stack gap="md" mt={40} align="center" style={{ width: '100%', padding: '0 1rem' }}>
             <Group gap="md" justify="center" wrap="wrap" style={{ width: '100%' }}>
               <Button
-                component={Link}
+                component="a"
                 href="/auth/register"
                 size="lg"
                 radius={12}
@@ -734,7 +734,7 @@ export default function Home() {
                 Get Started
               </Button>
               <Button
-                component={Link}
+                component="a"
                 href="#features"
                 size="lg"
                 radius={12}
@@ -1465,7 +1465,7 @@ export default function Home() {
                     </Group>
                   </Stack>
                   <Button
-                    component={Link}
+                    component="a"
                     href="/auth/register"
                     variant="outline"
                     radius={48}
@@ -1580,7 +1580,7 @@ export default function Home() {
                     </Group>
                   </Stack>
                   <Button
-                    component={Link}
+                    component="a"
                     href="/auth/register"
                     radius={48}
                     fullWidth
@@ -1706,7 +1706,7 @@ export default function Home() {
                     </Group>
                   </Stack>
                   <Button
-                    component={Link}
+                    component="a"
                     href="/auth/register"
                     radius={48}
                     fullWidth
@@ -1832,7 +1832,7 @@ export default function Home() {
                     </Group>
                   </Stack>
                   <Button
-                    component={Link}
+                    component="a"
                     href="/auth/register"
                     radius={48}
                     fullWidth
@@ -2231,7 +2231,7 @@ export default function Home() {
                 for organizations that want to scale elite performance across their entire workforce.
               </Text>
               <Button
-                component={Link}
+                component="a"
                 href="/enterprise-waitlist"
                 size="xl"
                 radius={48}

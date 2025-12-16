@@ -122,7 +122,7 @@ export default function NotFound() {
 
             <Group gap="md" mt={16}>
               <Button
-                component={Link}
+                component="a"
                 href="/"
                 size="lg"
                 radius={48}
@@ -184,7 +184,7 @@ export default function NotFound() {
             >
               Need help? Contact our{' '}
               <Text
-                component={Link}
+                component="a"
                 href="mailto:support@cherut.com"
                 style={{
                   color: '#3143B6',

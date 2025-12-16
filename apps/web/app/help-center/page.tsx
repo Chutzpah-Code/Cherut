@@ -1,6 +1,7 @@
+'use client';
+
 import { Container, Title, Text, Stack, Card, Group, ThemeIcon, Box, Badge, SimpleGrid, Button, Divider } from '@mantine/core';
 import { HelpCircle, BookOpen, MessageSquare, Target, Users, Zap, Settings, Calendar, BarChart } from 'lucide-react';
-import Link from 'next/link';
 import Header from '@/components/ui/Header';
 import Footer from '@/components/ui/Footer';
 
@@ -36,7 +37,7 @@ export default function HelpCenter() {
           {/* Quick Actions */}
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
             <Card
-              component={Link}
+              component="a"
               href="/getting-started"
               padding="xl"
               radius={20}
@@ -287,7 +288,7 @@ export default function HelpCenter() {
                     Get personalized help from our support team. We typically respond within 24 hours.
                   </Text>
                   <Button
-                    component={Link}
+                    component="a"
                     href="/contact"
                     radius={12}
                     style={{ background: '#3143B6', fontWeight: 600 }}

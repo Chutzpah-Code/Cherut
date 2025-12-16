@@ -1,6 +1,7 @@
+'use client';
+
 import { Container, Title, Text, Stack, Card, Group, ThemeIcon, Box, Badge, Divider } from '@mantine/core';
 import { Shield, Eye, Lock, Database, Users, FileText } from 'lucide-react';
-import Link from 'next/link';
 import Header from '@/components/ui/Header';
 import Footer from '@/components/ui/Footer';
 
@@ -394,11 +395,11 @@ export default function PrivacyPolicy() {
                     chutzpahcode@gmail.com
                   </Text>
                   <Text>|</Text>
-                  <Link href="/contact" style={{ textDecoration: 'none' }}>
+                  <a href="/contact" style={{ textDecoration: 'none' }}>
                     <Text fw={600} style={{ color: '#3143B6' }}>
                       Contact Form
                     </Text>
-                  </Link>
+                  </a>
                 </Group>
               </Stack>
             </Card>

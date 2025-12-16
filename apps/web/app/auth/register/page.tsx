@@ -288,7 +288,7 @@ export default function RegisterPage() {
             >
               Already have an account?{' '}
               <Anchor
-                component={Link}
+                component="a"
                 href="/auth/login"
                 fw={600}
                 style={{
@@ -301,7 +301,7 @@ export default function RegisterPage() {
             </Text>
 
             <Anchor
-              component={Link}
+              component="a"
               href="/"
               size="sm"
               style={{

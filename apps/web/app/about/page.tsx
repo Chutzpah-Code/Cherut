@@ -1,6 +1,7 @@
+'use client';
+
 import { Container, Title, Text, Stack, Card, Group, SimpleGrid, ThemeIcon, Box, Avatar, Badge } from '@mantine/core';
 import { Target, Heart, Zap, Users, Award, Globe, CheckCircle2 } from 'lucide-react';
-import Link from 'next/link';
 import Header from '@/components/ui/Header';
 import Footer from '@/components/ui/Footer';
 
@@ -233,11 +234,11 @@ export default function About() {
                 Ready to unlock your full potential? Join our beta community and start building
                 your elite performance system today.
               </Text>
-              <Link href="/auth/register" style={{ textDecoration: 'none' }}>
+              <a href="/auth/register" style={{ textDecoration: 'none' }}>
                 <Text style={{ color: '#3143B6', fontWeight: 600, fontSize: '18px' }}>
                   Start Your Journey →
                 </Text>
-              </Link>
+              </a>
             </Stack>
           </Card>
         </Stack>
