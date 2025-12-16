@@ -69,7 +69,7 @@ export default function Footer() {
               </Text>
               <Text
                 component="a"
-                href="https://discord.com/invite/zJp9sWsUNp"
+                href="https://discord.gg/AyjZ58KXGy"
                 target="_blank"
                 size="xs"
                 style={{

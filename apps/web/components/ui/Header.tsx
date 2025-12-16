@@ -89,7 +89,7 @@ export default function Header() {
             <Button
               variant="subtle"
               component="a"
-              href="https://discord.com/invite/zJp9sWsUNp"
+              href="https://discord.gg/AyjZ58KXGy"
               target="_blank"
               style={{ color: '#374151', fontWeight: 500 }}
               styles={{
@@ -215,7 +215,7 @@ export default function Header() {
               <Button
                 variant="subtle"
                 component="a"
-                href="https://discord.com/invite/zJp9sWsUNp"
+                href="https://discord.gg/AyjZ58KXGy"
                 target="_blank"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{

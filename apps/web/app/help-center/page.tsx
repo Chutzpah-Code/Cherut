@@ -309,7 +309,7 @@ export default function HelpCenter() {
                   </Text>
                   <Button
                     component="a"
-                    href="https://discord.com/invite/zJp9sWsUNp"
+                    href="https://discord.gg/AyjZ58KXGy"
                     target="_blank"
                     radius={12}
                     style={{ background: '#A855F7', fontWeight: 600 }}
