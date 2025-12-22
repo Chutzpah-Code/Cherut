@@ -25,8 +25,21 @@ export class JournalController {
   }
 
   @Get()
-  findAll(@Request() req, @Query('search') search?: string) {
-    return this.journalService.findAll(req.user.uid, search);
+  findAll(
+    @Request() req,
+    @Query('search') search?: string,
+    @Query('archived') archived?: string,
+  ) {
+    return this.journalService.findAll(
+      req.user.uid,
+      search,
+      archived === 'true'
+    );
+  }
+
+  @Get('counts')
+  getJournalCounts(@Request() req) {
+    return this.journalService.getJournalCounts(req.user.uid);
   }
 
   @Get('search/date')
@@ -55,5 +68,10 @@ export class JournalController {
   @Delete(':id')
   remove(@Request() req, @Param('id') id: string) {
     return this.journalService.remove(req.user.uid, id);
+  }
+
+  @Patch(':id/archive')
+  toggleArchive(@Request() req, @Param('id') id: string) {
+    return this.journalService.toggleArchive(req.user.uid, id);
   }
 }
