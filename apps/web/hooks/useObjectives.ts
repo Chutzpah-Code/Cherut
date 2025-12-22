@@ -249,10 +249,12 @@ export const useArchiveObjective = () => {
       await queryClient.cancelQueries({ queryKey: ['objectives'] });
       const previousObjectives = queryClient.getQueryData(['objectives', undefined]);
 
-      // Remove do cache imediatamente (aparece instantâneo)
+      // Update cache to mark as archived instead of removing
       queryClient.setQueryData(['objectives', undefined], (old: any) => {
         if (!old || !Array.isArray(old)) return old;
-        return old.filter((obj: any) => obj.id !== id);
+        return old.map((obj: any) =>
+          obj.id === id ? { ...obj, isArchived: true } : obj
+        );
       });
 
       return { previousObjectives };
@@ -261,7 +263,35 @@ export const useArchiveObjective = () => {
       if (context?.previousObjectives) {
         queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
       }
-      // Só invalida em caso de erro para sincronizar
+      queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
+    },
+  });
+};
+
+// Unarchive hook - OTIMIZADO
+export const useUnarchiveObjective = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => objectivesApi.unarchiveObjective(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['objectives'] });
+      const previousObjectives = queryClient.getQueryData(['objectives', undefined]);
+
+      // Update cache to mark as unarchived
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((obj: any) =>
+          obj.id === id ? { ...obj, isArchived: false } : obj
+        );
+      });
+
+      return { previousObjectives };
+    },
+    onError: (_err, _id, context: any) => {
+      if (context?.previousObjectives) {
+        queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
+      }
       queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
     },
   });

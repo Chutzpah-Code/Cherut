@@ -148,4 +148,10 @@ export const objectivesApi = {
     const { data } = await apiClient.patch(`/objectives/${id}/archive`);
     return data;
   },
+
+  // Unarchive operation
+  unarchiveObjective: async (id: string): Promise<Objective> => {
+    const { data } = await apiClient.patch(`/objectives/${id}/unarchive`);
+    return data;
+  },
 };

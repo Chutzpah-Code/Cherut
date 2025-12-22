@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Target, TrendingUp, CheckCircle2, Circle, X, Archive, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Edit2, Trash2, Target, TrendingUp, CheckCircle2, Circle, X, Archive, ArchiveRestore, ChevronDown, ChevronUp, MoreVertical } from 'lucide-react';
 import {
   Title,
   Text,
@@ -29,6 +29,7 @@ import {
   Box,
   ScrollArea,
   NumberInput,
+  Menu,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { modals } from '@mantine/modals';
@@ -47,6 +48,7 @@ import {
   useToggleObjectiveCompletion,
   useToggleKeyResultCompletion,
   useArchiveObjective,
+  useUnarchiveObjective,
 } from '@/hooks/useObjectives';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { useQueryClient } from '@tanstack/react-query';
@@ -93,6 +95,7 @@ export default function ObjectivesPage() {
   const toggleObjectiveCompletionMutation = useToggleObjectiveCompletion();
   const toggleKeyResultCompletionMutation = useToggleKeyResultCompletion();
   const archiveMutation = useArchiveObjective();
+  const unarchiveMutation = useUnarchiveObjective();
   const queryClient = useQueryClient();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -104,6 +107,7 @@ export default function ObjectivesPage() {
   } | null>(null);
   const [currentObjective, setCurrentObjective] = useState<string>('');
   const [expandedObjectives, setExpandedObjectives] = useState<Set<string>>(new Set());
+  const [viewFilter, setViewFilter] = useState<'all' | 'active' | 'archived'>('active');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -364,24 +368,34 @@ export default function ObjectivesPage() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteObjective = async (objective: Objective) => {
-    if (window.confirm(`Are you sure you want to delete "${objective.title}"? This action cannot be undone.`)) {
-      try {
-        await deleteMutation.mutateAsync(objective.id);
-        notifications.show({
-          title: 'Success',
-          message: 'Objective deleted successfully',
-          color: 'green',
-        });
-      } catch (error) {
-        console.error('Error deleting objective:', error);
-        notifications.show({
-          title: 'Error',
-          message: 'Failed to delete objective',
-          color: 'red',
-        });
-      }
-    }
+  const handleDeleteObjective = (objective: Objective) => {
+    modals.openConfirmModal({
+      title: 'Delete Objective',
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete "<strong>{objective.title}</strong>"? This action cannot be undone.
+        </Text>
+      ),
+      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        try {
+          await deleteMutation.mutateAsync(objective.id);
+          notifications.show({
+            title: 'Success',
+            message: 'Objective deleted successfully',
+            color: 'green',
+          });
+        } catch (error) {
+          console.error('Error deleting objective:', error);
+          notifications.show({
+            title: 'Error',
+            message: 'Failed to delete objective',
+            color: 'red',
+          });
+        }
+      },
+    });
   };
 
   const handleToggleKeyResult = async (objective: Objective, keyResult: KeyResult) => {
@@ -418,6 +432,42 @@ export default function ObjectivesPage() {
       notifications.show({
         title: 'Error',
         message: 'Failed to update objective',
+        color: 'red',
+      });
+    }
+  };
+
+  const handleArchiveObjective = async (objective: Objective) => {
+    try {
+      await archiveMutation.mutateAsync(objective.id);
+      notifications.show({
+        title: 'Success',
+        message: 'Objective archived successfully',
+        color: 'green',
+      });
+    } catch (error) {
+      console.error('Error archiving objective:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to archive objective',
+        color: 'red',
+      });
+    }
+  };
+
+  const handleUnarchiveObjective = async (objective: Objective) => {
+    try {
+      await unarchiveMutation.mutateAsync(objective.id);
+      notifications.show({
+        title: 'Success',
+        message: 'Objective unarchived successfully',
+        color: 'green',
+      });
+    } catch (error) {
+      console.error('Error unarchiving objective:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to unarchive objective',
         color: 'red',
       });
     }
@@ -464,6 +514,19 @@ export default function ObjectivesPage() {
     setKeyResults(updated);
   };
 
+  // Filter objectives based on archive status
+  const filteredObjectives = objectives?.filter(objective => {
+    switch (viewFilter) {
+      case 'active':
+        return !objective.isArchived;
+      case 'archived':
+        return objective.isArchived;
+      case 'all':
+      default:
+        return true;
+    }
+  });
+
   if (isLoading) {
     return (
       <Center h={400}>
@@ -489,9 +552,38 @@ export default function ObjectivesPage() {
             Create Objective
           </Button>
         </Group>
+
+        <Group justify="space-between" align="center">
+          <Group gap="sm">
+            <Button
+              variant={viewFilter === 'active' ? 'filled' : 'light'}
+              size="sm"
+              onClick={() => setViewFilter('active')}
+            >
+              Active
+            </Button>
+            <Button
+              variant={viewFilter === 'archived' ? 'filled' : 'light'}
+              size="sm"
+              onClick={() => setViewFilter('archived')}
+            >
+              Archived
+            </Button>
+            <Button
+              variant={viewFilter === 'all' ? 'filled' : 'light'}
+              size="sm"
+              onClick={() => setViewFilter('all')}
+            >
+              All
+            </Button>
+          </Group>
+          <Text size="sm" c="dimmed">
+            {filteredObjectives?.length || 0} objective{(filteredObjectives?.length || 0) !== 1 ? 's' : ''}
+          </Text>
+        </Group>
       </Stack>
 
-      {!objectives || objectives.length === 0 ? (
+      {!filteredObjectives || filteredObjectives.length === 0 ? (
         <Card p="xl" mt="lg">
           <Center>
             <Stack align="center">
@@ -500,22 +592,37 @@ export default function ObjectivesPage() {
               </ThemeIcon>
               <div style={{ textAlign: 'center' }}>
                 <Text size="xl" fw={500} mb="xs">
-                  No objectives yet
+                  {viewFilter === 'archived' ? 'No archived objectives' : viewFilter === 'active' ? 'No active objectives' : 'No objectives yet'}
                 </Text>
                 <Text c="dimmed" mb="md">
-                  Create your first objective to start tracking your progress towards your goals
+                  {viewFilter === 'archived'
+                    ? 'No objectives have been archived yet'
+                    : viewFilter === 'active'
+                    ? 'All your objectives are archived. Create a new one or unarchive existing ones.'
+                    : 'Create your first objective to start tracking your progress towards your goals'
+                  }
                 </Text>
-                <Button leftSection={<Plus size={16} />} onClick={handleCreateNew}>
-                  Create Your First Objective
-                </Button>
+                {viewFilter !== 'archived' && (
+                  <Button leftSection={<Plus size={16} />} onClick={handleCreateNew}>
+                    Create Your First Objective
+                  </Button>
+                )}
               </div>
             </Stack>
           </Center>
         </Card>
       ) : (
         <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 3 }} spacing={{ base: "md", md: "lg" }}>
-          {objectives.map((objective) => (
-            <Card key={objective.id} p="lg" withBorder>
+          {filteredObjectives.map((objective) => (
+            <Card
+              key={objective.id}
+              p="lg"
+              withBorder
+              style={{
+                opacity: objective.isArchived ? 0.7 : 1,
+                filter: objective.isArchived ? 'grayscale(0.3)' : 'none'
+              }}
+            >
               <Stack gap="md">
                 <Group justify="space-between" align="flex-start">
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -536,6 +643,11 @@ export default function ObjectivesPage() {
                         >
                           {objective.status}
                         </Badge>
+                        {objective.isArchived && (
+                          <Badge color="gray" variant="outline" size="sm">
+                            archived
+                          </Badge>
+                        )}
                       </Group>
                       {objective.description && (
                         <Text size="sm" c="dimmed" style={{ wordBreak: "break-word" }}>
@@ -544,32 +656,48 @@ export default function ObjectivesPage() {
                       )}
                     </Stack>
                   </div>
-                  <Group gap="xs">
-                    <ActionIcon
-                      variant="light"
-                      color={objective.status === 'completed' ? 'green' : 'gray'}
-                      size="sm"
-                      onClick={() => handleToggleObjective(objective)}
-                    >
-                      {objective.status === 'completed' ? <CheckCircle2 size={14} /> : <Circle size={14} />}
-                    </ActionIcon>
-                    <ActionIcon
-                      variant="light"
-                      color="blue"
-                      size="sm"
-                      onClick={() => handleEditObjective(objective)}
-                    >
-                      <Edit2 size={14} />
-                    </ActionIcon>
-                    <ActionIcon
-                      variant="light"
-                      color="red"
-                      size="sm"
-                      onClick={() => handleDeleteObjective(objective)}
-                    >
-                      <Trash2 size={14} />
-                    </ActionIcon>
-                  </Group>
+                  <Menu shadow="md" width={200}>
+                    <Menu.Target>
+                      <ActionIcon variant="light" color="gray" size="sm">
+                        <MoreVertical size={14} />
+                      </ActionIcon>
+                    </Menu.Target>
+
+                    <Menu.Dropdown>
+                      <Menu.Item
+                        leftSection={objective.status === 'completed' ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                        onClick={() => handleToggleObjective(objective)}
+                      >
+                        {objective.status === 'completed' ? 'Mark as Active' : 'Mark as Completed'}
+                      </Menu.Item>
+
+                      <Menu.Item
+                        leftSection={<Edit2 size={16} />}
+                        onClick={() => handleEditObjective(objective)}
+                      >
+                        Edit Objective
+                      </Menu.Item>
+
+                      <Menu.Divider />
+
+                      <Menu.Item
+                        leftSection={objective.isArchived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
+                        onClick={() => objective.isArchived ? handleUnarchiveObjective(objective) : handleArchiveObjective(objective)}
+                      >
+                        {objective.isArchived ? 'Unarchive' : 'Archive'}
+                      </Menu.Item>
+
+                      <Menu.Divider />
+
+                      <Menu.Item
+                        color="red"
+                        leftSection={<Trash2 size={16} />}
+                        onClick={() => handleDeleteObjective(objective)}
+                      >
+                        Delete
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
                 </Group>
 
                 <Box>
