@@ -19,6 +19,12 @@ export interface UpdateJournalEntryDto {
   content?: string;
 }
 
+export interface JournalCounts {
+  active: number;
+  archived: number;
+  total: number;
+}
+
 export const journalApi = {
   // Create a new journal entry
   create: async (dto: CreateJournalEntryDto): Promise<JournalEntry> => {
@@ -26,10 +32,26 @@ export const journalApi = {
     return response.data;
   },
 
-  // Get all journal entries with optional search
-  getAll: async (search?: string): Promise<JournalEntry[]> => {
-    const params = search ? { search } : {};
+  // Get all journal entries with optional search and archive filter
+  getAll: async (search?: string, archived?: boolean): Promise<JournalEntry[]> => {
+    const params: any = {};
+    if (search) params.search = search;
+    if (archived !== undefined) params.archived = archived;
     const response = await apiClient.get('/journal', { params });
+    return response.data;
+  },
+
+  // Get archived journal entries
+  getArchived: async (search?: string): Promise<JournalEntry[]> => {
+    const params: any = { archived: true };
+    if (search) params.search = search;
+    const response = await apiClient.get('/journal', { params });
+    return response.data;
+  },
+
+  // Get journal counts
+  getCounts: async (): Promise<JournalCounts> => {
+    const response = await apiClient.get('/journal/counts');
     return response.data;
   },
 
@@ -55,6 +77,12 @@ export const journalApi = {
   searchByDate: async (startDate: string, endDate?: string): Promise<JournalEntry[]> => {
     const params = endDate ? { startDate, endDate } : { startDate };
     const response = await apiClient.get('/journal/search/date', { params });
+    return response.data;
+  },
+
+  // Toggle archive status
+  toggleArchive: async (id: string): Promise<JournalEntry> => {
+    const response = await apiClient.patch(`/journal/${id}/archive`);
     return response.data;
   },
 };
