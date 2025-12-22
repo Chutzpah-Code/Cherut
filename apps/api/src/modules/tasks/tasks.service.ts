@@ -45,6 +45,7 @@ export class TasksService {
     lifeAreaId?: string,
     actionPlanId?: string,
     status?: string,
+    archived?: boolean,
   ) {
     const db = this.firebaseService.getFirestore();
 
@@ -68,10 +69,17 @@ export class TasksService {
 
     const snapshot = await query.get();
 
-    return snapshot.docs.map((doc) => ({
+    let tasks = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+
+    // Filter by archived status if specified
+    if (archived !== undefined) {
+      tasks = tasks.filter((task: any) => !!task.archived === archived);
+    }
+
+    return tasks;
   }
 
   async findOne(userId: string, id: string) {
@@ -366,5 +374,18 @@ export class TasksService {
 
     this.logger.log(`Task archived status toggled: ${taskId}`);
     return this.findOne(userId, taskId);
+  }
+
+  /**
+   * Get task counts (active, archived, total)
+   */
+  async getTaskCounts(userId: string, lifeAreaId?: string) {
+    const allTasks = await this.findAll(userId, lifeAreaId);
+
+    const active = allTasks.filter((task: any) => !task.archived).length;
+    const archived = allTasks.filter((task: any) => task.archived).length;
+    const total = allTasks.length;
+
+    return { active, archived, total };
   }
 }

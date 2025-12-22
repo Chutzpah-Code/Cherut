@@ -6,9 +6,11 @@ import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { KanbanView } from './components/KanbanView';
 import { ViewSwitcher, TaskView } from './components/ViewSwitcher';
 import { OptimizedLoader } from '@/components/ui/OptimizedLoader';
+import { TaskFilter as TaskFilterType } from './components/TaskFilter';
 
 export default function TasksPage() {
   const [currentView, setCurrentView] = useState<TaskView>('kanban');
+  const [currentFilter, setCurrentFilter] = useState<TaskFilterType>('active');
 
   return (
     <Stack gap="lg" style={{ position: 'relative' }}>
@@ -25,7 +27,10 @@ export default function TasksPage() {
       {/* Content based on view */}
       {currentView === 'kanban' && (
         <Suspense fallback={<OptimizedLoader text="Loading tasks..." variant="skeleton" lines={4} />}>
-          <KanbanView />
+          <KanbanView
+            currentFilter={currentFilter}
+            onFilterChange={setCurrentFilter}
+          />
         </Suspense>
       )}
 

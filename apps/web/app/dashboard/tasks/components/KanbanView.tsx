@@ -26,15 +26,28 @@ import {
   useToggleChecklistItem,
   useCreateTask,
   useUpdateTaskOrder,
+  useArchivedTasks,
+  useTaskCounts,
 } from '@/hooks/useTasks';
 import { Task, CreateTaskDto, UpdateTaskDto } from '@/lib/api/services/tasks';
 import { KanbanList } from './KanbanList';
 import { KanbanCard } from './KanbanCard';
 import { TaskModal } from './TaskModal';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
+import { TaskFilter, TaskFilter as TaskFilterType } from './TaskFilter';
+import { ArchivedTasksGrid } from './ArchivedTasksGrid';
 
-export function KanbanView() {
-  const { data: kanban, isLoading } = useKanbanBoard();
+interface KanbanViewProps {
+  currentFilter: TaskFilterType;
+  onFilterChange: (filter: TaskFilterType) => void;
+}
+
+export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
+  const { data: kanban, isLoading: kanbanLoading } = useKanbanBoard(undefined, currentFilter === 'all');
+  const { data: archivedTasks, isLoading: archivedLoading } = useArchivedTasks();
+  const { data: taskCounts } = useTaskCounts();
+
+  const isLoading = kanbanLoading || (currentFilter === 'archived' && archivedLoading);
   const { data: lifeAreas } = useLifeAreas();
   const updateMutation = useUpdateTask();
   const deleteMutation = useDeleteTask();
@@ -181,6 +194,10 @@ export function KanbanView() {
     archiveMutation.mutate(id);
   };
 
+  const handleUnarchiveTask = (task: Task) => {
+    archiveMutation.mutate(task.id);
+  };
+
   const handleCreateTask = () => {
     if (!newTaskData.title || !newTaskData.lifeAreaId) return;
 
@@ -227,45 +244,62 @@ export function KanbanView() {
 
   return (
     <>
-      <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        collisionDetection={closestCorners}
-      >
-        <Box
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '16px',
-            paddingBottom: '80px',
-            minHeight: '600px',
-          }}
-        >
-          {lists.map((list) => (
-            <Box key={list.id}>
-              <KanbanList
-                id={list.id}
-                title={list.title}
-                color={list.color}
-                tasks={list.tasks}
-                onTaskClick={handleTaskClick}
-                onAddTask={(status) => {
-                  setNewTaskStatus(status);
-                  setCreateModalOpened(true);
-                }}
-              />
-            </Box>
-          ))}
-        </Box>
+      {/* Filter Bar */}
+      <TaskFilter
+        currentFilter={currentFilter}
+        onFilterChange={onFilterChange}
+        taskCounts={taskCounts}
+      />
 
-        {/* DragOverlay - Renders the dragged item on top of everything */}
-        <DragOverlay dropAnimation={null}>
-          {activeTask ? (
-            <KanbanCard task={activeTask} onClick={() => {}} />
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+      {/* Conditional Content Based on Filter */}
+      {currentFilter === 'archived' ? (
+        <ArchivedTasksGrid
+          tasks={archivedTasks || []}
+          onUnarchive={handleUnarchiveTask}
+          onDelete={handleDeleteTask}
+          onView={handleTaskClick}
+        />
+      ) : (
+        <DndContext
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          collisionDetection={closestCorners}
+        >
+          <Box
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '16px',
+              paddingBottom: '80px',
+              minHeight: '600px',
+            }}
+          >
+            {lists.map((list) => (
+              <Box key={list.id}>
+                <KanbanList
+                  id={list.id}
+                  title={list.title}
+                  color={list.color}
+                  tasks={list.tasks}
+                  onTaskClick={handleTaskClick}
+                  onAddTask={(status) => {
+                    setNewTaskStatus(status);
+                    setCreateModalOpened(true);
+                  }}
+                />
+              </Box>
+            ))}
+          </Box>
+
+          {/* DragOverlay - Renders the dragged item on top of everything */}
+          <DragOverlay dropAnimation={null}>
+            {activeTask ? (
+              <KanbanCard task={activeTask} onClick={() => {}} />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      )}
 
       {/* Task Detail Modal */}
       <TaskModal

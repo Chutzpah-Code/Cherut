@@ -79,6 +79,12 @@ export interface KanbanBoard {
   done: Task[];
 }
 
+export interface TaskCounts {
+  active: number;
+  archived: number;
+  total: number;
+}
+
 export const tasksApi = {
   getAll: async (lifeAreaId?: string): Promise<Task[]> => {
     const params = lifeAreaId ? { lifeAreaId } : {};
@@ -86,9 +92,24 @@ export const tasksApi = {
     return data;
   },
 
-  getKanban: async (lifeAreaId?: string): Promise<KanbanBoard> => {
-    const params = lifeAreaId ? { lifeAreaId } : {};
+  getKanban: async (lifeAreaId?: string, includeArchived?: boolean): Promise<KanbanBoard> => {
+    const params: any = {};
+    if (lifeAreaId) params.lifeAreaId = lifeAreaId;
+    if (includeArchived !== undefined) params.includeArchived = includeArchived;
     const { data } = await apiClient.get('/tasks/kanban', { params });
+    return data;
+  },
+
+  getArchived: async (lifeAreaId?: string): Promise<Task[]> => {
+    const params: any = { archived: true };
+    if (lifeAreaId) params.lifeAreaId = lifeAreaId;
+    const { data } = await apiClient.get('/tasks', { params });
+    return data;
+  },
+
+  getCounts: async (lifeAreaId?: string): Promise<TaskCounts> => {
+    const params = lifeAreaId ? { lifeAreaId } : {};
+    const { data } = await apiClient.get('/tasks/counts', { params });
     return data;
   },
 

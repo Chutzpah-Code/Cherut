@@ -10,11 +10,29 @@ export const useTasks = (lifeAreaId?: string) => {
   });
 };
 
-export const useKanbanBoard = (lifeAreaId?: string) => {
+export const useKanbanBoard = (lifeAreaId?: string, includeArchived?: boolean) => {
   return useQuery({
-    queryKey: ['tasks', 'kanban', lifeAreaId],
-    queryFn: () => tasksApi.getKanban(lifeAreaId),
+    queryKey: ['tasks', 'kanban', lifeAreaId, includeArchived],
+    queryFn: () => tasksApi.getKanban(lifeAreaId, includeArchived),
     staleTime: 2 * 60 * 1000, // 2 minutes - kanban needs fresher data
+    gcTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useArchivedTasks = (lifeAreaId?: string) => {
+  return useQuery({
+    queryKey: ['tasks', 'archived', lifeAreaId],
+    queryFn: () => tasksApi.getArchived(lifeAreaId),
+    staleTime: 5 * 60 * 1000, // 5 minutes - archived tasks change less frequently
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
+export const useTaskCounts = (lifeAreaId?: string) => {
+  return useQuery({
+    queryKey: ['tasks', 'counts', lifeAreaId],
+    queryFn: () => tasksApi.getCounts(lifeAreaId),
+    staleTime: 3 * 60 * 1000, // 3 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
   });
 };

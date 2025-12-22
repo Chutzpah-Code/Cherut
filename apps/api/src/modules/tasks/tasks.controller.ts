@@ -43,18 +43,33 @@ export class TasksController {
     @Query('lifeAreaId') lifeAreaId?: string,
     @Query('actionPlanId') actionPlanId?: string,
     @Query('status') status?: string,
+    @Query('archived') archived?: string,
   ) {
     return this.tasksService.findAll(
       req.user.uid,
       lifeAreaId,
       actionPlanId,
       status,
+      archived === 'true',
     );
   }
 
   @Get('kanban')
-  getKanbanBoard(@Request() req, @Query('lifeAreaId') lifeAreaId?: string) {
-    return this.tasksService.getKanbanBoard(req.user.uid, lifeAreaId);
+  getKanbanBoard(
+    @Request() req,
+    @Query('lifeAreaId') lifeAreaId?: string,
+    @Query('includeArchived') includeArchived?: string,
+  ) {
+    return this.tasksService.getKanbanBoard(
+      req.user.uid,
+      lifeAreaId,
+      includeArchived === 'true'
+    );
+  }
+
+  @Get('counts')
+  getTaskCounts(@Request() req, @Query('lifeAreaId') lifeAreaId?: string) {
+    return this.tasksService.getTaskCounts(req.user.uid, lifeAreaId);
   }
 
   @Get(':id')
