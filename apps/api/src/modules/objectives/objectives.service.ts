@@ -59,7 +59,7 @@ export class ObjectivesService {
         const keyResultDto = {
           ...kr,
           objectiveId: docRef.id,
-          order: kr.order ?? index, // Use provided order or array index
+          order: typeof kr.order === 'number' ? kr.order : index, // Use provided order or array index
         };
         return this.createKeyResult(userId, docRef.id, keyResultDto);
       });
@@ -269,10 +269,19 @@ export class ObjectivesService {
 
     const db = this.firebaseService.getFirestore();
 
+    // Get the next order number if not provided
+    let order = createDto.order;
+    if (typeof order !== 'number') {
+      // Get current key results count to determine next order
+      const existingKeyResults = await this.getKeyResultsForObjective(userId, objectiveId);
+      order = existingKeyResults.length;
+    }
+
     const keyResult = {
       ...createDto,
       objectiveId,
       userId, // Adicionar userId para segurança
+      order,
       currentValue: createDto.currentValue || 0,
       isCompleted: (createDto.currentValue || 0) >= createDto.targetValue,
       isArchived: false,

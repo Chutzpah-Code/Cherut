@@ -39,6 +39,7 @@ export interface CreateKeyResultDto {
   targetValue: number;
   currentValue?: number;
   unit: string;
+  order?: number;
 }
 
 export interface CreateObjectiveDto {
