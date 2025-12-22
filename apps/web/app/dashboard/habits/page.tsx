@@ -22,20 +22,32 @@ import {
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { modals } from '@mantine/modals';
-import { useHabits, useCreateHabit, useUpdateHabit, useDeleteHabit, useLogHabit } from '@/hooks/useHabits';
+import { useHabits, useAllHabits, useCreateHabit, useUpdateHabit, useDeleteHabit, useLogHabit, useArchivedHabits, useHabitCounts, useToggleArchive } from '@/hooks/useHabits';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { CreateHabitDto, Habit } from '@/lib/api/services/habits';
 import { HabitCard } from './components/HabitCard';
 import { HabitModal } from './components/HabitModal';
+import { HabitsFilter, HabitsFilterType } from './components/HabitsFilter';
+import { ArchivedHabitsGrid } from './components/ArchivedHabitsGrid';
 import { habitsApi } from '@/lib/api/services/habits';
 
 export default function HabitsPage() {
-  const { data: habits, isLoading } = useHabits();
+  const [currentFilter, setCurrentFilter] = useState<HabitsFilterType>('active');
+
+  const { data: activeHabits, isLoading: activeLoading } = useHabits(); // Only active habits
+  const { data: allHabits, isLoading: allLoading } = useAllHabits(); // All habits (active + archived)
+  const { data: archivedHabits, isLoading: archivedLoading } = useArchivedHabits();
+  const { data: habitCounts } = useHabitCounts();
+
+  // Choose the right data source based on current filter
+  const habits = currentFilter === 'all' ? allHabits : activeHabits;
+  const isLoading = currentFilter === 'all' ? allLoading : activeLoading;
   const { data: lifeAreas } = useLifeAreas();
   const createMutation = useCreateHabit();
   const updateMutation = useUpdateHabit();
   const deleteMutation = useDeleteHabit();
   const logMutation = useLogHabit();
+  const archiveMutation = useToggleArchive();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [creatingCategory, setCreatingCategory] = useState<'good' | 'bad'>('good');
@@ -56,7 +68,9 @@ export default function HabitsPage() {
   const [startDateValue, setStartDateValue] = useState<Date | null>(null);
   const [dueDateValue, setDueDateValue] = useState<Date | null>(null);
 
-  // Separar hábitos por categoria
+  const isPageLoading = isLoading || (currentFilter === 'archived' && archivedLoading);
+
+  // Separar hábitos por categoria (apenas para visualização ativa)
   const goodHabits = useMemo(() => {
     return habits?.filter((h) => h.category === 'good') || [];
   }, [habits]);
@@ -162,6 +176,16 @@ export default function HabitsPage() {
     });
   };
 
+  const handleArchive = (habitId: string) => {
+    archiveMutation.mutate(habitId);
+    setEditModalOpen(false);
+    setEditingHabit(null);
+  };
+
+  const handleUnarchive = (habit: Habit) => {
+    archiveMutation.mutate(habit.id);
+  };
+
   const handleDayClick = async (habitId: string, date: string) => {
     const today = new Date().toISOString().split('T')[0];
 
@@ -213,7 +237,7 @@ export default function HabitsPage() {
     }
   };
 
-  if (isLoading) {
+  if (isPageLoading) {
     return (
       <Center h={300}>
         <Loader size="lg" />
@@ -233,8 +257,25 @@ export default function HabitsPage() {
         </Text>
       </Box>
 
-      {/* Section: Good Habits */}
-      <Box>
+      {/* Filter Bar */}
+      <HabitsFilter
+        currentFilter={currentFilter}
+        onFilterChange={setCurrentFilter}
+        habitCounts={habitCounts}
+      />
+
+      {/* Conditional Content Based on Filter */}
+      {currentFilter === 'archived' ? (
+        <ArchivedHabitsGrid
+          habits={archivedHabits || []}
+          onUnarchive={handleUnarchive}
+          onDelete={handleDelete}
+          onView={handleEdit}
+        />
+      ) : (
+        <>
+          {/* Section: Good Habits */}
+          <Box>
         <Group justify="space-between" mb="md">
           <Title order={2} size="h3" c="green">
             Good Habits to Start
@@ -302,6 +343,8 @@ export default function HabitsPage() {
           </Stack>
         )}
       </Box>
+        </>
+      )}
 
       {/* Create Modal */}
       <Modal
@@ -421,6 +464,7 @@ export default function HabitsPage() {
           logs={habitLogs[editingHabit.id] || []}
           onSave={handleSaveEdit}
           onDelete={handleDelete}
+          onArchive={handleArchive}
           onDayClick={handleDayClick}
           isSaving={updateMutation.isPending}
         />

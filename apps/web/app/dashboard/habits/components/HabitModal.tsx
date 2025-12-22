@@ -5,7 +5,7 @@ import { Modal, Stack, TextInput, Textarea, Button, Group, Divider, Text, Box, S
 import { DateInput } from '@mantine/dates';
 import { Habit, HabitLog } from '@/lib/api/services/habits';
 import { StreakVisualizer } from './StreakVisualizer';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Archive } from 'lucide-react';
 
 interface HabitModalProps {
   opened: boolean;
@@ -14,6 +14,7 @@ interface HabitModalProps {
   logs: HabitLog[];
   onSave: (habitId: string, updates: { title: string; description?: string; startDate?: string; dueDate?: string }) => Promise<void>;
   onDelete: (habitId: string) => void;
+  onArchive: (habitId: string) => void;
   onDayClick: (habitId: string, date: string) => void;
   isSaving: boolean;
 }
@@ -78,6 +79,7 @@ export function HabitModal({
   logs,
   onSave,
   onDelete,
+  onArchive,
   onDayClick,
   isSaving,
 }: HabitModalProps) {
@@ -301,7 +303,18 @@ export function HabitModal({
         {/* Action buttons */}
         <Stack gap="md" mt="md">
           <Grid>
-            <Grid.Col span={{ base: 12, sm: 'content' }}>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Button
+                variant="light"
+                color="blue"
+                leftSection={<Archive size={16} />}
+                onClick={() => onArchive(habit.id)}
+                fullWidth
+              >
+                Archive Habit
+              </Button>
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
               <Button
                 variant="light"
                 color="red"
