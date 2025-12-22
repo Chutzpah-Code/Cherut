@@ -190,6 +190,10 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
     deleteMutation.mutate(id);
   };
 
+  const handleDeleteTaskFromGrid = (task: Task) => {
+    deleteMutation.mutate(task.id);
+  };
+
   const handleArchiveTask = (id: string) => {
     archiveMutation.mutate(id);
   };
@@ -256,7 +260,7 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
         <ArchivedTasksGrid
           tasks={archivedTasks || []}
           onUnarchive={handleUnarchiveTask}
-          onDelete={handleDeleteTask}
+          onDelete={handleDeleteTaskFromGrid}
           onView={handleTaskClick}
         />
       ) : (
