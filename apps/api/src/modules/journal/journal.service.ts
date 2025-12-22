@@ -34,7 +34,7 @@ export class JournalService {
     };
   }
 
-  async findAll(userId: string, search?: string) {
+  async findAll(userId: string, search?: string, archived?: boolean) {
     const db = this.firebaseService.getFirestore();
 
     let query = db
@@ -47,6 +47,20 @@ export class JournalService {
       id: doc.id,
       ...doc.data(),
     })).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    // Filter by archived status
+    if (archived !== undefined) {
+      entries = entries.filter((entry: any) => {
+        const isArchived = entry.isArchived !== undefined ? entry.isArchived : false; // default to active for legacy data
+        return isArchived === archived;
+      });
+    } else {
+      // Default behavior: only active entries (including legacy entries without isArchived field)
+      entries = entries.filter((entry: any) => {
+        const isArchived = entry.isArchived !== undefined ? entry.isArchived : false;
+        return !isArchived;
+      });
+    }
 
     // If there's a search, filter by title only
     if (search) {
@@ -135,5 +149,63 @@ export class JournalService {
     });
 
     return entries.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  /**
+   * Archive/Unarchive journal entry (toggle isArchived status)
+   */
+  async toggleArchive(userId: string, entryId: string) {
+    const entry: any = await this.findOne(userId, entryId);
+    const db = this.firebaseService.getFirestore();
+
+    const newArchivedStatus = !entry.isArchived;
+
+    await db.collection(this.journalCollection).doc(entryId).update({
+      isArchived: newArchivedStatus,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Journal entry ${entryId} archived status toggled to ${newArchivedStatus}`);
+    return this.findOne(userId, entryId);
+  }
+
+  /**
+   * Get journal entry counts (active, archived, total)
+   */
+  async getJournalCounts(userId: string) {
+    // Get all journal entries regardless of archived status
+    const allEntries = await this.findAllWithoutFilter(userId);
+
+    const active = allEntries.filter((entry: any) => {
+      const isArchived = entry.isArchived !== undefined ? entry.isArchived : false; // default to active for legacy data
+      return !isArchived;
+    }).length;
+
+    const archived = allEntries.filter((entry: any) => {
+      const isArchived = entry.isArchived !== undefined ? entry.isArchived : false; // default to active for legacy data
+      return isArchived;
+    }).length;
+
+    const total = allEntries.length;
+
+    return { active, archived, total };
+  }
+
+  /**
+   * Helper method to get all journal entries without isArchived filter
+   */
+  private async findAllWithoutFilter(userId: string) {
+    const db = this.firebaseService.getFirestore();
+
+    let query = db
+      .collection(this.journalCollection)
+      .where('userId', '==', userId);
+
+    const snapshot = await query.get();
+
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
   }
 }
