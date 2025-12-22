@@ -18,13 +18,16 @@ import {
   Popover,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
-import { useJournalEntries, useCreateJournalEntry } from '@/hooks/useJournal';
+import { useJournalEntries, useAllJournalEntries, useArchivedJournalEntries, useCreateJournalEntry, useToggleJournalArchive, useJournalCounts } from '@/hooks/useJournal';
 import { JournalEntryForm } from './components/JournalEntryForm';
 import { EntryCard } from './components/EntryCard';
 import { EntryModal } from './components/EntryModal';
+import { JournalFilter, JournalFilterType } from './components/JournalFilter';
+import { ArchivedJournalGrid } from './components/ArchivedJournalGrid';
 import { JournalEntry } from '@/lib/api/services/journal';
 
 export default function JournalPage() {
+  const [currentFilter, setCurrentFilter] = useState<JournalFilterType>('active');
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
@@ -33,8 +36,15 @@ export default function JournalPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [filteredEntries, setFilteredEntries] = useState<JournalEntry[]>([]);
 
-  const { data: entries, isLoading } = useJournalEntries(searchTerm);
+  const { data: activeEntries, isLoading: activeLoading } = useJournalEntries(searchTerm, false);
+  const { data: allEntries, isLoading: allLoading } = useAllJournalEntries(searchTerm);
+  const { data: archivedEntries, isLoading: archivedLoading } = useArchivedJournalEntries(searchTerm);
+  const { data: journalCounts } = useJournalCounts();
   const createMutation = useCreateJournalEntry();
+  const archiveMutation = useToggleJournalArchive();
+
+  const entries = currentFilter === 'all' ? allEntries : currentFilter === 'archived' ? archivedEntries : activeEntries;
+  const isLoading = currentFilter === 'all' ? allLoading : currentFilter === 'archived' ? archivedLoading : activeLoading;
 
   // Filter entries by date range
   useEffect(() => {
@@ -103,6 +113,19 @@ export default function JournalPage() {
     setSelectedEntry(null);
   };
 
+  const handleUnarchive = (entry: JournalEntry) => {
+    archiveMutation.mutate(entry.id);
+  };
+
+  const handleDeleteFromGrid = (entryId: string) => {
+    // This will be handled by the grid component
+  };
+
+  const handleViewFromGrid = (entry: JournalEntry) => {
+    setSelectedEntry(entry);
+    setModalOpen(true);
+  };
+
   if (isLoading) {
     return (
       <Center h={300}>
@@ -123,70 +146,79 @@ export default function JournalPage() {
         </Text>
       </Box>
 
-      {/* Actions Bar */}
-      <Stack gap="md">
-        <Stack gap="sm">
-          <Group gap="xs" wrap="wrap">
-            <TextInput
-              placeholder="Search by title... (press Enter to search)"
-              leftSection={<Search size={16} />}
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyPress={handleSearchKeyPress}
-              style={{ flex: 1, minWidth: 200 }}
-            />
-            <Button
-              size="compact-sm"
-              onClick={handleSearch}
-              disabled={!searchInput.trim()}
-            >
-              Search
-            </Button>
-            {searchTerm && (
-              <ActionIcon
-                variant="light"
-                color="gray"
-                onClick={clearSearch}
-                title="Clear search"
-              >
-                <X size={16} />
-              </ActionIcon>
-            )}
-          </Group>
+      {/* Filter Bar */}
+      <JournalFilter
+        currentFilter={currentFilter}
+        onFilterChange={setCurrentFilter}
+        journalCounts={journalCounts}
+      />
 
-          <Group gap="xs" wrap="wrap">
-            <DatePickerInput
-              type="range"
-              placeholder="Filter by date range"
-              leftSection={<Calendar size={16} />}
-              value={dateRange}
-              onChange={setDateRange}
-              style={{ flex: 1, minWidth: 180 }}
-              clearable
-            />
-
-            {(dateRange[0] || dateRange[1]) && (
-              <ActionIcon
-                variant="light"
-                color="gray"
-                onClick={clearFilters}
-                title="Clear date filter"
+      {/* Actions Bar - Only show for active and all filters */}
+      {currentFilter !== 'archived' && (
+        <Stack gap="md">
+          <Stack gap="sm">
+            <Group gap="xs" wrap="wrap">
+              <TextInput
+                placeholder="Search by title... (press Enter to search)"
+                leftSection={<Search size={16} />}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                style={{ flex: 1, minWidth: 200 }}
+              />
+              <Button
+                size="compact-sm"
+                onClick={handleSearch}
+                disabled={!searchInput.trim()}
               >
-                <X size={16} />
-              </ActionIcon>
-            )}
-          </Group>
+                Search
+              </Button>
+              {searchTerm && (
+                <ActionIcon
+                  variant="light"
+                  color="gray"
+                  onClick={clearSearch}
+                  title="Clear search"
+                >
+                  <X size={16} />
+                </ActionIcon>
+              )}
+            </Group>
+
+            <Group gap="xs" wrap="wrap">
+              <DatePickerInput
+                type="range"
+                placeholder="Filter by date range"
+                leftSection={<Calendar size={16} />}
+                value={dateRange}
+                onChange={setDateRange}
+                style={{ flex: 1, minWidth: 180 }}
+                clearable
+              />
+
+              {(dateRange[0] || dateRange[1]) && (
+                <ActionIcon
+                  variant="light"
+                  color="gray"
+                  onClick={clearFilters}
+                  title="Clear date filter"
+                >
+                  <X size={16} />
+                </ActionIcon>
+              )}
+            </Group>
+          </Stack>
+
+          <Button
+            leftSection={<Plus size={20} />}
+            onClick={() => setIsCreateFormOpen(true)}
+            color="blue"
+            fullWidth
+          >
+            New Entry
+          </Button>
         </Stack>
-
-        <Button
-          leftSection={<Plus size={20} />}
-          onClick={() => setIsCreateFormOpen(true)}
-          color="blue"
-          fullWidth
-        >
-          New Entry
-        </Button>
-      </Stack>
+      )}
 
       {/* Create Form */}
       {isCreateFormOpen && (
@@ -199,25 +231,37 @@ export default function JournalPage() {
         </Box>
       )}
 
-      {/* Entries List */}
-      {filteredEntries && filteredEntries.length > 0 ? (
-        <Grid>
-          {filteredEntries.map((entry) => (
-            <Grid.Col key={entry.id} span={{ base: 12, md: 6, lg: 4 }}>
-              <EntryCard
-                entry={entry}
-                onClick={() => handleEntryClick(entry)}
-              />
-            </Grid.Col>
-          ))}
-        </Grid>
+      {/* Conditional Content Based on Filter */}
+      {currentFilter === 'archived' ? (
+        <ArchivedJournalGrid
+          entries={archivedEntries || []}
+          onUnarchive={handleUnarchive}
+          onDelete={handleDeleteFromGrid}
+          onView={handleViewFromGrid}
+        />
       ) : (
-        <Alert variant="light" color="gray" title="No entries found">
-          {searchTerm || dateRange[0] || dateRange[1]
-            ? `No entries found matching your filters${searchTerm ? ` for "${searchTerm}"` : ''}. Try adjusting your search criteria.`
-            : "You haven't written any journal entries yet. Click 'New Entry' to start writing!"
-          }
-        </Alert>
+        <>
+          {/* Entries List */}
+          {filteredEntries && filteredEntries.length > 0 ? (
+            <Grid>
+              {filteredEntries.map((entry) => (
+                <Grid.Col key={entry.id} span={{ base: 12, md: 6, lg: 4 }}>
+                  <EntryCard
+                    entry={entry}
+                    onClick={() => handleEntryClick(entry)}
+                  />
+                </Grid.Col>
+              ))}
+            </Grid>
+          ) : (
+            <Alert variant="light" color="gray" title="No entries found">
+              {searchTerm || dateRange[0] || dateRange[1]
+                ? `No entries found matching your filters${searchTerm ? ` for "${searchTerm}"` : ''}. Try adjusting your search criteria.`
+                : "You haven't written any journal entries yet. Click 'New Entry' to start writing!"
+              }
+            </Alert>
+          )}
+        </>
       )}
 
       {/* Entry Modal */}
