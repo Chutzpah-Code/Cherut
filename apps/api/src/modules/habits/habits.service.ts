@@ -42,13 +42,12 @@ export class HabitsService {
     };
   }
 
-  async findAll(userId: string, lifeAreaId?: string) {
+  async findAll(userId: string, lifeAreaId?: string, archived?: boolean) {
     const db = this.firebaseService.getFirestore();
 
     let query = db
       .collection(this.habitsCollection)
-      .where('userId', '==', userId)
-      .where('isActive', '==', true);
+      .where('userId', '==', userId);
 
     if (lifeAreaId) {
       query = query.where('lifeAreaId', '==', lifeAreaId);
@@ -56,10 +55,26 @@ export class HabitsService {
 
     const snapshot = await query.get();
 
-    return snapshot.docs.map((doc) => ({
+    let habits = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+
+    // Filter by archived status in code to handle legacy data
+    if (archived !== undefined) {
+      habits = habits.filter((habit: any) => {
+        const isActive = habit.isActive !== undefined ? habit.isActive : true; // default to active for legacy data
+        return !isActive === archived; // archived=true means !isActive, archived=false means isActive
+      });
+    } else {
+      // Default behavior: only active habits (including legacy habits without isActive field)
+      habits = habits.filter((habit: any) => {
+        const isActive = habit.isActive !== undefined ? habit.isActive : true;
+        return isActive;
+      });
+    }
+
+    return habits;
   }
 
   async findOne(userId: string, id: string) {
@@ -254,5 +269,67 @@ export class HabitsService {
         `${habit.type} habits require "value" field`,
       );
     }
+  }
+
+  /**
+   * Archive/Unarchive habit (toggle isActive status)
+   */
+  async toggleArchive(userId: string, habitId: string) {
+    const habit: any = await this.findOne(userId, habitId);
+    const db = this.firebaseService.getFirestore();
+
+    const newActiveStatus = !habit.isActive;
+
+    await db.collection(this.habitsCollection).doc(habitId).update({
+      isActive: newActiveStatus,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Habit ${habitId} archived status toggled to ${!newActiveStatus}`);
+    return this.findOne(userId, habitId);
+  }
+
+  /**
+   * Get habit counts (active, archived, total)
+   */
+  async getHabitCounts(userId: string, lifeAreaId?: string) {
+    // Get all habits regardless of archived status
+    const allHabits = await this.findAllWithoutFilter(userId, lifeAreaId);
+
+    const active = allHabits.filter((habit: any) => {
+      const isActive = habit.isActive !== undefined ? habit.isActive : true; // default to active for legacy data
+      return isActive;
+    }).length;
+
+    const archived = allHabits.filter((habit: any) => {
+      const isActive = habit.isActive !== undefined ? habit.isActive : true; // default to active for legacy data
+      return !isActive;
+    }).length;
+
+    const total = allHabits.length;
+
+    return { active, archived, total };
+  }
+
+  /**
+   * Helper method to get all habits without isActive filter
+   */
+  private async findAllWithoutFilter(userId: string, lifeAreaId?: string) {
+    const db = this.firebaseService.getFirestore();
+
+    let query = db
+      .collection(this.habitsCollection)
+      .where('userId', '==', userId);
+
+    if (lifeAreaId) {
+      query = query.where('lifeAreaId', '==', lifeAreaId);
+    }
+
+    const snapshot = await query.get();
+
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
   }
 }

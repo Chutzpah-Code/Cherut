@@ -25,8 +25,21 @@ export class HabitsController {
   }
 
   @Get()
-  findAll(@Request() req, @Query('lifeAreaId') lifeAreaId?: string) {
-    return this.habitsService.findAll(req.user.uid, lifeAreaId);
+  findAll(
+    @Request() req,
+    @Query('lifeAreaId') lifeAreaId?: string,
+    @Query('archived') archived?: string,
+  ) {
+    return this.habitsService.findAll(
+      req.user.uid,
+      lifeAreaId,
+      archived === 'true'
+    );
+  }
+
+  @Get('counts')
+  getHabitCounts(@Request() req, @Query('lifeAreaId') lifeAreaId?: string) {
+    return this.habitsService.getHabitCounts(req.user.uid, lifeAreaId);
   }
 
   @Get(':id')
@@ -67,5 +80,10 @@ export class HabitsController {
       startDate,
       endDate,
     );
+  }
+
+  @Patch(':id/archive')
+  toggleArchive(@Request() req, @Param('id') id: string) {
+    return this.habitsService.toggleArchive(req.user.uid, id);
   }
 }

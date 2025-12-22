@@ -73,11 +73,32 @@ export interface LogHabitDto {
   notes?: string;
 }
 
+export interface HabitCounts {
+  active: number;
+  archived: number;
+  total: number;
+}
+
 export const habitsApi = {
   // Habits CRUD
-  getAll: async (lifeAreaId?: string): Promise<Habit[]> => {
-    const params = lifeAreaId ? { lifeAreaId } : {};
+  getAll: async (lifeAreaId?: string, archived?: boolean): Promise<Habit[]> => {
+    const params: any = {};
+    if (lifeAreaId) params.lifeAreaId = lifeAreaId;
+    if (archived !== undefined) params.archived = archived;
     const { data } = await apiClient.get('/habits', { params });
+    return data;
+  },
+
+  getArchived: async (lifeAreaId?: string): Promise<Habit[]> => {
+    const params: any = { archived: true };
+    if (lifeAreaId) params.lifeAreaId = lifeAreaId;
+    const { data } = await apiClient.get('/habits', { params });
+    return data;
+  },
+
+  getCounts: async (lifeAreaId?: string): Promise<HabitCounts> => {
+    const params = lifeAreaId ? { lifeAreaId } : {};
+    const { data } = await apiClient.get('/habits/counts', { params });
     return data;
   },
 
@@ -115,6 +136,12 @@ export const habitsApi = {
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
     const { data } = await apiClient.get(`/habits/${habitId}/logs`, { params });
+    return data;
+  },
+
+  // Archive
+  toggleArchive: async (id: string): Promise<Habit> => {
+    const { data } = await apiClient.patch(`/habits/${id}/archive`);
     return data;
   },
 };
