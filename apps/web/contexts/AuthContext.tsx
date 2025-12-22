@@ -118,9 +118,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // User signed in - authenticate with backend
           await authenticateWithBackend(firebaseUser);
         } else {
-          // User signed out - clear backend auth
+          // User signed out - clear backend auth and reset theme
+          console.log('[Auth] User signed out - clearing theme preferences');
           setBackendAuthenticated(false);
           setUserData(null);
+
+          // Clear theme preference and reset to light mode for public pages
+          localStorage.removeItem('mantine-color-scheme-cherut');
+
+          // Force reset to light mode by dispatching a storage event
+          // This ensures the theme provider resets immediately
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new StorageEvent('storage', {
+              key: 'mantine-color-scheme-cherut',
+              newValue: null,
+              oldValue: localStorage.getItem('mantine-color-scheme-cherut'),
+            }));
+          }
         }
 
         setLoading(false);

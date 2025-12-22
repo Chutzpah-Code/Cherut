@@ -93,27 +93,57 @@ const theme = createTheme({
   },
 });
 
-function MantineThemeProvider({ children }: { children: React.ReactNode }) {
+interface AuthAwareMantineProviderProps {
+  children: React.ReactNode;
+  isAuthenticated?: boolean;
+}
+
+function AuthAwareMantineProvider({ children, isAuthenticated = false }: AuthAwareMantineProviderProps) {
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Carrega a preferência salva
-    const saved = localStorage.getItem('mantine-color-scheme-cherut');
-    if (saved === 'light' || saved === 'dark') {
-      setColorScheme(saved);
+
+    // Only load saved theme if user is authenticated
+    if (isAuthenticated) {
+      const saved = localStorage.getItem('mantine-color-scheme-cherut');
+      if (saved === 'light' || saved === 'dark') {
+        setColorScheme(saved);
+      }
+    } else {
+      // For public pages, always use light mode
+      setColorScheme('light');
     }
-  }, []);
+
+    // Listen for storage changes (like when auth context clears the theme)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'mantine-color-scheme-cherut') {
+        if (e.newValue === null) {
+          // Theme was cleared - reset to light
+          setColorScheme('light');
+        } else if ((e.newValue === 'light' || e.newValue === 'dark') && isAuthenticated) {
+          // Only apply saved theme if user is authenticated
+          setColorScheme(e.newValue);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    if (mounted) {
-      // Salva a preferência sempre que mudar
+    if (mounted && isAuthenticated) {
+      // Only save preference if user is authenticated
       localStorage.setItem('mantine-color-scheme-cherut', colorScheme);
     }
-  }, [colorScheme, mounted]);
+  }, [colorScheme, mounted, isAuthenticated]);
 
-  // Durante SSR e primeira renderização, sempre usa light
+  // Force light mode for unauthenticated users
+  const effectiveColorScheme = isAuthenticated ? colorScheme : 'light';
+
+  // During SSR and first render, always use light
   if (!mounted) {
     return (
       <MantineProvider theme={theme} defaultColorScheme="light">
@@ -123,12 +153,44 @@ function MantineThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <MantineProvider 
-      theme={theme} 
-      defaultColorScheme={colorScheme}
+    <MantineProvider
+      theme={theme}
+      defaultColorScheme={effectiveColorScheme}
     >
       {children}
     </MantineProvider>
+  );
+}
+
+function MantineThemeProvider({ children }: { children: React.ReactNode }) {
+  // We need to get auth state, but AuthProvider is below this in the tree
+  // So we'll use a simpler approach: just check localStorage for Firebase auth
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Simple check for any Firebase auth data
+    const checkAuthState = () => {
+      const hasFirebaseAuth = Object.keys(localStorage).some(key =>
+        key.startsWith('firebase:authUser:')
+      );
+      setIsAuthenticated(hasFirebaseAuth);
+    };
+
+    checkAuthState();
+
+    // Listen for auth state changes via storage events
+    const handleStorageChange = () => {
+      checkAuthState();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  return (
+    <AuthAwareMantineProvider isAuthenticated={isAuthenticated}>
+      {children}
+    </AuthAwareMantineProvider>
   );
 }
 
