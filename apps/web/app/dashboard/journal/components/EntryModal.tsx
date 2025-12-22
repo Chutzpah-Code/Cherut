@@ -14,10 +14,10 @@ import {
   ScrollArea,
   TextInput,
 } from '@mantine/core';
-import { Edit, Trash2, Calendar, Save, X } from 'lucide-react';
+import { Edit, Trash2, Calendar, Save, X, Archive } from 'lucide-react';
 import { modals } from '@mantine/modals';
 import { JournalEntry } from '@/lib/api/services/journal';
-import { useUpdateJournalEntry, useDeleteJournalEntry } from '@/hooks/useJournal';
+import { useUpdateJournalEntry, useDeleteJournalEntry, useToggleJournalArchive } from '@/hooks/useJournal';
 import { format } from 'date-fns';
 
 interface EntryModalProps {
@@ -34,6 +34,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
 
   const updateMutation = useUpdateJournalEntry();
   const deleteMutation = useDeleteJournalEntry();
+  const archiveMutation = useToggleJournalArchive();
 
   const formattedCreatedAt = format(new Date(entry.createdAt), 'MMMM dd, yyyy \'at\' HH:mm');
   const formattedUpdatedAt = format(new Date(entry.updatedAt), 'MMMM dd, yyyy \'at\' HH:mm');
@@ -105,6 +106,15 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
     });
   };
 
+  const handleArchive = async () => {
+    try {
+      await archiveMutation.mutateAsync(entry.id);
+      onClose();
+    } catch (error) {
+      console.error('Error archiving journal entry:', error);
+    }
+  };
+
   const characterCount = editContent.length;
   const isOverLimit = characterCount > 20000;
   const characterCountColor = isOverLimit ? 'red' : characterCount > 18000 ? 'orange' : 'dimmed';
@@ -127,6 +137,14 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
                 color="blue"
               >
                 <Edit size={16} />
+              </ActionIcon>
+              <ActionIcon
+                variant="subtle"
+                onClick={handleArchive}
+                color="orange"
+                loading={archiveMutation.isPending}
+              >
+                <Archive size={16} />
               </ActionIcon>
               <ActionIcon
                 variant="subtle"
