@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { registerUser } from '@/lib/firebase/auth';
 import apiClient from '@/lib/api/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { getRegistrationErrorMessage, createRateLimitError } from '@/lib/utils/auth-errors';
+import { useRateLimit } from '@/hooks/useRateLimit';
+import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
 import {
   Container,
   Paper,
@@ -31,6 +34,9 @@ export default function RegisterPage() {
   const router = useRouter();
   const { user } = useAuth();
 
+  // Rate limiting
+  const registerRateLimit = useRateLimit({ action: 'register' });
+
   useEffect(() => {
     if (user) {
       router.push('/dashboard');
@@ -40,6 +46,12 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Check rate limit before proceeding
+    if (!registerRateLimit.canSubmit) {
+      setError(registerRateLimit.warningMessage);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
@@ -70,9 +82,13 @@ export default function RegisterPage() {
         },
       });
 
+      // Record successful registration
+      registerRateLimit.recordSuccess();
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Failed to register');
+      // Record failed registration attempt
+      registerRateLimit.recordFailure();
+      setError(getRegistrationErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -129,6 +145,13 @@ export default function RegisterPage() {
           >
             <form onSubmit={handleSubmit}>
               <Stack gap="lg">
+                {/* Rate limit display */}
+                <RateLimitDisplay
+                  result={registerRateLimit.result}
+                  message={registerRateLimit.warningMessage}
+                  showProgress={true}
+                />
+
                 {error && (
                   <Alert
                     icon={<AlertCircle size={20} />}
