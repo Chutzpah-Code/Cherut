@@ -3,8 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { loginUser } from '@/lib/firebase/auth';
+import { loginUser, resetPassword } from '@/lib/firebase/auth';
 import { useAuth } from '@/contexts/AuthContext';
+import { getLoginErrorMessage, getAuthErrorMessage, createRateLimitError } from '@/lib/utils/auth-errors';
+import { useLoginRateLimit } from '@/hooks/useRateLimit';
+import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
 import {
   Container,
   Paper,
@@ -17,6 +20,8 @@ import {
   Alert,
   Anchor,
   Box,
+  Modal,
+  Group,
 } from '@mantine/core';
 import { ArrowRight, AlertCircle } from 'lucide-react';
 import CherutLogo from '@/components/ui/CherutLogo';
@@ -26,8 +31,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetModalOpened, setResetModalOpened] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetError, setResetError] = useState('');
   const router = useRouter();
   const { user } = useAuth();
+
+  // Rate limiting
+  const loginRateLimit = useLoginRateLimit();
 
   useEffect(() => {
     if (user) {
@@ -38,16 +51,48 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Check rate limit before proceeding
+    if (!loginRateLimit.canSubmit) {
+      setError(loginRateLimit.warningMessage);
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await loginUser(email, password);
+      await loginRateLimit.handleLoginAttempt(async () => {
+        await loginUser(email, password);
+      });
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Failed to login');
+      setError(getLoginErrorMessage(err));
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError('');
+    setResetLoading(true);
+
+    try {
+      await resetPassword(resetEmail);
+      setResetSuccess(true);
+    } catch (err: any) {
+      setResetError(getAuthErrorMessage(err));
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const handleResetModalClose = () => {
+    setResetModalOpened(false);
+    setResetEmail('');
+    setResetError('');
+    setResetSuccess(false);
+    setResetLoading(false);
   };
 
   return (
@@ -101,6 +146,13 @@ export default function LoginPage() {
           >
             <form onSubmit={handleSubmit}>
               <Stack gap="lg">
+                {/* Rate limit display */}
+                <RateLimitDisplay
+                  result={loginRateLimit.result}
+                  message={loginRateLimit.warningMessage}
+                  showProgress={true}
+                />
+
                 {error && (
                   <Alert
                     icon={<AlertCircle size={20} />}
@@ -212,6 +264,16 @@ export default function LoginPage() {
                 >
                   Sign In
                 </Button>
+
+                <Anchor
+                  ta="center"
+                  size="sm"
+                  fw={500}
+                  style={{ color: '#3143B6', cursor: 'pointer' }}
+                  onClick={() => setResetModalOpened(true)}
+                >
+                  Forgot your password?
+                </Anchor>
               </Stack>
             </form>
           </Paper>
@@ -250,6 +312,129 @@ export default function LoginPage() {
             </Anchor>
           </Stack>
         </Stack>
+
+        {/* Forgot Password Modal */}
+        <Modal
+          opened={resetModalOpened}
+          onClose={handleResetModalClose}
+          title="Reset Password"
+          centered
+          radius={20}
+        >
+          {resetSuccess ? (
+            <Stack gap="lg" ta="center">
+              <Text size="md" c="green" fw={600}>
+                Reset email sent!
+              </Text>
+              <Text size="sm" c="dimmed">
+                If the email is registered in our system, check your inbox (and spam folder) for password reset instructions.
+              </Text>
+              <Button
+                onClick={handleResetModalClose}
+                variant="outline"
+                radius={48}
+                style={{
+                  borderColor: '#3143B6',
+                  color: '#3143B6',
+                }}
+              >
+                Got it
+              </Button>
+            </Stack>
+          ) : (
+            <form onSubmit={handleResetPassword}>
+              <Stack gap="lg">
+                {resetError && (
+                  <Alert
+                    icon={<AlertCircle size={20} />}
+                    title="Error"
+                    color="red"
+                    radius={16}
+                    styles={{
+                      root: {
+                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                      },
+                      title: { color: '#dc2626', fontWeight: 600 },
+                      message: { color: '#dc2626' },
+                    }}
+                  >
+                    {resetError}
+                  </Alert>
+                )}
+
+                <Text size="sm" c="dimmed">
+                  Enter your email address. If it's registered in our system, we'll send you a link to reset your password.
+                </Text>
+
+                <TextInput
+                  label="Email"
+                  placeholder="you@example.com"
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  required
+                  size="md"
+                  radius={48}
+                  styles={{
+                    label: {
+                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontWeight: 600,
+                      marginBottom: 8,
+                      fontSize: '14px',
+                    },
+                    input: {
+                      backgroundColor: 'white',
+                      border: '1px solid hsl(0 0% 0% / 0.15)',
+                      color: 'hsl(0 0% 0% / 0.87)',
+                      height: '48px',
+                      fontSize: '16px',
+                      '&::placeholder': {
+                        color: 'hsl(0 0% 0% / 0.38)',
+                      },
+                      '&:focus': {
+                        borderColor: '#3143B6',
+                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                      },
+                    },
+                  }}
+                />
+
+                <Group justify="flex-end" gap="sm">
+                  <Button
+                    variant="outline"
+                    onClick={handleResetModalClose}
+                    radius={48}
+                    style={{
+                      borderColor: '#3143B6',
+                      color: '#3143B6',
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    loading={resetLoading}
+                    radius={48}
+                    style={{
+                      background: '#3143B6',
+                      border: 'none',
+                    }}
+                    styles={{
+                      root: {
+                        '&:hover': {
+                          background: '#2535a0',
+                        },
+                      },
+                    }}
+                  >
+                    Send Reset Email
+                  </Button>
+                </Group>
+              </Stack>
+            </form>
+          )}
+        </Modal>
       </Container>
     </Box>
   );
