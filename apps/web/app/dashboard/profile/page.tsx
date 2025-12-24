@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Globe, Clock, Save } from 'lucide-react';
+import { Mail, Globe, Clock, Save, Lock, Shield } from 'lucide-react';
 import {
   Title,
   Text,
@@ -18,15 +18,29 @@ import {
   Avatar,
   Divider,
   Grid,
+  PasswordInput,
+  Alert,
+  Modal,
+  useMantineColorScheme,
+  useComputedColorScheme,
 } from '@mantine/core';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
 import { UpdateProfileDto } from '@/lib/api/services/profile';
+import { changePassword } from '@/lib/firebase/auth';
+import { AlertCircle, CheckCircle } from 'lucide-react';
+import { getPasswordErrorMessage, createRateLimitError } from '@/lib/utils/auth-errors';
+import { useRateLimit } from '@/hooks/useRateLimit';
+import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
 
 export default function ProfilePage() {
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile();
   const updateMutation = useUpdateProfile();
+
+  // Theme integration hooks
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light');
 
   const [formData, setFormData] = useState<UpdateProfileDto>({
     displayName: '',
@@ -40,6 +54,20 @@ export default function ProfilePage() {
     },
   });
 
+  // Password change state
+  const [passwordModalOpened, setPasswordModalOpened] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+  // Rate limiting for password changes
+  const passwordChangeRateLimit = useRateLimit({ action: 'passwordChange' });
+
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -48,13 +76,14 @@ export default function ProfilePage() {
         timezone: profile.timezone || '',
         language: profile.language || 'en',
         preferences: {
-          theme: profile.preferences?.theme || 'dark',
+          // Use current Mantine theme instead of profile theme to ensure sync
+          theme: computedColorScheme as 'light' | 'dark',
           notifications: profile.preferences?.notifications ?? true,
           weekStartsOn: profile.preferences?.weekStartsOn ?? 0,
         },
       });
     }
-  }, [profile]);
+  }, [profile, computedColorScheme]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +94,93 @@ export default function ProfilePage() {
       console.error('Error updating profile:', error);
     }
   };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+
+    // Check rate limit before proceeding
+    if (!passwordChangeRateLimit.canSubmit) {
+      setPasswordError(passwordChangeRateLimit.warningMessage);
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters long');
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+
+    setPasswordLoading(true);
+
+    try {
+      await changePassword(passwordData.currentPassword, passwordData.newPassword);
+      // Record successful password change
+      passwordChangeRateLimit.recordSuccess();
+      setPasswordSuccess(true);
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+      setTimeout(() => {
+        setPasswordSuccess(false);
+        setPasswordModalOpened(false);
+      }, 2000);
+    } catch (error: any) {
+      // Record failed password change attempt
+      passwordChangeRateLimit.recordFailure();
+      setPasswordError(getPasswordErrorMessage(error));
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const handlePasswordModalClose = () => {
+    setPasswordModalOpened(false);
+    setPasswordData({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setPasswordError('');
+    setPasswordSuccess(false);
+    setPasswordLoading(false);
+  };
+
+  // Handle theme change with bidirectional sync
+  const handleThemeChange = async (newTheme: 'light' | 'dark') => {
+    // 1. Update Mantine theme immediately for instant visual feedback
+    setColorScheme(newTheme);
+    localStorage.setItem('mantine-color-scheme-cherut', newTheme);
+
+    // 2. Update form data
+    setFormData({
+      ...formData,
+      preferences: {
+        ...formData.preferences,
+        theme: newTheme,
+      },
+    });
+
+    // 3. Save to backend profile
+    try {
+      await updateMutation.mutateAsync({
+        ...formData,
+        preferences: {
+          ...formData.preferences,
+          theme: newTheme,
+        },
+      });
+    } catch (error) {
+      console.error('Error updating theme preference:', error);
+    }
+  };
+
 
   if (isLoading) {
     return (
@@ -194,10 +310,6 @@ export default function ProfilePage() {
                         onChange={(value) => setFormData({ ...formData, language: value || 'en' })}
                         data={[
                           { value: 'en', label: 'English' },
-                          { value: 'pt', label: 'Português' },
-                          { value: 'es', label: 'Español' },
-                          { value: 'fr', label: 'Français' },
-                          { value: 'de', label: 'Deutsch' },
                         ]}
                       />
                     </Grid.Col>
@@ -213,15 +325,7 @@ export default function ProfilePage() {
                     <Select
                       label="Theme"
                       value={formData.preferences?.theme}
-                      onChange={(value) =>
-                        setFormData({
-                          ...formData,
-                          preferences: {
-                            ...formData.preferences,
-                            theme: value as 'light' | 'dark',
-                          },
-                        })
-                      }
+                      onChange={(value) => handleThemeChange(value as 'light' | 'dark')}
                       data={[
                         { value: 'dark', label: 'Dark' },
                         { value: 'light', label: 'Light' },
@@ -246,19 +350,47 @@ export default function ProfilePage() {
                       ]}
                     />
 
-                    <Switch
-                      label="Enable notifications"
-                      checked={formData.preferences?.notifications ?? true}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          preferences: {
-                            ...formData.preferences,
-                            notifications: e.currentTarget.checked,
-                          },
-                        })
-                      }
-                    />
+                    <Group justify="space-between">
+                      <div>
+                        <Text size="sm" fw={500}>Notifications</Text>
+                        <Text size="xs" c="dimmed">
+                          Enable or disable all notifications
+                        </Text>
+                      </div>
+                      <Switch
+                        checked={formData.preferences?.notifications === true}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            preferences: {
+                              ...formData.preferences,
+                              notifications: e.currentTarget.checked,
+                            },
+                          })
+                        }
+                      />
+                    </Group>
+                  </Stack>
+                </div>
+
+                <Divider />
+
+                {/* Security Section */}
+                <div>
+                  <Title order={4} size="h5" mb="md">Security</Title>
+                  <Stack gap="md">
+                    <div>
+                      <Text size="sm" c="dimmed" mb="xs">
+                        Keep your account secure by updating your password regularly
+                      </Text>
+                      <Button
+                        variant="outline"
+                        leftSection={<Lock size={16} />}
+                        onClick={() => setPasswordModalOpened(true)}
+                      >
+                        Change Password
+                      </Button>
+                    </div>
                   </Stack>
                 </div>
 
@@ -283,6 +415,109 @@ export default function ProfilePage() {
           </Card>
         </Grid.Col>
       </Grid>
+
+      {/* Change Password Modal */}
+      <Modal
+        opened={passwordModalOpened}
+        onClose={handlePasswordModalClose}
+        title={
+          <Group gap="xs">
+            <Shield size={20} />
+            <Text fw={600}>Change Password</Text>
+          </Group>
+        }
+        centered
+        radius="md"
+      >
+        {passwordSuccess ? (
+          <Stack gap="lg" ta="center">
+            <Alert
+              icon={<CheckCircle size={20} />}
+              title="Password Changed Successfully!"
+              color="green"
+              radius="md"
+            >
+              Your password has been updated successfully.
+            </Alert>
+          </Stack>
+        ) : (
+          <form onSubmit={handlePasswordChange}>
+            <Stack gap="lg">
+              {/* Rate limit display */}
+              <RateLimitDisplay
+                result={passwordChangeRateLimit.result}
+                message={passwordChangeRateLimit.warningMessage}
+                showProgress={true}
+              />
+
+              {passwordError && (
+                <Alert
+                  icon={<AlertCircle size={20} />}
+                  title="Error"
+                  color="red"
+                  radius="md"
+                >
+                  {passwordError}
+                </Alert>
+              )}
+
+              <Text size="sm" c="dimmed">
+                Enter your current password and choose a new password to secure your account.
+              </Text>
+
+              <PasswordInput
+                label="Current Password"
+                placeholder="Enter your current password"
+                value={passwordData.currentPassword}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, currentPassword: e.target.value })
+                }
+                required
+                autoFocus
+              />
+
+              <PasswordInput
+                label="New Password"
+                placeholder="Enter new password"
+                value={passwordData.newPassword}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, newPassword: e.target.value })
+                }
+                required
+                description="Must be at least 6 characters long"
+              />
+
+              <PasswordInput
+                label="Confirm New Password"
+                placeholder="Confirm new password"
+                value={passwordData.confirmPassword}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, confirmPassword: e.target.value })
+                }
+                required
+              />
+
+              <Group justify="flex-end" gap="sm">
+                <Button
+                  variant="outline"
+                  onClick={handlePasswordModalClose}
+                  disabled={passwordLoading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  loading={passwordLoading}
+                  leftSection={<Lock size={16} />}
+                >
+                  {passwordLoading ? 'Changing...' : 'Change Password'}
+                </Button>
+              </Group>
+            </Stack>
+          </form>
+        )}
+      </Modal>
+
     </Stack>
   );
 }
