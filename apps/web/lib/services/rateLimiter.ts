@@ -303,7 +303,7 @@ export class RateLimitService {
       now >= entry.lockoutUntil &&
       entry.attempts > 0;
 
-    const isCorrupted = shouldHaveBeenReset || invalidAttempts || expiredLockoutWithAttempts;
+    const isCorrupted = !!(shouldHaveBeenReset || invalidAttempts || expiredLockoutWithAttempts);
 
     if (isCorrupted) {
       console.log('🔍 [RateLimit] Corruption detected:', {
