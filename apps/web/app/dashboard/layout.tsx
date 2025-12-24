@@ -100,6 +100,7 @@ export default function DashboardLayout({
           opened={isWelcomeOpen}
           onClose={closeWelcome}
         />
+
       </AppShell>
     </SidebarProvider>
   );
