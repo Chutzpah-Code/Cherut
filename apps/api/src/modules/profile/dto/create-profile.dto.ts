@@ -4,6 +4,8 @@ import {
   IsDateString,
   IsEnum,
   IsUrl,
+  IsObject,
+  IsBoolean,
 } from 'class-validator';
 
 export enum Gender {
@@ -45,4 +47,12 @@ export class CreateProfileDto {
   @IsString()
   @IsOptional()
   language?: string;
+
+  @IsObject()
+  @IsOptional()
+  preferences?: {
+    theme?: string;
+    notifications?: boolean | object;
+    weekStartsOn?: number;
+  };
 }
