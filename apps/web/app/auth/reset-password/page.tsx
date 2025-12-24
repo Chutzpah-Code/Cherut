@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { confirmPasswordReset } from '@/lib/firebase/auth';
 import { getPasswordErrorMessage, createRateLimitError } from '@/lib/utils/auth-errors';
@@ -22,7 +22,7 @@ import { AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
 import CherutLogo from '@/components/ui/CherutLogo';
 import Link from 'next/link';
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageContent() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -470,5 +470,35 @@ export default function ResetPasswordPage() {
         </Stack>
       </Container>
     </Box>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <Box
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#ffffff',
+            padding: '20px',
+          }}
+        >
+          <Container size="xs" style={{ width: '100%' }}>
+            <Stack gap="xl" align="center">
+              <CherutLogo size={120} />
+              <Text size="lg" ta="center">
+                Loading...
+              </Text>
+            </Stack>
+          </Container>
+        </Box>
+      }
+    >
+      <ResetPasswordPageContent />
+    </Suspense>
   );
 }
