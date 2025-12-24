@@ -4,6 +4,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Bell, Moon, Sun, Sparkles, HelpCircle } from 'lucide-react';
 import { Group, Burger, Text, ActionIcon, Avatar, Box, useMantineColorScheme, useComputedColorScheme, Badge, Stack, Indicator } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { NotificationCenter } from '@/components/notifications/NotificationCenter';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
 
 interface HeaderProps {
   mobileOpened: boolean;
@@ -19,11 +23,26 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
   const computedColorScheme = useComputedColorScheme('light');
   const [mounted, setMounted] = useState(false);
   const [greeting, setGreeting] = useState('Welcome back');
+  const router = useRouter();
+
+  // Profile integration for theme sync
+  const { data: profile } = useProfile();
+  const updateMutation = useUpdateProfile();
+
+  // Notifications
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    clearAllNotifications,
+  } = useNotifications();
 
   useEffect(() => {
     setMounted(true);
     
-    // Define saudação baseada no horário
+    // Define greeting based on time of day
     const hour = new Date().getHours();
     if (hour < 12) {
       setGreeting('Good morning');
@@ -34,16 +53,37 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
     }
   }, []);
 
-  const toggleColorScheme = () => {
+  const toggleColorScheme = async () => {
     const newScheme = computedColorScheme === 'dark' ? 'light' : 'dark';
+
+    // 1. Update Mantine theme immediately
     setColorScheme(newScheme);
     localStorage.setItem('mantine-color-scheme-cherut', newScheme);
+
+    // 2. Sync with backend profile if available
+    if (profile && updateMutation) {
+      try {
+        await updateMutation.mutateAsync({
+          ...profile,
+          preferences: {
+            ...profile.preferences,
+            theme: newScheme,
+          },
+        });
+      } catch (error) {
+        console.error('Error syncing theme to profile:', error);
+      }
+    }
   };
 
   const getFirstName = () => {
     if (!user?.email) return 'there';
     const name = user.email.split('@')[0];
     return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+
+  const navigateToProfile = () => {
+    router.push('/dashboard/profile');
   };
 
   return (
@@ -79,7 +119,7 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
             size="lg"
             radius="xl"
             onClick={onOpenWelcome}
-            title="Ajuda e instruções"
+            title="Help and instructions"
             style={{
               transition: 'all 0.3s ease',
             }}
@@ -88,22 +128,41 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
           </ActionIcon>
         )}
 
-        <Indicator inline color="red" size={8} offset={5} disabled>
-          <ActionIcon 
-            variant="subtle" 
-            size="lg" 
-            radius="xl"
-            title="Notifications"
-          >
-            <Bell size={20} />
-          </ActionIcon>
-        </Indicator>
+        <NotificationCenter
+          notifications={notifications}
+          unreadCount={unreadCount}
+          onMarkAsRead={markAsRead}
+          onMarkAllAsRead={markAllAsRead}
+          onDelete={deleteNotification}
+          onClearAll={clearAllNotifications}
+          onNotificationClick={(notification) => {
+            // Handle notification click - could navigate to specific page
+            if (notification.actionUrl) {
+              window.location.href = notification.actionUrl;
+            }
+          }}
+        >
+          <Indicator inline color="red" size={8} offset={5} disabled={unreadCount === 0}>
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              radius="xl"
+              title={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ''}`}
+              style={{
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Bell size={20} />
+            </ActionIcon>
+          </Indicator>
+        </NotificationCenter>
 
         <Group gap="xs" ml="xs">
-          <Avatar 
-            color="blue" 
+          <Avatar
+            color="blue"
             radius="xl"
             size="md"
+            onClick={navigateToProfile}
             styles={{
               root: {
                 border: '2px solid var(--mantine-color-blue-6)',
