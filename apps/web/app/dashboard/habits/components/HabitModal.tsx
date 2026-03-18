@@ -139,32 +139,68 @@ export function HabitModal({
   };
 
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title={
-        <Group gap="sm">
-          <Text fw={600} size="lg">
-            Edit Habit
-          </Text>
-          <Badge color={categoryColor} variant="light">
-            {categoryLabel}
-          </Badge>
-        </Group>
-      }
-      size="lg"
-      fullScreen
-      styles={{
-        body: {
-          maxHeight: '80vh',
-          overflowY: 'auto',
-        },
-      }}
-      overlayProps={{
-        backgroundOpacity: 0.55,
-        blur: 3,
-      }}
-    >
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Modal
+        opened={opened}
+        onClose={onClose}
+        title={
+          <Group gap="sm">
+            <Text
+              fw={600}
+              size="lg"
+              style={{
+                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: '24px',
+                fontWeight: 600,
+                color: '#000000',
+              }}
+            >
+              Edit Habit
+            </Text>
+            <Badge
+              color={categoryColor}
+              variant="light"
+              radius={8}
+              styles={{
+                root: {
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  backgroundColor: categoryColor === 'green' ? '#DCFCE7' : '#FEE2E2',
+                  color: categoryColor === 'green' ? '#22C55E' : '#EF4444',
+                  border: `1px solid ${categoryColor === 'green' ? '#22C55E' : '#EF4444'}`,
+                },
+              }}
+            >
+              {categoryLabel}
+            </Badge>
+          </Group>
+        }
+        size="lg"
+        fullScreen
+        radius={16}
+        styles={{
+          content: {
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          },
+          body: {
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            padding: '32px',
+          },
+          header: {
+            padding: '24px 32px 0 32px',
+            borderBottom: 'none',
+          },
+        }}
+        overlayProps={{
+          backgroundOpacity: 0.6,
+          blur: 4,
+        }}
+      >
       <Stack gap="md">
         {/* Form */}
         <TextInput
@@ -305,22 +341,54 @@ export function HabitModal({
           <Grid>
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <Button
-                variant="light"
-                color="blue"
+                variant="outline"
                 leftSection={<Archive size={16} />}
                 onClick={() => onArchive(habit.id)}
                 fullWidth
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  borderColor: '#4686FE',
+                  color: '#4686FE',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  height: '40px',
+                  background: 'white',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      backgroundColor: '#EBF8FF',
+                    },
+                  },
+                }}
               >
                 Archive Habit
               </Button>
             </Grid.Col>
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <Button
-                variant="light"
-                color="red"
+                variant="outline"
                 leftSection={<Trash2 size={16} />}
                 onClick={() => onDelete(habit.id)}
                 fullWidth
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  borderColor: '#EF4444',
+                  color: '#EF4444',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  height: '40px',
+                  background: 'white',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      backgroundColor: '#FEF2F2',
+                    },
+                  },
+                }}
               >
                 Delete Habit
               </Button>
@@ -330,9 +398,27 @@ export function HabitModal({
           <Grid justify="flex-end">
             <Grid.Col span={{ base: 6, sm: 'content' }}>
               <Button
-                variant="light"
+                variant="outline"
                 onClick={onClose}
                 fullWidth
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  borderColor: '#CCCCCC',
+                  color: '#333333',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  height: '48px',
+                  background: 'white',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      borderColor: '#4686FE',
+                      color: '#4686FE',
+                    },
+                  },
+                }}
               >
                 Cancel
               </Button>
@@ -341,8 +427,24 @@ export function HabitModal({
               <Button
                 onClick={handleSave}
                 loading={isSaving}
-                color={categoryColor}
                 fullWidth
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  height: '48px',
+                  backgroundColor: categoryColor === 'green' ? '#22C55E' : '#EF4444',
+                  border: 'none',
+                  color: 'white',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      backgroundColor: categoryColor === 'green' ? '#16A34A' : '#DC2626',
+                    },
+                  },
+                }}
               >
                 Save Changes
               </Button>
@@ -350,6 +452,7 @@ export function HabitModal({
           </Grid>
         </Stack>
       </Stack>
-    </Modal>
+      </Modal>
+    </>
   );
 }

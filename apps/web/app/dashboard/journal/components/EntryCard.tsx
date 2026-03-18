@@ -26,39 +26,79 @@ export function EntryCard({ entry, onClick, onEdit, onDelete }: EntryCardProps) 
   const wasUpdated = new Date(entry.updatedAt) > new Date(entry.createdAt);
 
   return (
-    <Card
-      withBorder
-      radius="md"
-      style={{
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-      styles={{
-        root: {
-          '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: 'var(--mantine-shadow-sm)',
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Card
+        withBorder
+        radius={12}
+        style={{
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        }}
+        styles={{
+          root: {
+            border: '1px solid #E2E8F0',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              borderColor: '#4686FE',
+              boxShadow: '0 4px 12px rgba(70, 134, 254, 0.15)',
+            }
           }
-        }
-      }}
-      onClick={onClick}
-    >
+        }}
+        onClick={onClick}
+      >
       {/* Title */}
-      <Text fw={600} size="md" mb="xs" lineClamp={2}>
+      <Text
+        fw={600}
+        size="md"
+        mb="xs"
+        lineClamp={2}
+        style={{
+          fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontSize: '18px',
+          fontWeight: 600,
+          color: '#000000',
+        }}
+      >
         {entry.title || 'Untitled Entry'}
       </Text>
 
       <Group justify="space-between" align="flex-start" mb="xs">
         <Group gap="xs" align="center">
           <Calendar size={14} />
-          <Text size="xs" c="dimmed">
+          <Text
+            size="xs"
+            c="dimmed"
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '12px',
+              fontWeight: 400,
+              color: '#666666',
+            }}
+          >
             {formattedDate} at {formattedTime}
           </Text>
           {wasUpdated && (
-            <Badge size="xs" color="blue" variant="light">
+            <Badge
+              size="xs"
+              radius={6}
+              styles={{
+                root: {
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  backgroundColor: '#EBF8FF',
+                  color: '#4686FE',
+                  border: '1px solid #4686FE',
+                },
+              }}
+            >
               Edited
             </Badge>
           )}
@@ -106,18 +146,48 @@ export function EntryCard({ entry, onClick, onEdit, onDelete }: EntryCardProps) 
         )}
       </Group>
 
-      <Text size="sm" style={{ flexGrow: 1, whiteSpace: 'pre-line' }}>
+      <Text
+        size="sm"
+        style={{
+          flexGrow: 1,
+          whiteSpace: 'pre-line',
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '14px',
+          fontWeight: 400,
+          color: '#333333',
+          lineHeight: '1.5',
+        }}
+      >
         {previewText}
       </Text>
 
-      <Group justify="space-between" align="center" mt="md" pt="xs" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
-        <Text size="xs" c="dimmed">
+      <Group justify="space-between" align="center" mt="md" pt="xs" style={{ borderTop: '1px solid #E2E8F0' }}>
+        <Text
+          size="xs"
+          c="dimmed"
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '12px',
+            fontWeight: 400,
+            color: '#666666',
+          }}
+        >
           {entry.content.length.toLocaleString()} characters
         </Text>
-        <Text size="xs" c="blue" fw={500}>
+        <Text
+          size="xs"
+          fw={500}
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '12px',
+            fontWeight: 500,
+            color: '#4686FE',
+          }}
+        >
           Click to read more
         </Text>
       </Group>
-    </Card>
+      </Card>
+    </>
   );
 }

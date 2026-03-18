@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Card, Text, Badge, Group, Stack, ActionIcon, Progress, Tooltip } from '@mantine/core';
 import { GripVertical, Target, CheckSquare, Clock, Archive } from 'lucide-react';
 import { Task } from '@/lib/api/services/tasks';
@@ -116,7 +117,11 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick }: KanbanCard
   );
 
   return (
-    <Card
+    <React.Fragment>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Card
       ref={setNodeRef}
       style={{
         ...style,
@@ -240,15 +245,16 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick }: KanbanCard
 
       </Stack>
 
-      {/* Global styles for pulse animation */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-          }
-        `
-      }} />
-    </Card>
+        {/* Global styles for pulse animation */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            @keyframes pulse {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.5; }
+            }
+          `
+        }} />
+      </Card>
+    </React.Fragment>
   );
 });

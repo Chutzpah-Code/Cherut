@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Loader, Center, Group, Button, Modal, TextInput, Stack, Select } from '@mantine/core';
+import { Box, Loader, Center, Group, Button, Modal, TextInput, Stack, Select, Text } from '@mantine/core';
 import { Plus } from 'lucide-react';
 import {
   DndContext,
@@ -228,7 +228,7 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
   if (isLoading) {
     return (
       <Center h={400}>
-        <Loader size="lg" />
+        <Loader size="lg" color="#4686FE" />
       </Center>
     );
   }
@@ -247,7 +247,15 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
     : null;
 
   return (
-    <>
+    <Box
+      style={{
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      }}
+    >
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+
       {/* Filter Bar */}
       <TaskFilter
         currentFilter={currentFilter}
@@ -325,15 +333,60 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
       <Modal
         opened={createModalOpened}
         onClose={() => setCreateModalOpened(false)}
-        title="Create New Task"
+        title={
+          <Text
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '20px',
+              fontWeight: 600,
+              color: '#000000',
+            }}
+          >
+            Create New Task
+          </Text>
+        }
+        size="md"
+        radius={16}
+        styles={{
+          content: {
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          },
+        }}
       >
-        <Stack gap="md">
+        <Stack gap="lg">
           <TextInput
             label="Title"
             placeholder="Task title"
             value={newTaskData.title}
             onChange={(e) => setNewTaskData({ ...newTaskData, title: e.target.value })}
             required
+            withAsterisk
+            size="md"
+            radius={8}
+            styles={{
+              label: {
+                fontFamily: 'Inter, sans-serif',
+                color: '#000000',
+                fontWeight: 600,
+                marginBottom: 8,
+                fontSize: '14px',
+              },
+              input: {
+                fontFamily: 'Inter, sans-serif',
+                backgroundColor: 'white',
+                border: '1px solid #CCCCCC',
+                color: '#000000',
+                height: '48px',
+                fontSize: '16px',
+                '&::placeholder': {
+                  color: '#999999',
+                },
+                '&:focus': {
+                  borderColor: '#4686FE',
+                  boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                },
+              },
+            }}
           />
 
           <Select
@@ -343,7 +396,34 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
             onChange={(value) => setNewTaskData({ ...newTaskData, lifeAreaId: value || '' })}
             data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
             required
+            withAsterisk
             searchable
+            size="md"
+            radius={8}
+            styles={{
+              label: {
+                fontFamily: 'Inter, sans-serif',
+                color: '#000000',
+                fontWeight: 600,
+                marginBottom: 8,
+                fontSize: '14px',
+              },
+              input: {
+                fontFamily: 'Inter, sans-serif',
+                backgroundColor: 'white',
+                border: '1px solid #CCCCCC',
+                color: '#000000',
+                height: '48px',
+                fontSize: '16px',
+                '&::placeholder': {
+                  color: '#999999',
+                },
+                '&:focus': {
+                  borderColor: '#4686FE',
+                  boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                },
+              },
+            }}
           />
 
           <Select
@@ -356,18 +436,85 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
               { value: 'high', label: 'High' },
               { value: 'urgent', label: 'Urgent' },
             ]}
+            size="md"
+            radius={8}
+            styles={{
+              label: {
+                fontFamily: 'Inter, sans-serif',
+                color: '#000000',
+                fontWeight: 600,
+                marginBottom: 8,
+                fontSize: '14px',
+              },
+              input: {
+                fontFamily: 'Inter, sans-serif',
+                backgroundColor: 'white',
+                border: '1px solid #CCCCCC',
+                color: '#000000',
+                height: '48px',
+                fontSize: '16px',
+                '&::placeholder': {
+                  color: '#999999',
+                },
+                '&:focus': {
+                  borderColor: '#4686FE',
+                  boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                },
+              },
+            }}
           />
 
-          <Group justify="flex-end">
-            <Button variant="light" onClick={() => setCreateModalOpened(false)}>
+          <Group justify="flex-end" mt="lg">
+            <Button
+              variant="outline"
+              onClick={() => setCreateModalOpened(false)}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                borderColor: '#CCCCCC',
+                color: '#333333',
+                fontSize: '16px',
+                fontWeight: 600,
+                height: '48px',
+                background: 'white',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    borderColor: '#4686FE',
+                    color: '#4686FE',
+                  },
+                },
+              }}
+            >
               Cancel
             </Button>
-            <Button onClick={handleCreateTask} loading={createMutation.isPending}>
+            <Button
+              onClick={handleCreateTask}
+              loading={createMutation.isPending}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                background: '#4686FE',
+                border: 'none',
+                fontSize: '16px',
+                fontWeight: 600,
+                color: 'white',
+                height: '48px',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    background: '#3366E5',
+                  },
+                },
+              }}
+            >
               Create Task
             </Button>
           </Group>
         </Stack>
       </Modal>
-    </>
+    </Box>
   );
 }

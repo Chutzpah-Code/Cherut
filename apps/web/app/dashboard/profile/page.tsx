@@ -185,22 +185,65 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <Center h={300}>
-        <Loader size="lg" />
+        <Loader size="lg" color="#4686FE" />
       </Center>
     );
   }
 
   return (
-    <Stack gap="lg">
-      <div>
-        <Title order={1} size="h2" mb="xs">Profile</Title>
-        <Text c="dimmed" size="sm">Manage your account settings and preferences</Text>
-      </div>
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Stack
+        gap="lg"
+        style={{
+          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        }}
+      >
+        <div>
+          <Title
+            order={1}
+            size="h2"
+            mb="xs"
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '32px',
+              fontWeight: 700,
+              color: '#000000',
+            }}
+          >
+            Profile
+          </Title>
+          <Text
+            c="dimmed"
+            size="sm"
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              fontWeight: 400,
+              color: '#666666',
+            }}
+          >
+            Manage your account settings and preferences
+          </Text>
+        </div>
 
       <Grid gutter="md">
         {/* Profile Card */}
         <Grid.Col span={{ base: 12, lg: 4 }}>
-          <Card shadow="sm" padding="lg" withBorder>
+          <Card
+            shadow="sm"
+            padding="lg"
+            withBorder
+            radius={12}
+            styles={{
+              root: {
+                border: '1px solid #E2E8F0',
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              },
+            }}
+          >
             <Stack align="center" gap="md">
               <Avatar
                 size={96}
@@ -211,10 +254,29 @@ export default function ProfilePage() {
               </Avatar>
 
               <div style={{ textAlign: 'center' }}>
-                <Text fw={600} size="lg">
+                <Text
+                  fw={600}
+                  size="lg"
+                  style={{
+                    fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                    fontSize: '20px',
+                    fontWeight: 600,
+                    color: '#000000',
+                  }}
+                >
                   {formData.displayName || 'User'}
                 </Text>
-                <Text size="sm" c="dimmed" style={{ wordBreak: 'break-all' }}>
+                <Text
+                  size="sm"
+                  c="dimmed"
+                  style={{
+                    wordBreak: 'break-all',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: '#666666',
+                  }}
+                >
                   {user?.email}
                 </Text>
               </div>
@@ -224,20 +286,52 @@ export default function ProfilePage() {
               <Stack gap="sm" w="100%">
                 <Group gap="xs" wrap="nowrap">
                   <Mail size={16} style={{ flexShrink: 0, opacity: 0.6 }} />
-                  <Text size="sm" truncate>{user?.email}</Text>
+                  <Text
+                    size="sm"
+                    truncate
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      color: '#333333',
+                    }}
+                  >
+                    {user?.email}
+                  </Text>
                 </Group>
 
                 {formData.timezone && (
                   <Group gap="xs" wrap="nowrap">
                     <Clock size={16} style={{ flexShrink: 0, opacity: 0.6 }} />
-                    <Text size="sm" truncate>{formData.timezone}</Text>
+                    <Text
+                      size="sm"
+                      truncate
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '14px',
+                        fontWeight: 400,
+                        color: '#333333',
+                      }}
+                    >
+                      {formData.timezone}
+                    </Text>
                   </Group>
                 )}
 
                 {formData.language && (
                   <Group gap="xs" wrap="nowrap">
                     <Globe size={16} style={{ flexShrink: 0, opacity: 0.6 }} />
-                    <Text size="sm">{formData.language.toUpperCase()}</Text>
+                    <Text
+                      size="sm"
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '14px',
+                        fontWeight: 400,
+                        color: '#333333',
+                      }}
+                    >
+                      {formData.language.toUpperCase()}
+                    </Text>
                   </Group>
                 )}
               </Stack>
@@ -247,14 +341,49 @@ export default function ProfilePage() {
 
         {/* Settings Form */}
         <Grid.Col span={{ base: 12, lg: 8 }}>
-          <Card shadow="sm" padding="lg" withBorder>
-            <Title order={3} size="h4" mb="lg">Profile Settings</Title>
+          <Card
+            shadow="sm"
+            padding="lg"
+            withBorder
+            radius={12}
+            styles={{
+              root: {
+                border: '1px solid #E2E8F0',
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              },
+            }}
+          >
+            <Title
+              order={3}
+              size="h4"
+              mb="lg"
+              style={{
+                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: '24px',
+                fontWeight: 600,
+                color: '#000000',
+              }}
+            >
+              Profile Settings
+            </Title>
 
             <form onSubmit={handleSubmit}>
               <Stack gap="lg">
                 {/* Personal Information */}
                 <div>
-                  <Title order={4} size="h5" mb="md">Personal Information</Title>
+                  <Title
+                    order={4}
+                    size="h5"
+                    mb="md"
+                    style={{
+                      fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    Personal Information
+                  </Title>
                   <Stack gap="md">
                     <TextInput
                       label="Display Name"
@@ -263,6 +392,24 @@ export default function ProfilePage() {
                       onChange={(e) =>
                         setFormData({ ...formData, displayName: e.target.value })
                       }
+                      radius={8}
+                      styles={{
+                        input: {
+                          height: '48px',
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          border: '1px solid #CCCCCC',
+                          '&:focus': {
+                            borderColor: '#4686FE',
+                          },
+                        },
+                        label: {
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          color: '#333333',
+                        },
+                      }}
                     />
 
                     <Textarea
@@ -271,6 +418,23 @@ export default function ProfilePage() {
                       value={formData.bio}
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                       rows={3}
+                      radius={8}
+                      styles={{
+                        input: {
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          border: '1px solid #CCCCCC',
+                          '&:focus': {
+                            borderColor: '#4686FE',
+                          },
+                        },
+                        label: {
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          color: '#333333',
+                        },
+                      }}
                     />
                   </Stack>
                 </div>
@@ -279,7 +443,19 @@ export default function ProfilePage() {
 
                 {/* Regional Settings */}
                 <div>
-                  <Title order={4} size="h5" mb="md">Regional Settings</Title>
+                  <Title
+                    order={4}
+                    size="h5"
+                    mb="md"
+                    style={{
+                      fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    Regional Settings
+                  </Title>
                   <Grid gutter="md">
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <Select
@@ -287,6 +463,24 @@ export default function ProfilePage() {
                         placeholder="Select timezone"
                         value={formData.timezone}
                         onChange={(value) => setFormData({ ...formData, timezone: value || '' })}
+                        radius={8}
+                        styles={{
+                          input: {
+                            height: '48px',
+                            fontFamily: 'Inter, sans-serif',
+                            fontSize: '14px',
+                            border: '1px solid #CCCCCC',
+                            '&:focus': {
+                              borderColor: '#4686FE',
+                            },
+                          },
+                          label: {
+                            fontFamily: 'Inter, sans-serif',
+                            fontSize: '14px',
+                            fontWeight: 500,
+                            color: '#333333',
+                          },
+                        }}
                         data={[
                           { value: '', label: 'Select timezone' },
                           { value: 'America/New_York', label: 'Eastern Time (ET)' },
@@ -308,6 +502,24 @@ export default function ProfilePage() {
                         label="Language"
                         value={formData.language}
                         onChange={(value) => setFormData({ ...formData, language: value || 'en' })}
+                        radius={8}
+                        styles={{
+                          input: {
+                            height: '48px',
+                            fontFamily: 'Inter, sans-serif',
+                            fontSize: '14px',
+                            border: '1px solid #CCCCCC',
+                            '&:focus': {
+                              borderColor: '#4686FE',
+                            },
+                          },
+                          label: {
+                            fontFamily: 'Inter, sans-serif',
+                            fontSize: '14px',
+                            fontWeight: 500,
+                            color: '#333333',
+                          },
+                        }}
                         data={[
                           { value: 'en', label: 'English' },
                         ]}
@@ -320,12 +532,42 @@ export default function ProfilePage() {
 
                 {/* Preferences */}
                 <div>
-                  <Title order={4} size="h5" mb="md">Preferences</Title>
+                  <Title
+                    order={4}
+                    size="h5"
+                    mb="md"
+                    style={{
+                      fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    Preferences
+                  </Title>
                   <Stack gap="md">
                     <Select
                       label="Theme"
                       value={formData.preferences?.theme}
                       onChange={(value) => handleThemeChange(value as 'light' | 'dark')}
+                      radius={8}
+                      styles={{
+                        input: {
+                          height: '48px',
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          border: '1px solid #CCCCCC',
+                          '&:focus': {
+                            borderColor: '#4686FE',
+                          },
+                        },
+                        label: {
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          color: '#333333',
+                        },
+                      }}
                       data={[
                         { value: 'dark', label: 'Dark' },
                         { value: 'light', label: 'Light' },
@@ -344,6 +586,24 @@ export default function ProfilePage() {
                           },
                         })
                       }
+                      radius={8}
+                      styles={{
+                        input: {
+                          height: '48px',
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          border: '1px solid #CCCCCC',
+                          '&:focus': {
+                            borderColor: '#4686FE',
+                          },
+                        },
+                        label: {
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          color: '#333333',
+                        },
+                      }}
                       data={[
                         { value: '0', label: 'Sunday' },
                         { value: '1', label: 'Monday' },
@@ -352,8 +612,28 @@ export default function ProfilePage() {
 
                     <Group justify="space-between">
                       <div>
-                        <Text size="sm" fw={500}>Notifications</Text>
-                        <Text size="xs" c="dimmed">
+                        <Text
+                          size="sm"
+                          fw={500}
+                          style={{
+                            fontFamily: 'Inter, sans-serif',
+                            fontSize: '14px',
+                            fontWeight: 500,
+                            color: '#333333',
+                          }}
+                        >
+                          Notifications
+                        </Text>
+                        <Text
+                          size="xs"
+                          c="dimmed"
+                          style={{
+                            fontFamily: 'Inter, sans-serif',
+                            fontSize: '12px',
+                            fontWeight: 400,
+                            color: '#666666',
+                          }}
+                        >
                           Enable or disable all notifications
                         </Text>
                       </div>
@@ -377,16 +657,56 @@ export default function ProfilePage() {
 
                 {/* Security Section */}
                 <div>
-                  <Title order={4} size="h5" mb="md">Security</Title>
+                  <Title
+                    order={4}
+                    size="h5"
+                    mb="md"
+                    style={{
+                      fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    Security
+                  </Title>
                   <Stack gap="md">
                     <div>
-                      <Text size="sm" c="dimmed" mb="xs">
+                      <Text
+                        size="sm"
+                        c="dimmed"
+                        mb="xs"
+                        style={{
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 400,
+                          color: '#666666',
+                        }}
+                      >
                         Keep your account secure by updating your password regularly
                       </Text>
                       <Button
                         variant="outline"
                         leftSection={<Lock size={16} />}
                         onClick={() => setPasswordModalOpened(true)}
+                        radius={8}
+                        style={{
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 600,
+                          height: '48px',
+                          borderColor: '#CCCCCC',
+                          color: '#333333',
+                          background: 'white',
+                        }}
+                        styles={{
+                          root: {
+                            '&:hover': {
+                              borderColor: '#4686FE',
+                              color: '#4686FE',
+                            },
+                          },
+                        }}
                       >
                         Change Password
                       </Button>
@@ -402,12 +722,43 @@ export default function ProfilePage() {
                     type="submit"
                     leftSection={<Save size={20} />}
                     loading={updateMutation.isPending}
+                    radius={8}
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      height: '48px',
+                      backgroundColor: '#4686FE',
+                      border: 'none',
+                      color: 'white',
+                    }}
+                    styles={{
+                      root: {
+                        '&:hover': {
+                          backgroundColor: '#3366E5',
+                        },
+                        '&:disabled': {
+                          backgroundColor: '#CCCCCC',
+                        },
+                      },
+                    }}
                   >
                     {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                   </Button>
 
                   {updateMutation.isSuccess && (
-                    <Text size="sm" c="green">Profile updated successfully!</Text>
+                    <Text
+                      size="sm"
+                      c="green"
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        color: '#22C55E',
+                      }}
+                    >
+                      Profile updated successfully!
+                    </Text>
                   )}
                 </Group>
               </Stack>
@@ -423,11 +774,29 @@ export default function ProfilePage() {
         title={
           <Group gap="xs">
             <Shield size={20} />
-            <Text fw={600}>Change Password</Text>
+            <Text
+              fw={600}
+              style={{
+                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#000000',
+              }}
+            >
+              Change Password
+            </Text>
           </Group>
         }
         centered
-        radius="md"
+        radius={12}
+        styles={{
+          header: {
+            padding: '24px 24px 0 24px',
+          },
+          body: {
+            padding: '24px',
+          },
+        }}
       >
         {passwordSuccess ? (
           <Stack gap="lg" ta="center">
@@ -461,7 +830,16 @@ export default function ProfilePage() {
                 </Alert>
               )}
 
-              <Text size="sm" c="dimmed">
+              <Text
+                size="sm"
+                c="dimmed"
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 400,
+                  color: '#666666',
+                }}
+              >
                 Enter your current password and choose a new password to secure your account.
               </Text>
 
@@ -474,6 +852,24 @@ export default function ProfilePage() {
                 }
                 required
                 autoFocus
+                radius={8}
+                styles={{
+                  input: {
+                    height: '48px',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    border: '1px solid #CCCCCC',
+                    '&:focus': {
+                      borderColor: '#4686FE',
+                    },
+                  },
+                  label: {
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    color: '#333333',
+                  },
+                }}
               />
 
               <PasswordInput
@@ -485,6 +881,29 @@ export default function ProfilePage() {
                 }
                 required
                 description="Must be at least 6 characters long"
+                radius={8}
+                styles={{
+                  input: {
+                    height: '48px',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    border: '1px solid #CCCCCC',
+                    '&:focus': {
+                      borderColor: '#4686FE',
+                    },
+                  },
+                  label: {
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    color: '#333333',
+                  },
+                  description: {
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '12px',
+                    color: '#666666',
+                  },
+                }}
               />
 
               <PasswordInput
@@ -495,6 +914,24 @@ export default function ProfilePage() {
                   setPasswordData({ ...passwordData, confirmPassword: e.target.value })
                 }
                 required
+                radius={8}
+                styles={{
+                  input: {
+                    height: '48px',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    border: '1px solid #CCCCCC',
+                    '&:focus': {
+                      borderColor: '#4686FE',
+                    },
+                  },
+                  label: {
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    color: '#333333',
+                  },
+                }}
               />
 
               <Group justify="flex-end" gap="sm">
@@ -502,6 +939,28 @@ export default function ProfilePage() {
                   variant="outline"
                   onClick={handlePasswordModalClose}
                   disabled={passwordLoading}
+                  radius={8}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    height: '48px',
+                    borderColor: '#CCCCCC',
+                    color: '#333333',
+                    background: 'white',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        borderColor: '#4686FE',
+                        color: '#4686FE',
+                      },
+                      '&:disabled': {
+                        borderColor: '#CCCCCC',
+                        color: '#999999',
+                      },
+                    },
+                  }}
                 >
                   Cancel
                 </Button>
@@ -509,6 +968,26 @@ export default function ProfilePage() {
                   type="submit"
                   loading={passwordLoading}
                   leftSection={<Lock size={16} />}
+                  radius={8}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    height: '48px',
+                    backgroundColor: '#4686FE',
+                    border: 'none',
+                    color: 'white',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        backgroundColor: '#3366E5',
+                      },
+                      '&:disabled': {
+                        backgroundColor: '#CCCCCC',
+                      },
+                    },
+                  }}
                 >
                   {passwordLoading ? 'Changing...' : 'Change Password'}
                 </Button>
@@ -517,7 +996,7 @@ export default function ProfilePage() {
           </form>
         )}
       </Modal>
-
-    </Stack>
+      </Stack>
+    </>
   );
 }

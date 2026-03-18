@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import {
   Modal,
   TextInput,
@@ -149,20 +150,44 @@ export function TaskModal({
     : null;
 
   return (
-    <Modal
+    <React.Fragment>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Modal
       opened={opened}
       onClose={onClose}
-      title={<Text fw={600} size="lg">Edit Task</Text>}
+      title={
+        <Text
+          style={{
+            fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontSize: '24px',
+            fontWeight: 600,
+            color: '#000000',
+          }}
+        >
+          Edit Task
+        </Text>
+      }
       size="xl"
+      radius={16}
       styles={{
+        content: {
+          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        },
         body: {
           maxHeight: '80vh',
           overflowY: 'auto',
+          padding: '32px',
+        },
+        header: {
+          padding: '24px 32px 0 32px',
+          borderBottom: 'none',
         },
       }}
       overlayProps={{
-        backgroundOpacity: 0.55,
-        blur: 3,
+        backgroundOpacity: 0.6,
+        blur: 4,
       }}
     >
       <Stack gap="md">
@@ -275,12 +300,61 @@ export function TaskModal({
           onChange={(e) => setFormData({ ...formData, estimatedPomodoros: parseInt(e.target.value) || undefined })}
         />
 
-        <Divider label="Time Tracking" labelPosition="center" />
+        <Divider
+          label={
+            <Text
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 600,
+                color: '#666666',
+              }}
+            >
+              Time Tracking
+            </Text>
+          }
+          labelPosition="center"
+          styles={{
+            label: {
+              backgroundColor: 'white',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+            },
+          }}
+        />
 
         {/* Time Tracking */}
         {currentTask.totalTimeTracked && currentTask.totalTimeTracked > 0 && (
-          <Alert icon={<Clock size={16} />} color="violet" variant="light">
-            Total time tracked: {formatTime(currentTask.totalTimeTracked)}
+          <Alert
+            icon={<Clock size={16} />}
+            variant="light"
+            radius={8}
+            styles={{
+              root: {
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+              },
+              icon: {
+                color: '#4686FE',
+              },
+              message: {
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 500,
+                color: '#334155',
+              },
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 500,
+                color: '#334155',
+              }}
+            >
+              Total time tracked: {formatTime(currentTask.totalTimeTracked)}
+            </Text>
           </Alert>
         )}
 
@@ -297,7 +371,7 @@ export function TaskModal({
               </Button>
             </Grid.Col>
           ) : (
-            <>
+            <React.Fragment>
               <Grid.Col span={{ base: 6, xs: 'content' }}>
                 <Button
                   leftSection={<Pause size={16} />}
@@ -318,7 +392,7 @@ export function TaskModal({
                   Stop
                 </Button>
               </Grid.Col>
-            </>
+            </React.Fragment>
           )}
         </Grid>
 
@@ -334,7 +408,16 @@ export function TaskModal({
             <Progress
               value={checklistProgress.percentage}
               size="lg"
-              color={checklistProgress.percentage === 100 ? 'green' : 'cyan'}
+              radius={8}
+              styles={{
+                root: {
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid #E2E8F0',
+                },
+                section: {
+                  backgroundColor: checklistProgress.percentage === 100 ? '#22C55E' : '#4686FE',
+                },
+              }}
             />
           </Stack>
         )}
@@ -346,6 +429,15 @@ export function TaskModal({
                 checked={item.completed}
                 onChange={() => onToggleChecklistItem(currentTask.id, item.id)}
                 style={{ flex: 0 }}
+                styles={{
+                  input: {
+                    borderColor: '#CCCCCC',
+                    '&:checked': {
+                      backgroundColor: '#4686FE',
+                      borderColor: '#4686FE',
+                    },
+                  },
+                }}
               />
               <Text
                 size="sm"
@@ -359,9 +451,19 @@ export function TaskModal({
               </Text>
               <ActionIcon
                 size="sm"
-                color="red"
-                variant="subtle"
+                variant="outline"
                 onClick={() => handleRemoveChecklistItem(item.id)}
+                styles={{
+                  root: {
+                    borderColor: '#CCCCCC',
+                    color: '#666666',
+                    '&:hover': {
+                      borderColor: '#EF4444',
+                      color: '#EF4444',
+                      backgroundColor: '#FEF2F2',
+                    },
+                  },
+                }}
               >
                 <X size={14} />
               </ActionIcon>
@@ -429,9 +531,27 @@ export function TaskModal({
           <Grid justify="flex-end">
             <Grid.Col span={{ base: 6, sm: 'content' }}>
               <Button
-                variant="light"
+                variant="outline"
                 onClick={onClose}
                 fullWidth
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  borderColor: '#CCCCCC',
+                  color: '#333333',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  height: '48px',
+                  background: 'white',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      borderColor: '#4686FE',
+                      color: '#4686FE',
+                    },
+                  },
+                }}
               >
                 Cancel
               </Button>
@@ -440,6 +560,23 @@ export function TaskModal({
               <Button
                 onClick={handleSave}
                 fullWidth
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  background: '#4686FE',
+                  border: 'none',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: 'white',
+                  height: '48px',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      background: '#3366E5',
+                    },
+                  },
+                }}
               >
                 Save Changes
               </Button>
@@ -447,6 +584,7 @@ export function TaskModal({
           </Grid>
         </Stack>
       </Stack>
-    </Modal>
+      </Modal>
+    </React.Fragment>
   );
 }

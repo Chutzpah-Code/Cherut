@@ -1,6 +1,7 @@
 'use client';
 
-import { Card, Text, Badge, Stack, Button, TextInput, ActionIcon, Group } from '@mantine/core';
+import React from 'react';
+import { Card, Text, Badge, Stack, Button, TextInput, ActionIcon, Group, ScrollArea, Box } from '@mantine/core';
 import { Plus, X, Check } from 'lucide-react';
 import { Task } from '@/lib/api/services/tasks';
 import { useDroppable } from '@dnd-kit/core';
@@ -42,7 +43,11 @@ export function KanbanList({
   };
 
   return (
-    <Card
+    <React.Fragment>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Card
       shadow="sm"
       padding="md"
       radius="md"
@@ -145,19 +150,37 @@ export function KanbanList({
         </SortableContext>
       </div>
 
-      {/* Add Card Button */}
-      {!isAddingCard && (
-        <Button
-          variant="subtle"
-          leftSection={<Plus size={16} />}
-          onClick={() => onAddTask(id)}
-          fullWidth
-          mt="md"
-          size="sm"
-        >
-          Add card
-        </Button>
-      )}
-    </Card>
+        {/* Add Card Button */}
+        {!isAddingCard && (
+          <Button
+            variant="outline"
+            leftSection={<Plus size={16} />}
+            onClick={() => onAddTask(id)}
+            fullWidth
+            mt="lg"
+            radius={8}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              borderColor: '#CCCCCC',
+              color: '#333333',
+              fontSize: '14px',
+              fontWeight: 600,
+              height: '40px',
+              background: 'white',
+            }}
+            styles={{
+              root: {
+                '&:hover': {
+                  borderColor: '#4686FE',
+                  color: '#4686FE',
+                },
+              },
+            }}
+          >
+            Add card
+          </Button>
+        )}
+      </Card>
+    </React.Fragment>
   );
 }

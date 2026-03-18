@@ -129,22 +129,50 @@ export default function JournalPage() {
   if (isLoading) {
     return (
       <Center h={300}>
-        <Loader size="lg" />
+        <Loader size="lg" color="#4686FE" />
       </Center>
     );
   }
 
   return (
-    <Stack gap="lg">
-      {/* Header */}
-      <Box>
-        <Title order={1} size="h2" mb="xs">
-          Journal
-        </Title>
-        <Text c="dimmed" size="sm">
-          Personal space for daily reflections and thoughts. Write freely without limits.
-        </Text>
-      </Box>
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Stack
+        gap="lg"
+        style={{
+          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        }}
+      >
+        {/* Header */}
+        <Box>
+          <Title
+            order={1}
+            size="h2"
+            mb="xs"
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '32px',
+              fontWeight: 700,
+              color: '#000000',
+            }}
+          >
+            Journal
+          </Title>
+          <Text
+            c="dimmed"
+            size="sm"
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              fontWeight: 400,
+              color: '#666666',
+            }}
+          >
+            Personal space for daily reflections and thoughts. Write freely without limits.
+          </Text>
+        </Box>
 
       {/* Filter Bar */}
       <JournalFilter
@@ -170,6 +198,25 @@ export default function JournalPage() {
                 size="compact-sm"
                 onClick={handleSearch}
                 disabled={!searchInput.trim()}
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  backgroundColor: '#4686FE',
+                  border: 'none',
+                  color: 'white',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      backgroundColor: '#3366E5',
+                    },
+                    '&:disabled': {
+                      backgroundColor: '#CCCCCC',
+                    },
+                  },
+                }}
               >
                 Search
               </Button>
@@ -212,8 +259,24 @@ export default function JournalPage() {
           <Button
             leftSection={<Plus size={20} />}
             onClick={() => setIsCreateFormOpen(true)}
-            color="blue"
             fullWidth
+            radius={8}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              fontWeight: 600,
+              height: '48px',
+              backgroundColor: '#4686FE',
+              border: 'none',
+              color: 'white',
+            }}
+            styles={{
+              root: {
+                '&:hover': {
+                  backgroundColor: '#3366E5',
+                },
+              },
+            }}
           >
             New Entry
           </Button>
@@ -254,7 +317,30 @@ export default function JournalPage() {
               ))}
             </Grid>
           ) : (
-            <Alert variant="light" color="gray" title="No entries found">
+            <Alert
+              variant="light"
+              color="gray"
+              title="No entries found"
+              radius={12}
+              styles={{
+                root: {
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                },
+                title: {
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: '#334155',
+                },
+                message: {
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 400,
+                  color: '#64748B',
+                },
+              }}
+            >
               {searchTerm || dateRange[0] || dateRange[1]
                 ? `No entries found matching your filters${searchTerm ? ` for "${searchTerm}"` : ''}. Try adjusting your search criteria.`
                 : "You haven't written any journal entries yet. Click 'New Entry' to start writing!"
@@ -272,6 +358,7 @@ export default function JournalPage() {
           onClose={handleCloseModal}
         />
       )}
-    </Stack>
+      </Stack>
+    </>
   );
 }

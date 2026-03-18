@@ -261,22 +261,50 @@ export default function HabitsPage() {
   if (isPageLoading) {
     return (
       <Center h={300}>
-        <Loader size="lg" />
+        <Loader size="lg" color="#4686FE" />
       </Center>
     );
   }
 
   return (
-    <Stack gap="xl">
-      {/* Header */}
-      <Box>
-        <Title order={1} size="h2" mb="xs">
-          Habit Tracker
-        </Title>
-        <Text c="dimmed" size="sm">
-          Track your daily habits and build consistency
-        </Text>
-      </Box>
+    <React.Fragment>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Stack
+        gap="xl"
+        style={{
+          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        }}
+      >
+        {/* Header */}
+        <Box>
+          <Title
+            order={1}
+            size="h2"
+            mb="xs"
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '32px',
+              fontWeight: 700,
+              color: '#000000',
+            }}
+          >
+            Habit Tracker
+          </Title>
+          <Text
+            c="dimmed"
+            size="sm"
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              fontWeight: 400,
+              color: '#666666',
+            }}
+          >
+            Track your daily habits and build consistency
+          </Text>
+        </Box>
 
       {/* Filter Bar */}
       <HabitsFilter
@@ -298,20 +326,69 @@ export default function HabitsPage() {
           {/* Section: Good Habits */}
           <Box>
         <Group justify="space-between" mb="md">
-          <Title order={2} size="h3" c="green">
+          <Title
+            order={2}
+            size="h3"
+            c="green"
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '24px',
+              fontWeight: 600,
+              color: '#22C55E',
+            }}
+          >
             Good Habits to Start
           </Title>
           <Button
             leftSection={<Plus size={20} />}
             onClick={() => handleOpenCreateModal('good')}
             color="green"
+            radius={8}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 600,
+              height: '40px',
+              backgroundColor: '#22C55E',
+              border: 'none',
+            }}
+            styles={{
+              root: {
+                '&:hover': {
+                  backgroundColor: '#16A34A',
+                },
+              },
+            }}
           >
             Add Good Habit
           </Button>
         </Group>
 
         {goodHabits.length === 0 ? (
-          <Alert variant="light" color="gray" title="No good habits yet">
+          <Alert
+            variant="light"
+            color="gray"
+            title="No good habits yet"
+            radius={12}
+            styles={{
+              root: {
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+              },
+              title: {
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+                fontWeight: 600,
+                color: '#334155',
+              },
+              message: {
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 400,
+                color: '#64748B',
+              },
+            }}
+          >
             Start by adding positive habits you want to implement in your routine!
           </Alert>
         ) : (
@@ -334,20 +411,69 @@ export default function HabitsPage() {
       {/* Section: Bad Habits */}
       <Box>
         <Group justify="space-between" mb="md">
-          <Title order={2} size="h3" c="red">
+          <Title
+            order={2}
+            size="h3"
+            c="red"
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '24px',
+              fontWeight: 600,
+              color: '#EF4444',
+            }}
+          >
             Habits to Eliminate
           </Title>
           <Button
             leftSection={<Plus size={20} />}
             onClick={() => handleOpenCreateModal('bad')}
             color="red"
+            radius={8}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 600,
+              height: '40px',
+              backgroundColor: '#EF4444',
+              border: 'none',
+            }}
+            styles={{
+              root: {
+                '&:hover': {
+                  backgroundColor: '#DC2626',
+                },
+              },
+            }}
           >
             Add Bad Habit
           </Button>
         </Group>
 
         {badHabits.length === 0 ? (
-          <Alert variant="light" color="gray" title="No bad habits yet">
+          <Alert
+            variant="light"
+            color="gray"
+            title="No bad habits yet"
+            radius={12}
+            styles={{
+              root: {
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+              },
+              title: {
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+                fontWeight: 600,
+                color: '#334155',
+              },
+              message: {
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 400,
+                color: '#64748B',
+              },
+            }}
+          >
             Add negative habits you want to eliminate from your life!
           </Alert>
         ) : (
@@ -372,15 +498,67 @@ export default function HabitsPage() {
         opened={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         title={
-          <Text fw={600} size="lg">
+          <Text
+            fw={600}
+            size="lg"
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '20px',
+              fontWeight: 600,
+              color: '#000000',
+            }}
+          >
             {creatingCategory === 'good' ? 'New Good Habit' : 'New Bad Habit'}
           </Text>
         }
         size="md"
+        radius={16}
+        styles={{
+          content: {
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          },
+          body: {
+            padding: '32px',
+          },
+          header: {
+            padding: '24px 32px 0 32px',
+            borderBottom: 'none',
+          },
+        }}
+        overlayProps={{
+          backgroundOpacity: 0.6,
+          blur: 4,
+        }}
       >
         <form onSubmit={handleCreateSubmit}>
           <Stack gap="md">
-            <Alert variant="light" color="blue" title="21-Day Challenge">
+            <Alert
+              variant="light"
+              color="blue"
+              title="21-Day Challenge"
+              radius={12}
+              styles={{
+                root: {
+                  backgroundColor: '#EBF8FF',
+                  border: '1px solid #4686FE',
+                },
+                icon: {
+                  color: '#4686FE',
+                },
+                title: {
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: '#334155',
+                },
+                message: {
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 400,
+                  color: '#64748B',
+                },
+              }}
+            >
               Research shows it takes <strong>21 days</strong> of consistent practice to form a new habit.
               Stay committed and track your progress daily!
             </Alert>
@@ -451,9 +629,27 @@ export default function HabitsPage() {
             <Grid justify="flex-end" align="center" mt="md">
               <Grid.Col span={{ base: 6, sm: 'content' }}>
                 <Button
-                  variant="light"
+                  variant="outline"
                   onClick={() => setIsCreateModalOpen(false)}
                   fullWidth
+                  radius={8}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    borderColor: '#CCCCCC',
+                    color: '#333333',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    height: '48px',
+                    background: 'white',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        borderColor: '#4686FE',
+                        color: '#4686FE',
+                      },
+                    },
+                  }}
                 >
                   Cancel
                 </Button>
@@ -464,6 +660,23 @@ export default function HabitsPage() {
                   loading={createMutation.isPending}
                   color={creatingCategory === 'good' ? 'green' : 'red'}
                   fullWidth
+                  radius={8}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    height: '48px',
+                    backgroundColor: creatingCategory === 'good' ? '#22C55E' : '#EF4444',
+                    border: 'none',
+                    color: 'white',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        backgroundColor: creatingCategory === 'good' ? '#16A34A' : '#DC2626',
+                      },
+                    },
+                  }}
                 >
                   Create Habit
                 </Button>
@@ -490,6 +703,7 @@ export default function HabitsPage() {
           isSaving={updateMutation.isPending}
         />
       )}
-    </Stack>
+      </Stack>
+    </React.Fragment>
   );
 }
