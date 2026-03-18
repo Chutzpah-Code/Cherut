@@ -121,6 +121,10 @@ export const habitsApi = {
     await apiClient.delete(`/habits/${id}`);
   },
 
+  permanentDelete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/habits/${id}/permanent`);
+  },
+
   // Habit Logs
   logHabit: async (dto: LogHabitDto): Promise<HabitLog> => {
     const { data } = await apiClient.post('/habits/log', dto);

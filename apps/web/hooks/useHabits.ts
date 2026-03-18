@@ -70,6 +70,17 @@ export const useDeleteHabit = () => {
   });
 };
 
+export const usePermanentDeleteHabit = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => habitsApi.permanentDelete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['habits'] });
+    },
+  });
+};
+
 export const useLogHabit = () => {
   const queryClient = useQueryClient();
 

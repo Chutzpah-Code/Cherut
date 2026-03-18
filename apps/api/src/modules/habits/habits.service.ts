@@ -122,16 +122,29 @@ export class HabitsService {
     await this.findOne(userId, id);
 
     const db = this.firebaseService.getFirestore();
+    const batch = db.batch();
 
-    // Soft delete - mark as inactive
-    await db.collection(this.habitsCollection).doc(id).update({
-      isActive: false,
-      updatedAt: new Date().toISOString(),
+    // Delete the habit document
+    const habitRef = db.collection(this.habitsCollection).doc(id);
+    batch.delete(habitRef);
+
+    // Delete all habit logs for this habit
+    const logsSnapshot = await db
+      .collection(this.logsCollection)
+      .where('userId', '==', userId)
+      .where('habitId', '==', id)
+      .get();
+
+    logsSnapshot.docs.forEach((doc) => {
+      batch.delete(doc.ref);
     });
 
-    this.logger.log(`Habit deactivated: ${id}`);
+    // Execute all deletions atomically
+    await batch.commit();
 
-    return { message: 'Habit deactivated successfully' };
+    this.logger.log(`Habit permanently deleted: ${id} with ${logsSnapshot.docs.length} logs`);
+
+    return { message: 'Habit deleted successfully' };
   }
 
   // Habit Logging
@@ -309,6 +322,38 @@ export class HabitsService {
     const total = allHabits.length;
 
     return { active, archived, total };
+  }
+
+  /**
+   * Permanently delete a habit and all its logs
+   */
+  async permanentDelete(userId: string, id: string) {
+    await this.findOne(userId, id);
+
+    const db = this.firebaseService.getFirestore();
+    const batch = db.batch();
+
+    // Delete the habit document
+    const habitRef = db.collection(this.habitsCollection).doc(id);
+    batch.delete(habitRef);
+
+    // Delete all habit logs for this habit
+    const logsSnapshot = await db
+      .collection(this.logsCollection)
+      .where('userId', '==', userId)
+      .where('habitId', '==', id)
+      .get();
+
+    logsSnapshot.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    // Execute all deletions atomically
+    await batch.commit();
+
+    this.logger.log(`Habit permanently deleted: ${id} with ${logsSnapshot.docs.length} logs`);
+
+    return { message: 'Habit permanently deleted successfully' };
   }
 
   /**

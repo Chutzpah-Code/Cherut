@@ -86,4 +86,9 @@ export class HabitsController {
   toggleArchive(@Request() req, @Param('id') id: string) {
     return this.habitsService.toggleArchive(req.user.uid, id);
   }
+
+  @Delete(':id/permanent')
+  permanentDelete(@Request() req, @Param('id') id: string) {
+    return this.habitsService.permanentDelete(req.user.uid, id);
+  }
 }

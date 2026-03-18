@@ -22,7 +22,7 @@ import {
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { modals } from '@mantine/modals';
-import { useHabits, useAllHabits, useCreateHabit, useUpdateHabit, useDeleteHabit, useLogHabit, useArchivedHabits, useHabitCounts, useToggleArchive } from '@/hooks/useHabits';
+import { useHabits, useAllHabits, useCreateHabit, useUpdateHabit, useDeleteHabit, useLogHabit, useArchivedHabits, useHabitCounts, useToggleArchive, usePermanentDeleteHabit } from '@/hooks/useHabits';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { CreateHabitDto, Habit } from '@/lib/api/services/habits';
 import { HabitCard } from './components/HabitCard';
@@ -46,6 +46,7 @@ export default function HabitsPage() {
   const createMutation = useCreateHabit();
   const updateMutation = useUpdateHabit();
   const deleteMutation = useDeleteHabit();
+  const permanentDeleteMutation = usePermanentDeleteHabit();
   const logMutation = useLogHabit();
   const archiveMutation = useToggleArchive();
 
@@ -186,6 +187,26 @@ export default function HabitsPage() {
     archiveMutation.mutate(habit.id);
   };
 
+  const handlePermanentDelete = (habitId: string) => {
+    modals.openConfirmModal({
+      title: 'Delete Habit Permanently',
+      children: (
+        <Text size="sm">
+          Are you sure you want to permanently delete this habit? This will completely remove the habit and all its data. This action cannot be undone.
+        </Text>
+      ),
+      labels: { confirm: 'Delete Permanently', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        try {
+          await permanentDeleteMutation.mutateAsync(habitId);
+        } catch (error) {
+          console.error('Error permanently deleting habit:', error);
+        }
+      },
+    });
+  };
+
   const handleDayClick = async (habitId: string, date: string) => {
     const today = new Date().toISOString().split('T')[0];
 
@@ -269,7 +290,7 @@ export default function HabitsPage() {
         <ArchivedHabitsGrid
           habits={archivedHabits || []}
           onUnarchive={handleUnarchive}
-          onDelete={handleDelete}
+          onDelete={handlePermanentDelete}
           onView={handleEdit}
         />
       ) : (
