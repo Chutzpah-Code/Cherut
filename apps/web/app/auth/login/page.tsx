@@ -102,10 +102,14 @@ export default function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#ffffff',
+        background: '#FFFFFF',
         padding: '20px',
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       }}
     >
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
       <Container size="xs" style={{ width: '100%' }}>
         <Stack gap="xl">
           {/* Logo/Brand */}
@@ -115,9 +119,10 @@ export default function LoginPage() {
               order={1}
               ta="center"
               style={{
+                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 fontSize: 'clamp(28px, 5vw, 40px)',
-                fontWeight: 800,
-                color: 'hsl(0 0% 0% / 0.87)',
+                fontWeight: 700,
+                color: '#000000',
                 lineHeight: 1.2,
                 letterSpacing: '-0.01em',
               }}
@@ -125,10 +130,14 @@ export default function LoginPage() {
               Welcome Back
             </Title>
             <Text
-              size="md"
               ta="center"
-              fw={500}
-              style={{ color: 'hsl(0 0% 0% / 0.6)' }}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+                fontWeight: 500,
+                color: '#666666',
+                lineHeight: '24px',
+              }}
             >
               Sign in to continue your journey
             </Text>
@@ -136,11 +145,11 @@ export default function LoginPage() {
 
           {/* Form Card */}
           <Paper
-            radius={20}
+            radius={16}
             p="xl"
             style={{
               background: 'white',
-              border: '1px solid hsl(0 0% 0% / 0.08)',
+              border: '1px solid #CCCCCC',
               boxShadow: 'none',
             }}
           >
@@ -180,26 +189,28 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   size="md"
-                  radius={48}
+                  radius={8}
                   styles={{
                     label: {
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontFamily: 'Inter, sans-serif',
+                      color: '#000000',
                       fontWeight: 600,
                       marginBottom: 8,
                       fontSize: '14px',
                     },
                     input: {
+                      fontFamily: 'Inter, sans-serif',
                       backgroundColor: 'white',
-                      border: '1px solid hsl(0 0% 0% / 0.15)',
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      border: '1px solid #CCCCCC',
+                      color: '#000000',
                       height: '48px',
                       fontSize: '16px',
                       '&::placeholder': {
-                        color: 'hsl(0 0% 0% / 0.38)',
+                        color: '#999999',
                       },
                       '&:focus': {
-                        borderColor: '#3143B6',
-                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                        borderColor: '#4686FE',
+                        boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
                       },
                     },
                   }}
@@ -212,30 +223,33 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   size="md"
-                  radius={48}
+                  radius={8}
                   styles={{
                     label: {
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontFamily: 'Inter, sans-serif',
+                      color: '#000000',
                       fontWeight: 600,
                       marginBottom: 8,
                       fontSize: '14px',
                     },
                     input: {
+                      fontFamily: 'Inter, sans-serif',
                       backgroundColor: 'white',
-                      border: '1px solid hsl(0 0% 0% / 0.15)',
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      border: '1px solid #CCCCCC',
+                      color: '#000000',
                       height: '48px',
                       fontSize: '16px',
                       '&::placeholder': {
-                        color: 'hsl(0 0% 0% / 0.38)',
+                        color: '#999999',
                       },
                       '&:focus': {
-                        borderColor: '#3143B6',
-                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                        borderColor: '#4686FE',
+                        boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
                       },
                     },
                     innerInput: {
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontFamily: 'Inter, sans-serif',
+                      color: '#000000',
                     },
                   }}
                 />
@@ -243,21 +257,23 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   size="lg"
-                  radius={48}
+                  radius={8}
                   fullWidth
                   loading={loading}
                   rightSection={<ArrowRight size={20} />}
                   style={{
-                    background: '#3143B6',
+                    fontFamily: 'Inter, sans-serif',
+                    background: '#4686FE',
                     border: 'none',
                     height: '56px',
                     fontSize: '16px',
                     fontWeight: 600,
+                    color: 'white',
                   }}
                   styles={{
                     root: {
                       '&:hover': {
-                        background: '#2535a0',
+                        background: '#3366E5',
                       },
                     },
                   }}
@@ -269,7 +285,12 @@ export default function LoginPage() {
                   ta="center"
                   size="sm"
                   fw={500}
-                  style={{ color: '#3143B6', cursor: 'pointer' }}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    color: '#4686FE',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                  }}
                   onClick={() => setResetModalOpened(true)}
                 >
                   Forgot your password?
@@ -281,17 +302,21 @@ export default function LoginPage() {
           {/* Footer Links */}
           <Stack gap="md" align="center">
             <Text
-              size="sm"
               ta="center"
-              style={{ color: 'hsl(0 0% 0% / 0.6)' }}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                color: '#666666',
+              }}
             >
-              Don&apos;t have an account?{' '}
+              Don't have an account?{' '}
               <Anchor
                 component="a"
                 href="/auth/register"
                 fw={600}
                 style={{
-                  color: '#3143B6',
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#4686FE',
                   textDecoration: 'none',
                 }}
               >
@@ -302,9 +327,10 @@ export default function LoginPage() {
             <Anchor
               component="a"
               href="/"
-              size="sm"
               style={{
-                color: 'hsl(0 0% 0% / 0.6)',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                color: '#666666',
                 textDecoration: 'none',
               }}
             >
@@ -319,23 +345,46 @@ export default function LoginPage() {
           onClose={handleResetModalClose}
           title="Reset Password"
           centered
-          radius={20}
+          radius={16}
+          styles={{
+            title: {
+              fontFamily: 'Inter Display, sans-serif',
+              fontWeight: 600,
+              color: '#000000',
+            },
+          }}
         >
           {resetSuccess ? (
             <Stack gap="lg" ta="center">
-              <Text size="md" c="green" fw={600}>
+              <Text
+                style={{
+                  fontFamily: 'Inter Display, sans-serif',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: '#22C55E',
+                }}
+              >
                 Reset email sent!
               </Text>
-              <Text size="sm" c="dimmed">
+              <Text
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  color: '#666666',
+                  lineHeight: '20px',
+                }}
+              >
                 If the email is registered in our system, check your inbox (and spam folder) for password reset instructions.
               </Text>
               <Button
                 onClick={handleResetModalClose}
                 variant="outline"
-                radius={48}
+                radius={8}
                 style={{
-                  borderColor: '#3143B6',
-                  color: '#3143B6',
+                  fontFamily: 'Inter, sans-serif',
+                  borderColor: '#4686FE',
+                  color: '#4686FE',
+                  fontWeight: 600,
                 }}
               >
                 Got it
@@ -363,7 +412,14 @@ export default function LoginPage() {
                   </Alert>
                 )}
 
-                <Text size="sm" c="dimmed">
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    color: '#666666',
+                    lineHeight: '20px',
+                  }}
+                >
                   Enter your email address. If it's registered in our system, we'll send you a link to reset your password.
                 </Text>
 
@@ -375,26 +431,28 @@ export default function LoginPage() {
                   onChange={(e) => setResetEmail(e.target.value)}
                   required
                   size="md"
-                  radius={48}
+                  radius={8}
                   styles={{
                     label: {
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontFamily: 'Inter, sans-serif',
+                      color: '#000000',
                       fontWeight: 600,
                       marginBottom: 8,
                       fontSize: '14px',
                     },
                     input: {
+                      fontFamily: 'Inter, sans-serif',
                       backgroundColor: 'white',
-                      border: '1px solid hsl(0 0% 0% / 0.15)',
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      border: '1px solid #CCCCCC',
+                      color: '#000000',
                       height: '48px',
                       fontSize: '16px',
                       '&::placeholder': {
-                        color: 'hsl(0 0% 0% / 0.38)',
+                        color: '#999999',
                       },
                       '&:focus': {
-                        borderColor: '#3143B6',
-                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                        borderColor: '#4686FE',
+                        boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
                       },
                     },
                   }}
@@ -404,10 +462,12 @@ export default function LoginPage() {
                   <Button
                     variant="outline"
                     onClick={handleResetModalClose}
-                    radius={48}
+                    radius={8}
                     style={{
-                      borderColor: '#3143B6',
-                      color: '#3143B6',
+                      fontFamily: 'Inter, sans-serif',
+                      borderColor: '#4686FE',
+                      color: '#4686FE',
+                      fontWeight: 600,
                     }}
                   >
                     Cancel
@@ -415,15 +475,18 @@ export default function LoginPage() {
                   <Button
                     type="submit"
                     loading={resetLoading}
-                    radius={48}
+                    radius={8}
                     style={{
-                      background: '#3143B6',
+                      fontFamily: 'Inter, sans-serif',
+                      background: '#4686FE',
                       border: 'none',
+                      fontWeight: 600,
+                      color: 'white',
                     }}
                     styles={{
                       root: {
                         '&:hover': {
-                          background: '#2535a0',
+                          background: '#3366E5',
                         },
                       },
                     }}

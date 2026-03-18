@@ -101,10 +101,14 @@ export default function RegisterPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#ffffff',
+        background: '#FFFFFF',
         padding: '20px',
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       }}
     >
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
       <Container size="xs" style={{ width: '100%' }}>
         <Stack gap="xl">
           {/* Logo/Brand */}
@@ -114,9 +118,10 @@ export default function RegisterPage() {
               order={1}
               ta="center"
               style={{
+                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 fontSize: 'clamp(28px, 5vw, 40px)',
-                fontWeight: 800,
-                color: 'hsl(0 0% 0% / 0.87)',
+                fontWeight: 700,
+                color: '#000000',
                 lineHeight: 1.2,
                 letterSpacing: '-0.01em',
               }}
@@ -124,10 +129,14 @@ export default function RegisterPage() {
               Create Account
             </Title>
             <Text
-              size="md"
               ta="center"
-              fw={500}
-              style={{ color: 'hsl(0 0% 0% / 0.6)' }}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+                fontWeight: 500,
+                color: '#666666',
+                lineHeight: '24px',
+              }}
             >
               Start your journey to elite performance
             </Text>
@@ -135,11 +144,11 @@ export default function RegisterPage() {
 
           {/* Form Card */}
           <Paper
-            radius={20}
+            radius={16}
             p="xl"
             style={{
               background: 'white',
-              border: '1px solid hsl(0 0% 0% / 0.08)',
+              border: '1px solid #CCCCCC',
               boxShadow: 'none',
             }}
           >
@@ -179,26 +188,28 @@ export default function RegisterPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   size="md"
-                  radius={48}
+                  radius={8}
                   styles={{
                     label: {
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontFamily: 'Inter, sans-serif',
+                      color: '#000000',
                       fontWeight: 600,
                       marginBottom: 8,
                       fontSize: '14px',
                     },
                     input: {
+                      fontFamily: 'Inter, sans-serif',
                       backgroundColor: 'white',
-                      border: '1px solid hsl(0 0% 0% / 0.15)',
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      border: '1px solid #CCCCCC',
+                      color: '#000000',
                       height: '48px',
                       fontSize: '16px',
                       '&::placeholder': {
-                        color: 'hsl(0 0% 0% / 0.38)',
+                        color: '#999999',
                       },
                       '&:focus': {
-                        borderColor: '#3143B6',
-                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                        borderColor: '#4686FE',
+                        boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
                       },
                     },
                   }}
@@ -211,30 +222,33 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   size="md"
-                  radius={48}
+                  radius={8}
                   styles={{
                     label: {
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontFamily: 'Inter, sans-serif',
+                      color: '#000000',
                       fontWeight: 600,
                       marginBottom: 8,
                       fontSize: '14px',
                     },
                     input: {
+                      fontFamily: 'Inter, sans-serif',
                       backgroundColor: 'white',
-                      border: '1px solid hsl(0 0% 0% / 0.15)',
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      border: '1px solid #CCCCCC',
+                      color: '#000000',
                       height: '48px',
                       fontSize: '16px',
                       '&::placeholder': {
-                        color: 'hsl(0 0% 0% / 0.38)',
+                        color: '#999999',
                       },
                       '&:focus': {
-                        borderColor: '#3143B6',
-                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                        borderColor: '#4686FE',
+                        boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
                       },
                     },
                     innerInput: {
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontFamily: 'Inter, sans-serif',
+                      color: '#000000',
                     },
                   }}
                 />
@@ -246,30 +260,33 @@ export default function RegisterPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   size="md"
-                  radius={48}
+                  radius={8}
                   styles={{
                     label: {
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontFamily: 'Inter, sans-serif',
+                      color: '#000000',
                       fontWeight: 600,
                       marginBottom: 8,
                       fontSize: '14px',
                     },
                     input: {
+                      fontFamily: 'Inter, sans-serif',
                       backgroundColor: 'white',
-                      border: '1px solid hsl(0 0% 0% / 0.15)',
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      border: '1px solid #CCCCCC',
+                      color: '#000000',
                       height: '48px',
                       fontSize: '16px',
                       '&::placeholder': {
-                        color: 'hsl(0 0% 0% / 0.38)',
+                        color: '#999999',
                       },
                       '&:focus': {
-                        borderColor: '#3143B6',
-                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
+                        borderColor: '#4686FE',
+                        boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
                       },
                     },
                     innerInput: {
-                      color: 'hsl(0 0% 0% / 0.87)',
+                      fontFamily: 'Inter, sans-serif',
+                      color: '#000000',
                     },
                   }}
                 />
@@ -277,21 +294,23 @@ export default function RegisterPage() {
                 <Button
                   type="submit"
                   size="lg"
-                  radius={48}
+                  radius={8}
                   fullWidth
                   loading={loading}
                   rightSection={<ArrowRight size={20} />}
                   style={{
-                    background: '#3143B6',
+                    fontFamily: 'Inter, sans-serif',
+                    background: '#4686FE',
                     border: 'none',
                     height: '56px',
                     fontSize: '16px',
                     fontWeight: 600,
+                    color: 'white',
                   }}
                   styles={{
                     root: {
                       '&:hover': {
-                        background: '#2535a0',
+                        background: '#3366E5',
                       },
                     },
                   }}
@@ -305,9 +324,12 @@ export default function RegisterPage() {
           {/* Footer Links */}
           <Stack gap="md" align="center">
             <Text
-              size="sm"
               ta="center"
-              style={{ color: 'hsl(0 0% 0% / 0.6)' }}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                color: '#666666',
+              }}
             >
               Already have an account?{' '}
               <Anchor
@@ -315,7 +337,8 @@ export default function RegisterPage() {
                 href="/auth/login"
                 fw={600}
                 style={{
-                  color: '#3143B6',
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#4686FE',
                   textDecoration: 'none',
                 }}
               >
@@ -326,9 +349,10 @@ export default function RegisterPage() {
             <Anchor
               component="a"
               href="/"
-              size="sm"
               style={{
-                color: 'hsl(0 0% 0% / 0.6)',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                color: '#666666',
                 textDecoration: 'none',
               }}
             >

@@ -7,8 +7,16 @@ import Footer from '@/components/ui/Footer';
 
 export default function Contact() {
   return (
-    <Box style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 50%, #ffffff 100%)' }}>
+    <Box style={{
+      minHeight: '100vh',
+      background: '#FFFFFF',
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    }}>
       <Header />
+
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
 
       <Container size="lg" py={80} style={{ marginTop: '100px' }}>
         <Stack gap={80}>
@@ -18,67 +26,247 @@ export default function Contact() {
               order={1}
               ta="center"
               style={{
-                fontSize: '48px',
-                fontWeight: 800,
-                background: 'linear-gradient(135deg, #3143B6 0%, #A855F7 50%, #EC4899 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: 'clamp(36px, 6vw, 48px)',
+                lineHeight: 1.2,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                color: '#000000',
               }}
             >
-              Contact Us
+              Contact <span style={{ color: '#4686FE' }}>Us</span>
             </Title>
-            <Text size="xl" ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-              Have questions, feedback, or need support? We&apos;d love to hear from you.
+            <Text
+              ta="center"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '24px',
+                lineHeight: '32px',
+                color: '#666666',
+                fontWeight: 400,
+                maxWidth: '700px',
+                margin: '0 auto',
+              }}
+            >
+              Have questions, feedback, or need support? We'd love to hear from you.
               Our team is here to help you achieve extraordinary results.
             </Text>
           </Stack>
 
           {/* Contact Methods */}
           <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="xl">
-            <Card padding="xl" radius={20} style={{ background: 'rgba(49, 67, 182, 0.05)', border: '1px solid rgba(49, 67, 182, 0.15)', textAlign: 'center' }}>
-              <Stack align="center" gap="md">
-                <ThemeIcon size={60} radius={16} style={{ background: 'rgba(49, 67, 182, 0.1)', color: '#3143B6' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+                textAlign: 'center',
+                height: '100%',
+              }}
+            >
+              <Stack align="center" gap="lg" h="100%">
+                <ThemeIcon
+                  size={64}
+                  radius={16}
+                  style={{
+                    background: '#F5F5F5',
+                    color: '#4686FE',
+                    border: 'none',
+                  }}
+                >
                   <Mail size={32} />
                 </ThemeIcon>
-                <Text fw={700}>Email</Text>
-                <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontSize: '20px',
+                    fontWeight: 600,
+                    color: '#000000',
+                  }}
+                >
+                  Email
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
                   chutzpahcode@gmail.com
                 </Text>
               </Stack>
             </Card>
 
-            <Card padding="xl" radius={20} style={{ background: 'rgba(168, 85, 247, 0.05)', border: '1px solid rgba(168, 85, 247, 0.15)', textAlign: 'center' }}>
-              <Stack align="center" gap="md">
-                <ThemeIcon size={60} radius={16} style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#A855F7' }}>
+            <Card
+              component="a"
+              href="https://discord.gg/AyjZ58KXGy"
+              target="_blank"
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+                textAlign: 'center',
+                textDecoration: 'none',
+                color: 'inherit',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                height: '100%',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    borderColor: '#4686FE',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                  }
+                }
+              }}
+            >
+              <Stack align="center" gap="lg" h="100%">
+                <ThemeIcon
+                  size={64}
+                  radius={16}
+                  style={{
+                    background: '#F5F5F5',
+                    color: '#4686FE',
+                    border: 'none',
+                  }}
+                >
                   <Users size={32} />
                 </ThemeIcon>
-                <Text fw={700}>Community</Text>
-                <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                  chutzpahcode@gmail.com
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontSize: '20px',
+                    fontWeight: 600,
+                    color: '#000000',
+                  }}
+                >
+                  Community
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  Join Discord
                 </Text>
               </Stack>
             </Card>
 
-            <Card padding="xl" radius={20} style={{ background: 'rgba(47, 178, 100, 0.05)', border: '1px solid rgba(47, 178, 100, 0.15)', textAlign: 'center' }}>
-              <Stack align="center" gap="md">
-                <ThemeIcon size={60} radius={16} style={{ background: 'rgba(47, 178, 100, 0.1)', color: '#2FB264' }}>
+            <Card
+              component="a"
+              href="mailto:chutzpahcode@gmail.com"
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+                textAlign: 'center',
+                textDecoration: 'none',
+                color: 'inherit',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                height: '100%',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    borderColor: '#4686FE',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                  }
+                }
+              }}
+            >
+              <Stack align="center" gap="lg" h="100%">
+                <ThemeIcon
+                  size={64}
+                  radius={16}
+                  style={{
+                    background: '#F5F5F5',
+                    color: '#4686FE',
+                    border: 'none',
+                  }}
+                >
                   <HelpCircle size={32} />
                 </ThemeIcon>
-                <Text fw={700}>Support</Text>
-                <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                  chutzpahcode@gmail.com
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontSize: '20px',
+                    fontWeight: 600,
+                    color: '#000000',
+                  }}
+                >
+                  Support
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  Get help
                 </Text>
               </Stack>
             </Card>
 
-            <Card padding="xl" radius={20} style={{ background: 'rgba(250, 173, 24, 0.05)', border: '1px solid rgba(250, 173, 24, 0.15)', textAlign: 'center' }}>
-              <Stack align="center" gap="md">
-                <ThemeIcon size={60} radius={16} style={{ background: 'rgba(250, 173, 24, 0.1)', color: '#FAAD18' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+                textAlign: 'center',
+                height: '100%',
+              }}
+            >
+              <Stack align="center" gap="lg" h="100%">
+                <ThemeIcon
+                  size={64}
+                  radius={16}
+                  style={{
+                    background: '#F5F5F5',
+                    color: '#4686FE',
+                    border: 'none',
+                  }}
+                >
                   <Clock size={32} />
                 </ThemeIcon>
-                <Text fw={700}>Response Time</Text>
-                <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontSize: '20px',
+                    fontWeight: 600,
+                    color: '#000000',
+                  }}
+                >
+                  Response Time
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
                   Within 24 hours
                 </Text>
               </Stack>
@@ -87,105 +275,196 @@ export default function Contact() {
 
           {/* Contact Info */}
           <Stack gap="lg">
-            <Card padding="xl" radius={20} style={{ background: 'rgba(49, 67, 182, 0.05)', border: '2px solid rgba(49, 67, 182, 0.15)' }}>
-                <Stack gap="lg">
-                  <Group gap="md">
-                    <ThemeIcon size={50} radius={16} style={{ background: 'rgba(49, 67, 182, 0.1)', color: '#3143B6' }}>
-                      <MessageSquare size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Text fw={700} size="lg">General Inquiries</Text>
-                      <Text style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                        For general questions about Cherut, pricing, or features.
-                      </Text>
-                      <Text fw={600} style={{ color: '#3143B6' }}>
-                        chutzpahcode@gmail.com
-                      </Text>
-                    </Stack>
-                  </Group>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
+              <Group gap="lg" align="flex-start">
+                <ThemeIcon
+                  size={60}
+                  radius={16}
+                  style={{
+                    background: '#F5F5F5',
+                    color: '#4686FE',
+                    border: 'none',
+                    flexShrink: 0,
+                  }}
+                >
+                  <MessageSquare size={28} />
+                </ThemeIcon>
+                <Stack gap="xs" style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '24px',
+                      fontWeight: 700,
+                      color: '#000000',
+                    }}
+                  >
+                    General Inquiries
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    For general questions about Cherut, pricing, or features.
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    chutzpahcode@gmail.com
+                  </Text>
                 </Stack>
-              </Card>
+              </Group>
+            </Card>
 
-              <Card padding="xl" radius={20} style={{ background: 'rgba(168, 85, 247, 0.05)', border: '2px solid rgba(168, 85, 247, 0.15)' }}>
-                <Stack gap="lg">
-                  <Group gap="md">
-                    <ThemeIcon size={50} radius={16} style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#A855F7' }}>
-                      <HelpCircle size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Text fw={700} size="lg">Technical Support</Text>
-                      <Text style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                        Need help with your account, bugs, or technical issues?
-                      </Text>
-                      <Text fw={600} style={{ color: '#A855F7' }}>
-                        chutzpahcode@gmail.com
-                      </Text>
-                    </Stack>
-                  </Group>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
+              <Group gap="lg" align="flex-start">
+                <ThemeIcon
+                  size={60}
+                  radius={16}
+                  style={{
+                    background: '#F5F5F5',
+                    color: '#4686FE',
+                    border: 'none',
+                    flexShrink: 0,
+                  }}
+                >
+                  <HelpCircle size={28} />
+                </ThemeIcon>
+                <Stack gap="xs" style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '24px',
+                      fontWeight: 700,
+                      color: '#000000',
+                    }}
+                  >
+                    Technical Support
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    Need help with your account, bugs, or technical issues?
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    chutzpahcode@gmail.com
+                  </Text>
                 </Stack>
-              </Card>
+              </Group>
+            </Card>
 
-              <Card padding="xl" radius={20} style={{ background: 'rgba(47, 178, 100, 0.05)', border: '2px solid rgba(47, 178, 100, 0.15)' }}>
-                <Stack gap="lg">
-                  <Group gap="md">
-                    <ThemeIcon size={50} radius={16} style={{ background: 'rgba(47, 178, 100, 0.1)', color: '#2FB264' }}>
-                      <Users size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Text fw={700} size="lg">Partnership & Media</Text>
-                      <Text style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                        Interested in partnerships, press inquiries, or media coverage?
-                      </Text>
-                      <Text fw={600} style={{ color: '#2FB264' }}>
-                        chutzpahcode@gmail.com
-                      </Text>
-                    </Stack>
-                  </Group>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
+              <Group gap="lg" align="flex-start">
+                <ThemeIcon
+                  size={60}
+                  radius={16}
+                  style={{
+                    background: '#F5F5F5',
+                    color: '#4686FE',
+                    border: 'none',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Users size={28} />
+                </ThemeIcon>
+                <Stack gap="xs" style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '24px',
+                      fontWeight: 700,
+                      color: '#000000',
+                    }}
+                  >
+                    Partnership & Media
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    Interested in partnerships, press inquiries, or media coverage?
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    chutzpahcode@gmail.com
+                  </Text>
                 </Stack>
-              </Card>
-
-              <Card padding="xl" radius={20} style={{ background: 'rgba(168, 85, 247, 0.05)', border: '2px solid rgba(168, 85, 247, 0.15)' }}>
-                <Stack gap="lg">
-                  <Group gap="md">
-                    <ThemeIcon size={50} radius={16} style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#A855F7' }}>
-                      <HelpCircle size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Text fw={700} size="lg">Technical Support</Text>
-                      <Text style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                        Need help with your account, bugs, or technical issues?
-                      </Text>
-                      <Text fw={600} style={{ color: '#A855F7' }}>
-                        chutzpahcode@gmail.com
-                      </Text>
-                    </Stack>
-                  </Group>
-                </Stack>
-              </Card>
-
-              <Card padding="xl" radius={20} style={{ background: 'rgba(47, 178, 100, 0.05)', border: '2px solid rgba(47, 178, 100, 0.15)' }}>
-                <Stack gap="lg">
-                  <Group gap="md">
-                    <ThemeIcon size={50} radius={16} style={{ background: 'rgba(47, 178, 100, 0.1)', color: '#2FB264' }}>
-                      <Users size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Text fw={700} size="lg">Partnership & Media</Text>
-                      <Text style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                        Interested in partnerships, press inquiries, or media coverage?
-                      </Text>
-                      <Text fw={600} style={{ color: '#2FB264' }}>
-                        chutzpahcode@gmail.com
-                      </Text>
-                    </Stack>
-                  </Group>
-                </Stack>
-              </Card>
-            </Stack>
+              </Group>
+            </Card>
+          </Stack>
 
           {/* Quick Links */}
           <Stack gap="xl">
-            <Title order={2} ta="center" style={{ fontSize: '32px', fontWeight: 700 }}>
+            <Title
+              order={2}
+              ta="center"
+              style={{
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#000000',
+              }}
+            >
               Looking for Something Specific?
             </Title>
 
@@ -194,30 +473,59 @@ export default function Contact() {
                 component="a"
                 href="/help-center"
                 padding="xl"
-                radius={20}
+                radius={16}
                 style={{
                   background: 'white',
-                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
                   textDecoration: 'none',
                   color: 'inherit',
                   cursor: 'pointer',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  transition: 'all 0.2s ease',
+                  height: '100%',
                 }}
                 styles={{
                   root: {
                     '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 24px rgba(0, 0, 0, 0.1)',
+                      borderColor: '#4686FE',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
                     }
                   }
                 }}
               >
-                <Stack align="center" gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(49, 67, 182, 0.1)', color: '#3143B6' }}>
+                <Stack align="center" gap="lg" h="100%">
+                  <ThemeIcon
+                    size={64}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                    }}
+                  >
                     <HelpCircle size={32} />
                   </ThemeIcon>
-                  <Text fw={700} ta="center">Help Center</Text>
-                  <Text size="sm" ta="center" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '20px',
+                      fontWeight: 600,
+                      color: '#000000',
+                      textAlign: 'center',
+                    }}
+                  >
+                    Help Center
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                      textAlign: 'center',
+                    }}
+                  >
                     Browse FAQs, guides, and tutorials
                   </Text>
                 </Stack>
@@ -227,30 +535,59 @@ export default function Contact() {
                 component="a"
                 href="/careers"
                 padding="xl"
-                radius={20}
+                radius={16}
                 style={{
                   background: 'white',
-                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
                   textDecoration: 'none',
                   color: 'inherit',
                   cursor: 'pointer',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  transition: 'all 0.2s ease',
+                  height: '100%',
                 }}
                 styles={{
                   root: {
                     '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 24px rgba(0, 0, 0, 0.1)',
+                      borderColor: '#4686FE',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
                     }
                   }
                 }}
               >
-                <Stack align="center" gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#A855F7' }}>
+                <Stack align="center" gap="lg" h="100%">
+                  <ThemeIcon
+                    size={64}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                    }}
+                  >
                     <Users size={32} />
                   </ThemeIcon>
-                  <Text fw={700} ta="center">Careers</Text>
-                  <Text size="sm" ta="center" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '20px',
+                      fontWeight: 600,
+                      color: '#000000',
+                      textAlign: 'center',
+                    }}
+                  >
+                    Careers
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                      textAlign: 'center',
+                    }}
+                  >
                     Join our team and build the future
                   </Text>
                 </Stack>
@@ -260,30 +597,59 @@ export default function Contact() {
                 component="a"
                 href="mailto:chutzpahcode@gmail.com"
                 padding="xl"
-                radius={20}
+                radius={16}
                 style={{
                   background: 'white',
-                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
                   textDecoration: 'none',
                   color: 'inherit',
                   cursor: 'pointer',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  transition: 'all 0.2s ease',
+                  height: '100%',
                 }}
                 styles={{
                   root: {
                     '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 24px rgba(0, 0, 0, 0.1)',
+                      borderColor: '#4686FE',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
                     }
                   }
                 }}
               >
-                <Stack align="center" gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(47, 178, 100, 0.1)', color: '#2FB264' }}>
+                <Stack align="center" gap="lg" h="100%">
+                  <ThemeIcon
+                    size={64}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                    }}
+                  >
                     <MessageSquare size={32} />
                   </ThemeIcon>
-                  <Text fw={700} ta="center">Send Feedback</Text>
-                  <Text size="sm" ta="center" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '20px',
+                      fontWeight: 600,
+                      color: '#000000',
+                      textAlign: 'center',
+                    }}
+                  >
+                    Send Feedback
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                      textAlign: 'center',
+                    }}
+                  >
                     Help us improve Cherut
                   </Text>
                 </Stack>
@@ -292,14 +658,52 @@ export default function Contact() {
           </Stack>
 
           {/* Beta Notice */}
-          <Card padding="xl" radius={20} style={{ background: 'rgba(250, 173, 24, 0.05)', border: '2px solid rgba(250, 173, 24, 0.2)' }}>
-            <Stack align="center" gap="md">
-              <Badge size="lg" color="yellow" variant="light">
+          <Card
+            padding="xl"
+            radius={16}
+            style={{
+              background: '#F5F5F5',
+              border: '1px solid #CCCCCC',
+              boxShadow: 'none',
+            }}
+          >
+            <Stack align="center" gap="lg">
+              <Badge
+                size="lg"
+                style={{
+                  background: 'rgba(250, 173, 24, 0.1)',
+                  color: '#FAAD18',
+                  border: 'none',
+                  padding: '8px 16px',
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 500,
+                }}
+              >
                 Beta Testing Period
               </Badge>
-              <Title order={3} ta="center">Your Feedback Shapes Our Future</Title>
-              <Text ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.7 }}>
-                During our beta phase, your input is incredibly valuable. Whether you&apos;ve found a bug,
+              <Text
+                style={{
+                  fontFamily: 'Inter Display, sans-serif',
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  color: '#000000',
+                  textAlign: 'center',
+                }}
+              >
+                Your Feedback Shapes Our Future
+              </Text>
+              <Text
+                ta="center"
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '18px',
+                  lineHeight: '26px',
+                  color: '#666666',
+                  fontWeight: 400,
+                  maxWidth: '700px',
+                }}
+              >
+                During our beta phase, your input is incredibly valuable. Whether you've found a bug,
                 have a feature request, or just want to share your experience, we want to hear from you.
                 Every piece of feedback helps us build a better Cherut.
               </Text>

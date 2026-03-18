@@ -7,8 +7,16 @@ import Footer from '@/components/ui/Footer';
 
 export default function GettingStarted() {
   return (
-    <Box style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 50%, #ffffff 100%)' }}>
+    <Box style={{
+      minHeight: '100vh',
+      background: '#FFFFFF',
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    }}>
       <Header />
+
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
 
       <Container size="lg" py={80} style={{ marginTop: '100px' }}>
         <Stack gap={80}>
@@ -18,43 +26,119 @@ export default function GettingStarted() {
               order={1}
               ta="center"
               style={{
-                fontSize: '48px',
-                fontWeight: 800,
-                background: 'linear-gradient(135deg, #3143B6 0%, #A855F7 50%, #EC4899 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: 'clamp(36px, 6vw, 48px)',
+                lineHeight: 1.2,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                color: '#000000',
               }}
             >
-              Getting Started with Cherut
+              Getting Started with <span style={{ color: '#4686FE' }}>Cherut</span>
             </Title>
-            <Text size="xl" ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
+            <Text
+              ta="center"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '24px',
+                lineHeight: '32px',
+                color: '#666666',
+                fontWeight: 400,
+                maxWidth: '700px',
+                margin: '0 auto',
+              }}
+            >
               Follow this step-by-step guide to set up your personal excellence system and
               start achieving extraordinary results.
             </Text>
-            <Badge size="xl" color="green" variant="light">
+            <Badge
+              size="lg"
+              style={{
+                background: 'rgba(34, 197, 94, 0.1)',
+                color: '#22C55E',
+                border: 'none',
+                padding: '8px 16px',
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: 500,
+              }}
+            >
               Complete Onboarding Guide
             </Badge>
           </Stack>
 
           {/* Overview */}
-          <Card padding="xl" radius={24} style={{ background: 'rgba(49, 67, 182, 0.05)', border: '2px solid rgba(49, 67, 182, 0.15)' }}>
+          <Card
+            padding="xl"
+            radius={16}
+            style={{
+              background: '#F5F5F5',
+              border: '1px solid #CCCCCC',
+              boxShadow: 'none',
+            }}
+          >
             <Stack align="center" gap="lg">
-              <ThemeIcon size={80} radius={20} style={{ background: 'linear-gradient(135deg, #3143B6 0%, #A855F7 100%)', color: 'white' }}>
+              <ThemeIcon
+                size={80}
+                radius={20}
+                style={{
+                  background: '#4686FE',
+                  color: 'white',
+                  border: 'none',
+                }}
+              >
                 <BookOpen size={40} />
               </ThemeIcon>
-              <Title order={2} ta="center" style={{ fontSize: '32px', fontWeight: 700 }}>
+              <Title
+                order={2}
+                ta="center"
+                style={{
+                  fontFamily: 'Inter Display, sans-serif',
+                  fontSize: '32px',
+                  fontWeight: 700,
+                  color: '#000000',
+                }}
+              >
                 Your Journey to Excellence
               </Title>
-              <Text size="lg" ta="center" maw={800} style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
+              <Text
+                ta="center"
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '20px',
+                  lineHeight: '28px',
+                  color: '#666666',
+                  fontWeight: 400,
+                  maxWidth: '800px',
+                }}
+              >
                 Cherut is designed to help you achieve peak performance across all areas of your life.
                 This guide will walk you through setting up your complete personal excellence system in just 30 minutes.
               </Text>
-              <Group gap="md">
-                <Badge leftSection={<Clock size={16} />} size="lg" color="blue" variant="light">
+              <Group gap="lg">
+                <Badge
+                  leftSection={<Clock size={16} />}
+                  size="lg"
+                  style={{
+                    background: 'rgba(70, 134, 254, 0.1)',
+                    color: '#4686FE',
+                    border: 'none',
+                    fontFamily: 'Inter, sans-serif',
+                    fontWeight: 500,
+                  }}
+                >
                   30 minutes setup
                 </Badge>
-                <Badge leftSection={<CheckCircle2 size={16} />} size="lg" color="green" variant="light">
+                <Badge
+                  leftSection={<CheckCircle2 size={16} />}
+                  size="lg"
+                  style={{
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    color: '#22C55E',
+                    border: 'none',
+                    fontFamily: 'Inter, sans-serif',
+                    fontWeight: 500,
+                  }}
+                >
                   7 easy steps
                 </Badge>
               </Group>
@@ -63,38 +147,149 @@ export default function GettingStarted() {
 
           {/* Step-by-Step Checklist */}
           <Stack gap="xl">
-            <Title order={2} ta="center" style={{ fontSize: '32px', fontWeight: 700 }}>
+            <Title
+              order={2}
+              ta="center"
+              style={{
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#000000',
+              }}
+            >
               Your Onboarding Checklist
             </Title>
 
             {/* Step 1 */}
-            <Card padding="xl" radius={20} style={{ background: 'white', border: '2px solid rgba(49, 67, 182, 0.15)' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
               <Stack gap="lg">
-                <Group gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(49, 67, 182, 0.1)', color: '#3143B6' }}>
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <CheckCircle2 size={32} />
                   </ThemeIcon>
                   <Stack gap="xs" style={{ flex: 1 }}>
-                    <Badge size="md" color="blue" variant="light">Step 1</Badge>
-                    <Text size="xl" fw={700}>Complete Your Profile</Text>
-                    <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
+                    <Badge
+                      size="md"
+                      style={{
+                        background: 'rgba(70, 134, 254, 0.1)',
+                        color: '#4686FE',
+                        border: 'none',
+                        fontFamily: 'Inter, sans-serif',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Step 1
+                    </Badge>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Complete Your Profile
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
                       Set up your account with accurate information to personalize your Cherut experience.
                     </Text>
                   </Stack>
                 </Group>
 
-                <Divider style={{ borderColor: 'rgba(49, 67, 182, 0.1)' }} />
+                <Divider />
 
-                <Stack gap="md" pl="md">
-                  <Text fw={600} size="lg">What to do:</Text>
+                <Stack gap="lg" pl="md">
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    What to do:
+                  </Text>
                   <Stack gap="xs">
-                    <Text>• Upload a profile photo (helps with motivation and accountability)</Text>
-                    <Text>• Set your timezone for accurate scheduling</Text>
-                    <Text>• Choose your preferred notification settings</Text>
-                    <Text>• Set your working hours for better task planning</Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Upload a profile photo (helps with motivation and accountability)
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Set your timezone for accurate scheduling
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Choose your preferred notification settings
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Set your working hours for better task planning
+                    </Text>
                   </Stack>
 
-                  <Text fw={600} size="sm" style={{ color: '#3143B6', marginTop: '8px' }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                      marginTop: '8px',
+                    }}
+                  >
                     ⏱️ Time needed: 5 minutes
                   </Text>
                 </Stack>
@@ -102,34 +297,146 @@ export default function GettingStarted() {
             </Card>
 
             {/* Step 2 */}
-            <Card padding="xl" radius={20} style={{ background: 'white', border: '2px solid rgba(168, 85, 247, 0.15)' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
               <Stack gap="lg">
-                <Group gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#A855F7' }}>
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <Heart size={32} />
                   </ThemeIcon>
                   <Stack gap="xs" style={{ flex: 1 }}>
-                    <Badge size="md" color="grape" variant="light">Step 2</Badge>
-                    <Text size="xl" fw={700}>Define Your Core Values</Text>
-                    <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
+                    <Badge
+                      size="md"
+                      style={{
+                        background: 'rgba(70, 134, 254, 0.1)',
+                        color: '#4686FE',
+                        border: 'none',
+                        fontFamily: 'Inter, sans-serif',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Step 2
+                    </Badge>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Define Your Core Values
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
                       Establish the fundamental principles that guide your decisions and actions.
                     </Text>
                   </Stack>
                 </Group>
 
-                <Divider style={{ borderColor: 'rgba(168, 85, 247, 0.1)' }} />
+                <Divider />
 
-                <Stack gap="md" pl="md">
-                  <Text fw={600} size="lg">What to do:</Text>
+                <Stack gap="lg" pl="md">
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    What to do:
+                  </Text>
                   <Stack gap="xs">
-                    <Text>• Navigate to the Values section in your dashboard</Text>
-                    <Text>• Choose 3-5 core values that resonate deeply with you</Text>
-                    <Text>• Write a brief description for each value explaining what it means to you</Text>
-                    <Text>• Rank them in order of importance</Text>
-                    <Text>• Use these values as your north star for all decisions</Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Navigate to the Values section in your dashboard
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Choose 3-5 core values that resonate deeply with you
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Write a brief description for each value explaining what it means to you
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Rank them in order of importance
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Use these values as your north star for all decisions
+                    </Text>
                   </Stack>
 
-                  <Text fw={600} size="sm" style={{ color: '#A855F7', marginTop: '8px' }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                      marginTop: '8px',
+                    }}
+                  >
                     ⏱️ Time needed: 10 minutes
                   </Text>
                 </Stack>
@@ -137,33 +444,135 @@ export default function GettingStarted() {
             </Card>
 
             {/* Step 3 */}
-            <Card padding="xl" radius={20} style={{ background: 'white', border: '2px solid rgba(47, 178, 100, 0.15)' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
               <Stack gap="lg">
-                <Group gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(47, 178, 100, 0.1)', color: '#2FB264' }}>
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <Target size={32} />
                   </ThemeIcon>
                   <Stack gap="xs" style={{ flex: 1 }}>
-                    <Badge size="md" color="green" variant="light">Step 3</Badge>
-                    <Text size="xl" fw={700}>Set Up Your Life Areas</Text>
-                    <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
+                    <Badge
+                      size="md"
+                      style={{
+                        background: 'rgba(70, 134, 254, 0.1)',
+                        color: '#4686FE',
+                        border: 'none',
+                        fontFamily: 'Inter, sans-serif',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Step 3
+                    </Badge>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Set Up Your Life Areas
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
                       Organize your goals into key life categories for balanced growth.
                     </Text>
                   </Stack>
                 </Group>
 
-                <Divider style={{ borderColor: 'rgba(47, 178, 100, 0.1)' }} />
+                <Divider />
 
-                <Stack gap="md" pl="md">
-                  <Text fw={600} size="lg">What to do:</Text>
+                <Stack gap="lg" pl="md">
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    What to do:
+                  </Text>
                   <Stack gap="xs">
-                    <Text>• Create 4-6 life areas (e.g., Health, Career, Relationships, Finance, Personal Growth)</Text>
-                    <Text>• Write a vision statement for each area describing your ideal future</Text>
-                    <Text>• Assign colors and icons to make them visually distinct</Text>
-                    <Text>• Set priority levels for each area based on current focus</Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Create 4-6 life areas (e.g., Health, Career, Relationships, Finance, Personal Growth)
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Write a vision statement for each area describing your ideal future
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Assign colors and icons to make them visually distinct
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Set priority levels for each area based on current focus
+                    </Text>
                   </Stack>
 
-                  <Text fw={600} size="sm" style={{ color: '#2FB264', marginTop: '8px' }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                      marginTop: '8px',
+                    }}
+                  >
                     ⏱️ Time needed: 8 minutes
                   </Text>
                 </Stack>
@@ -171,34 +580,146 @@ export default function GettingStarted() {
             </Card>
 
             {/* Step 4 */}
-            <Card padding="xl" radius={20} style={{ background: 'white', border: '2px solid rgba(250, 173, 24, 0.15)' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
               <Stack gap="lg">
-                <Group gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(250, 173, 24, 0.1)', color: '#FAAD18' }}>
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <Star size={32} />
                   </ThemeIcon>
                   <Stack gap="xs" style={{ flex: 1 }}>
-                    <Badge size="md" color="yellow" variant="light">Step 4</Badge>
-                    <Text size="xl" fw={700}>Create Your First OKRs</Text>
-                    <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
+                    <Badge
+                      size="md"
+                      style={{
+                        background: 'rgba(70, 134, 254, 0.1)',
+                        color: '#4686FE',
+                        border: 'none',
+                        fontFamily: 'Inter, sans-serif',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Step 4
+                    </Badge>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Create Your First OKRs
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
                       Set objectives and key results that will drive meaningful progress.
                     </Text>
                   </Stack>
                 </Group>
 
-                <Divider style={{ borderColor: 'rgba(250, 173, 24, 0.1)' }} />
+                <Divider />
 
-                <Stack gap="md" pl="md">
-                  <Text fw={600} size="lg">What to do:</Text>
+                <Stack gap="lg" pl="md">
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    What to do:
+                  </Text>
                   <Stack gap="xs">
-                    <Text>• Start with 1-2 objectives per life area (keep it focused)</Text>
-                    <Text>• Write inspiring, qualitative objectives (e.g., &quot;Achieve exceptional physical fitness&quot;)</Text>
-                    <Text>• Add 2-4 measurable key results per objective (e.g., &quot;Run a 10K in under 50 minutes&quot;)</Text>
-                    <Text>• Set realistic but challenging targets with specific deadlines</Text>
-                    <Text>• Link each OKR to your core values</Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Start with 1-2 objectives per life area (keep it focused)
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Write inspiring, qualitative objectives (e.g., "Achieve exceptional physical fitness")
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Add 2-4 measurable key results per objective (e.g., "Run a 10K in under 50 minutes")
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Set realistic but challenging targets with specific deadlines
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Link each OKR to your core values
+                    </Text>
                   </Stack>
 
-                  <Text fw={600} size="sm" style={{ color: '#FAAD18', marginTop: '8px' }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                      marginTop: '8px',
+                    }}
+                  >
                     ⏱️ Time needed: 15 minutes
                   </Text>
                 </Stack>
@@ -206,34 +727,146 @@ export default function GettingStarted() {
             </Card>
 
             {/* Step 5 */}
-            <Card padding="xl" radius={20} style={{ background: 'white', border: '2px solid rgba(236, 72, 153, 0.15)' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
               <Stack gap="lg">
-                <Group gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(236, 72, 153, 0.1)', color: '#EC4899' }}>
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <Zap size={32} />
                   </ThemeIcon>
                   <Stack gap="xs" style={{ flex: 1 }}>
-                    <Badge size="md" color="pink" variant="light">Step 5</Badge>
-                    <Text size="xl" fw={700}>Build Success Habits</Text>
-                    <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
+                    <Badge
+                      size="md"
+                      style={{
+                        background: 'rgba(70, 134, 254, 0.1)',
+                        color: '#4686FE',
+                        border: 'none',
+                        fontFamily: 'Inter, sans-serif',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Step 5
+                    </Badge>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Build Success Habits
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
                       Establish daily and weekly habits that support your objectives.
                     </Text>
                   </Stack>
                 </Group>
 
-                <Divider style={{ borderColor: 'rgba(236, 72, 153, 0.1)' }} />
+                <Divider />
 
-                <Stack gap="md" pl="md">
-                  <Text fw={600} size="lg">What to do:</Text>
+                <Stack gap="lg" pl="md">
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    What to do:
+                  </Text>
                   <Stack gap="xs">
-                    <Text>• Create 3-5 keystone habits that support multiple objectives</Text>
-                    <Text>• Start small (e.g., &quot;Meditate for 5 minutes&quot; vs &quot;Meditate for 1 hour&quot;)</Text>
-                    <Text>• Set specific times and triggers for each habit</Text>
-                    <Text>• Link habits to your life areas and OKRs</Text>
-                    <Text>• Enable habit tracking and streaks for motivation</Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Create 3-5 keystone habits that support multiple objectives
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Start small (e.g., "Meditate for 5 minutes" vs "Meditate for 1 hour")
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Set specific times and triggers for each habit
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Link habits to your life areas and OKRs
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Enable habit tracking and streaks for motivation
+                    </Text>
                   </Stack>
 
-                  <Text fw={600} size="sm" style={{ color: '#EC4899', marginTop: '8px' }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                      marginTop: '8px',
+                    }}
+                  >
                     ⏱️ Time needed: 10 minutes
                   </Text>
                 </Stack>
@@ -241,34 +874,146 @@ export default function GettingStarted() {
             </Card>
 
             {/* Step 6 */}
-            <Card padding="xl" radius={20} style={{ background: 'white', border: '2px solid rgba(6, 182, 212, 0.15)' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
               <Stack gap="lg">
-                <Group gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(6, 182, 212, 0.1)', color: '#06B6D4' }}>
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <Calendar size={32} />
                   </ThemeIcon>
                   <Stack gap="xs" style={{ flex: 1 }}>
-                    <Badge size="md" color="cyan" variant="light">Step 6</Badge>
-                    <Text size="xl" fw={700}>Plan Your First Week</Text>
-                    <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
+                    <Badge
+                      size="md"
+                      style={{
+                        background: 'rgba(70, 134, 254, 0.1)',
+                        color: '#4686FE',
+                        border: 'none',
+                        fontFamily: 'Inter, sans-serif',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Step 6
+                    </Badge>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Plan Your First Week
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
                       Create actionable tasks and schedule that moves you toward your goals.
                     </Text>
                   </Stack>
                 </Group>
 
-                <Divider style={{ borderColor: 'rgba(6, 182, 212, 0.1)' }} />
+                <Divider />
 
-                <Stack gap="md" pl="md">
-                  <Text fw={600} size="lg">What to do:</Text>
+                <Stack gap="lg" pl="md">
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    What to do:
+                  </Text>
                   <Stack gap="xs">
-                    <Text>• Break down your key results into specific, actionable tasks</Text>
-                    <Text>• Use the Eisenhower Matrix to prioritize tasks (Urgent/Important)</Text>
-                    <Text>• Schedule focused work blocks for your most important tasks</Text>
-                    <Text>• Plan your habit execution times throughout the week</Text>
-                    <Text>• Set up weekly review sessions to track progress</Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Break down your key results into specific, actionable tasks
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Use the Eisenhower Matrix to prioritize tasks (Urgent/Important)
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Schedule focused work blocks for your most important tasks
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Plan your habit execution times throughout the week
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Set up weekly review sessions to track progress
+                    </Text>
                   </Stack>
 
-                  <Text fw={600} size="sm" style={{ color: '#06B6D4', marginTop: '8px' }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                      marginTop: '8px',
+                    }}
+                  >
                     ⏱️ Time needed: 12 minutes
                   </Text>
                 </Stack>
@@ -276,34 +1021,146 @@ export default function GettingStarted() {
             </Card>
 
             {/* Step 7 */}
-            <Card padding="xl" radius={20} style={{ background: 'white', border: '2px solid rgba(147, 51, 234, 0.15)' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
               <Stack gap="lg">
-                <Group gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(147, 51, 234, 0.1)', color: '#9333EA' }}>
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <BarChart size={32} />
                   </ThemeIcon>
                   <Stack gap="xs" style={{ flex: 1 }}>
-                    <Badge size="md" color="violet" variant="light">Step 7</Badge>
-                    <Text size="xl" fw={700}>Set Up Tracking & Reviews</Text>
-                    <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
+                    <Badge
+                      size="md"
+                      style={{
+                        background: 'rgba(70, 134, 254, 0.1)',
+                        color: '#4686FE',
+                        border: 'none',
+                        fontFamily: 'Inter, sans-serif',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Step 7
+                    </Badge>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Set Up Tracking & Reviews
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
                       Establish systems to monitor progress and course-correct as needed.
                     </Text>
                   </Stack>
                 </Group>
 
-                <Divider style={{ borderColor: 'rgba(147, 51, 234, 0.1)' }} />
+                <Divider />
 
-                <Stack gap="md" pl="md">
-                  <Text fw={600} size="lg">What to do:</Text>
+                <Stack gap="lg" pl="md">
+                  <Text
+                    style={{
+                      fontFamily: 'Inter Display, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                    }}
+                  >
+                    What to do:
+                  </Text>
                   <Stack gap="xs">
-                    <Text>• Configure your dashboard to show key metrics and progress</Text>
-                    <Text>• Set up automated progress tracking for quantifiable goals</Text>
-                    <Text>• Schedule daily check-ins (5 minutes) and weekly reviews (30 minutes)</Text>
-                    <Text>• Enable analytics to understand your performance patterns</Text>
-                    <Text>• Create alerts for important deadlines and milestones</Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Configure your dashboard to show key metrics and progress
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Set up automated progress tracking for quantifiable goals
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Schedule daily check-ins (5 minutes) and weekly reviews (30 minutes)
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Enable analytics to understand your performance patterns
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      • Create alerts for important deadlines and milestones
+                    </Text>
                   </Stack>
 
-                  <Text fw={600} size="sm" style={{ color: '#9333EA', marginTop: '8px' }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                      marginTop: '8px',
+                    }}
+                  >
                     ⏱️ Time needed: 8 minutes
                   </Text>
                 </Stack>
@@ -313,49 +1170,160 @@ export default function GettingStarted() {
 
           {/* Pro Tips */}
           <Stack gap="xl">
-            <Title order={2} ta="center" style={{ fontSize: '32px', fontWeight: 700 }}>
+            <Title
+              order={2}
+              ta="center"
+              style={{
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#000000',
+              }}
+            >
               Pro Tips for Success
             </Title>
 
             <Stack gap="lg">
-              <Card padding="lg" radius={16} style={{ background: 'rgba(47, 178, 100, 0.05)', border: '1px solid rgba(47, 178, 100, 0.2)' }}>
-                <Group gap="md">
-                  <ThemeIcon size={40} radius={12} style={{ background: 'rgba(47, 178, 100, 0.15)', color: '#2FB264' }}>
+              <Card
+                padding="xl"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={48}
+                    radius={12}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <CheckCircle2 size={24} />
                   </ThemeIcon>
                   <Stack gap="xs" style={{ flex: 1 }}>
-                    <Text fw={600}>Start Small, Think Big</Text>
-                    <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                      It&apos;s better to consistently achieve smaller goals than to fail at overly ambitious ones.
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        color: '#000000',
+                      }}
+                    >
+                      Start Small, Think Big
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      It's better to consistently achieve smaller goals than to fail at overly ambitious ones.
                       Build momentum with early wins.
                     </Text>
                   </Stack>
                 </Group>
               </Card>
 
-              <Card padding="lg" radius={16} style={{ background: 'rgba(49, 67, 182, 0.05)', border: '1px solid rgba(49, 67, 182, 0.2)' }}>
-                <Group gap="md">
-                  <ThemeIcon size={40} radius={12} style={{ background: 'rgba(49, 67, 182, 0.15)', color: '#3143B6' }}>
+              <Card
+                padding="xl"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={48}
+                    radius={12}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <Calendar size={24} />
                   </ThemeIcon>
                   <Stack gap="xs" style={{ flex: 1 }}>
-                    <Text fw={600}>Weekly Reviews Are Key</Text>
-                    <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        color: '#000000',
+                      }}
+                    >
+                      Weekly Reviews Are Key
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
                       Schedule a 30-minute weekly review every Sunday. Celebrate wins, analyze obstacles, and adjust your plans.
                     </Text>
                   </Stack>
                 </Group>
               </Card>
 
-              <Card padding="lg" radius={16} style={{ background: 'rgba(168, 85, 247, 0.05)', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
-                <Group gap="md">
-                  <ThemeIcon size={40} radius={12} style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#A855F7' }}>
+              <Card
+                padding="xl"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={48}
+                    radius={12}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <Heart size={24} />
                   </ThemeIcon>
                   <Stack gap="xs" style={{ flex: 1 }}>
-                    <Text fw={600}>Connect Everything to Values</Text>
-                    <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                      When goals align with your core values, motivation becomes automatic. Always ask: &quot;Why does this matter to me?&quot;
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        color: '#000000',
+                      }}
+                    >
+                      Connect Everything to Values
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      When goals align with your core values, motivation becomes automatic. Always ask: "Why does this matter to me?"
                     </Text>
                   </Stack>
                 </Group>
@@ -364,24 +1332,65 @@ export default function GettingStarted() {
           </Stack>
 
           {/* Next Steps */}
-          <Card padding="xl" radius={20} style={{ background: 'rgba(49, 67, 182, 0.05)', border: '2px solid rgba(49, 67, 182, 0.2)' }}>
+          <Card
+            padding="xl"
+            radius={16}
+            style={{
+              background: '#F5F5F5',
+              border: '1px solid #CCCCCC',
+              boxShadow: 'none',
+            }}
+          >
             <Stack align="center" gap="lg">
-              <Title order={3} ta="center">Ready to Begin Your Excellence Journey?</Title>
-              <Text ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.7 }}>
+              <Text
+                style={{
+                  fontFamily: 'Inter Display, sans-serif',
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  color: '#000000',
+                  textAlign: 'center',
+                }}
+              >
+                Ready to Begin Your Excellence Journey?
+              </Text>
+              <Text
+                ta="center"
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '18px',
+                  lineHeight: '26px',
+                  color: '#666666',
+                  fontWeight: 400,
+                  maxWidth: '700px',
+                }}
+              >
                 You now have everything you need to start using Cherut effectively. Remember, the system is only as powerful
                 as your commitment to using it consistently.
               </Text>
-              <Group gap="md">
+              <Group gap="lg">
                 <Button
                   component="a"
                   href="/auth/register"
                   size="lg"
-                  radius={12}
                   rightSection={<ArrowRight size={18} />}
                   style={{
-                    background: '#3143B6',
+                    background: '#4686FE',
                     border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '16px',
                     fontWeight: 600,
+                    height: '56px',
+                    padding: '0 32px',
+                    color: 'white',
+                    transition: 'all 0.2s ease',
+                    fontFamily: 'Inter, sans-serif',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        background: '#3366E5',
+                      },
+                    },
                   }}
                 >
                   Sign Up
@@ -390,12 +1399,26 @@ export default function GettingStarted() {
                   component="a"
                   href="/help-center"
                   size="lg"
-                  radius={12}
                   variant="outline"
                   style={{
-                    borderColor: '#3143B6',
-                    color: '#3143B6',
+                    borderColor: '#CCCCCC',
+                    color: '#333333',
+                    borderRadius: '12px',
+                    fontSize: '16px',
                     fontWeight: 600,
+                    height: '56px',
+                    padding: '0 32px',
+                    background: 'white',
+                    transition: 'all 0.2s ease',
+                    fontFamily: 'Inter, sans-serif',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        borderColor: '#4686FE',
+                        color: '#4686FE',
+                      },
+                    },
                   }}
                 >
                   Back to Help Center
@@ -405,18 +1428,61 @@ export default function GettingStarted() {
           </Card>
 
           {/* Support */}
-          <Card padding="lg" radius={16} style={{ background: 'rgba(250, 173, 24, 0.05)', border: '1px solid rgba(250, 173, 24, 0.2)' }}>
-            <Stack align="center" gap="md">
-              <Text fw={600} size="lg">Need Help Getting Started?</Text>
-              <Text ta="center" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                Our support team is here to help you succeed. Don&apos;t hesitate to reach out if you have questions.
+          <Card
+            padding="xl"
+            radius={16}
+            style={{
+              background: '#F5F5F5',
+              border: '1px solid #CCCCCC',
+              boxShadow: 'none',
+            }}
+          >
+            <Stack align="center" gap="lg">
+              <Text
+                style={{
+                  fontFamily: 'Inter Display, sans-serif',
+                  fontSize: '20px',
+                  fontWeight: 600,
+                  color: '#000000',
+                }}
+              >
+                Need Help Getting Started?
+              </Text>
+              <Text
+                ta="center"
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '16px',
+                  fontWeight: 400,
+                  color: '#666666',
+                  lineHeight: '24px',
+                }}
+              >
+                Our support team is here to help you succeed. Don't hesitate to reach out if you have questions.
               </Text>
               <Button
                 component="a"
                 href="mailto:chutzpahcode@gmail.com"
-                size="md"
-                radius={12}
-                style={{ background: '#FAAD18', fontWeight: 600 }}
+                size="lg"
+                style={{
+                  background: '#4686FE',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  height: '56px',
+                  padding: '0 32px',
+                  color: 'white',
+                  transition: 'all 0.2s ease',
+                  fontFamily: 'Inter, sans-serif',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      background: '#3366E5',
+                    },
+                  },
+                }}
               >
                 Contact Support
               </Button>

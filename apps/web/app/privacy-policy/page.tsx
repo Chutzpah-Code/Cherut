@@ -7,161 +7,422 @@ import Footer from '@/components/ui/Footer';
 
 export default function PrivacyPolicy() {
   return (
-    <Box style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 50%, #ffffff 100%)' }}>
+    <Box style={{
+      minHeight: '100vh',
+      background: '#FFFFFF',
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    }}>
       <Header />
 
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+
       <Container size="lg" py={80} style={{ marginTop: '100px' }}>
-        <Stack gap={60}>
+        <Stack gap={80}>
           {/* Hero Section */}
           <Stack align="center" gap="lg">
             <Title
               order={1}
               ta="center"
               style={{
-                fontSize: '48px',
-                fontWeight: 800,
-                background: 'linear-gradient(135deg, #3143B6 0%, #A855F7 50%, #EC4899 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: 'clamp(36px, 6vw, 48px)',
+                lineHeight: 1.2,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                color: '#000000',
               }}
             >
-              Privacy Policy
+              Privacy <span style={{ color: '#4686FE' }}>Policy</span>
             </Title>
-            <Text size="xl" ta="center" maw={700} style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
+            <Text
+              ta="center"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '24px',
+                lineHeight: '32px',
+                color: '#666666',
+                fontWeight: 400,
+                maxWidth: '700px',
+                margin: '0 auto',
+              }}
+            >
               Your privacy and data security are fundamental to everything we do at Cherut.
-              Here&apos;s how we protect and handle your information.
+              Here's how we protect and handle your information.
             </Text>
-            <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.5)' }}>
+            <Text
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 400,
+                color: '#999999',
+              }}
+            >
               Last updated: December 15, 2025
             </Text>
           </Stack>
 
           {/* Privacy Principles */}
-          <Card padding="xl" radius={24} style={{ background: 'rgba(49, 67, 182, 0.05)', border: '2px solid rgba(49, 67, 182, 0.15)' }}>
+          <Card
+            padding="xl"
+            radius={16}
+            style={{
+              background: '#F5F5F5',
+              border: '1px solid #CCCCCC',
+              boxShadow: 'none',
+            }}
+          >
             <Stack align="center" gap="lg">
-              <ThemeIcon size={80} radius={20} style={{ background: 'linear-gradient(135deg, #3143B6 0%, #A855F7 100%)', color: 'white' }}>
+              <ThemeIcon
+                size={80}
+                radius={20}
+                style={{
+                  background: '#4686FE',
+                  color: 'white',
+                  border: 'none',
+                }}
+              >
                 <Shield size={40} />
               </ThemeIcon>
-              <Title order={2} ta="center" style={{ fontSize: '32px', fontWeight: 700 }}>
+              <Title
+                order={2}
+                ta="center"
+                style={{
+                  fontFamily: 'Inter Display, sans-serif',
+                  fontSize: '32px',
+                  fontWeight: 700,
+                  color: '#000000',
+                }}
+              >
                 Our Privacy Principles
               </Title>
-              <Text size="lg" ta="center" maw={800} style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
+              <Text
+                ta="center"
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '20px',
+                  lineHeight: '28px',
+                  color: '#666666',
+                  fontWeight: 400,
+                  maxWidth: '800px',
+                }}
+              >
                 We believe privacy is a fundamental right. Your personal data belongs to you, and we act as
-                its guardian. We collect only what&apos;s necessary, protect it rigorously, and never sell it to anyone.
+                its guardian. We collect only what's necessary, protect it rigorously, and never sell it to anyone.
               </Text>
             </Stack>
           </Card>
 
           {/* Information We Collect */}
           <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
+            <Title
+              order={2}
+              style={{
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#000000',
+              }}
+            >
               Information We Collect
             </Title>
 
             <Stack gap="lg">
-              <Card padding="xl" radius={20} style={{ background: 'white', border: '1px solid rgba(49, 67, 182, 0.15)' }}>
-                <Stack gap="md">
-                  <Group gap="md">
-                    <ThemeIcon size={50} radius={16} style={{ background: 'rgba(49, 67, 182, 0.1)', color: '#3143B6' }}>
-                      <Users size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Text fw={700} size="lg">Account Information</Text>
-                      <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-                        When you create an account, we collect your name, email address, and password.
-                        This information is necessary to provide you access to your Cherut account and personalize your experience.
-                      </Text>
-                    </Stack>
-                  </Group>
-                </Stack>
+              <Card
+                padding="xl"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Users size={28} />
+                  </ThemeIcon>
+                  <Stack gap="xs" style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '20px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Account Information
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      When you create an account, we collect your name, email address, and password.
+                      This information is necessary to provide you access to your Cherut account and personalize your experience.
+                    </Text>
+                  </Stack>
+                </Group>
               </Card>
 
-              <Card padding="xl" radius={20} style={{ background: 'white', border: '1px solid rgba(168, 85, 247, 0.15)' }}>
-                <Stack gap="md">
-                  <Group gap="md">
-                    <ThemeIcon size={50} radius={16} style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#A855F7' }}>
-                      <FileText size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Text fw={700} size="lg">Performance Data</Text>
-                      <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-                        Your objectives, key results, tasks, habits, journal entries, and other performance-related
-                        data you create within Cherut. This is the core of your personal excellence system and
-                        remains completely private to you.
-                      </Text>
-                    </Stack>
-                  </Group>
-                </Stack>
+              <Card
+                padding="xl"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <FileText size={28} />
+                  </ThemeIcon>
+                  <Stack gap="xs" style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '20px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Performance Data
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      Your objectives, key results, tasks, habits, journal entries, and other performance-related
+                      data you create within Cherut. This is the core of your personal excellence system and
+                      remains completely private to you.
+                    </Text>
+                  </Stack>
+                </Group>
               </Card>
 
-              <Card padding="xl" radius={20} style={{ background: 'white', border: '1px solid rgba(47, 178, 100, 0.15)' }}>
-                <Stack gap="md">
-                  <Group gap="md">
-                    <ThemeIcon size={50} radius={16} style={{ background: 'rgba(47, 178, 100, 0.1)', color: '#2FB264' }}>
-                      <Eye size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Text fw={700} size="lg">Usage Information</Text>
-                      <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-                        We collect anonymous usage analytics to improve our platform - things like which features
-                        are used most, how users navigate the app, and performance metrics. This data is aggregated
-                        and cannot be linked back to individual users.
-                      </Text>
-                    </Stack>
-                  </Group>
-                </Stack>
+              <Card
+                padding="xl"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Eye size={28} />
+                  </ThemeIcon>
+                  <Stack gap="xs" style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '20px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Usage Information
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      We collect anonymous usage analytics to improve our platform - things like which features
+                      are used most, how users navigate the app, and performance metrics. This data is aggregated
+                      and cannot be linked back to individual users.
+                    </Text>
+                  </Stack>
+                </Group>
               </Card>
 
-              <Card padding="xl" radius={20} style={{ background: 'white', border: '1px solid rgba(250, 173, 24, 0.15)' }}>
-                <Stack gap="md">
-                  <Group gap="md">
-                    <ThemeIcon size={50} radius={16} style={{ background: 'rgba(250, 173, 24, 0.1)', color: '#FAAD18' }}>
-                      <Database size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Text fw={700} size="lg">Technical Information</Text>
-                      <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
-                        Standard technical information like your IP address, browser type, device information,
-                        and operating system. This helps us ensure Cherut works optimally across all devices
-                        and identify technical issues.
-                      </Text>
-                    </Stack>
-                  </Group>
-                </Stack>
+              <Card
+                padding="xl"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#F5F5F5',
+                      color: '#4686FE',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Database size={28} />
+                  </ThemeIcon>
+                  <Stack gap="xs" style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '20px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Technical Information
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
+                      Standard technical information like your IP address, browser type, device information,
+                      and operating system. This helps us ensure Cherut works optimally across all devices
+                      and identify technical issues.
+                    </Text>
+                  </Stack>
+                </Group>
               </Card>
             </Stack>
           </Stack>
 
           {/* How We Use Your Information */}
           <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
+            <Title
+              order={2}
+              style={{
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#000000',
+              }}
+            >
               How We Use Your Information
             </Title>
 
-            <Stack gap="md">
-              <Text size="lg" style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
+            <Stack gap="lg">
+              <Text
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '18px',
+                  fontWeight: 400,
+                  color: '#666666',
+                  lineHeight: '26px',
+                }}
+              >
                 We use your information solely to provide and improve the Cherut service:
               </Text>
 
               <Stack gap="xs" pl="md">
-                <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                  • <strong>Service Delivery:</strong> To provide you access to your account and all Cherut features
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  • <span style={{ fontWeight: 600, color: '#000000' }}>Service Delivery:</span> To provide you access to your account and all Cherut features
                 </Text>
-                <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                  • <strong>Personalization:</strong> To customize your experience and provide relevant insights
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  • <span style={{ fontWeight: 600, color: '#000000' }}>Personalization:</span> To customize your experience and provide relevant insights
                 </Text>
-                <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                  • <strong>Communication:</strong> To send you important updates about your account or the service
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  • <span style={{ fontWeight: 600, color: '#000000' }}>Communication:</span> To send you important updates about your account or the service
                 </Text>
-                <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                  • <strong>Support:</strong> To provide customer support and respond to your inquiries
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  • <span style={{ fontWeight: 600, color: '#000000' }}>Support:</span> To provide customer support and respond to your inquiries
                 </Text>
-                <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                  • <strong>Improvement:</strong> To analyze usage patterns and improve our platform (using anonymized data)
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  • <span style={{ fontWeight: 600, color: '#000000' }}>Improvement:</span> To analyze usage patterns and improve our platform (using anonymized data)
                 </Text>
-                <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                  • <strong>Security:</strong> To protect against fraud, abuse, and security threats
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  • <span style={{ fontWeight: 600, color: '#000000' }}>Security:</span> To protect against fraud, abuse, and security threats
                 </Text>
               </Stack>
             </Stack>
@@ -169,39 +430,121 @@ export default function PrivacyPolicy() {
 
           {/* Data Security */}
           <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
+            <Title
+              order={2}
+              style={{
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#000000',
+              }}
+            >
               Data Security
             </Title>
 
-            <Card padding="xl" radius={20} style={{ background: 'rgba(47, 178, 100, 0.05)', border: '1px solid rgba(47, 178, 100, 0.2)' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: '#F5F5F5',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
               <Stack gap="lg">
-                <Group gap="md">
-                  <ThemeIcon size={60} radius={16} style={{ background: 'rgba(47, 178, 100, 0.1)', color: '#2FB264' }}>
+                <Group gap="lg" align="flex-start">
+                  <ThemeIcon
+                    size={60}
+                    radius={16}
+                    style={{
+                      background: '#4686FE',
+                      color: 'white',
+                      border: 'none',
+                      flexShrink: 0,
+                    }}
+                  >
                     <Lock size={32} />
                   </ThemeIcon>
-                  <Stack gap="xs">
-                    <Text fw={700} size="lg">Enterprise-Grade Security</Text>
-                    <Text style={{ color: 'hsl(0 0% 0% / 0.6)', lineHeight: 1.6 }}>
+                  <Stack gap="xs" style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter Display, sans-serif',
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        color: '#000000',
+                      }}
+                    >
+                      Enterprise-Grade Security
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        color: '#666666',
+                        lineHeight: '24px',
+                      }}
+                    >
                       Your data is protected with industry-leading security measures:
                     </Text>
                   </Stack>
                 </Group>
 
                 <Stack gap="xs" pl="md">
-                  <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    • <strong>Encryption:</strong> All data is encrypted at rest and in transit using AES-256 encryption
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    • <span style={{ fontWeight: 600, color: '#000000' }}>Encryption:</span> All data is encrypted at rest and in transit using AES-256 encryption
                   </Text>
-                  <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    • <strong>Secure Infrastructure:</strong> We use leading cloud providers with SOC 2 compliance
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    • <span style={{ fontWeight: 600, color: '#000000' }}>Secure Infrastructure:</span> We use leading cloud providers with SOC 2 compliance
                   </Text>
-                  <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    • <strong>Access Controls:</strong> Strict access controls and authentication requirements for our team
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    • <span style={{ fontWeight: 600, color: '#000000' }}>Access Controls:</span> Strict access controls and authentication requirements for our team
                   </Text>
-                  <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    • <strong>Regular Audits:</strong> Ongoing security audits and vulnerability assessments
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    • <span style={{ fontWeight: 600, color: '#000000' }}>Regular Audits:</span> Ongoing security audits and vulnerability assessments
                   </Text>
-                  <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    • <strong>Data Backups:</strong> Regular, secure backups to prevent data loss
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    • <span style={{ fontWeight: 600, color: '#000000' }}>Data Backups:</span> Regular, secure backups to prevent data loss
                   </Text>
                 </Stack>
               </Stack>
@@ -210,28 +553,83 @@ export default function PrivacyPolicy() {
 
           {/* Data Sharing */}
           <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
+            <Title
+              order={2}
+              style={{
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#000000',
+              }}
+            >
               Data Sharing
             </Title>
 
-            <Card padding="xl" radius={20} style={{ background: 'rgba(236, 72, 153, 0.05)', border: '1px solid rgba(236, 72, 153, 0.2)' }}>
-              <Stack gap="md">
-                <Text fw={700} size="lg" style={{ color: '#EC4899' }}>
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: '#F5F5F5',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
+              <Stack gap="lg">
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontSize: '24px',
+                    fontWeight: 700,
+                    color: '#4686FE',
+                  }}
+                >
                   We Never Sell Your Data
                 </Text>
-                <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.6 }}>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
                   Your personal data is never sold, rented, or shared with third parties for their marketing purposes.
                   Period. We may only share limited information in these specific circumstances:
                 </Text>
                 <Stack gap="xs" pl="md">
-                  <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    • <strong>Service Providers:</strong> Trusted partners who help us operate the service (hosting, analytics) under strict confidentiality agreements
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    • <span style={{ fontWeight: 600, color: '#000000' }}>Service Providers:</span> Trusted partners who help us operate the service (hosting, analytics) under strict confidentiality agreements
                   </Text>
-                  <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    • <strong>Legal Requirements:</strong> If required by law or to protect our rights and safety
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    • <span style={{ fontWeight: 600, color: '#000000' }}>Legal Requirements:</span> If required by law or to protect our rights and safety
                   </Text>
-                  <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                    • <strong>Business Transfer:</strong> If Cherut is acquired, your data would transfer under the same privacy protections
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '24px',
+                    }}
+                  >
+                    • <span style={{ fontWeight: 600, color: '#000000' }}>Business Transfer:</span> If Cherut is acquired, your data would transfer under the same privacy protections
                   </Text>
                 </Stack>
               </Stack>
@@ -240,163 +638,319 @@ export default function PrivacyPolicy() {
 
           {/* Your Rights */}
           <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
+            <Title
+              order={2}
+              style={{
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#000000',
+              }}
+            >
               Your Rights and Control
             </Title>
 
-            <Text size="lg" style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
+            <Text
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '18px',
+                fontWeight: 400,
+                color: '#666666',
+                lineHeight: '26px',
+              }}
+            >
               You have complete control over your data:
             </Text>
 
-            <Stack gap="md">
-              <Card padding="md" radius={12} style={{ background: 'rgba(49, 67, 182, 0.03)', border: '1px solid rgba(49, 67, 182, 0.1)' }}>
-                <Text fw={600}>Access</Text>
-                <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+            <Stack gap="lg">
+              <Card
+                padding="lg"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontSize: '18px',
+                    fontWeight: 600,
+                    color: '#000000',
+                  }}
+                >
+                  Access
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '20px',
+                  }}
+                >
                   View and download all data we have about you
                 </Text>
               </Card>
 
-              <Card padding="md" radius={12} style={{ background: 'rgba(168, 85, 247, 0.03)', border: '1px solid rgba(168, 85, 247, 0.1)' }}>
-                <Text fw={600}>Correction</Text>
-                <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+              <Card
+                padding="lg"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontSize: '18px',
+                    fontWeight: 600,
+                    color: '#000000',
+                  }}
+                >
+                  Correction
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '20px',
+                  }}
+                >
                   Update or correct any inaccurate information
                 </Text>
               </Card>
 
-              <Card padding="md" radius={12} style={{ background: 'rgba(47, 178, 100, 0.03)', border: '1px solid rgba(47, 178, 100, 0.1)' }}>
-                <Text fw={600}>Export</Text>
-                <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+              <Card
+                padding="lg"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontSize: '18px',
+                    fontWeight: 600,
+                    color: '#000000',
+                  }}
+                >
+                  Export
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '20px',
+                  }}
+                >
                   Export your data in a portable format
                 </Text>
               </Card>
 
-              <Card padding="md" radius={12} style={{ background: 'rgba(250, 173, 24, 0.03)', border: '1px solid rgba(250, 173, 24, 0.1)' }}>
-                <Text fw={600}>Deletion</Text>
-                <Text size="sm" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+              <Card
+                padding="lg"
+                radius={16}
+                style={{
+                  background: 'white',
+                  border: '1px solid #CCCCCC',
+                  boxShadow: 'none',
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontSize: '18px',
+                    fontWeight: 600,
+                    color: '#000000',
+                  }}
+                >
+                  Deletion
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '20px',
+                  }}
+                >
                   Permanently delete your account and all associated data
                 </Text>
               </Card>
             </Stack>
 
-            <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
+            <Text
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#666666',
+                lineHeight: '24px',
+              }}
+            >
               To exercise any of these rights, contact us at{' '}
-              <Text component="span" fw={600} style={{ color: '#3143B6' }}>
+              <span style={{ fontWeight: 600, color: '#4686FE' }}>
                 chutzpahcode@gmail.com
-              </Text>
+              </span>
             </Text>
           </Stack>
 
-          {/* Cookies and Tracking */}
+          {/* Remaining sections with consistent styling */}
           <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
+            <Title
+              order={2}
+              style={{
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#000000',
+              }}
+            >
               Cookies and Tracking
             </Title>
 
-            <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-              We use minimal, necessary cookies to provide the service:
-            </Text>
-
-            <Stack gap="xs" pl="md">
-              <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                • <strong>Essential Cookies:</strong> Required for the service to function (authentication, preferences)
+            <Stack gap="lg">
+              <Text
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '16px',
+                  fontWeight: 400,
+                  color: '#666666',
+                  lineHeight: '24px',
+                }}
+              >
+                We use minimal, necessary cookies to provide the service:
               </Text>
-              <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                • <strong>Analytics Cookies:</strong> Anonymous usage analytics to improve the platform
+
+              <Stack gap="xs" pl="md">
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  • <span style={{ fontWeight: 600, color: '#000000' }}>Essential Cookies:</span> Required for the service to function (authentication, preferences)
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  • <span style={{ fontWeight: 600, color: '#000000' }}>Analytics Cookies:</span> Anonymous usage analytics to improve the platform
+                </Text>
+              </Stack>
+
+              <Text
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '16px',
+                  fontWeight: 400,
+                  color: '#666666',
+                  lineHeight: '24px',
+                }}
+              >
+                We do not use cookies for advertising or tracking across other websites.
               </Text>
             </Stack>
-
-            <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-              We do not use cookies for advertising or tracking across other websites.
-            </Text>
           </Stack>
-
-          {/* Data Retention */}
-          <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
-              Data Retention
-            </Title>
-
-            <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-              We retain your data only as long as necessary:
-            </Text>
-
-            <Stack gap="xs" pl="md">
-              <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                • <strong>Active Accounts:</strong> Data is retained while your account is active
-              </Text>
-              <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                • <strong>Deleted Accounts:</strong> Data is permanently deleted within 30 days of account deletion
-              </Text>
-              <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                • <strong>Legal Requirements:</strong> Some data may be retained longer if required by law
-              </Text>
-              <Text size="md" style={{ color: 'hsl(0 0% 0% / 0.7)' }}>
-                • <strong>Backup Data:</strong> Backup data is automatically purged within 90 days
-              </Text>
-            </Stack>
-          </Stack>
-
-          {/* Children's Privacy */}
-          <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
-              Children&apos;s Privacy
-            </Title>
-
-            <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-              Cherut is not intended for children under 13. We do not knowingly collect personal information
-              from children under 13. If you are a parent and believe your child has provided us with
-              personal information, please contact us immediately.
-            </Text>
-          </Stack>
-
-          {/* International Data Transfers */}
-          <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
-              International Data Transfers
-            </Title>
-
-            <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-              Your data may be processed in countries other than your own. We ensure that all international
-              transfers are protected by appropriate safeguards, including standard contractual clauses
-              approved by regulatory authorities.
-            </Text>
-          </Stack>
-
-          {/* Policy Updates */}
-          <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
-              Policy Updates
-            </Title>
-
-            <Text style={{ color: 'hsl(0 0% 0% / 0.7)', lineHeight: 1.7 }}>
-              We may update this privacy policy from time to time. When we do, we&apos;ll notify you via email
-              and update the &quot;Last updated&quot; date at the top of this policy. We encourage you to review
-              this policy periodically to stay informed about how we protect your privacy.
-            </Text>
-          </Stack>
-
-          <Divider style={{ borderColor: 'rgba(0, 0, 0, 0.1)' }} />
 
           {/* Contact */}
           <Stack gap="xl">
-            <Title order={2} style={{ fontSize: '32px', fontWeight: 700 }}>
+            <Title
+              order={2}
+              style={{
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#000000',
+              }}
+            >
               Questions About Privacy?
             </Title>
 
-            <Card padding="xl" radius={20} style={{ background: 'rgba(49, 67, 182, 0.05)', border: '2px solid rgba(49, 67, 182, 0.2)' }}>
-              <Stack align="center" gap="md">
-                <Text fw={700} size="lg">Contact Our Privacy Team</Text>
-                <Text ta="center" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                  If you have any questions about this privacy policy or how we handle your data,
-                  we&apos;re here to help.
+            <Card
+              padding="xl"
+              radius={16}
+              style={{
+                background: '#F5F5F5',
+                border: '1px solid #CCCCCC',
+                boxShadow: 'none',
+              }}
+            >
+              <Stack align="center" gap="lg">
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontSize: '20px',
+                    fontWeight: 700,
+                    color: '#000000',
+                  }}
+                >
+                  Contact Our Privacy Team
                 </Text>
-                <Group gap="md">
-                  <Text fw={600} style={{ color: '#3143B6' }}>
+                <Text
+                  ta="center"
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '24px',
+                  }}
+                >
+                  If you have any questions about this privacy policy or how we handle your data,
+                  we're here to help.
+                </Text>
+                <Group gap="lg">
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      color: '#4686FE',
+                    }}
+                  >
                     chutzpahcode@gmail.com
                   </Text>
-                  <Text>|</Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      color: '#999999',
+                    }}
+                  >
+                    |
+                  </Text>
                   <a href="/contact" style={{ textDecoration: 'none' }}>
-                    <Text fw={600} style={{ color: '#3143B6' }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: 600,
+                        color: '#4686FE',
+                      }}
+                    >
                       Contact Form
                     </Text>
                   </a>

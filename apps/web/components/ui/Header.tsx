@@ -27,9 +27,10 @@ export default function Header() {
         left: 0,
         right: 0,
         zIndex: 1000,
-        background: 'rgba(255, 255, 255, 0.95)',
+        background: 'rgba(255, 255, 255, 0.98)',
         backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+        borderBottom: '1px solid #CCCCCC',
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       }}
     >
       <Container size="lg">
@@ -44,12 +45,17 @@ export default function Header() {
             <Button
               variant="subtle"
               onClick={() => navigate('/about')}
-              style={{ color: '#374151', fontWeight: 500 }}
+              style={{
+                color: '#333333',
+                fontWeight: 500,
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+              }}
               styles={{
                 root: {
                   '&:hover': {
-                    background: 'rgba(49, 67, 182, 0.1)',
-                    color: '#3143B6',
+                    background: 'rgba(70, 134, 254, 0.08)',
+                    color: '#4686FE',
                   },
                 },
               }}
@@ -59,12 +65,17 @@ export default function Header() {
             <Button
               variant="subtle"
               onClick={() => navigate('/#pricing')}
-              style={{ color: '#374151', fontWeight: 500 }}
+              style={{
+                color: '#333333',
+                fontWeight: 500,
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+              }}
               styles={{
                 root: {
                   '&:hover': {
-                    background: 'rgba(49, 67, 182, 0.1)',
-                    color: '#3143B6',
+                    background: 'rgba(70, 134, 254, 0.08)',
+                    color: '#4686FE',
                   },
                 },
               }}
@@ -74,12 +85,17 @@ export default function Header() {
             <Button
               variant="subtle"
               onClick={() => navigate('/#testimonials')}
-              style={{ color: '#374151', fontWeight: 500 }}
+              style={{
+                color: '#333333',
+                fontWeight: 500,
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+              }}
               styles={{
                 root: {
                   '&:hover': {
-                    background: 'rgba(49, 67, 182, 0.1)',
-                    color: '#3143B6',
+                    background: 'rgba(70, 134, 254, 0.08)',
+                    color: '#4686FE',
                   },
                 },
               }}
@@ -91,12 +107,17 @@ export default function Header() {
               component="a"
               href="https://discord.gg/AyjZ58KXGy"
               target="_blank"
-              style={{ color: '#374151', fontWeight: 500 }}
+              style={{
+                color: '#333333',
+                fontWeight: 500,
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+              }}
               styles={{
                 root: {
                   '&:hover': {
-                    background: 'rgba(49, 67, 182, 0.1)',
-                    color: '#3143B6',
+                    background: 'rgba(70, 134, 254, 0.08)',
+                    color: '#4686FE',
                   },
                 },
               }}
@@ -110,12 +131,17 @@ export default function Header() {
             <Button
               variant="subtle"
               onClick={() => navigate('/auth/login')}
-              style={{ color: '#374151', fontWeight: 600 }}
+              style={{
+                color: '#333333',
+                fontWeight: 600,
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+              }}
               styles={{
                 root: {
                   '&:hover': {
-                    background: 'rgba(49, 67, 182, 0.1)',
-                    color: '#3143B6',
+                    background: 'rgba(70, 134, 254, 0.08)',
+                    color: '#4686FE',
                   },
                 },
               }}
@@ -126,17 +152,19 @@ export default function Header() {
               radius={8}
               onClick={() => navigate('/auth/register')}
               style={{
-                background: '#3143B6',
+                background: '#4686FE',
                 color: 'white',
                 fontWeight: 600,
                 padding: '8px 20px',
                 transition: 'all 0.2s ease',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+                border: 'none',
               }}
               styles={{
                 root: {
                   '&:hover': {
-                    background: '#2535a0',
-                    transform: 'translateY(-1px)',
+                    background: '#3366E5',
                   },
                 },
               }}
@@ -166,7 +194,7 @@ export default function Header() {
           hiddenFrom="md"
           style={{
             background: 'rgba(255, 255, 255, 0.98)',
-            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+            borderTop: '1px solid #CCCCCC',
             padding: '20px 0',
           }}
         >
@@ -177,10 +205,11 @@ export default function Header() {
                 variant="subtle"
                 onClick={() => { navigate('/about'); setMobileMenuOpen(false); }}
                 style={{
-                  color: '#374151',
+                  color: '#333333',
                   fontWeight: 500,
                   justifyContent: 'flex-start',
                   height: '48px',
+                  fontFamily: 'Inter, sans-serif',
                 }}
                 fullWidth
               >
@@ -190,10 +219,11 @@ export default function Header() {
                 variant="subtle"
                 onClick={() => { navigate('/#pricing'); setMobileMenuOpen(false); }}
                 style={{
-                  color: '#374151',
+                  color: '#333333',
                   fontWeight: 500,
                   justifyContent: 'flex-start',
                   height: '48px',
+                  fontFamily: 'Inter, sans-serif',
                 }}
                 fullWidth
               >
@@ -203,10 +233,11 @@ export default function Header() {
                 variant="subtle"
                 onClick={() => { navigate('/#testimonials'); setMobileMenuOpen(false); }}
                 style={{
-                  color: '#374151',
+                  color: '#333333',
                   fontWeight: 500,
                   justifyContent: 'flex-start',
                   height: '48px',
+                  fontFamily: 'Inter, sans-serif',
                 }}
                 fullWidth
               >
@@ -219,10 +250,11 @@ export default function Header() {
                 target="_blank"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
-                  color: '#374151',
+                  color: '#333333',
                   fontWeight: 500,
                   justifyContent: 'flex-start',
                   height: '48px',
+                  fontFamily: 'Inter, sans-serif',
                 }}
                 fullWidth
               >
@@ -236,10 +268,11 @@ export default function Header() {
                 variant="outline"
                 onClick={() => { navigate('/auth/login'); setMobileMenuOpen(false); }}
                 style={{
-                  borderColor: '#3143B6',
-                  color: '#3143B6',
+                  borderColor: '#4686FE',
+                  color: '#4686FE',
                   fontWeight: 600,
                   height: '48px',
+                  fontFamily: 'Inter, sans-serif',
                 }}
                 fullWidth
               >
@@ -249,10 +282,12 @@ export default function Header() {
                 radius={8}
                 onClick={() => { navigate('/auth/register'); setMobileMenuOpen(false); }}
                 style={{
-                  background: '#3143B6',
+                  background: '#4686FE',
                   color: 'white',
                   fontWeight: 600,
                   height: '48px',
+                  fontFamily: 'Inter, sans-serif',
+                  border: 'none',
                 }}
                 fullWidth
               >
