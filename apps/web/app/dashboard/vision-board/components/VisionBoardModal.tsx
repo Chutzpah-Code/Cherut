@@ -125,20 +125,45 @@ export function VisionBoardModal({
   const currentImageUrl = newImageUrl || item.imageUrl;
 
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title={
-        <Text fw={600} size="lg">
-          Edit Vision Board Item
-        </Text>
-      }
-      size="xl"
-    >
-      <Stack gap="md">
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Modal
+        opened={opened}
+        onClose={onClose}
+        title={
+          <Text
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '20px',
+              fontWeight: 600,
+              color: '#000000',
+            }}
+          >
+            Edit Vision Board Item
+          </Text>
+        }
+        size="xl"
+        radius={16}
+        styles={{
+          content: {
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          },
+        }}
+      >
+        <Stack gap="lg">
         {/* Imagem Preview */}
         <Box>
-          <Text size="sm" fw={500} mb="xs">
+          <Text
+            mb="xs"
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#000000',
+            }}
+          >
             Image
           </Text>
           <Box
@@ -148,7 +173,8 @@ export function VisionBoardModal({
               paddingTop: '56.25%', // 16:9 aspect ratio
               borderRadius: 8,
               overflow: 'hidden',
-              backgroundColor: 'var(--mantine-color-gray-1)',
+              backgroundColor: '#F5F5F5',
+              border: '1px solid #CCCCCC',
             }}
           >
             <Image
@@ -174,11 +200,29 @@ export function VisionBoardModal({
             {(props) => (
               <Button
                 {...props}
-                variant="light"
-                leftSection={isUploadingImage ? <Loader size={16} /> : <Upload size={16} />}
+                variant="outline"
+                leftSection={isUploadingImage ? <Loader size={16} color="#4686FE" /> : <Upload size={16} />}
                 fullWidth
                 mt="sm"
                 disabled={isUploadingImage}
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  borderColor: '#CCCCCC',
+                  color: '#333333',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  height: '48px',
+                  background: 'white',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      borderColor: '#4686FE',
+                      color: '#4686FE',
+                    },
+                  },
+                }}
               >
                 {isUploadingImage ? 'Uploading...' : 'Replace Image'}
               </Button>
@@ -186,7 +230,20 @@ export function VisionBoardModal({
           </FileButton>
 
           {uploadError && (
-            <Alert icon={<AlertCircle size={16} />} color="red" mt="xs">
+            <Alert
+              icon={<AlertCircle size={16} />}
+              color="red"
+              mt="xs"
+              radius={16}
+              styles={{
+                root: {
+                  backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                },
+                title: { color: '#dc2626', fontWeight: 600, fontFamily: 'Inter, sans-serif' },
+                message: { color: '#dc2626', fontFamily: 'Inter, sans-serif' },
+              }}
+            >
               {uploadError}
             </Alert>
           )}
@@ -203,6 +260,32 @@ export function VisionBoardModal({
           }}
           required
           withAsterisk
+          size="md"
+          radius={8}
+          styles={{
+            label: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#000000',
+              fontWeight: 600,
+              marginBottom: 8,
+              fontSize: '14px',
+            },
+            input: {
+              fontFamily: 'Inter, sans-serif',
+              backgroundColor: 'white',
+              border: '1px solid #CCCCCC',
+              color: '#000000',
+              height: '48px',
+              fontSize: '16px',
+              '&::placeholder': {
+                color: '#999999',
+              },
+              '&:focus': {
+                borderColor: '#4686FE',
+                boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+              },
+            },
+          }}
         />
 
         <Textarea
@@ -212,6 +295,30 @@ export function VisionBoardModal({
           onChange={(e) => setDescription(e.target.value)}
           rows={2}
           maxLength={500}
+          radius={8}
+          styles={{
+            label: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#000000',
+              fontWeight: 600,
+              marginBottom: 8,
+              fontSize: '14px',
+            },
+            input: {
+              fontFamily: 'Inter, sans-serif',
+              backgroundColor: 'white',
+              border: '1px solid #CCCCCC',
+              color: '#000000',
+              fontSize: '16px',
+              '&::placeholder': {
+                color: '#999999',
+              },
+              '&:focus': {
+                borderColor: '#4686FE',
+                boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+              },
+            },
+          }}
         />
 
         <Textarea
@@ -221,6 +328,30 @@ export function VisionBoardModal({
           onChange={(e) => setFullDescription(e.target.value)}
           rows={4}
           maxLength={2000}
+          radius={8}
+          styles={{
+            label: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#000000',
+              fontWeight: 600,
+              marginBottom: 8,
+              fontSize: '14px',
+            },
+            input: {
+              fontFamily: 'Inter, sans-serif',
+              backgroundColor: 'white',
+              border: '1px solid #CCCCCC',
+              color: '#000000',
+              fontSize: '16px',
+              '&::placeholder': {
+                color: '#999999',
+              },
+              '&:focus': {
+                borderColor: '#4686FE',
+                boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+              },
+            },
+          }}
         />
 
         <DateInput
@@ -230,34 +361,132 @@ export function VisionBoardModal({
           value={dueDateValue}
           onChange={setDueDateValue}
           clearable
+          radius={8}
+          styles={{
+            label: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#000000',
+              fontWeight: 600,
+              marginBottom: 8,
+              fontSize: '14px',
+            },
+            input: {
+              fontFamily: 'Inter, sans-serif',
+              backgroundColor: 'white',
+              border: '1px solid #CCCCCC',
+              color: '#000000',
+              height: '48px',
+              fontSize: '16px',
+              '&::placeholder': {
+                color: '#999999',
+              },
+              '&:focus': {
+                borderColor: '#4686FE',
+                boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+              },
+            },
+            description: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#666666',
+              fontSize: '14px',
+            },
+          }}
         />
 
         {/* Save Error Alert */}
         {saveError && (
-          <Alert icon={<AlertCircle size={16} />} color="red" mt="xs">
+          <Alert
+            icon={<AlertCircle size={16} />}
+            color="red"
+            mt="xs"
+            radius={16}
+            styles={{
+              root: {
+                backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+              },
+              title: { color: '#dc2626', fontWeight: 600, fontFamily: 'Inter, sans-serif' },
+              message: { color: '#dc2626', fontFamily: 'Inter, sans-serif' },
+            }}
+          >
             {saveError}
           </Alert>
         )}
 
         {/* Action buttons */}
-        <Group justify="space-between" mt="md">
+        <Group justify="space-between" mt="lg">
           <Button
-            variant="light"
+            variant="outline"
             color="red"
             leftSection={<Trash2 size={16} />}
             onClick={() => onDelete(item.id)}
+            radius={8}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              borderColor: '#dc2626',
+              color: '#dc2626',
+              fontSize: '16px',
+              fontWeight: 600,
+              height: '48px',
+              background: 'white',
+            }}
+            styles={{
+              root: {
+                '&:hover': {
+                  backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                },
+              },
+            }}
           >
             Delete
           </Button>
 
           <Group>
-            <Button variant="light" onClick={onClose}>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                borderColor: '#CCCCCC',
+                color: '#333333',
+                fontSize: '16px',
+                fontWeight: 600,
+                height: '48px',
+                background: 'white',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    borderColor: '#4686FE',
+                    color: '#4686FE',
+                  },
+                },
+              }}
+            >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               loading={isSaving}
               disabled={!title.trim() || isUploadingImage}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                background: '#4686FE',
+                border: 'none',
+                fontSize: '16px',
+                fontWeight: 600,
+                color: 'white',
+                height: '48px',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    background: '#3366E5',
+                  },
+                },
+              }}
             >
               Save Changes
             </Button>
@@ -265,5 +494,6 @@ export function VisionBoardModal({
         </Group>
       </Stack>
     </Modal>
+    </>
   );
 }

@@ -13,13 +13,41 @@ export default function TasksPage() {
   const [currentFilter, setCurrentFilter] = useState<TaskFilterType>('active');
 
   return (
-    <Stack gap="lg" style={{ position: 'relative' }}>
+    <Stack
+      gap="xl"
+      style={{
+        position: 'relative',
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      }}
+    >
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+
       {/* Header */}
       <Box>
-        <Title order={1} size="h2" mb="xs">
+        <Title
+          order={1}
+          mb="xs"
+          style={{
+            fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontSize: '32px',
+            fontWeight: 700,
+            color: '#000000',
+            letterSpacing: '-0.02em',
+          }}
+        >
           Tasks
         </Title>
-        <Text c="dimmed" size="sm">
+        <Text
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '16px',
+            fontWeight: 400,
+            color: '#666666',
+            lineHeight: '24px',
+          }}
+        >
           Manage your tasks with drag & drop Kanban board, calendar and time tracking
         </Text>
       </Box>
@@ -35,11 +63,42 @@ export default function TasksPage() {
       )}
 
       {currentView === 'calendar' && (
-        <Alert icon={<CalendarIcon size={20} />} color="blue" variant="light">
-          <Text fw={600} mb="xs">
+        <Alert
+          icon={<CalendarIcon size={20} />}
+          radius={16}
+          style={{
+            backgroundColor: 'rgba(70, 134, 254, 0.08)',
+            border: '1px solid rgba(70, 134, 254, 0.2)',
+          }}
+          styles={{
+            icon: {
+              color: '#4686FE',
+            },
+            wrapper: {
+              alignItems: 'flex-start',
+            },
+          }}
+        >
+          <Text
+            mb="xs"
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '16px',
+              fontWeight: 600,
+              color: '#000000',
+            }}
+          >
             Calendar View - Coming Soon!
           </Text>
-          <Text size="sm">
+          <Text
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 400,
+              color: '#666666',
+              lineHeight: '20px',
+            }}
+          >
             View your tasks organized by due date in a calendar format. Track deadlines and plan your
             schedule effectively.
           </Text>
@@ -47,11 +106,42 @@ export default function TasksPage() {
       )}
 
       {currentView === 'timetracker' && (
-        <Alert icon={<Clock size={20} />} color="violet" variant="light">
-          <Text fw={600} mb="xs">
+        <Alert
+          icon={<Clock size={20} />}
+          radius={16}
+          style={{
+            backgroundColor: 'rgba(70, 134, 254, 0.08)',
+            border: '1px solid rgba(70, 134, 254, 0.2)',
+          }}
+          styles={{
+            icon: {
+              color: '#4686FE',
+            },
+            wrapper: {
+              alignItems: 'flex-start',
+            },
+          }}
+        >
+          <Text
+            mb="xs"
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '16px',
+              fontWeight: 600,
+              color: '#000000',
+            }}
+          >
             Time Tracker View - Coming Soon!
           </Text>
-          <Text size="sm">
+          <Text
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 400,
+              color: '#666666',
+              lineHeight: '20px',
+            }}
+          >
             View and analyze your time tracking data. See how much time you&apos;ve spent on each task and
             optimize your productivity.
           </Text>

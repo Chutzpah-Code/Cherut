@@ -372,12 +372,26 @@ export default function ObjectivesPage() {
     modals.openConfirmModal({
       title: 'Delete Objective',
       children: (
-        <Text size="sm">
+        <Text
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '14px',
+            fontWeight: 400,
+            color: '#666666',
+            lineHeight: '20px',
+          }}
+        >
           Are you sure you want to delete "<strong>{objective.title}</strong>"? This action cannot be undone.
         </Text>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
+      confirmProps: {
+        color: 'red',
+        style: {
+          fontFamily: 'Inter, sans-serif',
+          fontWeight: 600,
+        },
+      },
       onConfirm: async () => {
         try {
           await deleteMutation.mutateAsync(objective.id);
@@ -530,71 +544,216 @@ export default function ObjectivesPage() {
   if (isLoading) {
     return (
       <Center h={400}>
-        <Loader />
+        <Loader size="lg" color="#4686FE" />
       </Center>
     );
   }
 
   return (
-    <div>
-      <Stack mb="xl" gap="md">
-        <Group justify="space-between" align="flex-start" gap="md">
-          <div style={{ flex: 1 }}>
-            <Title order={1}>Objectives & Key Results</Title>
-            <Text c="dimmed" size="lg" mt="xs">
-              Define and track your strategic goals using the OKR methodology
-            </Text>
-          </div>
+    <div
+      style={{
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      }}
+    >
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Stack mb="xl" gap="xl">
+        {/* Header */}
+        <Box>
+          <Title
+            order={1}
+            mb="xs"
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '32px',
+              fontWeight: 700,
+              color: '#000000',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Objectives & Key Results
+          </Title>
+          <Text
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              fontWeight: 400,
+              color: '#666666',
+              lineHeight: '24px',
+            }}
+          >
+            Define and track your strategic goals using the OKR methodology
+          </Text>
+        </Box>
+
+        {/* Add Button */}
+        <Box>
           <Button
-            leftSection={<Plus size={16} />}
+            leftSection={<Plus size={20} />}
             onClick={handleCreateNew}
+            radius={8}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              background: '#4686FE',
+              border: 'none',
+              fontSize: '16px',
+              fontWeight: 600,
+              color: 'white',
+              height: '48px',
+              padding: '0 24px',
+            }}
+            styles={{
+              root: {
+                '&:hover': {
+                  background: '#3366E5',
+                },
+              },
+            }}
           >
             Create Objective
           </Button>
-        </Group>
+        </Box>
 
         <Group justify="space-between" align="center">
           <Group gap="sm">
             <Button
-              variant={viewFilter === 'active' ? 'filled' : 'light'}
+              variant={viewFilter === 'active' ? 'filled' : 'outline'}
               size="sm"
               onClick={() => setViewFilter('active')}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                borderColor: viewFilter === 'active' ? '#4686FE' : '#CCCCCC',
+                color: viewFilter === 'active' ? 'white' : '#333333',
+                background: viewFilter === 'active' ? '#4686FE' : 'white',
+                fontSize: '14px',
+                fontWeight: 600,
+                height: '36px',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    borderColor: '#4686FE',
+                    color: viewFilter === 'active' ? 'white' : '#4686FE',
+                    background: viewFilter === 'active' ? '#3366E5' : 'rgba(70, 134, 254, 0.08)',
+                  },
+                },
+              }}
             >
               Active
             </Button>
             <Button
-              variant={viewFilter === 'archived' ? 'filled' : 'light'}
+              variant={viewFilter === 'archived' ? 'filled' : 'outline'}
               size="sm"
               onClick={() => setViewFilter('archived')}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                borderColor: viewFilter === 'archived' ? '#4686FE' : '#CCCCCC',
+                color: viewFilter === 'archived' ? 'white' : '#333333',
+                background: viewFilter === 'archived' ? '#4686FE' : 'white',
+                fontSize: '14px',
+                fontWeight: 600,
+                height: '36px',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    borderColor: '#4686FE',
+                    color: viewFilter === 'archived' ? 'white' : '#4686FE',
+                    background: viewFilter === 'archived' ? '#3366E5' : 'rgba(70, 134, 254, 0.08)',
+                  },
+                },
+              }}
             >
               Archived
             </Button>
             <Button
-              variant={viewFilter === 'all' ? 'filled' : 'light'}
+              variant={viewFilter === 'all' ? 'filled' : 'outline'}
               size="sm"
               onClick={() => setViewFilter('all')}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                borderColor: viewFilter === 'all' ? '#4686FE' : '#CCCCCC',
+                color: viewFilter === 'all' ? 'white' : '#333333',
+                background: viewFilter === 'all' ? '#4686FE' : 'white',
+                fontSize: '14px',
+                fontWeight: 600,
+                height: '36px',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    borderColor: '#4686FE',
+                    color: viewFilter === 'all' ? 'white' : '#4686FE',
+                    background: viewFilter === 'all' ? '#3366E5' : 'rgba(70, 134, 254, 0.08)',
+                  },
+                },
+              }}
             >
               All
             </Button>
           </Group>
-          <Text size="sm" c="dimmed">
+          <Text
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 400,
+              color: '#666666',
+            }}
+          >
             {filteredObjectives?.length || 0} objective{(filteredObjectives?.length || 0) !== 1 ? 's' : ''}
           </Text>
         </Group>
       </Stack>
 
       {!filteredObjectives || filteredObjectives.length === 0 ? (
-        <Card p="xl" mt="lg">
+        <Card
+          padding="xl"
+          mt="lg"
+          radius={16}
+          style={{
+            background: '#F5F5F5',
+            border: '1px solid #CCCCCC',
+          }}
+        >
           <Center>
             <Stack align="center">
-              <ThemeIcon size={60} radius="xl" variant="light">
+              <ThemeIcon
+                size={60}
+                radius={16}
+                style={{
+                  background: '#F5F5F5',
+                  color: '#4686FE',
+                  border: '1px solid #CCCCCC',
+                }}
+              >
                 <Target size={30} />
               </ThemeIcon>
               <div style={{ textAlign: 'center' }}>
-                <Text size="xl" fw={500} mb="xs">
+                <Text
+                  mb="xs"
+                  style={{
+                    fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                    fontSize: '20px',
+                    fontWeight: 500,
+                    color: '#000000',
+                  }}
+                >
                   {viewFilter === 'archived' ? 'No archived objectives' : viewFilter === 'active' ? 'No active objectives' : 'No objectives yet'}
                 </Text>
-                <Text c="dimmed" mb="md">
+                <Text
+                  mb="md"
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '20px',
+                  }}
+                >
                   {viewFilter === 'archived'
                     ? 'No objectives have been archived yet'
                     : viewFilter === 'active'
@@ -603,7 +762,27 @@ export default function ObjectivesPage() {
                   }
                 </Text>
                 {viewFilter !== 'archived' && (
-                  <Button leftSection={<Plus size={16} />} onClick={handleCreateNew}>
+                  <Button
+                    leftSection={<Plus size={16} />}
+                    onClick={handleCreateNew}
+                    radius={8}
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      background: '#4686FE',
+                      border: 'none',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      color: 'white',
+                      height: '48px',
+                    }}
+                    styles={{
+                      root: {
+                        '&:hover': {
+                          background: '#3366E5',
+                        },
+                      },
+                    }}
+                  >
                     Create Your First Objective
                   </Button>
                 )}
@@ -612,23 +791,42 @@ export default function ObjectivesPage() {
           </Center>
         </Card>
       ) : (
-        <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 3 }} spacing={{ base: "md", md: "lg" }}>
+        <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 3 }} spacing="xl">
           {filteredObjectives.map((objective) => (
             <Card
               key={objective.id}
-              p="lg"
-              withBorder
+              padding="xl"
+              radius={16}
               style={{
                 opacity: objective.isArchived ? 0.7 : 1,
-                filter: objective.isArchived ? 'grayscale(0.3)' : 'none'
+                filter: objective.isArchived ? 'grayscale(0.3)' : 'none',
+                background: 'white',
+                border: '1px solid #CCCCCC',
+                transition: 'all 0.2s ease',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    borderColor: '#4686FE',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                  },
+                },
               }}
             >
-              <Stack gap="md">
+              <Stack gap="lg">
                 <Group justify="space-between" align="flex-start">
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <Stack gap="xs">
                       <Group gap="xs">
-                        <Text fw={600} size="lg" style={{ wordBreak: "break-word" }}>
+                        <Text
+                          style={{
+                            wordBreak: "break-word",
+                            fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                            fontSize: '18px',
+                            fontWeight: 600,
+                            color: '#000000',
+                          }}
+                        >
                           {objective.title}
                         </Text>
                         <Badge
@@ -650,7 +848,16 @@ export default function ObjectivesPage() {
                         )}
                       </Group>
                       {objective.description && (
-                        <Text size="sm" c="dimmed" style={{ wordBreak: "break-word" }}>
+                        <Text
+                          style={{
+                            wordBreak: "break-word",
+                            fontFamily: 'Inter, sans-serif',
+                            fontSize: '14px',
+                            fontWeight: 400,
+                            color: '#666666',
+                            lineHeight: '20px',
+                          }}
+                        >
                           {objective.description}
                         </Text>
                       )}
@@ -702,20 +909,41 @@ export default function ObjectivesPage() {
 
                 <Box>
                   <Group justify="space-between" align="center" mb="xs">
-                    <Text size="sm" fw={500}>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        color: '#333333',
+                      }}
+                    >
                       Progress
                     </Text>
-                    <Text size="sm" fw={500}>
+                    <Text
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        color: '#333333',
+                      }}
+                    >
                       {objective.progress}%
                     </Text>
                   </Group>
-                  <Progress value={objective.progress} size="sm" radius="xl" />
+                  <Progress value={objective.progress} size="sm" radius={8} color="#4686FE" />
                 </Box>
 
                 {objective.keyResults && objective.keyResults.length > 0 && (
                   <div>
                     <Group justify="space-between" align="center" mb="xs">
-                      <Text size="sm" fw={500}>
+                      <Text
+                        style={{
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          color: '#333333',
+                        }}
+                      >
                         Key Results ({objective.keyResults.length})
                       </Text>
                       {objective.keyResults.length > 3 && (
@@ -739,15 +967,38 @@ export default function ObjectivesPage() {
                         ? objective.keyResults
                         : objective.keyResults.slice(0, 3)
                       ).map((kr) => (
-                        <Paper key={kr.id} p="xs" withBorder>
+                        <Paper
+                          key={kr.id}
+                          p="sm"
+                          radius={8}
+                          style={{
+                            border: '1px solid #CCCCCC',
+                            background: '#F5F5F5',
+                          }}
+                        >
                           <Group justify="space-between" align="center">
                             <Box style={{ flex: 1 }}>
-                              <Text size="xs" fw={500} lineClamp={1}>
+                              <Text
+                                lineClamp={1}
+                                style={{
+                                  fontFamily: 'Inter, sans-serif',
+                                  fontSize: '12px',
+                                  fontWeight: 500,
+                                  color: '#000000',
+                                }}
+                              >
                                 {kr.title}
                               </Text>
                               <Group gap="xs" mt={4}>
-                                <TrendingUp size={12} />
-                                <Text size="xs" c="dimmed">
+                                <TrendingUp size={12} color="#4686FE" />
+                                <Text
+                                  style={{
+                                    fontFamily: 'Inter, sans-serif',
+                                    fontSize: '12px',
+                                    fontWeight: 400,
+                                    color: '#666666',
+                                  }}
+                                >
                                   Progress: {kr.currentValue || 0}/{kr.targetValue || 0} {kr.unit || ''} ({(kr.completionPercentage || 0).toFixed(0)}%)
                                 </Text>
                               </Group>
@@ -764,7 +1015,15 @@ export default function ObjectivesPage() {
                         </Paper>
                       ))}
                       {!expandedObjectives.has(objective.id) && objective.keyResults.length > 3 && (
-                        <Text size="xs" c="dimmed" ta="center">
+                        <Text
+                          ta="center"
+                          style={{
+                            fontFamily: 'Inter, sans-serif',
+                            fontSize: '12px',
+                            fontWeight: 400,
+                            color: '#666666',
+                          }}
+                        >
                           +{objective.keyResults.length - 3} more
                         </Text>
                       )}
@@ -780,10 +1039,25 @@ export default function ObjectivesPage() {
       <Modal
         opened={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingObjective ? 'Edit Objective' : 'Create New Objective'}
+        title={
+          <Text
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '20px',
+              fontWeight: 600,
+              color: '#000000',
+            }}
+          >
+            {editingObjective ? 'Edit Objective' : 'Create New Objective'}
+          </Text>
+        }
         size="lg"
+        radius={16}
         scrollAreaComponent={ScrollArea.Autosize}
         styles={{
+          content: {
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          },
           body: {
             maxHeight: 'calc(100vh - 120px)',
             overflowY: 'auto',
@@ -791,13 +1065,39 @@ export default function ObjectivesPage() {
         }}
       >
         <form onSubmit={handleSubmit}>
-          <Stack>
+          <Stack gap="lg">
             <TextInput
               label="Title"
               placeholder="Enter objective title"
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              size="md"
+              radius={8}
+              styles={{
+                label: {
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#000000',
+                  fontWeight: 600,
+                  marginBottom: 8,
+                  fontSize: '14px',
+                },
+                input: {
+                  fontFamily: 'Inter, sans-serif',
+                  backgroundColor: 'white',
+                  border: '1px solid #CCCCCC',
+                  color: '#000000',
+                  height: '48px',
+                  fontSize: '16px',
+                  '&::placeholder': {
+                    color: '#999999',
+                  },
+                  '&:focus': {
+                    borderColor: '#4686FE',
+                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  },
+                },
+              }}
             />
 
             <Textarea
@@ -806,6 +1106,30 @@ export default function ObjectivesPage() {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
+              radius={8}
+              styles={{
+                label: {
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#000000',
+                  fontWeight: 600,
+                  marginBottom: 8,
+                  fontSize: '14px',
+                },
+                input: {
+                  fontFamily: 'Inter, sans-serif',
+                  backgroundColor: 'white',
+                  border: '1px solid #CCCCCC',
+                  color: '#000000',
+                  fontSize: '16px',
+                  '&::placeholder': {
+                    color: '#999999',
+                  },
+                  '&:focus': {
+                    borderColor: '#4686FE',
+                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  },
+                },
+              }}
             />
 
             <Select
@@ -815,6 +1139,32 @@ export default function ObjectivesPage() {
               data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
               value={formData.lifeAreaId}
               onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
+              size="md"
+              radius={8}
+              styles={{
+                label: {
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#000000',
+                  fontWeight: 600,
+                  marginBottom: 8,
+                  fontSize: '14px',
+                },
+                input: {
+                  fontFamily: 'Inter, sans-serif',
+                  backgroundColor: 'white',
+                  border: '1px solid #CCCCCC',
+                  color: '#000000',
+                  height: '48px',
+                  fontSize: '16px',
+                  '&::placeholder': {
+                    color: '#999999',
+                  },
+                  '&:focus': {
+                    borderColor: '#4686FE',
+                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  },
+                },
+              }}
             />
 
             <Stack gap="sm">
@@ -844,8 +1194,37 @@ export default function ObjectivesPage() {
 
             <div>
               <Group justify="space-between" align="center" mb="md">
-                <Text fw={500}>Key Results</Text>
-                <Button variant="light" size="compact-sm" onClick={addKeyResult}>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 500,
+                    color: '#000000',
+                  }}
+                >
+                  Key Results
+                </Text>
+                <Button
+                  variant="outline"
+                  size="compact-sm"
+                  onClick={addKeyResult}
+                  radius={6}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    borderColor: '#4686FE',
+                    color: '#4686FE',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    background: 'white',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        backgroundColor: 'rgba(70, 134, 254, 0.08)',
+                      },
+                    },
+                  }}
+                >
                   <Plus size={14} />
                 </Button>
               </Group>
@@ -965,19 +1344,46 @@ export default function ObjectivesPage() {
                 ))}
 
                 {keyResults.length === 0 && (
-                  <Text size="sm" c="dimmed" ta="center" py="md">
+                  <Text
+                    ta="center"
+                    py="md"
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      color: '#666666',
+                    }}
+                  >
                     No key results added yet. Click the + button to add some.
                   </Text>
                 )}
               </Stack>
             </div>
 
-            <Grid justify="flex-end" align="center" mt="md">
+            <Grid justify="flex-end" align="center" mt="lg">
               <Grid.Col span={{ base: 6, sm: 'content' }}>
                 <Button
-                  variant="light"
+                  variant="outline"
                   onClick={() => setIsModalOpen(false)}
                   fullWidth
+                  radius={8}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    borderColor: '#CCCCCC',
+                    color: '#333333',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    height: '48px',
+                    background: 'white',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        borderColor: '#4686FE',
+                        color: '#4686FE',
+                      },
+                    },
+                  }}
                 >
                   Cancel
                 </Button>
@@ -987,6 +1393,23 @@ export default function ObjectivesPage() {
                   type="submit"
                   loading={createMutation.isPending || updateMutation.isPending}
                   fullWidth
+                  radius={8}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    background: '#4686FE',
+                    border: 'none',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: 'white',
+                    height: '48px',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        background: '#3366E5',
+                      },
+                    },
+                  }}
                 >
                   {editingObjective ? 'Update' : 'Create'} Objective
                 </Button>

@@ -33,29 +33,37 @@ export function VisionBoardCard({ item, onClick }: VisionBoardCardProps) {
   };
 
   return (
-    <Card
-      shadow="sm"
-      padding={0}
-      radius="md"
-      withBorder
-      onClick={onClick}
-      style={{
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        overflow: 'hidden',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px)';
-        e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '';
-      }}
-    >
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Card
+        shadow="none"
+        padding={0}
+        radius={16}
+        onClick={onClick}
+        style={{
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          overflow: 'hidden',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          border: '1px solid #CCCCCC',
+          background: 'white',
+          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.borderColor = '#4686FE';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.borderColor = '#CCCCCC';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+      >
       {/* Imagem */}
       <Box style={{ position: 'relative', paddingTop: '75%', overflow: 'hidden' }}>
         <Image
@@ -86,17 +94,37 @@ export function VisionBoardCard({ item, onClick }: VisionBoardCardProps) {
       </Box>
 
       {/* Conteúdo */}
-      <Box p="md" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Text fw={600} size="lg" lineClamp={2} mb="xs">
+      <Box p="lg" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Text
+          lineClamp={2}
+          mb="xs"
+          style={{
+            fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontSize: '18px',
+            fontWeight: 600,
+            color: '#000000',
+            lineHeight: '24px',
+          }}
+        >
           {item.title}
         </Text>
 
         {item.description && (
-          <Text size="sm" c="dimmed" lineClamp={2}>
+          <Text
+            lineClamp={2}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 400,
+              color: '#666666',
+              lineHeight: '20px',
+            }}
+          >
             {item.description}
           </Text>
         )}
       </Box>
     </Card>
+    </>
   );
 }

@@ -132,20 +132,45 @@ export function CreateVisionBoardModal({
   };
 
   return (
-    <Modal
-      opened={opened}
-      onClose={handleClose}
-      title={
-        <Text fw={600} size="lg">
-          Add to Vision Board
-        </Text>
-      }
-      size="lg"
-    >
-      <Stack gap="md">
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      <Modal
+        opened={opened}
+        onClose={handleClose}
+        title={
+          <Text
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '20px',
+              fontWeight: 600,
+              color: '#000000',
+            }}
+          >
+            Add to Vision Board
+          </Text>
+        }
+        size="lg"
+        radius={16}
+        styles={{
+          content: {
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          },
+        }}
+      >
+        <Stack gap="lg">
         {/* Upload de Imagem */}
         <Box>
-          <Text size="sm" fw={500} mb="xs">
+          <Text
+            mb="xs"
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#000000',
+            }}
+          >
             Image <Text component="span" c="red">*</Text>
           </Text>
 
@@ -159,39 +184,61 @@ export function CreateVisionBoardModal({
                 <Box
                   {...props}
                   style={{
-                    border: '2px dashed var(--mantine-color-gray-4)',
+                    border: '2px dashed #CCCCCC',
                     borderRadius: 8,
                     padding: '40px 20px',
                     textAlign: 'center',
                     cursor: isUploadingImage ? 'not-allowed' : 'pointer',
-                    backgroundColor: 'var(--mantine-color-gray-0)',
+                    backgroundColor: '#F5F5F5',
                     transition: 'all 0.2s',
                   }}
                   onMouseEnter={(e) => {
                     if (!isUploadingImage) {
-                      e.currentTarget.style.borderColor = 'var(--mantine-color-blue-6)';
-                      e.currentTarget.style.backgroundColor = 'var(--mantine-color-blue-0)';
+                      e.currentTarget.style.borderColor = '#4686FE';
+                      e.currentTarget.style.backgroundColor = 'rgba(70, 134, 254, 0.08)';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--mantine-color-gray-4)';
-                    e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-0)';
+                    e.currentTarget.style.borderColor = '#CCCCCC';
+                    e.currentTarget.style.backgroundColor = '#F5F5F5';
                   }}
                 >
                   {isUploadingImage ? (
                     <>
-                      <Loader size="lg" />
-                      <Text size="sm" c="dimmed" mt="md">
+                      <Loader size="lg" color="#4686FE" />
+                      <Text
+                        mt="md"
+                        style={{
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          color: '#666666',
+                        }}
+                      >
                         Uploading image...
                       </Text>
                     </>
                   ) : (
                     <>
-                      <ImageIcon size={48} strokeWidth={1.5} color="var(--mantine-color-gray-6)" />
-                      <Text size="sm" fw={500} mt="md">
+                      <ImageIcon size={48} strokeWidth={1.5} color="#999999" />
+                      <Text
+                        mt="md"
+                        style={{
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          color: '#000000',
+                        }}
+                      >
                         Click to upload image
                       </Text>
-                      <Text size="xs" c="dimmed" mt="xs">
+                      <Text
+                        mt="xs"
+                        style={{
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '12px',
+                          color: '#666666',
+                        }}
+                      >
                         PNG, JPG, JPEG, WEBP (max 1MB)
                       </Text>
                     </>
@@ -232,11 +279,29 @@ export function CreateVisionBoardModal({
                 {(props) => (
                   <Button
                     {...props}
-                    variant="light"
+                    variant="outline"
                     leftSection={<Upload size={16} />}
                     fullWidth
                     mt="sm"
                     disabled={isUploadingImage}
+                    radius={8}
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      borderColor: '#CCCCCC',
+                      color: '#333333',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      height: '48px',
+                      background: 'white',
+                    }}
+                    styles={{
+                      root: {
+                        '&:hover': {
+                          borderColor: '#4686FE',
+                          color: '#4686FE',
+                        },
+                      },
+                    }}
                   >
                     Change Image
                   </Button>
@@ -246,7 +311,20 @@ export function CreateVisionBoardModal({
           )}
 
           {uploadError && (
-            <Alert icon={<AlertCircle size={16} />} color="red" mt="xs">
+            <Alert
+              icon={<AlertCircle size={16} />}
+              color="red"
+              mt="xs"
+              radius={16}
+              styles={{
+                root: {
+                  backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                },
+                title: { color: '#dc2626', fontWeight: 600, fontFamily: 'Inter, sans-serif' },
+                message: { color: '#dc2626', fontFamily: 'Inter, sans-serif' },
+              }}
+            >
               {uploadError}
             </Alert>
           )}
@@ -264,6 +342,32 @@ export function CreateVisionBoardModal({
           required
           withAsterisk
           maxLength={100}
+          size="md"
+          radius={8}
+          styles={{
+            label: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#000000',
+              fontWeight: 600,
+              marginBottom: 8,
+              fontSize: '14px',
+            },
+            input: {
+              fontFamily: 'Inter, sans-serif',
+              backgroundColor: 'white',
+              border: '1px solid #CCCCCC',
+              color: '#000000',
+              height: '48px',
+              fontSize: '16px',
+              '&::placeholder': {
+                color: '#999999',
+              },
+              '&:focus': {
+                borderColor: '#4686FE',
+                boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+              },
+            },
+          }}
         />
 
         <Textarea
@@ -273,6 +377,30 @@ export function CreateVisionBoardModal({
           onChange={(e) => setDescription(e.target.value)}
           rows={2}
           maxLength={500}
+          radius={8}
+          styles={{
+            label: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#000000',
+              fontWeight: 600,
+              marginBottom: 8,
+              fontSize: '14px',
+            },
+            input: {
+              fontFamily: 'Inter, sans-serif',
+              backgroundColor: 'white',
+              border: '1px solid #CCCCCC',
+              color: '#000000',
+              fontSize: '16px',
+              '&::placeholder': {
+                color: '#999999',
+              },
+              '&:focus': {
+                borderColor: '#4686FE',
+                boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+              },
+            },
+          }}
         />
 
         <Textarea
@@ -282,6 +410,30 @@ export function CreateVisionBoardModal({
           onChange={(e) => setFullDescription(e.target.value)}
           rows={4}
           maxLength={2000}
+          radius={8}
+          styles={{
+            label: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#000000',
+              fontWeight: 600,
+              marginBottom: 8,
+              fontSize: '14px',
+            },
+            input: {
+              fontFamily: 'Inter, sans-serif',
+              backgroundColor: 'white',
+              border: '1px solid #CCCCCC',
+              color: '#000000',
+              fontSize: '16px',
+              '&::placeholder': {
+                color: '#999999',
+              },
+              '&:focus': {
+                borderColor: '#4686FE',
+                boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+              },
+            },
+          }}
         />
 
         <DateInput
@@ -292,29 +444,111 @@ export function CreateVisionBoardModal({
           onChange={setDueDateValue}
           clearable
           minDate={new Date()}
+          radius={8}
+          styles={{
+            label: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#000000',
+              fontWeight: 600,
+              marginBottom: 8,
+              fontSize: '14px',
+            },
+            input: {
+              fontFamily: 'Inter, sans-serif',
+              backgroundColor: 'white',
+              border: '1px solid #CCCCCC',
+              color: '#000000',
+              height: '48px',
+              fontSize: '16px',
+              '&::placeholder': {
+                color: '#999999',
+              },
+              '&:focus': {
+                borderColor: '#4686FE',
+                boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+              },
+            },
+            description: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#666666',
+              fontSize: '14px',
+            },
+          }}
         />
 
         {/* Create Error Alert */}
         {createError && (
-          <Alert icon={<AlertCircle size={16} />} color="red" mt="xs">
+          <Alert
+            icon={<AlertCircle size={16} />}
+            color="red"
+            mt="xs"
+            radius={16}
+            styles={{
+              root: {
+                backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+              },
+              title: { color: '#dc2626', fontWeight: 600, fontFamily: 'Inter, sans-serif' },
+              message: { color: '#dc2626', fontFamily: 'Inter, sans-serif' },
+            }}
+          >
             {createError}
           </Alert>
         )}
 
         {/* Action buttons */}
-        <Group justify="flex-end" mt="md">
-          <Button variant="light" onClick={handleClose}>
+        <Group justify="flex-end" mt="lg">
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            radius={8}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              borderColor: '#CCCCCC',
+              color: '#333333',
+              fontSize: '16px',
+              fontWeight: 600,
+              height: '48px',
+              background: 'white',
+            }}
+            styles={{
+              root: {
+                '&:hover': {
+                  borderColor: '#4686FE',
+                  color: '#4686FE',
+                },
+              },
+            }}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleCreate}
             loading={isCreating}
             disabled={!title.trim() || !imageUrl || isUploadingImage}
+            radius={8}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              background: '#4686FE',
+              border: 'none',
+              fontSize: '16px',
+              fontWeight: 600,
+              color: 'white',
+              height: '48px',
+            }}
+            styles={{
+              root: {
+                '&:hover': {
+                  background: '#3366E5',
+                },
+              },
+            }}
           >
             Add to Vision Board
           </Button>
         </Group>
       </Stack>
     </Modal>
+    </>
   );
 }

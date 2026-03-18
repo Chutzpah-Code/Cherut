@@ -16,6 +16,7 @@ import {
   ThemeIcon,
   Loader,
   Center,
+  Box,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
@@ -114,9 +115,27 @@ export default function ValuesPage() {
   const handleDelete = (id: string) => {
     modals.openConfirmModal({
       title: 'Delete Value',
-      children: <Text size="sm">Are you sure you want to delete this value? This action cannot be undone.</Text>,
+      children: (
+        <Text
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '14px',
+            fontWeight: 400,
+            color: '#666666',
+            lineHeight: '20px',
+          }}
+        >
+          Are you sure you want to delete this value? This action cannot be undone.
+        </Text>
+      ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
+      confirmProps: {
+        color: 'red',
+        style: {
+          fontFamily: 'Inter, sans-serif',
+          fontWeight: 600,
+        },
+      },
       onConfirm: async () => {
         try {
           await deleteMutation.mutateAsync(id);
@@ -147,9 +166,27 @@ export default function ValuesPage() {
     if (formData.title.trim() && !editingValue) {
       modals.openConfirmModal({
         title: 'Discard Changes',
-        children: <Text size="sm">You have unsaved changes. Are you sure you want to cancel?</Text>,
+        children: (
+          <Text
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 400,
+              color: '#666666',
+              lineHeight: '20px',
+            }}
+          >
+            You have unsaved changes. Are you sure you want to cancel?
+          </Text>
+        ),
         labels: { confirm: 'Discard', cancel: 'Keep Editing' },
-        confirmProps: { color: 'red' },
+        confirmProps: {
+          color: 'red',
+          style: {
+            fontFamily: 'Inter, sans-serif',
+            fontWeight: 600,
+          },
+        },
         onConfirm: () => {
           setIsModalOpen(false);
           setEditingValue(null);
@@ -166,72 +203,219 @@ export default function ValuesPage() {
   if (isLoading) {
     return (
       <Center h={300}>
-        <Loader size="lg" />
+        <Loader size="lg" color="#4686FE" />
       </Center>
     );
   }
 
   return (
-    <Stack gap="lg">
-      <Stack gap="md">
-        <div>
-          <Title order={1} size="h2" mb="xs">Values</Title>
-          <Text c="dimmed" size="sm">Define and align with your core personal values</Text>
-        </div>
-        <Group justify="flex-end">
-          <Button
-            leftSection={<Plus size={20} />}
-            onClick={handleNew}
-            fullWidth
-          >
-            New Value
-          </Button>
-        </Group>
-      </Stack>
+    <Stack
+      gap="xl"
+      style={{
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      }}
+    >
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+      `}</style>
+      {/* Header */}
+      <Box>
+        <Title
+          order={1}
+          mb="xs"
+          style={{
+            fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontSize: '32px',
+            fontWeight: 700,
+            color: '#000000',
+            letterSpacing: '-0.02em',
+          }}
+        >
+          Values
+        </Title>
+        <Text
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '16px',
+            fontWeight: 400,
+            color: '#666666',
+            lineHeight: '24px',
+          }}
+        >
+          Define and align with your core personal values
+        </Text>
+      </Box>
+
+      {/* Add Button */}
+      <Box>
+        <Button
+          leftSection={<Plus size={20} />}
+          onClick={handleNew}
+          radius={8}
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            background: '#4686FE',
+            border: 'none',
+            fontSize: '16px',
+            fontWeight: 600,
+            color: 'white',
+            height: '48px',
+            padding: '0 24px',
+          }}
+          styles={{
+            root: {
+              '&:hover': {
+                background: '#3366E5',
+              },
+            },
+          }}
+        >
+          New Value
+        </Button>
+      </Box>
 
       {/* Values Grid */}
-      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="xl">
         {values?.map((value) => {
           const IconComponent = getIconForValue(value.title);
           return (
-          <Card key={value.id} shadow="sm" padding="lg" withBorder>
-            <Group mb="md" wrap="nowrap">
-              <ThemeIcon size="xl" radius="md" color="blue" variant="light">
+          <Card
+            key={value.id}
+            shadow="none"
+            padding="xl"
+            radius={16}
+            style={{
+              background: 'white',
+              border: '1px solid #CCCCCC',
+              transition: 'all 0.2s ease',
+            }}
+            styles={{
+              root: {
+                '&:hover': {
+                  borderColor: '#4686FE',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                },
+              },
+            }}
+          >
+            <Group mb="lg" wrap="nowrap">
+              <ThemeIcon
+                size={48}
+                radius={12}
+                style={{
+                  background: '#F5F5F5',
+                  color: '#4686FE',
+                  border: 'none',
+                }}
+              >
                 <IconComponent size={24} />
               </ThemeIcon>
               <div style={{ flex: 1 }}>
-                <Text fw={600} size="lg">{value.title}</Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                    fontSize: '20px',
+                    fontWeight: 600,
+                    color: '#000000',
+                    marginBottom: '4px',
+                  }}
+                >
+                  {value.title}
+                </Text>
                 {value.shortDescription && (
-                  <Text size="sm" c="dimmed" lineClamp={2}>{value.shortDescription}</Text>
+                  <Text
+                    lineClamp={2}
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      color: '#666666',
+                      lineHeight: '20px',
+                    }}
+                  >
+                    {value.shortDescription}
+                  </Text>
                 )}
               </div>
             </Group>
 
             {value.behaviors && (
               <div style={{ marginBottom: '16px' }}>
-                <Text size="sm" fw={500} mb="xs">Reinforcing Behaviors:</Text>
-                <Text size="sm" c="dimmed" lineClamp={3}>
+                <Text
+                  mb="xs"
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    color: '#333333',
+                  }}
+                >
+                  Reinforcing Behaviors:
+                </Text>
+                <Text
+                  lineClamp={3}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: '#666666',
+                    lineHeight: '20px',
+                  }}
+                >
                   {value.behaviors}
                 </Text>
               </div>
             )}
 
-            <Stack gap="xs" mt="md" pt="md" style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
-              <Group gap="xs" grow>
+            <Stack gap="sm" mt="lg" pt="lg" style={{ borderTop: '1px solid #CCCCCC' }}>
+              <Group gap="sm" grow>
                 <Button
-                  variant="light"
+                  variant="outline"
                   leftSection={<Edit2 size={16} />}
                   onClick={() => handleEdit(value)}
-                  size="sm"
+                  radius={8}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    borderColor: '#CCCCCC',
+                    color: '#333333',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    height: '40px',
+                    background: 'white',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        borderColor: '#4686FE',
+                        color: '#4686FE',
+                      },
+                    },
+                  }}
                 >
                   Edit
                 </Button>
                 <Button
-                  variant="light"
+                  variant="outline"
                   color="red"
                   leftSection={<Trash2 size={16} />}
                   onClick={() => handleDelete(value.id)}
-                  size="sm"
+                  radius={8}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    borderColor: '#dc2626',
+                    color: '#dc2626',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    height: '40px',
+                    background: 'white',
+                  }}
+                  styles={{
+                    root: {
+                      '&:hover': {
+                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                      },
+                    },
+                  }}
                 >
                   Delete
                 </Button>
@@ -243,13 +427,59 @@ export default function ValuesPage() {
       </SimpleGrid>
 
       {values?.length === 0 && (
-        <Card shadow="sm" padding="xl" withBorder>
-          <Stack align="center" gap="md">
-            <Text c="dimmed">No values defined yet</Text>
-            <Text size="sm" c="dimmed" ta="center">
+        <Card
+          shadow="none"
+          padding="xl"
+          radius={16}
+          style={{
+            background: '#F5F5F5',
+            border: '1px solid #CCCCCC',
+          }}
+        >
+          <Stack align="center" gap="lg">
+            <Text
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+                fontWeight: 500,
+                color: '#666666',
+              }}
+            >
+              No values defined yet
+            </Text>
+            <Text
+              ta="center"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 400,
+                color: '#666666',
+                lineHeight: '20px',
+              }}
+            >
               Start defining your core values to guide your decisions and actions
             </Text>
-            <Button variant="light" onClick={handleNew}>
+            <Button
+              variant="outline"
+              onClick={handleNew}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                borderColor: '#4686FE',
+                color: '#4686FE',
+                fontSize: '16px',
+                fontWeight: 600,
+                height: '48px',
+                background: 'white',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    backgroundColor: 'rgba(70, 134, 254, 0.08)',
+                  },
+                },
+              }}
+            >
               Create your first value
             </Button>
           </Stack>
@@ -260,12 +490,29 @@ export default function ValuesPage() {
       <Modal
         opened={isModalOpen}
         onClose={handleCancel}
-        title={editingValue ? 'Edit Value' : 'New Value'}
+        title={
+          <Text
+            style={{
+              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: '20px',
+              fontWeight: 600,
+              color: '#000000',
+            }}
+          >
+            {editingValue ? 'Edit Value' : 'New Value'}
+          </Text>
+        }
         size="md"
         fullScreen={false}
+        radius={16}
+        styles={{
+          content: {
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          },
+        }}
       >
         <form onSubmit={handleSubmit}>
-          <Stack gap="md">
+          <Stack gap="lg">
             <TextInput
               label="Title"
               placeholder="e.g., Honesty, Growth, Family"
@@ -274,6 +521,36 @@ export default function ValuesPage() {
               required
               withAsterisk
               error={!formData.title.trim() && formData.title !== '' ? 'Title is required' : null}
+              size="md"
+              radius={8}
+              styles={{
+                label: {
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#000000',
+                  fontWeight: 600,
+                  marginBottom: 8,
+                  fontSize: '14px',
+                },
+                input: {
+                  fontFamily: 'Inter, sans-serif',
+                  backgroundColor: 'white',
+                  border: '1px solid #CCCCCC',
+                  color: '#000000',
+                  height: '48px',
+                  fontSize: '16px',
+                  '&::placeholder': {
+                    color: '#999999',
+                  },
+                  '&:focus': {
+                    borderColor: '#4686FE',
+                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  },
+                },
+                error: {
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#dc2626',
+                },
+              }}
             />
 
             <TextInput
@@ -281,6 +558,32 @@ export default function ValuesPage() {
               placeholder="Brief description of this value..."
               value={formData.shortDescription}
               onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+              size="md"
+              radius={8}
+              styles={{
+                label: {
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#000000',
+                  fontWeight: 600,
+                  marginBottom: 8,
+                  fontSize: '14px',
+                },
+                input: {
+                  fontFamily: 'Inter, sans-serif',
+                  backgroundColor: 'white',
+                  border: '1px solid #CCCCCC',
+                  color: '#000000',
+                  height: '48px',
+                  fontSize: '16px',
+                  '&::placeholder': {
+                    color: '#999999',
+                  },
+                  '&:focus': {
+                    borderColor: '#4686FE',
+                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  },
+                },
+              }}
             />
 
             <Textarea
@@ -291,18 +594,77 @@ export default function ValuesPage() {
               rows={4}
               autosize
               maxRows={8}
+              radius={8}
+              styles={{
+                label: {
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#000000',
+                  fontWeight: 600,
+                  marginBottom: 8,
+                  fontSize: '14px',
+                },
+                input: {
+                  fontFamily: 'Inter, sans-serif',
+                  backgroundColor: 'white',
+                  border: '1px solid #CCCCCC',
+                  color: '#000000',
+                  fontSize: '16px',
+                  '&::placeholder': {
+                    color: '#999999',
+                  },
+                  '&:focus': {
+                    borderColor: '#4686FE',
+                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  },
+                },
+              }}
             />
 
-            <Group justify="flex-end" mt="md">
+            <Group justify="flex-end" mt="lg">
               <Button
-                variant="light"
+                variant="outline"
                 onClick={handleCancel}
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  borderColor: '#CCCCCC',
+                  color: '#333333',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  height: '48px',
+                  background: 'white',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      borderColor: '#4686FE',
+                      color: '#4686FE',
+                    },
+                  },
+                }}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 loading={createMutation.isPending || updateMutation.isPending}
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  background: '#4686FE',
+                  border: 'none',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: 'white',
+                  height: '48px',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      background: '#3366E5',
+                    },
+                  },
+                }}
               >
                 {editingValue ? 'Update' : 'Create'}
               </Button>
