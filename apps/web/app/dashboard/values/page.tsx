@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Heart, Star, Shield, Compass, Lightbulb, Target, Zap, Gem, Crown } from 'lucide-react';
+import { Plus, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import {
   Title,
   Text,
@@ -13,29 +13,18 @@ import {
   Modal,
   TextInput,
   Textarea,
-  ThemeIcon,
   Loader,
   Center,
   Box,
+  ActionIcon,
+  Menu,
+  Transition,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { useValues, useCreateValue, useUpdateValue, useDeleteValue } from '@/hooks/useValues';
 import { CreateValueDto, Value } from '@/lib/api/services/values';
 
-const valueIcons = [Heart, Star, Shield, Compass, Lightbulb, Target, Zap, Gem, Crown];
-
-const getIconForValue = (title: string) => {
-  // Simple hash function to consistently assign icons based on title
-  let hash = 0;
-  for (let i = 0; i < title.length; i++) {
-    const char = title.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
-  }
-  const index = Math.abs(hash) % valueIcons.length;
-  return valueIcons[index];
-};
 
 export default function ValuesPage() {
   const { data: values, isLoading } = useValues();
@@ -45,11 +34,46 @@ export default function ValuesPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingValue, setEditingValue] = useState<Value | null>(null);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set());
+  const [expandedBehaviors, setExpandedBehaviors] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState<CreateValueDto>({
     title: '',
     shortDescription: '',
     behaviors: '',
   });
+
+  // Helper function to truncate text by character count
+  const truncateText = (text: string, limit: number) => {
+    if (text.length <= limit) return { text, isTruncated: false };
+    return { text: text.substring(0, limit), isTruncated: true };
+  };
+
+  // Toggle expanded state for descriptions
+  const toggleDescription = (valueId: string) => {
+    setExpandedDescriptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(valueId)) {
+        newSet.delete(valueId);
+      } else {
+        newSet.add(valueId);
+      }
+      return newSet;
+    });
+  };
+
+  // Toggle expanded state for behaviors
+  const toggleBehaviors = (valueId: string) => {
+    setExpandedBehaviors(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(valueId)) {
+        newSet.delete(valueId);
+      } else {
+        newSet.add(valueId);
+      }
+      return newSet;
+    });
+  };
 
   const resetForm = () => {
     setFormData({
@@ -276,18 +300,19 @@ export default function ValuesPage() {
 
       {/* Values Grid */}
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="xl">
-        {values?.map((value) => {
-          const IconComponent = getIconForValue(value.title);
-          return (
+        {values?.map((value) => (
           <Card
             key={value.id}
             shadow="none"
             padding="xl"
             radius={16}
+            onMouseEnter={() => setHoveredCard(value.id)}
+            onMouseLeave={() => setHoveredCard(null)}
             style={{
               background: 'white',
-              border: '1px solid #CCCCCC',
+              border: '1px solid #E5E7EB',
               transition: 'all 0.2s ease',
+              position: 'relative',
             }}
             styles={{
               root: {
@@ -298,132 +323,183 @@ export default function ValuesPage() {
               },
             }}
           >
-            <Group mb="lg" wrap="nowrap">
-              <ThemeIcon
-                size={48}
-                radius={12}
-                style={{
-                  background: '#F5F5F5',
-                  color: '#4686FE',
-                  border: 'none',
-                }}
-              >
-                <IconComponent size={24} />
-              </ThemeIcon>
+            <Group mb="lg" wrap="nowrap" justify="space-between" align="flex-start">
               <div style={{ flex: 1 }}>
                 <Text
                   style={{
                     fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                    fontSize: '20px',
+                    fontSize: '18px',
                     fontWeight: 600,
-                    color: '#000000',
-                    marginBottom: '4px',
+                    color: '#111827',
+                    marginBottom: '6px',
+                    lineHeight: '24px',
                   }}
                 >
                   {value.title}
                 </Text>
-                {value.shortDescription && (
-                  <Text
-                    lineClamp={2}
+                {value.shortDescription && (() => {
+                  const isExpanded = expandedDescriptions.has(value.id);
+                  const { text: truncatedText, isTruncated } = truncateText(value.shortDescription, 120);
+                  const displayText = isExpanded ? value.shortDescription : truncatedText;
+
+                  return (
+                    <div>
+                      <Text
+                        style={{
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 400,
+                          color: '#6B7280',
+                          lineHeight: '20px',
+                        }}
+                      >
+                        {displayText}{!isExpanded && isTruncated && '...'}
+                      </Text>
+                      {isTruncated && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleDescription(value.id);
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#4686FE',
+                            fontSize: '13px',
+                            fontWeight: 500,
+                            cursor: 'pointer',
+                            padding: 0,
+                            marginTop: '4px',
+                            textDecoration: 'none',
+                            fontFamily: 'Inter, sans-serif',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.textDecoration = 'underline';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.textDecoration = 'none';
+                          }}
+                        >
+                          {isExpanded ? 'Show less' : 'Show more'}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+
+              <Menu shadow="md" width={140} position="bottom-end">
+                <Menu.Target>
+                  <ActionIcon
+                    variant="subtle"
+                    color="gray"
+                    size={32}
+                    radius={8}
+                    style={{
+                      color: hoveredCard === value.id ? '#4B5563' : '#D1D5DB',
+                      transition: 'color 0.15s ease',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <MoreVertical size={16} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    leftSection={<Edit2 size={14} />}
+                    onClick={() => handleEdit(value)}
                     style={{
                       fontFamily: 'Inter, sans-serif',
                       fontSize: '14px',
-                      fontWeight: 400,
-                      color: '#666666',
-                      lineHeight: '20px',
+                      fontWeight: 500,
                     }}
                   >
-                    {value.shortDescription}
-                  </Text>
-                )}
-              </div>
+                    Edit
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<Trash2 size={14} />}
+                    color="red"
+                    onClick={() => handleDelete(value.id)}
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Delete
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
             </Group>
 
             {value.behaviors && (
-              <div style={{ marginBottom: '16px' }}>
+              <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #E5E7EB' }}>
                 <Text
-                  mb="xs"
+                  mb="sm"
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     fontWeight: 500,
-                    color: '#333333',
+                    color: '#4B5563',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
                   }}
                 >
-                  Reinforcing Behaviors:
+                  Reinforcing Behaviors
                 </Text>
-                <Text
-                  lineClamp={3}
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 400,
-                    color: '#666666',
-                    lineHeight: '20px',
-                  }}
-                >
-                  {value.behaviors}
-                </Text>
+                {(() => {
+                  const isExpanded = expandedBehaviors.has(value.id);
+                  const { text: truncatedText, isTruncated } = truncateText(value.behaviors, 200);
+                  const displayText = isExpanded ? value.behaviors : truncatedText;
+
+                  return (
+                    <div>
+                      <Text
+                        style={{
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 400,
+                          color: '#6B7280',
+                          lineHeight: '20px',
+                        }}
+                      >
+                        {displayText}{!isExpanded && isTruncated && '...'}
+                      </Text>
+                      {isTruncated && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleBehaviors(value.id);
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#4686FE',
+                            fontSize: '13px',
+                            fontWeight: 500,
+                            cursor: 'pointer',
+                            padding: 0,
+                            marginTop: '6px',
+                            textDecoration: 'none',
+                            fontFamily: 'Inter, sans-serif',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.textDecoration = 'underline';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.textDecoration = 'none';
+                          }}
+                        >
+                          {isExpanded ? 'Show less' : 'Show more'}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             )}
-
-            <Stack gap="sm" mt="lg" pt="lg" style={{ borderTop: '1px solid #CCCCCC' }}>
-              <Group gap="sm" grow>
-                <Button
-                  variant="outline"
-                  leftSection={<Edit2 size={16} />}
-                  onClick={() => handleEdit(value)}
-                  radius={8}
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    borderColor: '#CCCCCC',
-                    color: '#333333',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    height: '40px',
-                    background: 'white',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        borderColor: '#4686FE',
-                        color: '#4686FE',
-                      },
-                    },
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  color="red"
-                  leftSection={<Trash2 size={16} />}
-                  onClick={() => handleDelete(value.id)}
-                  radius={8}
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    borderColor: '#dc2626',
-                    color: '#dc2626',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    height: '40px',
-                    background: 'white',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                      },
-                    },
-                  }}
-                >
-                  Delete
-                </Button>
-              </Group>
-            </Stack>
           </Card>
-        );
-      })}
+        ))}
       </SimpleGrid>
 
       {values?.length === 0 && (
@@ -432,8 +508,8 @@ export default function ValuesPage() {
           padding="xl"
           radius={16}
           style={{
-            background: '#F5F5F5',
-            border: '1px solid #CCCCCC',
+            background: '#F9FAFB',
+            border: '1px solid #E5E7EB',
           }}
         >
           <Stack align="center" gap="lg">
@@ -442,7 +518,7 @@ export default function ValuesPage() {
                 fontFamily: 'Inter, sans-serif',
                 fontSize: '16px',
                 fontWeight: 500,
-                color: '#666666',
+                color: '#6B7280',
               }}
             >
               No values defined yet
@@ -453,7 +529,7 @@ export default function ValuesPage() {
                 fontFamily: 'Inter, sans-serif',
                 fontSize: '14px',
                 fontWeight: 400,
-                color: '#666666',
+                color: '#6B7280',
                 lineHeight: '20px',
               }}
             >
