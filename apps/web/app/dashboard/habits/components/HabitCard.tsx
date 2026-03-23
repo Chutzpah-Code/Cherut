@@ -1,16 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Card, Group, Stack, Text, ActionIcon, Badge, Box, ScrollArea } from '@mantine/core';
-import { Edit2, Flame } from 'lucide-react';
+import { Card, Group, Stack, Text, ActionIcon, Badge, Box, ScrollArea, Menu } from '@mantine/core';
+import { Edit2, Flame, MoreVertical, ArchiveRestore, Eye } from 'lucide-react';
 import { Habit, HabitLog } from '@/lib/api/services/habits';
-import { StreakVisualizer } from './StreakVisualizer';
+import { HabitSummary } from './HabitSummary';
 
 interface HabitCardProps {
   habit: Habit;
   logs: HabitLog[];
   onEdit: (habit: Habit) => void;
   onDayClick: (habitId: string, date: string) => void;
+  isArchived?: boolean;
+  onUnarchive?: (habit: Habit) => void;
 }
 
 function calculateCurrentStreak(logs: HabitLog[]): number {
@@ -43,7 +45,7 @@ function calculateCurrentStreak(logs: HabitLog[]): number {
   return streak;
 }
 
-export function HabitCard({ habit, logs, onEdit, onDayClick }: HabitCardProps) {
+export function HabitCard({ habit, logs, onEdit, onDayClick, isArchived = false, onUnarchive }: HabitCardProps) {
   const currentStreak = calculateCurrentStreak(logs);
 
   return (
@@ -52,14 +54,16 @@ export function HabitCard({ habit, logs, onEdit, onDayClick }: HabitCardProps) {
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
       <Card
-        shadow="sm"
-        padding="md"
+        padding={24}
         withBorder
-        radius={12}
+        radius={24}
+        style={{
+          background: '#FBFBFB',
+          border: '1px solid rgba(0,0,0,0.06)',
+          transition: 'all 0.2s ease',
+        }}
         styles={{
           root: {
-            border: '1px solid #E2E8F0',
-            transition: 'all 0.2s ease',
             '&:hover': {
               borderColor: '#4686FE',
               boxShadow: '0 4px 12px rgba(70, 134, 254, 0.15)',
@@ -73,33 +77,43 @@ export function HabitCard({ habit, logs, onEdit, onDayClick }: HabitCardProps) {
           <Box style={{ flex: 1, minWidth: 0 }}>
             <Group gap="sm" wrap="wrap">
               <Text
-                fw={600}
-                size="lg"
                 style={{
                   fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                   fontSize: '18px',
-                  fontWeight: 600,
+                  fontWeight: 500,
                   color: '#000000',
                 }}
               >
                 {habit.title}
               </Text>
+              {isArchived && (
+                <Badge
+                  radius={40}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    backgroundColor: '#4686FE',
+                    color: 'white',
+                    padding: '4px 8px',
+                    border: 'none',
+                  }}
+                >
+                  Archived
+                </Badge>
+              )}
               {currentStreak > 0 && (
                 <Badge
-                  size="lg"
-                  variant="light"
-                  color={habit.category === 'good' ? 'green' : 'red'}
                   leftSection={<Flame size={14} />}
-                  radius={8}
-                  styles={{
-                    root: {
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      backgroundColor: habit.category === 'good' ? '#DCFCE7' : '#FEE2E2',
-                      color: habit.category === 'good' ? '#22C55E' : '#EF4444',
-                      border: `1px solid ${habit.category === 'good' ? '#22C55E' : '#EF4444'}`,
-                    },
+                  radius={40}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    backgroundColor: '#FFBE0D',
+                    color: '#000',
+                    padding: '4px 12px',
+                    border: 'none',
                   }}
                 >
                   {currentStreak} {currentStreak === 1 ? 'day' : 'days'}
@@ -109,8 +123,6 @@ export function HabitCard({ habit, logs, onEdit, onDayClick }: HabitCardProps) {
 
             {habit.description && (
               <Text
-                size="sm"
-                c="dimmed"
                 lineClamp={2}
                 mt="xs"
                 style={{
@@ -118,6 +130,7 @@ export function HabitCard({ habit, logs, onEdit, onDayClick }: HabitCardProps) {
                   fontSize: '14px',
                   fontWeight: 400,
                   color: '#666666',
+                  lineHeight: '20px',
                 }}
               >
                 {habit.description}
@@ -125,40 +138,74 @@ export function HabitCard({ habit, logs, onEdit, onDayClick }: HabitCardProps) {
             )}
           </Box>
 
-          {/* Edit button - always visible on top right */}
-          <ActionIcon
-            variant="subtle"
-            color="gray"
-            size="lg"
-            onClick={() => onEdit(habit)}
-            style={{ flexShrink: 0 }}
-            styles={{
-              root: {
-                color: '#666666',
-                '&:hover': {
-                  backgroundColor: '#F1F5F9',
-                  color: '#4686FE',
+          {/* Edit button or Menu for archived items */}
+          {isArchived ? (
+            <Menu shadow="md" width={200} position="bottom-end">
+              <Menu.Target>
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  size="lg"
+                  style={{ flexShrink: 0 }}
+                  styles={{
+                    root: {
+                      color: '#666666',
+                      '&:hover': {
+                        backgroundColor: '#F1F5F9',
+                        color: '#4686FE',
+                      },
+                    },
+                  }}
+                >
+                  <MoreVertical size={20} />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<Eye size={16} />}
+                  onClick={() => onEdit(habit)}
+                >
+                  View Details
+                </Menu.Item>
+                {onUnarchive && (
+                  <Menu.Item
+                    leftSection={<ArchiveRestore size={16} />}
+                    onClick={() => onUnarchive(habit)}
+                  >
+                    Unarchive
+                  </Menu.Item>
+                )}
+              </Menu.Dropdown>
+            </Menu>
+          ) : (
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              size="lg"
+              onClick={() => onEdit(habit)}
+              style={{ flexShrink: 0 }}
+              styles={{
+                root: {
+                  color: '#666666',
+                  '&:hover': {
+                    backgroundColor: '#F1F5F9',
+                    color: '#4686FE',
+                  },
                 },
-              },
-            }}
-          >
-            <Edit2 size={20} />
-          </ActionIcon>
+              }}
+            >
+              <Edit2 size={20} />
+            </ActionIcon>
+          )}
         </Group>
 
-        {/* Streak visualizer - full width with scroll */}
-        <ScrollArea type="auto" scrollbarSize={6}>
-          <StreakVisualizer
-            habitId={habit.id}
-            category={habit.category}
-            logs={logs}
-            onDayClick={(date) => onDayClick(habit.id, date)}
-            compact={true}
-            habitStartDate={habit.startDate}
-            habitCreatedAt={habit.createdAt}
-            habitDueDate={habit.dueDate}
-          />
-        </ScrollArea>
+        {/* Habit summary - clean progress overview */}
+        <HabitSummary
+          logs={logs}
+          habitStartDate={habit.startDate}
+          habitCreatedAt={habit.createdAt}
+          habitDueDate={habit.dueDate}
+        />
       </Stack>
       </Card>
     </React.Fragment>

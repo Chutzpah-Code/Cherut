@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Box, Loader, Center, Group, Button, Modal, TextInput, Stack, Select, Text } from '@mantine/core';
 import { Plus } from 'lucide-react';
 import {
@@ -10,10 +10,13 @@ import {
   DragStartEvent,
   DragOverlay,
   PointerSensor,
+  TouchSensor,
+  KeyboardSensor,
   useSensor,
   useSensors,
-  closestCorners
+  closestCenter
 } from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { arrayMove } from '@dnd-kit/sortable';
 import {
   useKanbanBoard,
@@ -35,7 +38,6 @@ import { KanbanCard } from './KanbanCard';
 import { TaskModal } from './TaskModal';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { TaskFilter, TaskFilter as TaskFilterType } from './TaskFilter';
-import { ArchivedTasksGrid } from './ArchivedTasksGrid';
 
 interface KanbanViewProps {
   currentFilter: TaskFilterType;
@@ -43,7 +45,7 @@ interface KanbanViewProps {
 }
 
 export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
-  const { data: kanban, isLoading: kanbanLoading } = useKanbanBoard(undefined, currentFilter === 'all');
+  const { data: kanban, isLoading: kanbanLoading } = useKanbanBoard(undefined, false);
   const { data: archivedTasks, isLoading: archivedLoading } = useArchivedTasks();
   const { data: taskCounts } = useTaskCounts();
 
@@ -69,27 +71,40 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
     priority: 'medium',
   });
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 1, // Ultra-sensitive for instant response
       },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 50, // Minimal delay for ultra-responsive touch
+        tolerance: 3, // Reduced tolerance for precision
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id as string);
-  };
+  }, []);
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    const { over } = event;
+    setOverId(over?.id as string || null);
+  }, []);
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
     setActiveId(null);
+    setOverId(null);
     const { active, over } = event;
 
-    console.log('Drag End:', { activeId: active.id, overId: over?.id });
-
     if (!over) {
-      console.log('No drop target detected');
       return;
     }
 
@@ -102,7 +117,6 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
       || kanban?.done.find(t => t.id === taskId);
 
     if (!activeTask) {
-      console.log('Active task not found');
       return;
     }
 
@@ -113,7 +127,6 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
     // Check if overId is a column
     if (['todo', 'in_progress', 'done'].includes(overId)) {
       targetStatus = overId as 'todo' | 'in_progress' | 'done';
-      console.log('Dropped on column:', targetStatus);
     } else {
       // overId is a task, find which column that task belongs to
       overTask = kanban?.todo.find(t => t.id === overId)
@@ -122,20 +135,34 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
 
       if (overTask) {
         targetStatus = overTask.status;
-        console.log('Dropped on task in column:', targetStatus);
       }
     }
 
     if (!targetStatus) {
-      console.log('Could not determine target status');
       return;
     }
 
     // If moving to a different column
     if (targetStatus !== activeTask.status) {
-      console.log('Moving task from', activeTask.status, 'to', targetStatus);
       const targetColumnTasks = kanban?.[targetStatus] || [];
-      const newOrder = overTask ? overTask.order : (targetColumnTasks.length > 0 ? Math.max(...targetColumnTasks.map(t => t.order)) + 1 : 0);
+
+      let newOrder: number;
+
+      if (overTask) {
+        // Dropped on a specific task - insert before it
+        const overTaskIndex = targetColumnTasks.findIndex(t => t.id === overId);
+        if (overTaskIndex === 0) {
+          // Insert at the beginning
+          newOrder = Math.max(0, overTask.order - 1);
+        } else {
+          // Insert between tasks
+          const beforeTask = targetColumnTasks[overTaskIndex - 1];
+          newOrder = (beforeTask.order + overTask.order) / 2;
+        }
+      } else {
+        // Dropped on column - add to the end
+        newOrder = targetColumnTasks.length > 0 ? Math.max(...targetColumnTasks.map(t => t.order)) + 1 : 0;
+      }
 
       updateOrderMutation.mutate({
         id: taskId,
@@ -147,52 +174,74 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
     }
     // If reordering within the same column
     else if (taskId !== overId && overTask) {
-      console.log('Reordering within same column');
       const currentColumnTasks = kanban?.[targetStatus] || [];
       const oldIndex = currentColumnTasks.findIndex(t => t.id === taskId);
       const newIndex = currentColumnTasks.findIndex(t => t.id === overId);
 
       if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-        console.log('Moving from index', oldIndex, 'to', newIndex);
 
-        // Reorder the array locally
-        const reorderedTasks = arrayMove(currentColumnTasks, oldIndex, newIndex);
+        // Calculate new order based on position relative to overTask
+        let newOrder: number;
 
-        // Update ALL tasks in the column with new order values
-        // This ensures proper ordering when the data reloads
-        reorderedTasks.forEach((task, index) => {
-          // Update each task's order in the backend
-          updateOrderMutation.mutate({
-            id: task.id,
-            dto: {
-              newStatus: targetStatus,
-              newOrder: index,
-            },
-          });
+        if (newIndex === 0) {
+          // Moving to the top
+          newOrder = Math.max(0, overTask.order - 1);
+        } else if (newIndex === currentColumnTasks.length - 1) {
+          // Moving to the bottom
+          newOrder = overTask.order + 1;
+        } else {
+          // Moving between tasks - calculate order between adjacent tasks
+          const beforeTask = currentColumnTasks[newIndex - (oldIndex < newIndex ? 0 : 1)];
+          const afterTask = currentColumnTasks[newIndex + (oldIndex < newIndex ? 1 : 0)];
+          newOrder = (beforeTask.order + afterTask.order) / 2;
+        }
+
+        // Single optimistic update call
+        updateOrderMutation.mutate({
+          id: taskId,
+          dto: {
+            newStatus: targetStatus,
+            newOrder: newOrder,
+          },
         });
       }
-    } else {
-      console.log('No change needed');
     }
-  };
+  }, [kanban, updateOrderMutation]);
 
-  const handleTaskClick = (task: Task) => {
+  const handleTaskClick = useCallback((task: Task) => {
     setSelectedTask(task);
     setModalOpened(true);
-  };
+  }, []);
 
-  const handleSaveTask = (id: string, updates: UpdateTaskDto) => {
+  const handleSaveTask = useCallback((id: string, updates: UpdateTaskDto) => {
     updateMutation.mutate({ id, dto: updates });
     setModalOpened(false);
-  };
+  }, [updateMutation]);
 
-  const handleDeleteTask = (id: string) => {
+  const handleDeleteTask = useCallback((id: string) => {
     deleteMutation.mutate(id);
-  };
+  }, [deleteMutation]);
 
-  const handleDeleteTaskFromGrid = (task: Task) => {
-    deleteMutation.mutate(task.id);
-  };
+  const handleToggleComplete = useCallback((taskId: string) => {
+    // Find the task in kanban data directly to avoid dependency on lists
+    const task = kanban?.todo.find(t => t.id === taskId)
+      || kanban?.in_progress.find(t => t.id === taskId)
+      || kanban?.done.find(t => t.id === taskId);
+
+    if (!task) return;
+
+    // Toggle between done and todo
+    const newStatus = task.status === 'done' ? 'todo' : 'done';
+
+    updateOrderMutation.mutate({
+      id: taskId,
+      dto: {
+        newStatus: newStatus,
+        newOrder: task.order, // Keep same order
+      },
+    });
+  }, [kanban, updateOrderMutation]);
+
 
   const handleArchiveTask = (id: string) => {
     archiveMutation.mutate(id);
@@ -225,6 +274,37 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
     setCreateModalOpened(false);
   };
 
+  // Organize archived tasks by status if on archived filter - Memoized for performance
+  const archivedTasksByStatus = useMemo(() => {
+    if (currentFilter !== 'archived' || !archivedTasks) return null;
+    return {
+      todo: archivedTasks.filter(task => task.status === 'todo'),
+      in_progress: archivedTasks.filter(task => task.status === 'in_progress'),
+      done: archivedTasks.filter(task => task.status === 'done'),
+    };
+  }, [currentFilter, archivedTasks]);
+
+  const lists = useMemo(() => {
+    if (currentFilter === 'archived' && archivedTasksByStatus) {
+      return [
+        { id: 'todo', title: 'To Do', color: 'gray', tasks: archivedTasksByStatus.todo },
+        { id: 'in_progress', title: 'In Progress', color: 'blue', tasks: archivedTasksByStatus.in_progress },
+        { id: 'done', title: 'Done', color: 'green', tasks: archivedTasksByStatus.done },
+      ];
+    }
+    return [
+      { id: 'todo', title: 'To Do', color: 'gray', tasks: kanban?.todo || [] },
+      { id: 'in_progress', title: 'In Progress', color: 'blue', tasks: kanban?.in_progress || [] },
+      { id: 'done', title: 'Done', color: 'green', tasks: kanban?.done || [] },
+    ];
+  }, [currentFilter, archivedTasksByStatus, kanban]);
+
+  // Find the active task for DragOverlay - Memoized for performance
+  const activeTask = useMemo(() => {
+    if (!activeId) return null;
+    return lists.flatMap(list => list.tasks).find(t => t.id === activeId) || null;
+  }, [activeId, lists]);
+
   if (isLoading) {
     return (
       <Center h={400}>
@@ -232,19 +312,6 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
       </Center>
     );
   }
-
-  const lists = [
-    { id: 'todo', title: 'To Do', color: 'gray', tasks: kanban?.todo || [] },
-    { id: 'in_progress', title: 'In Progress', color: 'blue', tasks: kanban?.in_progress || [] },
-    { id: 'done', title: 'Done', color: 'green', tasks: kanban?.done || [] },
-  ];
-
-  // Find the active task for DragOverlay
-  const activeTask = activeId
-    ? kanban?.todo.find(t => t.id === activeId) ||
-      kanban?.in_progress.find(t => t.id === activeId) ||
-      kanban?.done.find(t => t.id === activeId)
-    : null;
 
   return (
     <Box
@@ -263,55 +330,50 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
         taskCounts={taskCounts}
       />
 
-      {/* Conditional Content Based on Filter */}
-      {currentFilter === 'archived' ? (
-        <ArchivedTasksGrid
-          tasks={archivedTasks || []}
-          onUnarchive={handleUnarchiveTask}
-          onDelete={handleDeleteTaskFromGrid}
-          onView={handleTaskClick}
-        />
-      ) : (
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          collisionDetection={closestCorners}
+      {/* Kanban Layout - same for all filters */}
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+        collisionDetection={closestCenter}
+      >
+        <Box
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '16px',
+            paddingBottom: '24px', // Reduced padding
+            // Removed minHeight to prevent page scroll
+          }}
         >
-          <Box
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '16px',
-              paddingBottom: '80px',
-              minHeight: '600px',
-            }}
-          >
-            {lists.map((list) => (
-              <Box key={list.id}>
-                <KanbanList
-                  id={list.id}
-                  title={list.title}
-                  color={list.color}
-                  tasks={list.tasks}
-                  onTaskClick={handleTaskClick}
-                  onAddTask={(status) => {
-                    setNewTaskStatus(status);
-                    setCreateModalOpened(true);
-                  }}
-                />
-              </Box>
-            ))}
-          </Box>
+          {lists.map((list) => (
+            <Box key={list.id}>
+              <KanbanList
+                id={list.id}
+                title={list.title}
+                color={list.color}
+                tasks={list.tasks}
+                onTaskClick={handleTaskClick}
+                onAddTask={currentFilter === 'archived' ? undefined : (status) => {
+                  setNewTaskStatus(status);
+                  setCreateModalOpened(true);
+                }}
+                activeId={activeId}
+                overId={overId}
+                onToggleComplete={handleToggleComplete}
+              />
+            </Box>
+          ))}
+        </Box>
 
-          {/* DragOverlay - Renders the dragged item on top of everything */}
-          <DragOverlay dropAnimation={null}>
-            {activeTask ? (
-              <KanbanCard task={activeTask} onClick={() => {}} />
-            ) : null}
-          </DragOverlay>
-        </DndContext>
-      )}
+        {/* DragOverlay - Renders the dragged item on top of everything */}
+        <DragOverlay dropAnimation={null}>
+          {activeTask ? (
+            <KanbanCard task={activeTask} onClick={() => {}} />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
 
       {/* Task Detail Modal */}
       <TaskModal

@@ -54,22 +54,18 @@ export function StreakVisualizer({
     const isToday = date === today;
 
     if (completed) {
-      // Verde para hábitos bons, vermelho para ruins
-      return category === 'good' ? '#40C057' : '#FA5252';
+      return '#4686FE';
     }
 
     if (isPast) {
-      // Cinza escuro para dias passados não completados
-      return '#868E96';
+      return '#6D6D6D';
     }
 
     if (isToday) {
-      // Cinza claro para hoje (ainda não completado)
-      return '#ADB5BD';
+      return '#CCCCCC';
     }
 
-    // Futuro - muito claro
-    return '#E9ECEF';
+    return '#EEEEEE';
   };
 
   return (
@@ -101,11 +97,11 @@ export function StreakVisualizer({
                 justifyContent: 'center',
                 fontSize: compact ? '9px' : '11px',
                 fontWeight: 600,
-                color: completed ? '#fff' : '#868E96',
+                color: completed ? '#fff' : '#6D6D6D',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'scale(1.1)';
-                e.currentTarget.style.borderColor = '#228BE6';
+                e.currentTarget.style.borderColor = '#4686FE';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';

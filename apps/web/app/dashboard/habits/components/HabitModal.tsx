@@ -5,7 +5,7 @@ import { Modal, Stack, TextInput, Textarea, Button, Group, Divider, Text, Box, S
 import { DateInput } from '@mantine/dates';
 import { Habit, HabitLog } from '@/lib/api/services/habits';
 import { StreakVisualizer } from './StreakVisualizer';
-import { Trash2, Archive } from 'lucide-react';
+import { Trash2, Archive, ArchiveRestore } from 'lucide-react';
 
 interface HabitModalProps {
   opened: boolean;
@@ -149,30 +149,26 @@ export function HabitModal({
         title={
           <Group gap="sm">
             <Text
-              fw={600}
-              size="lg"
               style={{
-                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: '24px',
-                fontWeight: 600,
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '26px',
+                fontWeight: 500,
+                letterSpacing: '-0.78px',
                 color: '#000000',
               }}
             >
               Edit Habit
             </Text>
             <Badge
-              color={categoryColor}
-              variant="light"
-              radius={8}
-              styles={{
-                root: {
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  backgroundColor: categoryColor === 'green' ? '#DCFCE7' : '#FEE2E2',
-                  color: categoryColor === 'green' ? '#22C55E' : '#EF4444',
-                  border: `1px solid ${categoryColor === 'green' ? '#22C55E' : '#EF4444'}`,
-                },
+              radius={40}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '11px',
+                fontWeight: 600,
+                backgroundColor: '#4686FE',
+                color: 'white',
+                padding: '4px 8px',
+                border: 'none',
               }}
             >
               {categoryLabel}
@@ -342,7 +338,7 @@ export function HabitModal({
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <Button
                 variant="outline"
-                leftSection={<Archive size={16} />}
+                leftSection={habit.isActive === false ? <ArchiveRestore size={16} /> : <Archive size={16} />}
                 onClick={() => onArchive(habit.id)}
                 fullWidth
                 radius={8}
@@ -363,7 +359,7 @@ export function HabitModal({
                   },
                 }}
               >
-                Archive Habit
+                {habit.isActive === false ? 'Restore Habit' : 'Archive Habit'}
               </Button>
             </Grid.Col>
             <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -398,24 +394,23 @@ export function HabitModal({
           <Grid justify="flex-end">
             <Grid.Col span={{ base: 6, sm: 'content' }}>
               <Button
-                variant="outline"
                 onClick={onClose}
                 fullWidth
-                radius={8}
+                radius={40}
                 style={{
                   fontFamily: 'Inter, sans-serif',
-                  borderColor: '#CCCCCC',
-                  color: '#333333',
-                  fontSize: '16px',
-                  fontWeight: 600,
+                  background: '#000',
+                  color: 'white',
+                  padding: '12px 28px',
+                  fontSize: '15px',
+                  fontWeight: 500,
                   height: '48px',
-                  background: 'white',
+                  border: 'none',
                 }}
                 styles={{
                   root: {
                     '&:hover': {
-                      borderColor: '#4686FE',
-                      color: '#4686FE',
+                      background: '#1e1e1e',
                     },
                   },
                 }}
@@ -428,20 +423,23 @@ export function HabitModal({
                 onClick={handleSave}
                 loading={isSaving}
                 fullWidth
-                radius={8}
+                radius={40}
                 style={{
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '16px',
-                  fontWeight: 600,
+                  fontWeight: 500,
                   height: '48px',
-                  backgroundColor: categoryColor === 'green' ? '#22C55E' : '#EF4444',
+                  padding: '12px 24px',
+                  background: 'linear-gradient(135deg, #659BFF 0%, #4686FE 100%)',
                   border: 'none',
                   color: 'white',
+                  boxShadow: 'rgba(0,0,0,0.15) 0px 4px 8px 0px',
                 }}
                 styles={{
                   root: {
                     '&:hover': {
-                      backgroundColor: categoryColor === 'green' ? '#16A34A' : '#DC2626',
+                      opacity: 0.9,
+                      transform: 'translateY(-1px)',
                     },
                   },
                 }}

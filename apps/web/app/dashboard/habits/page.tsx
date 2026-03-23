@@ -28,7 +28,7 @@ import { CreateHabitDto, Habit } from '@/lib/api/services/habits';
 import { HabitCard } from './components/HabitCard';
 import { HabitModal } from './components/HabitModal';
 import { HabitsFilter, HabitsFilterType } from './components/HabitsFilter';
-import { ArchivedHabitsGrid } from './components/ArchivedHabitsGrid';
+import { HabitColumn } from './components/HabitColumn';
 import { habitsApi } from '@/lib/api/services/habits';
 
 export default function HabitsPage() {
@@ -79,6 +79,15 @@ export default function HabitsPage() {
   const badHabits = useMemo(() => {
     return habits?.filter((h) => h.category === 'bad') || [];
   }, [habits]);
+
+  // Separar hábitos arquivados por categoria (para visualização arquivada)
+  const goodArchivedHabits = useMemo(() => {
+    return archivedHabits?.filter((h) => h.category === 'good') || [];
+  }, [archivedHabits]);
+
+  const badArchivedHabits = useMemo(() => {
+    return archivedHabits?.filter((h) => h.category === 'bad') || [];
+  }, [archivedHabits]);
 
   // Carregar logs de um hábito
   const loadHabitLogs = async (habitId: string) => {
@@ -281,25 +290,24 @@ export default function HabitsPage() {
         <Box>
           <Title
             order={1}
-            size="h2"
             mb="xs"
             style={{
               fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               fontSize: '32px',
               fontWeight: 700,
               color: '#000000',
+              letterSpacing: '-0.02em',
             }}
           >
             Habit Tracker
           </Title>
           <Text
-            c="dimmed"
-            size="sm"
             style={{
               fontFamily: 'Inter, sans-serif',
               fontSize: '16px',
               fontWeight: 400,
               color: '#666666',
+              lineHeight: '24px',
             }}
           >
             Track your daily habits and build consistency
@@ -313,185 +321,79 @@ export default function HabitsPage() {
         habitCounts={habitCounts}
       />
 
-      {/* Conditional Content Based on Filter */}
-      {currentFilter === 'archived' ? (
-        <ArchivedHabitsGrid
-          habits={archivedHabits || []}
-          onUnarchive={handleUnarchive}
-          onDelete={handlePermanentDelete}
-          onView={handleEdit}
-        />
-      ) : (
-        <>
-          {/* Section: Good Habits */}
-          <Box>
-        <Group justify="space-between" mb="md">
-          <Title
-            order={2}
-            size="h3"
-            c="green"
-            style={{
-              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '24px',
-              fontWeight: 600,
-              color: '#22C55E',
-            }}
-          >
-            Good Habits to Start
-          </Title>
-          <Button
-            leftSection={<Plus size={20} />}
-            onClick={() => handleOpenCreateModal('good')}
-            color="green"
-            radius={8}
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '14px',
-              fontWeight: 600,
-              height: '40px',
-              backgroundColor: '#22C55E',
-              border: 'none',
-            }}
-            styles={{
-              root: {
-                '&:hover': {
-                  backgroundColor: '#16A34A',
-                },
-              },
-            }}
-          >
-            Add Good Habit
-          </Button>
-        </Group>
+      {/* Kanban Layout for both Active and Archived */}
+      <Box
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gap: '24px',
+          width: '100%',
+        }}
+      >
+        {currentFilter === 'archived' ? (
+          <>
+            {/* Archived Good Habits Column */}
+            <HabitColumn
+              title="Archived Good Habits"
+              habits={goodArchivedHabits}
+              habitLogs={habitLogs}
+              onAddHabit={() => {}}
+              onEdit={handleEdit}
+              onDayClick={handleDayClick}
+              onUnarchive={handleUnarchive}
+              isArchived={true}
+              addButtonText=""
+              emptyStateTitle="No archived good habits yet"
+              emptyStateMessage="No good habits have been archived yet."
+            />
 
-        {goodHabits.length === 0 ? (
-          <Alert
-            variant="light"
-            color="gray"
-            title="No good habits yet"
-            radius={12}
-            styles={{
-              root: {
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0',
-              },
-              title: {
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-                fontWeight: 600,
-                color: '#334155',
-              },
-              message: {
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
-                fontWeight: 400,
-                color: '#64748B',
-              },
-            }}
-          >
-            Start by adding positive habits you want to implement in your routine!
-          </Alert>
+            {/* Archived Bad Habits Column */}
+            <HabitColumn
+              title="Archived Bad Habits"
+              habits={badArchivedHabits}
+              habitLogs={habitLogs}
+              onAddHabit={() => {}}
+              onEdit={handleEdit}
+              onDayClick={handleDayClick}
+              onUnarchive={handleUnarchive}
+              isArchived={true}
+              addButtonText=""
+              emptyStateTitle="No archived bad habits yet"
+              emptyStateMessage="No bad habits have been archived yet."
+            />
+          </>
         ) : (
-          <Stack gap="md">
-            {goodHabits.map((habit) => (
-              <HabitCard
-                key={habit.id}
-                habit={habit}
-                logs={habitLogs[habit.id] || []}
-                onEdit={handleEdit}
-                onDayClick={handleDayClick}
-              />
-            ))}
-          </Stack>
+          <>
+            {/* Good Habits Column */}
+            <HabitColumn
+              title="Good Habits to Start"
+              habits={goodHabits}
+              habitLogs={habitLogs}
+              onAddHabit={() => handleOpenCreateModal('good')}
+              onEdit={handleEdit}
+              onDayClick={handleDayClick}
+              isArchived={false}
+              addButtonText="Add Good Habit"
+              emptyStateTitle="No good habits yet"
+              emptyStateMessage="Start by adding positive habits you want to implement in your routine!"
+            />
+
+            {/* Bad Habits Column */}
+            <HabitColumn
+              title="Habits to Eliminate"
+              habits={badHabits}
+              habitLogs={habitLogs}
+              onAddHabit={() => handleOpenCreateModal('bad')}
+              onEdit={handleEdit}
+              onDayClick={handleDayClick}
+              isArchived={false}
+              addButtonText="Add Bad Habit"
+              emptyStateTitle="No bad habits yet"
+              emptyStateMessage="Add negative habits you want to eliminate from your life!"
+            />
+          </>
         )}
       </Box>
-
-      <Divider size="md" />
-
-      {/* Section: Bad Habits */}
-      <Box>
-        <Group justify="space-between" mb="md">
-          <Title
-            order={2}
-            size="h3"
-            c="red"
-            style={{
-              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '24px',
-              fontWeight: 600,
-              color: '#EF4444',
-            }}
-          >
-            Habits to Eliminate
-          </Title>
-          <Button
-            leftSection={<Plus size={20} />}
-            onClick={() => handleOpenCreateModal('bad')}
-            color="red"
-            radius={8}
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '14px',
-              fontWeight: 600,
-              height: '40px',
-              backgroundColor: '#EF4444',
-              border: 'none',
-            }}
-            styles={{
-              root: {
-                '&:hover': {
-                  backgroundColor: '#DC2626',
-                },
-              },
-            }}
-          >
-            Add Bad Habit
-          </Button>
-        </Group>
-
-        {badHabits.length === 0 ? (
-          <Alert
-            variant="light"
-            color="gray"
-            title="No bad habits yet"
-            radius={12}
-            styles={{
-              root: {
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0',
-              },
-              title: {
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-                fontWeight: 600,
-                color: '#334155',
-              },
-              message: {
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
-                fontWeight: 400,
-                color: '#64748B',
-              },
-            }}
-          >
-            Add negative habits you want to eliminate from your life!
-          </Alert>
-        ) : (
-          <Stack gap="md">
-            {badHabits.map((habit) => (
-              <HabitCard
-                key={habit.id}
-                habit={habit}
-                logs={habitLogs[habit.id] || []}
-                onEdit={handleEdit}
-                onDayClick={handleDayClick}
-              />
-            ))}
-          </Stack>
-        )}
-      </Box>
-        </>
-      )}
 
       {/* Create Modal */}
       <Modal

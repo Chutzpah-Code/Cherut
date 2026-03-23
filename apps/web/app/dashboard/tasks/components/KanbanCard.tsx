@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card, Text, Badge, Group, Stack, ActionIcon, Progress, Tooltip } from '@mantine/core';
-import { GripVertical, Target, CheckSquare, Clock, Archive } from 'lucide-react';
+import { Target, CheckSquare, Clock, Archive } from 'lucide-react';
 import { Task } from '@/lib/api/services/tasks';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -11,9 +11,10 @@ import { memo, useMemo } from 'react';
 interface KanbanCardProps {
   task: Task;
   onClick: () => void;
+  onToggleComplete?: (taskId: string) => void;
 }
 
-export const KanbanCard = memo(function KanbanCard({ task, onClick }: KanbanCardProps) {
+export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComplete }: KanbanCardProps) {
   const {
     attributes,
     listeners,
@@ -31,8 +32,9 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick }: KanbanCard
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)',
     opacity: isDragging ? 0 : 1,
+    willChange: 'transform', // Enables hardware acceleration
   };
 
   const priorityColor = useMemo(() => {
@@ -128,9 +130,14 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick }: KanbanCard
         touchAction: 'none',
         borderLeft: `4px solid var(--mantine-color-${priorityColor}-6)`,
         transition: isDragging ? 'none' : 'all 0.2s ease',
-        backgroundColor: task.archived ? 'var(--mantine-color-gray-1)' : undefined,
-        opacity: isDragging ? 0 : (task.archived ? 0.7 : 1),
+        backgroundColor: task.archived ? 'var(--mantine-color-gray-1)' : (isDragging ? '#f8f9fa' : undefined),
+        opacity: isDragging ? 0.8 : (task.archived ? 0.7 : 1),
         cursor: isDragging ? 'grabbing' : 'grab',
+        transform: isDragging ? 'translate3d(0, 0, 0) rotate(3deg) scale(1.02)' : 'translate3d(0, 0, 0)',
+        boxShadow: isDragging
+          ? '0 8px 25px rgba(0,0,0,0.15), 0 0 0 1px rgba(70,134,254,0.3)'
+          : undefined,
+        zIndex: isDragging ? 1000 : 'auto',
       }}
       shadow="sm"
       padding="sm"
@@ -141,47 +148,80 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick }: KanbanCard
       {...listeners}
     >
       <Stack gap="xs">
-        {/* Header with grip and priority */}
-        <Group justify="space-between" gap="xs" wrap="nowrap">
-          <Group gap="xs" style={{ flex: 1 }} wrap="nowrap">
-            {/* Drag Handle - Visual indicator only, entire card is draggable */}
-            <ActionIcon
+        {/* Header with optional badges */}
+        <Group justify="flex-end" gap="xs" wrap="nowrap">
+          {task.archived && (
+            <Badge
               size="sm"
-              variant="subtle"
+              variant="light"
               color="gray"
-              style={{ cursor: 'grab', touchAction: 'none', pointerEvents: 'none' }}
+              radius={6}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '11px',
+                fontWeight: 500,
+                backgroundColor: '#F3F4F6',
+                color: '#6B7280',
+              }}
             >
-              <GripVertical size={16} />
-            </ActionIcon>
-
-            <Badge color={priorityColor} size="xs" variant="light">
-              {task.priority}
+              Archived
             </Badge>
+          )}
 
-            {task.archived && (
-              <Tooltip label="Archived">
-                <Archive size={14} color="gray" />
-              </Tooltip>
-            )}
-
-            {hasActiveTimeTracking && (
-              <Tooltip label="Time tracking active">
-                <Clock
-                  size={14}
-                  color="red"
-                  style={{
-                    animation: 'pulse 2s infinite',
-                  }}
-                />
-              </Tooltip>
-            )}
-          </Group>
+          {hasActiveTimeTracking && (
+            <Tooltip label="Time tracking active">
+              <Clock
+                size={14}
+                color="red"
+                style={{
+                  animation: 'pulse 2s infinite',
+                }}
+              />
+            </Tooltip>
+          )}
         </Group>
 
-        {/* Title */}
-        <Text fw={600} size="sm" lineClamp={2} style={{ wordBreak: 'break-word' }}>
-          {task.title}
-        </Text>
+        {/* Title with checkbox */}
+        <Group gap="xs" align="flex-start" wrap="nowrap">
+          {/* Task completion checkbox */}
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onToggleComplete) {
+                onToggleComplete(task.id);
+              }
+            }}
+            style={{
+              width: 20,
+              height: 20,
+              borderRadius: '50%',
+              border: `2px solid var(--mantine-color-${priorityColor}-6)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+              marginTop: '2px',
+              backgroundColor: task.status === 'done' ? `var(--mantine-color-green-6)` : 'transparent',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {task.status === 'done' && (
+              <div
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  backgroundColor: 'white',
+                }}
+              />
+            )}
+          </div>
+
+          <Text fw={600} size="sm" lineClamp={2} style={{ wordBreak: 'break-word', flex: 1 }}>
+            {task.title}
+          </Text>
+        </Group>
 
         {/* Description */}
         {task.description && (

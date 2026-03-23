@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card, Text, Group, Badge, ActionIcon, Menu } from '@mantine/core';
-import { MoreVertical, Edit, Trash2, Calendar } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Calendar, Eye, ArchiveRestore } from 'lucide-react';
 import { JournalEntry } from '@/lib/api/services/journal';
 import { format } from 'date-fns';
 
@@ -11,9 +11,11 @@ interface EntryCardProps {
   onClick: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  isArchived?: boolean;
+  onUnarchive?: (entry: JournalEntry) => void;
 }
 
-export function EntryCard({ entry, onClick, onEdit, onDelete }: EntryCardProps) {
+export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false, onUnarchive }: EntryCardProps) {
   const formattedDate = format(new Date(entry.createdAt), 'MMM dd, yyyy');
   const formattedTime = format(new Date(entry.createdAt), 'HH:mm');
 
@@ -54,20 +56,40 @@ export function EntryCard({ entry, onClick, onEdit, onDelete }: EntryCardProps) 
         onClick={onClick}
       >
       {/* Title */}
-      <Text
-        fw={600}
-        size="md"
-        mb="xs"
-        lineClamp={2}
-        style={{
-          fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          fontSize: '18px',
-          fontWeight: 600,
-          color: '#000000',
-        }}
-      >
-        {entry.title || 'Untitled Entry'}
-      </Text>
+      {/* Title with Archive badge */}
+      <Group gap="sm" wrap="wrap" align="flex-start">
+        <Text
+          fw={600}
+          size="md"
+          lineClamp={2}
+          style={{
+            fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontSize: '18px',
+            fontWeight: 600,
+            color: '#000000',
+            flex: 1,
+          }}
+        >
+          {entry.title || 'Untitled Entry'}
+        </Text>
+        {isArchived && (
+          <Badge
+            size="sm"
+            variant="light"
+            color="gray"
+            radius={6}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '11px',
+              fontWeight: 500,
+              backgroundColor: '#F3F4F6',
+              color: '#6B7280',
+            }}
+          >
+            Archived
+          </Badge>
+        )}
+      </Group>
 
       <Group justify="space-between" align="flex-start" mb="xs">
         <Group gap="xs" align="center">
@@ -104,8 +126,8 @@ export function EntryCard({ entry, onClick, onEdit, onDelete }: EntryCardProps) 
           )}
         </Group>
 
-        {(onEdit || onDelete) && (
-          <Menu shadow="md" width={120} position="bottom-end">
+        {(onEdit || onDelete || isArchived) && (
+          <Menu shadow="md" width={isArchived ? 180 : 120} position="bottom-end">
             <Menu.Target>
               <ActionIcon
                 variant="subtle"
@@ -118,28 +140,70 @@ export function EntryCard({ entry, onClick, onEdit, onDelete }: EntryCardProps) 
             </Menu.Target>
 
             <Menu.Dropdown>
-              {onEdit && (
-                <Menu.Item
-                  leftSection={<Edit size={14} />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit();
-                  }}
-                >
-                  Edit
-                </Menu.Item>
-              )}
-              {onDelete && (
-                <Menu.Item
-                  leftSection={<Trash2 size={14} />}
-                  color="red"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete();
-                  }}
-                >
-                  Delete
-                </Menu.Item>
+              {isArchived ? (
+                <>
+                  <Menu.Item
+                    leftSection={<Eye size={14} />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClick();
+                    }}
+                  >
+                    View Details
+                  </Menu.Item>
+                  {onUnarchive && (
+                    <Menu.Item
+                      leftSection={<ArchiveRestore size={14} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUnarchive(entry);
+                      }}
+                    >
+                      Unarchive
+                    </Menu.Item>
+                  )}
+                  {onDelete && (
+                    <>
+                      <Menu.Divider />
+                      <Menu.Item
+                        leftSection={<Trash2 size={14} />}
+                        color="red"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete();
+                        }}
+                      >
+                        Delete Permanently
+                      </Menu.Item>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  {onEdit && (
+                    <Menu.Item
+                      leftSection={<Edit size={14} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit();
+                      }}
+                    >
+                      Edit
+                    </Menu.Item>
+                  )}
+                  {onDelete && (
+                    <Menu.Item
+                      leftSection={<Trash2 size={14} />}
+                      color="red"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
+                      }}
+                    >
+                      Delete
+                    </Menu.Item>
+                  )}
+                </>
               )}
             </Menu.Dropdown>
           </Menu>
