@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Title, Text, Button, Stack, Box, SimpleGrid, Loader, Center, Alert, Group } from '@mantine/core';
-import { Plus, Sparkles } from 'lucide-react';
+import { Title, Text, Button, Stack, Box, SimpleGrid, Loader, Center, Alert, Group, Badge } from '@mantine/core';
+import { Plus, Sparkles, Archive } from 'lucide-react';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
   useVisionBoardItems,
   useCreateVisionBoardItem,
@@ -11,22 +12,34 @@ import {
   useDeleteVisionBoardItem,
   useUploadImage,
   useReorderVisionBoard,
+  useToggleArchiveVisionBoard,
 } from '@/hooks/useVisionBoard';
 import { VisionBoardItem } from '@/lib/api/services/vision-board';
 import { VisionBoardCard } from './components/VisionBoardCard';
 import { VisionBoardModal } from './components/VisionBoardModal';
 import { CreateVisionBoardModal } from './components/CreateVisionBoardModal';
+import { ArchivedVisionBoardGrid } from './components/ArchivedVisionBoardGrid';
+
+type VisionBoardFilterType = 'active' | 'archived';
 
 export default function VisionBoardPage() {
-  const { data: items, isLoading } = useVisionBoardItems();
+  const [currentFilter, setCurrentFilter] = useState<VisionBoardFilterType>('active');
+
+  const { data: activeItems, isLoading: activeLoading } = useVisionBoardItems(false); // Only active items
+  const { data: archivedItems, isLoading: archivedLoading } = useVisionBoardItems(true); // Only archived items
   const createMutation = useCreateVisionBoardItem();
   const updateMutation = useUpdateVisionBoardItem();
   const deleteMutation = useDeleteVisionBoardItem();
   const uploadMutation = useUploadImage();
+  const toggleArchiveMutation = useToggleArchiveVisionBoard();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<VisionBoardItem | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
+
+  // Choose the right data source based on current filter
+  const items = currentFilter === 'active' ? activeItems : archivedItems;
+  const isLoading = currentFilter === 'active' ? activeLoading : archivedLoading;
 
   // Handler para upload de imagem
   const handleUploadImage = async (file: File) => {
@@ -83,10 +96,53 @@ export default function VisionBoardPage() {
     }
   };
 
+  // Handler para arquivar/desarquivar
+  const handleArchive = async (item: VisionBoardItem) => {
+    try {
+      await toggleArchiveMutation.mutateAsync(item.id);
+      notifications.show({
+        title: 'Success',
+        message: `"${item.title}" has been archived`,
+        color: 'green',
+      });
+    } catch (error) {
+      console.error('Error archiving vision board item:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to archive item. Please try again.',
+        color: 'red',
+      });
+    }
+  };
+
+  // Handler para desarquivar
+  const handleUnarchive = async (item: VisionBoardItem) => {
+    try {
+      await toggleArchiveMutation.mutateAsync(item.id);
+      notifications.show({
+        title: 'Success',
+        message: `"${item.title}" has been restored`,
+        color: 'green',
+      });
+    } catch (error) {
+      console.error('Error unarchiving vision board item:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to restore item. Please try again.',
+        color: 'red',
+      });
+    }
+  };
+
   // Handler para deletar
   const handleDelete = (id: string) => {
+    const title = currentFilter === 'archived' ? 'Delete Vision Board Item Permanently' : 'Delete Vision Board Item';
+    const message = currentFilter === 'archived'
+      ? 'Are you sure you want to permanently delete this item? This action cannot be undone and the image will be permanently deleted.'
+      : 'Are you sure you want to delete this item? This action cannot be undone and the image will be permanently deleted.';
+
     modals.openConfirmModal({
-      title: 'Delete Vision Board Item',
+      title,
       children: (
         <Text
           style={{
@@ -97,8 +153,7 @@ export default function VisionBoardPage() {
             lineHeight: '20px',
           }}
         >
-          Are you sure you want to delete this item? This action cannot be undone and the image will
-          be permanently deleted.
+          {message}
         </Text>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
@@ -161,90 +216,26 @@ export default function VisionBoardPage() {
             fontWeight: 400,
             color: '#666666',
             lineHeight: '24px',
+            marginBottom: '24px',
           }}
         >
-          Drag and drop to organize your goals
+          {currentFilter === 'active' ? 'Drag and drop to organize your goals' : 'View and manage your archived vision board items'}
         </Text>
-      </Box>
 
-      {/* Add Button */}
-      <Box>
-        <Button
-          leftSection={<Plus size={20} />}
-          onClick={() => setIsCreateModalOpen(true)}
-          radius={8}
-          style={{
-            fontFamily: 'Inter, sans-serif',
-            background: '#4686FE',
-            border: 'none',
-            fontSize: '16px',
-            fontWeight: 600,
-            color: 'white',
-            height: '48px',
-            padding: '0 24px',
-          }}
-          styles={{
-            root: {
-              '&:hover': {
-                background: '#3366E5',
-              },
-            },
-          }}
-        >
-          Add Goal
-        </Button>
-      </Box>
-
-      {/* Grid de Itens */}
-      {!items || items.length === 0 ? (
-        <Alert
-          icon={<Sparkles size={20} />}
-          radius={16}
-          style={{
-            background: '#F5F5F5',
-            border: '1px solid #CCCCCC',
-          }}
-          styles={{
-            icon: {
-              color: '#4686FE',
-            },
-            title: {
-              fontFamily: 'Inter Display, sans-serif',
-              fontSize: '18px',
-              fontWeight: 600,
-              color: '#000000',
-            },
-            message: {
-              color: '#666666',
-            },
-          }}
-          title="Start Your Vision Board"
-        >
-          <Text
-            mb="md"
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '14px',
-              fontWeight: 400,
-              color: '#666666',
-              lineHeight: '20px',
-            }}
-          >
-            Create a visual representation of your dreams and goals. Add images that inspire you and
-            track your progress towards achieving them!
-          </Text>
+        <Box mb="lg">
           <Button
-            leftSection={<Plus size={16} />}
+            leftSection={<Plus size={20} />}
             onClick={() => setIsCreateModalOpen(true)}
             radius={8}
             style={{
               fontFamily: 'Inter, sans-serif',
               background: '#4686FE',
               border: 'none',
-              fontSize: '14px',
+              fontSize: '16px',
               fontWeight: 600,
               color: 'white',
-              height: '40px',
+              height: '48px',
+              padding: '0 24px',
             }}
             styles={{
               root: {
@@ -254,24 +245,192 @@ export default function VisionBoardPage() {
               },
             }}
           >
-            Add Your First Goal
+            Add Goal
           </Button>
-        </Alert>
+        </Box>
+
+        <Group justify="space-between" align="center">
+          <Group
+            gap={0}
+            style={{
+              background: '#EEEEEE',
+              borderRadius: '40px',
+              height: '48px',
+              padding: '4px',
+            }}
+          >
+            <Button
+              onClick={() => setCurrentFilter('active')}
+              radius={40}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 500,
+                height: '40px',
+                padding: '0 20px',
+                border: 'none',
+                ...(currentFilter === 'active' ? {
+                  background: '#4686FE',
+                  color: 'white',
+                } : {
+                  background: 'transparent',
+                  color: '#6D6D6D',
+                }),
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    ...(currentFilter === 'active' ? {} : {
+                      background: 'rgba(70, 134, 254, 0.1)',
+                    }),
+                  },
+                },
+              }}
+            >
+              Active
+            </Button>
+            <Button
+              onClick={() => setCurrentFilter('archived')}
+              radius={40}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 500,
+                height: '40px',
+                padding: '0 20px',
+                border: 'none',
+                ...(currentFilter === 'archived' ? {
+                  background: '#4686FE',
+                  color: 'white',
+                } : {
+                  background: 'transparent',
+                  color: '#6D6D6D',
+                }),
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    ...(currentFilter === 'archived' ? {} : {
+                      background: 'rgba(70, 134, 254, 0.1)',
+                    }),
+                  },
+                },
+              }}
+            >
+              Archived
+            </Button>
+          </Group>
+          <Text
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 400,
+              color: '#6D6D6D',
+            }}
+          >
+            {currentFilter === 'active'
+              ? `${activeItems?.length || 0} active item${(activeItems?.length || 0) !== 1 ? 's' : ''}`
+              : `${archivedItems?.length || 0} archived item${(archivedItems?.length || 0) !== 1 ? 's' : ''}`
+            }
+          </Text>
+        </Group>
+      </Box>
+
+      {/* Content based on filter */}
+      {currentFilter === 'active' ? (
+        // Active Items View
+        !activeItems || activeItems.length === 0 ? (
+          <Alert
+            icon={<Sparkles size={20} />}
+            radius={16}
+            style={{
+              background: '#F5F5F5',
+              border: '1px solid #CCCCCC',
+            }}
+            styles={{
+              icon: {
+                color: '#4686FE',
+              },
+              title: {
+                fontFamily: 'Inter Display, sans-serif',
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#000000',
+              },
+              message: {
+                color: '#666666',
+              },
+            }}
+            title="Start Your Vision Board"
+          >
+            <Text
+              mb="md"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 400,
+                color: '#666666',
+                lineHeight: '20px',
+              }}
+            >
+              Create a visual representation of your dreams and goals. Add images that inspire you and
+              track your progress towards achieving them!
+            </Text>
+            <Button
+              leftSection={<Plus size={16} />}
+              onClick={() => setIsCreateModalOpen(true)}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                background: '#4686FE',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: 600,
+                color: 'white',
+                height: '40px',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    background: '#3366E5',
+                  },
+                },
+              }}
+            >
+              Add Your First Goal
+            </Button>
+          </Alert>
+        ) : (
+          <SimpleGrid
+            cols={{
+              base: 1, // Mobile: 1 coluna
+              xs: 2, // Small tablets: 2 colunas
+              sm: 2, // Tablets: 2 colunas
+              md: 3, // Desktop: 3 colunas
+              lg: 4, // Large desktop: 4 colunas
+            }}
+            spacing="xl"
+          >
+            {activeItems.map((item) => (
+              <VisionBoardCard
+                key={item.id}
+                item={item}
+                onClick={() => handleEdit(item)}
+                onEdit={handleEdit}
+                onArchive={handleArchive}
+                onDelete={handleDelete}
+              />
+            ))}
+          </SimpleGrid>
+        )
       ) : (
-        <SimpleGrid
-          cols={{
-            base: 1, // Mobile: 1 coluna
-            xs: 2, // Small tablets: 2 colunas
-            sm: 2, // Tablets: 2 colunas
-            md: 3, // Desktop: 3 colunas
-            lg: 4, // Large desktop: 4 colunas
-          }}
-          spacing="xl"
-        >
-          {items.map((item) => (
-            <VisionBoardCard key={item.id} item={item} onClick={() => handleEdit(item)} />
-          ))}
-        </SimpleGrid>
+        // Archived Items View
+        <ArchivedVisionBoardGrid
+          items={archivedItems || []}
+          onUnarchive={handleUnarchive}
+          onDelete={handleDelete}
+          onView={handleEdit}
+        />
       )}
 
       {/* Create Modal */}

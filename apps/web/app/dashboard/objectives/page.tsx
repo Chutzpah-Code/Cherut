@@ -339,12 +339,20 @@ export default function ObjectivesPage() {
     console.log('🔑 objective.keyResults:', objective.keyResults);
 
     setEditingObjective(objective);
+
+    // Safely parse dates with fallback to current date
+    const parseDate = (dateString: string | Date) => {
+      if (!dateString) return new Date();
+      const parsed = new Date(dateString);
+      return isNaN(parsed.getTime()) ? new Date() : parsed;
+    };
+
     setFormData({
       title: objective.title,
       description: objective.description || '',
       lifeAreaId: objective.lifeAreaId,
-      startDate: new Date(objective.startDate),
-      endDate: new Date(objective.endDate),
+      startDate: parseDate(objective.startDate),
+      endDate: parseDate(objective.endDate),
     });
 
     // Convert existing Key Results to form data
@@ -616,27 +624,39 @@ export default function ObjectivesPage() {
         </Box>
 
         <Group justify="space-between" align="center">
-          <Group gap="sm">
+          <Group
+            gap={0}
+            style={{
+              background: '#EEEEEE',
+              borderRadius: '40px',
+              height: '48px',
+              padding: '4px',
+            }}
+          >
             <Button
-              variant={viewFilter === 'active' ? 'filled' : 'outline'}
-              size="sm"
               onClick={() => setViewFilter('active')}
-              radius={8}
+              radius={40}
               style={{
                 fontFamily: 'Inter, sans-serif',
-                borderColor: viewFilter === 'active' ? '#4686FE' : '#CCCCCC',
-                color: viewFilter === 'active' ? 'white' : '#333333',
-                background: viewFilter === 'active' ? '#4686FE' : 'white',
                 fontSize: '14px',
-                fontWeight: 600,
-                height: '36px',
+                fontWeight: 500,
+                height: '40px',
+                padding: '0 20px',
+                border: 'none',
+                ...(viewFilter === 'active' ? {
+                  background: '#4686FE',
+                  color: 'white',
+                } : {
+                  background: 'transparent',
+                  color: '#6D6D6D',
+                }),
               }}
               styles={{
                 root: {
                   '&:hover': {
-                    borderColor: '#4686FE',
-                    color: viewFilter === 'active' ? 'white' : '#4686FE',
-                    background: viewFilter === 'active' ? '#3366E5' : 'rgba(70, 134, 254, 0.08)',
+                    ...(viewFilter === 'active' ? {} : {
+                      background: 'rgba(70, 134, 254, 0.1)',
+                    }),
                   },
                 },
               }}
@@ -644,25 +664,29 @@ export default function ObjectivesPage() {
               Active
             </Button>
             <Button
-              variant={viewFilter === 'archived' ? 'filled' : 'outline'}
-              size="sm"
               onClick={() => setViewFilter('archived')}
-              radius={8}
+              radius={40}
               style={{
                 fontFamily: 'Inter, sans-serif',
-                borderColor: viewFilter === 'archived' ? '#4686FE' : '#CCCCCC',
-                color: viewFilter === 'archived' ? 'white' : '#333333',
-                background: viewFilter === 'archived' ? '#4686FE' : 'white',
                 fontSize: '14px',
-                fontWeight: 600,
-                height: '36px',
+                fontWeight: 500,
+                height: '40px',
+                padding: '0 20px',
+                border: 'none',
+                ...(viewFilter === 'archived' ? {
+                  background: '#4686FE',
+                  color: 'white',
+                } : {
+                  background: 'transparent',
+                  color: '#6D6D6D',
+                }),
               }}
               styles={{
                 root: {
                   '&:hover': {
-                    borderColor: '#4686FE',
-                    color: viewFilter === 'archived' ? 'white' : '#4686FE',
-                    background: viewFilter === 'archived' ? '#3366E5' : 'rgba(70, 134, 254, 0.08)',
+                    ...(viewFilter === 'archived' ? {} : {
+                      background: 'rgba(70, 134, 254, 0.1)',
+                    }),
                   },
                 },
               }}
@@ -670,25 +694,29 @@ export default function ObjectivesPage() {
               Archived
             </Button>
             <Button
-              variant={viewFilter === 'all' ? 'filled' : 'outline'}
-              size="sm"
               onClick={() => setViewFilter('all')}
-              radius={8}
+              radius={40}
               style={{
                 fontFamily: 'Inter, sans-serif',
-                borderColor: viewFilter === 'all' ? '#4686FE' : '#CCCCCC',
-                color: viewFilter === 'all' ? 'white' : '#333333',
-                background: viewFilter === 'all' ? '#4686FE' : 'white',
                 fontSize: '14px',
-                fontWeight: 600,
-                height: '36px',
+                fontWeight: 500,
+                height: '40px',
+                padding: '0 20px',
+                border: 'none',
+                ...(viewFilter === 'all' ? {
+                  background: '#4686FE',
+                  color: 'white',
+                } : {
+                  background: 'transparent',
+                  color: '#6D6D6D',
+                }),
               }}
               styles={{
                 root: {
                   '&:hover': {
-                    borderColor: '#4686FE',
-                    color: viewFilter === 'all' ? 'white' : '#4686FE',
-                    background: viewFilter === 'all' ? '#3366E5' : 'rgba(70, 134, 254, 0.08)',
+                    ...(viewFilter === 'all' ? {} : {
+                      background: 'rgba(70, 134, 254, 0.1)',
+                    }),
                   },
                 },
               }}
@@ -701,7 +729,7 @@ export default function ObjectivesPage() {
               fontFamily: 'Inter, sans-serif',
               fontSize: '14px',
               fontWeight: 400,
-              color: '#666666',
+              color: '#6D6D6D',
             }}
           >
             {filteredObjectives?.length || 0} objective{(filteredObjectives?.length || 0) !== 1 ? 's' : ''}
@@ -1173,7 +1201,7 @@ export default function ObjectivesPage() {
                   <DateInput
                     label="Start Date"
                     placeholder="Select start date"
-                    value={formData.startDate}
+                    value={formData.startDate && !isNaN(formData.startDate.getTime()) ? formData.startDate : new Date()}
                     onChange={(value) => setFormData({ ...formData, startDate: value || new Date() })}
                     required
                   />
@@ -1182,7 +1210,7 @@ export default function ObjectivesPage() {
                   <DateInput
                     label="End Date"
                     placeholder="Select end date"
-                    value={formData.endDate}
+                    value={formData.endDate && !isNaN(formData.endDate.getTime()) ? formData.endDate : new Date()}
                     onChange={(value) => setFormData({ ...formData, endDate: value || new Date() })}
                     required
                   />

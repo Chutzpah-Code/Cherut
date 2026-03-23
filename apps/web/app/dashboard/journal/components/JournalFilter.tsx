@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Group, Button, Text, Badge } from '@mantine/core';
-import { Archive, Eye, EyeOff } from 'lucide-react';
 import { JournalCounts } from '@/lib/api/services/journal';
 
 export type JournalFilterType = 'active' | 'archived' | 'all';
@@ -31,35 +30,38 @@ export function JournalFilter({
           fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         }}
       >
-        <Group gap="sm">
+        <Group
+          gap={0}
+          style={{
+            background: '#EEEEEE',
+            borderRadius: '40px',
+            height: '48px',
+            padding: '4px',
+          }}
+        >
           <Button
-            variant={currentFilter === 'active' ? 'filled' : 'outline'}
             onClick={() => onFilterChange('active')}
-            leftSection={<Eye size={16} />}
-            radius={8}
+            radius={40}
             style={{
               fontFamily: 'Inter, sans-serif',
               fontSize: '14px',
-              fontWeight: 600,
+              fontWeight: 500,
               height: '40px',
+              padding: '0 20px',
+              border: 'none',
               ...(currentFilter === 'active' ? {
                 background: '#4686FE',
-                border: '1px solid #4686FE',
                 color: 'white',
               } : {
-                borderColor: '#CCCCCC',
-                color: '#333333',
-                background: 'white',
+                background: 'transparent',
+                color: '#6D6D6D',
               }),
             }}
             styles={{
               root: {
                 '&:hover': {
-                  ...(currentFilter === 'active' ? {
-                    background: '#3366E5',
-                  } : {
-                    borderColor: '#4686FE',
-                    color: '#4686FE',
+                  ...(currentFilter === 'active' ? {} : {
+                    background: 'rgba(70, 134, 254, 0.1)',
                   }),
                 },
               },
@@ -68,33 +70,28 @@ export function JournalFilter({
             Active
           </Button>
           <Button
-            variant={currentFilter === 'archived' ? 'filled' : 'outline'}
             onClick={() => onFilterChange('archived')}
-            leftSection={<Archive size={16} />}
-            radius={8}
+            radius={40}
             style={{
               fontFamily: 'Inter, sans-serif',
               fontSize: '14px',
-              fontWeight: 600,
+              fontWeight: 500,
               height: '40px',
+              padding: '0 20px',
+              border: 'none',
               ...(currentFilter === 'archived' ? {
                 background: '#4686FE',
-                border: '1px solid #4686FE',
                 color: 'white',
               } : {
-                borderColor: '#CCCCCC',
-                color: '#333333',
-                background: 'white',
+                background: 'transparent',
+                color: '#6D6D6D',
               }),
             }}
             styles={{
               root: {
                 '&:hover': {
-                  ...(currentFilter === 'archived' ? {
-                    background: '#3366E5',
-                  } : {
-                    borderColor: '#4686FE',
-                    color: '#4686FE',
+                  ...(currentFilter === 'archived' ? {} : {
+                    background: 'rgba(70, 134, 254, 0.1)',
                   }),
                 },
               },
@@ -103,33 +100,28 @@ export function JournalFilter({
             Archived
           </Button>
           <Button
-            variant={currentFilter === 'all' ? 'filled' : 'outline'}
             onClick={() => onFilterChange('all')}
-            leftSection={<EyeOff size={16} />}
-            radius={8}
+            radius={40}
             style={{
               fontFamily: 'Inter, sans-serif',
               fontSize: '14px',
-              fontWeight: 600,
+              fontWeight: 500,
               height: '40px',
+              padding: '0 20px',
+              border: 'none',
               ...(currentFilter === 'all' ? {
                 background: '#4686FE',
-                border: '1px solid #4686FE',
                 color: 'white',
               } : {
-                borderColor: '#CCCCCC',
-                color: '#333333',
-                background: 'white',
+                background: 'transparent',
+                color: '#6D6D6D',
               }),
             }}
             styles={{
               root: {
                 '&:hover': {
-                  ...(currentFilter === 'all' ? {
-                    background: '#3366E5',
-                  } : {
-                    borderColor: '#4686FE',
-                    color: '#4686FE',
+                  ...(currentFilter === 'all' ? {} : {
+                    background: 'rgba(70, 134, 254, 0.1)',
                   }),
                 },
               },
@@ -142,13 +134,11 @@ export function JournalFilter({
         {journalCounts && (
           <Group gap="xs">
             <Text
-              size="sm"
-              c="dimmed"
               style={{
                 fontFamily: 'Inter, sans-serif',
                 fontSize: '14px',
                 fontWeight: 400,
-                color: '#666666',
+                color: '#6D6D6D',
               }}
             >
               {currentFilter === 'active' && `${journalCounts.active} active entries`}
@@ -158,13 +148,15 @@ export function JournalFilter({
 
             {currentFilter === 'archived' && journalCounts.archived > 0 && (
               <Badge
-                size="md"
-                radius={6}
+                radius={40}
                 style={{
                   fontFamily: 'Inter, sans-serif',
-                  background: '#F5F5F5',
-                  color: '#666666',
-                  border: '1px solid #CCCCCC',
+                  background: '#4686FE',
+                  color: 'white',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  padding: '4px 8px',
+                  border: 'none',
                 }}
               >
                 {journalCounts.archived}
