@@ -10,9 +10,12 @@ export const useObjectives = (lifeAreaId?: string) => {
       console.log('[useObjectives] Success:', result?.length || 0, 'objectives');
       return result;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-    retry: 1, // Reduce retries to avoid hanging
+    staleTime: 15 * 60 * 1000, // 15 minutes - muito mais cache
+    gcTime: 30 * 60 * 1000, // 30 minutes
+    retry: 1,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 };
 
@@ -31,8 +34,12 @@ export const useCreateObjective = () => {
 
   return useMutation({
     mutationFn: (dto: CreateObjectiveDto) => objectivesApi.create(dto),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onSuccess: (newObjective) => {
+      // OTIMIZAÇÃO: Adiciona ao cache sem invalidar
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return [newObjective];
+        return [newObjective, ...old];
+      });
     },
   });
 };
@@ -43,8 +50,12 @@ export const useUpdateObjective = () => {
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateObjectiveDto }) =>
       objectivesApi.update(id, dto),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onSuccess: (updatedObjective, { id }) => {
+      // OTIMIZAÇÃO: Atualiza cache sem invalidar
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((obj: any) => obj.id === id ? { ...obj, ...updatedObjective } : obj);
+      });
     },
   });
 };
@@ -54,8 +65,12 @@ export const useDeleteObjective = () => {
 
   return useMutation({
     mutationFn: (id: string) => objectivesApi.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onSuccess: (_, deletedId) => {
+      // OTIMIZAÇÃO: Remove do cache sem invalidar
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.filter((obj: any) => obj.id !== deletedId);
+      });
     },
   });
 };
@@ -65,8 +80,12 @@ export const useCompleteObjective = () => {
 
   return useMutation({
     mutationFn: (id: string) => objectivesApi.completeObjective(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onSuccess: (updatedObjective, id) => {
+      // OTIMIZAÇÃO: Atualiza cache sem invalidar
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((obj: any) => obj.id === id ? { ...obj, ...updatedObjective } : obj);
+      });
     },
   });
 };
@@ -82,11 +101,16 @@ export const useCreateKeyResult = () => {
       skipInvalidation?: boolean;
     }) =>
       objectivesApi.createKeyResult(objectiveId, dto),
-    onSuccess: (data, variables) => {
-      // Only invalidate if not explicitly skipped
-      if (!variables.skipInvalidation) {
-        queryClient.invalidateQueries({ queryKey: ['objectives'] });
-      }
+    onSuccess: (newKeyResult, { objectiveId, skipInvalidation }) => {
+      // OTIMIZAÇÃO: Sempre usa cache, nunca invalida
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((obj: any) => {
+          if (obj.id !== objectiveId) return obj;
+          const updatedKeyResults = [...(obj.keyResults || []), newKeyResult];
+          return { ...obj, keyResults: updatedKeyResults };
+        });
+      });
     },
   });
 };
@@ -102,11 +126,18 @@ export const useUpdateKeyResult = () => {
       skipInvalidation?: boolean;
     }) =>
       objectivesApi.updateKeyResult(objectiveId, keyResultId, dto),
-    onSuccess: (data, variables) => {
-      // Only invalidate if not explicitly skipped
-      if (!variables.skipInvalidation) {
-        queryClient.invalidateQueries({ queryKey: ['objectives'] });
-      }
+    onSuccess: (updatedKeyResult, { objectiveId, keyResultId }) => {
+      // OTIMIZAÇÃO: Sempre usa cache, nunca invalida
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((obj: any) => {
+          if (obj.id !== objectiveId) return obj;
+          const updatedKeyResults = obj.keyResults?.map((kr: any) =>
+            kr.id === keyResultId ? { ...kr, ...updatedKeyResult } : kr
+          ) || [];
+          return { ...obj, keyResults: updatedKeyResults };
+        });
+      });
     },
   });
 };
@@ -121,11 +152,16 @@ export const useDeleteKeyResult = () => {
       skipInvalidation?: boolean;
     }) =>
       objectivesApi.deleteKeyResult(objectiveId, keyResultId),
-    onSuccess: (data, variables) => {
-      // Only invalidate if not explicitly skipped
-      if (!variables.skipInvalidation) {
-        queryClient.invalidateQueries({ queryKey: ['objectives'] });
-      }
+    onSuccess: (_, { objectiveId, keyResultId }) => {
+      // OTIMIZAÇÃO: Sempre usa cache, nunca invalida
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((obj: any) => {
+          if (obj.id !== objectiveId) return obj;
+          const updatedKeyResults = obj.keyResults?.filter((kr: any) => kr.id !== keyResultId) || [];
+          return { ...obj, keyResults: updatedKeyResults };
+        });
+      });
     },
   });
 };
@@ -136,8 +172,18 @@ export const useCompleteKeyResult = () => {
   return useMutation({
     mutationFn: ({ objectiveId, keyResultId }: { objectiveId: string; keyResultId: string }) =>
       objectivesApi.completeKeyResult(objectiveId, keyResultId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onSuccess: (updatedKeyResult, { objectiveId, keyResultId }) => {
+      // OTIMIZAÇÃO: Atualiza cache sem invalidar
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((obj: any) => {
+          if (obj.id !== objectiveId) return obj;
+          const updatedKeyResults = obj.keyResults?.map((kr: any) =>
+            kr.id === keyResultId ? { ...kr, ...updatedKeyResult } : kr
+          ) || [];
+          return { ...obj, keyResults: updatedKeyResults };
+        });
+      });
     },
   });
 };
@@ -149,8 +195,19 @@ export const useBatchUpdateKeyResults = () => {
   return useMutation({
     mutationFn: ({ objectiveId, updates }: { objectiveId: string; updates: Array<{id: string, dto: UpdateKeyResultDto}> }) =>
       objectivesApi.batchUpdateKeyResults(objectiveId, updates),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    onSuccess: (result, { objectiveId, updates }) => {
+      // OTIMIZAÇÃO: Usa cache, nunca invalida
+      queryClient.setQueryData(['objectives', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((obj: any) => {
+          if (obj.id !== objectiveId) return obj;
+          const updatedKeyResults = obj.keyResults?.map((kr: any) => {
+            const update = updates.find(u => u.id === kr.id);
+            return update ? { ...kr, ...update.dto } : kr;
+          }) || [];
+          return { ...obj, keyResults: updatedKeyResults };
+        });
+      });
     },
   });
 };
@@ -226,15 +283,14 @@ export const useToggleKeyResultCompletion = () => {
       return { previousObjectives };
     },
     onSuccess: () => {
-      // Invalidate to ensure sync with server (hybrid approach)
-      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+      // OTIMIZAÇÃO: Não invalida mais, optimistic update já atualizou
+      // Cache já foi atualizado no onMutate
     },
     onError: (_err, _vars, context: any) => {
       if (context?.previousObjectives) {
         queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
       }
-      // Invalida em caso de erro para sincronizar
-      queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
+      // OTIMIZAÇÃO: Só invalida em caso de erro crítico
     },
   });
 };
@@ -263,7 +319,7 @@ export const useArchiveObjective = () => {
       if (context?.previousObjectives) {
         queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
       }
-      queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
+      // OTIMIZAÇÃO: Só invalida em caso de erro crítico se necessário
     },
   });
 };
@@ -292,7 +348,7 @@ export const useUnarchiveObjective = () => {
       if (context?.previousObjectives) {
         queryClient.setQueryData(['objectives', undefined], context.previousObjectives);
       }
-      queryClient.invalidateQueries({ queryKey: ['objectives'], exact: false });
+      // OTIMIZAÇÃO: Só invalida em caso de erro crítico se necessário
     },
   });
 };
