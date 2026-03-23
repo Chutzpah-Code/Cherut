@@ -10,7 +10,7 @@ import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
 import WelcomeModal from '@/components/ui/WelcomeModal';
 import { useWelcomeModal } from '@/hooks/useWelcomeModal';
-import { SidebarProvider } from '@/contexts/SidebarContext';
+import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext';
 
 export default function DashboardLayout({
   children,
@@ -69,39 +69,93 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider mobileOpened={mobileOpened} desktopOpened={desktopOpened}>
-      <AppShell
-        header={{ height: 60 }}
-        navbar={{
-          width: 260,
-          breakpoint: 'lg',
-          collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
-        }}
-        padding="md"
+      <ResponsiveDashboard
+        mobileOpened={mobileOpened}
+        desktopOpened={desktopOpened}
+        toggleMobile={toggleMobile}
+        toggleDesktop={toggleDesktop}
+        openWelcome={openWelcome}
+        closeMobile={closeMobile}
+        isWelcomeOpen={isWelcomeOpen}
+        closeWelcome={closeWelcome}
       >
-        <AppShell.Header>
-          <Header
-            mobileOpened={mobileOpened}
-            desktopOpened={desktopOpened}
-            toggleMobile={toggleMobile}
-            toggleDesktop={toggleDesktop}
-            onOpenWelcome={openWelcome}
-          />
-        </AppShell.Header>
-
-        <AppShell.Navbar>
-          <Sidebar onClose={closeMobile} />
-        </AppShell.Navbar>
-
-        <AppShell.Main>
-          {children}
-        </AppShell.Main>
-
-        <WelcomeModal
-          opened={isWelcomeOpen}
-          onClose={closeWelcome}
-        />
-
-      </AppShell>
+        {children}
+      </ResponsiveDashboard>
     </SidebarProvider>
+  );
+}
+
+function ResponsiveDashboard({
+  children,
+  mobileOpened,
+  desktopOpened,
+  toggleMobile,
+  toggleDesktop,
+  openWelcome,
+  closeMobile,
+  isWelcomeOpen,
+  closeWelcome,
+}: {
+  children: React.ReactNode;
+  mobileOpened: boolean;
+  desktopOpened: boolean;
+  toggleMobile: () => void;
+  toggleDesktop: () => void;
+  openWelcome: () => void;
+  closeMobile: () => void;
+  isWelcomeOpen: boolean;
+  closeWelcome: () => void;
+}) {
+  const { sidebarMode, isCompact, screenSize } = useSidebar();
+
+  const getSidebarWidth = () => {
+    if (screenSize === 'mobile') return 260;
+    if (isCompact) return 80;
+    return 260;
+  };
+
+  const getSidebarCollapsed = () => {
+    if (screenSize === 'mobile') {
+      return { mobile: !mobileOpened, desktop: false };
+    }
+    if (screenSize === 'tablet') {
+      return { mobile: false, desktop: false }; // Always show in compact mode
+    }
+    return { mobile: !mobileOpened, desktop: !desktopOpened };
+  };
+
+  return (
+    <AppShell
+      header={{ height: 60 }}
+      navbar={{
+        width: getSidebarWidth(),
+        breakpoint: 'sm',
+        collapsed: getSidebarCollapsed(),
+      }}
+      padding="md"
+    >
+      <AppShell.Header>
+        <Header
+          mobileOpened={mobileOpened}
+          desktopOpened={desktopOpened}
+          toggleMobile={toggleMobile}
+          toggleDesktop={toggleDesktop}
+          onOpenWelcome={openWelcome}
+        />
+      </AppShell.Header>
+
+      <AppShell.Navbar>
+        <Sidebar onClose={closeMobile} />
+      </AppShell.Navbar>
+
+      <AppShell.Main>
+        {children}
+      </AppShell.Main>
+
+      <WelcomeModal
+        opened={isWelcomeOpen}
+        onClose={closeWelcome}
+      />
+    </AppShell>
   );
 }
