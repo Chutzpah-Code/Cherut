@@ -9,6 +9,7 @@ export interface VisionBoardItem {
   imageUrl: string;
   dueDate?: string;
   order?: number;
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,6 +21,7 @@ export interface CreateVisionBoardItemDto {
   imageUrl: string;
   dueDate?: string;
   order?: number;
+  isActive?: boolean;
 }
 
 export interface UpdateVisionBoardItemDto {
@@ -29,6 +31,7 @@ export interface UpdateVisionBoardItemDto {
   imageUrl?: string;
   dueDate?: string;
   order?: number;
+  isActive?: boolean;
 }
 
 /**
@@ -85,8 +88,10 @@ export const visionBoardApi = {
   /**
    * 📋 Listar todos os itens
    */
-  getAll: async (): Promise<VisionBoardItem[]> => {
-    const { data } = await apiClient.get('/vision-board');
+  getAll: async (archived?: boolean): Promise<VisionBoardItem[]> => {
+    const params: any = {};
+    if (archived !== undefined) params.archived = archived;
+    const { data } = await apiClient.get('/vision-board', { params });
     return data;
   },
 
@@ -118,6 +123,14 @@ export const visionBoardApi = {
    */
   reorder: async (items: { id: string; order: number }[]): Promise<void> => {
     await apiClient.patch('/vision-board/reorder/items', { items });
+  },
+
+  /**
+   * 📦 Arquivar/desarquivar item (toggle isActive status)
+   */
+  toggleArchive: async (id: string): Promise<VisionBoardItem> => {
+    const { data } = await apiClient.patch(`/vision-board/${id}/archive`);
+    return data;
   },
 };
 

@@ -14,10 +14,10 @@ import { visionBoardApi, CreateVisionBoardItemDto, UpdateVisionBoardItemDto } fr
  * - useReorderVisionBoard() - Reordenar itens (drag-and-drop)
  */
 
-export const useVisionBoardItems = () => {
+export const useVisionBoardItems = (archived?: boolean) => {
   return useQuery({
-    queryKey: ['vision-board-items'],
-    queryFn: () => visionBoardApi.getAll(),
+    queryKey: ['vision-board-items', archived],
+    queryFn: () => visionBoardApi.getAll(archived),
   });
 };
 
@@ -79,6 +79,17 @@ export const useReorderVisionBoard = () => {
 
   return useMutation({
     mutationFn: (items: { id: string; order: number }[]) => visionBoardApi.reorder(items),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vision-board-items'] });
+    },
+  });
+};
+
+export const useToggleArchiveVisionBoard = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => visionBoardApi.toggleArchive(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vision-board-items'] });
     },
