@@ -44,17 +44,6 @@ export function HabitColumn({
         borderRadius: '24px',
         padding: '24px',
       }}
-      styles={{
-        root: {
-          '@media (max-width: 768px)': {
-            height: '450px', // Smaller height for mobile/tablet
-          },
-          '@media (max-width: 480px)': {
-            height: '400px', // Even smaller for mobile
-            padding: '16px',
-          },
-        },
-      }}
     >
       {/* Column Header */}
       <Group justify="space-between" mb="md" style={{ flexShrink: 0 }}>
