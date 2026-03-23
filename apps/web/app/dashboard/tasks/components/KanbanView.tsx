@@ -362,6 +362,7 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
                 activeId={activeId}
                 overId={overId}
                 onToggleComplete={handleToggleComplete}
+                onEditTask={handleTaskClick}
               />
             </Box>
           ))}

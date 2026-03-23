@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import { Card, Text, Badge, Group, Stack, ActionIcon, Progress, Tooltip } from '@mantine/core';
-import { Target, CheckSquare, Clock, Archive } from 'lucide-react';
+import React, { useState } from 'react';
+import { Card, Text, Group, Stack, Badge, Tooltip, ActionIcon } from '@mantine/core';
+import { Clock, Archive, Edit2 } from 'lucide-react';
 import { Task } from '@/lib/api/services/tasks';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -12,9 +12,11 @@ interface KanbanCardProps {
   task: Task;
   onClick: () => void;
   onToggleComplete?: (taskId: string) => void;
+  onEdit?: () => void;
 }
 
-export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComplete }: KanbanCardProps) {
+export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComplete, onEdit }: KanbanCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
   const {
     attributes,
     listeners,
@@ -52,66 +54,6 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
     }
   }, [task.priority]);
 
-  const daysUntilDue = useMemo(() => {
-    if (!task.dueDate) return null;
-    const today = new Date();
-    const dueDate = new Date(task.dueDate);
-    const diffTime = dueDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  }, [task.dueDate]);
-
-  const dueDateBadge = useMemo(() => {
-    if (daysUntilDue === null) return null;
-
-    if (daysUntilDue < 0) {
-      return (
-        <Badge color="red" size="xs" variant="filled">
-          Overdue ({Math.abs(daysUntilDue)}d)
-        </Badge>
-      );
-    } else if (daysUntilDue === 0) {
-      return (
-        <Badge color="orange" size="xs" variant="filled">
-          Today
-        </Badge>
-      );
-    } else if (daysUntilDue <= 3) {
-      return (
-        <Badge color="yellow" size="xs" variant="filled">
-          {daysUntilDue}d left
-        </Badge>
-      );
-    } else if (daysUntilDue <= 7) {
-      return (
-        <Badge color="blue" size="xs" variant="light">
-          {daysUntilDue}d
-        </Badge>
-      );
-    }
-    return (
-      <Badge color="gray" size="xs" variant="light">
-        {daysUntilDue}d
-      </Badge>
-    );
-  }, [daysUntilDue]);
-
-  const checklistProgress = useMemo(() => {
-    if (!task.checklist || task.checklist.length === 0) return null;
-    const completed = task.checklist.filter((item) => item.completed).length;
-    const total = task.checklist.length;
-    const percentage = Math.round((completed / total) * 100);
-    return { completed, total, percentage };
-  }, [task.checklist]);
-
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    }
-    return `${minutes}m`;
-  };
 
   const hasActiveTimeTracking = useMemo(() =>
     task.timeTracking?.some((t) => t.status === 'running'),
@@ -144,13 +86,15 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
       radius="md"
       withBorder
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       {...attributes}
       {...listeners}
     >
       <Stack gap="xs">
-        {/* Header with optional badges */}
-        <Group justify="flex-end" gap="xs" wrap="nowrap">
-          {task.archived && (
+        {/* Archived badge - only show if task is archived */}
+        {task.archived && (
+          <Group justify="flex-end">
             <Badge
               size="sm"
               variant="light"
@@ -166,123 +110,77 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
             >
               Archived
             </Badge>
-          )}
-
-          {hasActiveTimeTracking && (
-            <Tooltip label="Time tracking active">
-              <Clock
-                size={14}
-                color="red"
-                style={{
-                  animation: 'pulse 2s infinite',
-                }}
-              />
-            </Tooltip>
-          )}
-        </Group>
-
-        {/* Title with checkbox */}
-        <Group gap="xs" align="flex-start" wrap="nowrap">
-          {/* Task completion checkbox */}
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onToggleComplete) {
-                onToggleComplete(task.id);
-              }
-            }}
-            style={{
-              width: 20,
-              height: 20,
-              borderRadius: '50%',
-              border: `2px solid var(--mantine-color-${priorityColor}-6)`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              flexShrink: 0,
-              marginTop: '2px',
-              backgroundColor: task.status === 'done' ? `var(--mantine-color-green-6)` : 'transparent',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {task.status === 'done' && (
-              <div
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  backgroundColor: 'white',
-                }}
-              />
-            )}
-          </div>
-
-          <Text fw={600} size="sm" lineClamp={2} style={{ wordBreak: 'break-word', flex: 1 }}>
-            {task.title}
-          </Text>
-        </Group>
-
-        {/* Description */}
-        {task.description && (
-          <Text size="xs" c="dimmed" lineClamp={2}>
-            {task.description}
-          </Text>
+          </Group>
         )}
 
-        {/* Metadata badges */}
-        <Group gap="sm" wrap="wrap" style={{ marginTop: '4px' }}>
-          {dueDateBadge}
+        {/* Title with checkbox and edit button */}
+        <Group gap="xs" align="flex-start" wrap="nowrap" justify="space-between">
+          {/* Left side: checkbox and title */}
+          <Group gap="xs" align="flex-start" wrap="nowrap" style={{ flex: 1 }}>
+            {/* Task completion checkbox */}
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onToggleComplete) {
+                  onToggleComplete(task.id);
+                }
+              }}
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                border: `2px solid var(--mantine-color-${priorityColor}-6)`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                flexShrink: 0,
+                marginTop: '2px',
+                backgroundColor: task.status === 'done' ? `var(--mantine-color-green-6)` : 'transparent',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {task.status === 'done' && (
+                <div
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    backgroundColor: 'white',
+                  }}
+                />
+              )}
+            </div>
 
-          {task.objectiveId && !task.keyResultId && (
-            <Tooltip label="Linked to Objective">
-              <Badge leftSection={<Target size={12} />} size="sm" variant="dot" color="blue">
-                Objective
-              </Badge>
-            </Tooltip>
-          )}
+            <Text fw={400} size="sm" lineClamp={2} style={{ wordBreak: 'break-word', flex: 1 }}>
+              {task.title.length > 50 ? `${task.title.substring(0, 50)}...` : task.title}
+            </Text>
+          </Group>
 
-          {task.keyResultId && (
-            <Tooltip label="Linked to Key Result">
-              <Badge leftSection={<Target size={12} />} size="sm" variant="filled" color="blue">
-                Key Result
-              </Badge>
-            </Tooltip>
-          )}
-
-          {checklistProgress && (
-            <Tooltip label={`${checklistProgress.completed}/${checklistProgress.total} completed`}>
-              <Badge leftSection={<CheckSquare size={12} />} size="sm" variant="dot" color="cyan">
-                {checklistProgress.completed}/{checklistProgress.total}
-              </Badge>
-            </Tooltip>
-          )}
-
-          {task.totalTimeTracked && task.totalTimeTracked > 0 && (
-            <Tooltip label="Total time tracked">
-              <Badge leftSection={<Clock size={12} />} size="sm" variant="dot" color="violet">
-                {formatTime(task.totalTimeTracked)}
-              </Badge>
-            </Tooltip>
-          )}
-
-          {task.tags && task.tags.length > 0 && (
-            <Badge size="sm" variant="outline" color="gray">
-              {task.tags[0]}
-              {task.tags.length > 1 && ` +${task.tags.length - 1}`}
-            </Badge>
+          {/* Right side: edit button */}
+          {onEdit && (
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              size={24}
+              radius={6}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+              style={{
+                opacity: isHovered ? 1 : 0,
+                visibility: isHovered ? 'visible' : 'hidden',
+                transition: 'all 0.15s ease',
+                color: isHovered ? '#4686FE' : '#D1D5DB',
+                flexShrink: 0,
+                marginTop: '2px',
+              }}
+            >
+              <Edit2 size={12} />
+            </ActionIcon>
           )}
         </Group>
-
-        {/* Checklist Progress Bar */}
-        {checklistProgress && (
-          <Progress
-            value={checklistProgress.percentage}
-            size="xs"
-            color={checklistProgress.percentage === 100 ? 'green' : 'cyan'}
-          />
-        )}
-
       </Stack>
 
         {/* Global styles for pulse animation */}

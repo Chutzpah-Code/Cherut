@@ -22,6 +22,7 @@ interface KanbanListProps {
   activeId?: string | null;
   overId?: string | null;
   onToggleComplete?: (taskId: string) => void;
+  onEditTask?: (task: Task) => void;
 }
 
 export function KanbanList({
@@ -36,6 +37,7 @@ export function KanbanList({
   activeId,
   overId,
   onToggleComplete,
+  onEditTask,
 }: KanbanListProps) {
   const { setNodeRef, isOver } = useDroppable({ id });
   const [isAddingCard, setIsAddingCard] = useState(false);
@@ -219,6 +221,7 @@ export function KanbanList({
                         task={task}
                         onClick={() => onTaskClick(task)}
                         onToggleComplete={onToggleComplete}
+                        onEdit={onEditTask ? () => onEditTask(task) : undefined}
                       />
                     )}
 
