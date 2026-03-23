@@ -20,7 +20,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migrate:key-results-order": "ts-node -r tsconfig-paths/register scripts/migrate-key-results-order.ts",
-    "script:create-admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts"
+    "script:create-admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts",
+    "script:populate-sample-data": "ts-node -r tsconfig-paths/register scripts/populate-sample-data.ts",
+    "emulators": "firebase emulators:start",
+    "dev:emulator": "NODE_ENV=development npm run start:dev"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
