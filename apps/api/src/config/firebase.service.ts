@@ -65,14 +65,38 @@ export class FirebaseService implements OnModuleInit {
    * Inicializa o Firebase Admin SDK
    *
    * ESTRATÉGIA:
-   * 1. Primeiro tenta usar arquivo JSON de credenciais (desenvolvimento)
-   * 2. Se não encontrar, tenta usar variáveis de ambiente (produção)
+   * 1. Se NODE_ENV === 'development', usa Firebase Emulator
+   * 2. Senão, tenta usar arquivo JSON de credenciais (desenvolvimento)
+   * 3. Se não encontrar, tenta usar variáveis de ambiente (produção)
    */
   private async initializeFirebase() {
     // Verifica se Firebase já foi inicializado
     if (admin.apps.length > 0) {
       this.logger.log('Firebase already initialized');
       this.firebaseApp = admin.apps[0]!; // Non-null assertion (já verificamos length > 0)
+      return;
+    }
+
+    // Se estamos em desenvolvimento, configura para usar emulator
+    if (process.env.NODE_ENV === 'development') {
+      this.logger.log('🧪 Initializing Firebase Admin SDK for EMULATOR mode');
+
+      // Configurações mínimas para emulator (não precisa de credenciais reais)
+      this.firebaseApp = admin.initializeApp({
+        projectId: 'demo-project', // ID fictício para emulator
+      });
+
+      // Configura Firestore para usar emulator
+      const db = admin.firestore(this.firebaseApp);
+      db.settings({
+        host: 'localhost:8080',
+        ssl: false,
+      });
+
+      // Configura Auth para usar emulator
+      process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+
+      this.logger.log('✅ Firebase Admin SDK configured for emulator (Firestore: localhost:8080, Auth: localhost:9099)');
       return;
     }
 
