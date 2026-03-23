@@ -23,7 +23,6 @@ import { JournalEntryForm } from './components/JournalEntryForm';
 import { EntryCard } from './components/EntryCard';
 import { EntryModal } from './components/EntryModal';
 import { JournalFilter, JournalFilterType } from './components/JournalFilter';
-import { ArchivedJournalGrid } from './components/ArchivedJournalGrid';
 import { JournalEntry } from '@/lib/api/services/journal';
 
 export default function JournalPage() {
@@ -117,14 +116,6 @@ export default function JournalPage() {
     archiveMutation.mutate(entry.id);
   };
 
-  const handleDeleteFromGrid = (entryId: string) => {
-    // This will be handled by the grid component
-  };
-
-  const handleViewFromGrid = (entry: JournalEntry) => {
-    setSelectedEntry(entry);
-    setModalOpen(true);
-  };
 
   if (isLoading) {
     return (
@@ -172,6 +163,34 @@ export default function JournalPage() {
           >
             Personal space for daily reflections and thoughts. Write freely without limits.
           </Text>
+        </Box>
+
+        {/* Add Button */}
+        <Box>
+          <Button
+            leftSection={<Plus size={20} />}
+            onClick={() => setIsCreateFormOpen(true)}
+            radius={8}
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              background: '#4686FE',
+              border: 'none',
+              fontSize: '16px',
+              fontWeight: 600,
+              color: 'white',
+              height: '48px',
+              padding: '0 24px',
+            }}
+            styles={{
+              root: {
+                '&:hover': {
+                  background: '#3366E5',
+                },
+              },
+            }}
+          >
+            New Entry
+          </Button>
         </Box>
 
       {/* Filter Bar */}
@@ -256,30 +275,6 @@ export default function JournalPage() {
             </Group>
           </Stack>
 
-          <Button
-            leftSection={<Plus size={20} />}
-            onClick={() => setIsCreateFormOpen(true)}
-            fullWidth
-            radius={8}
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '16px',
-              fontWeight: 600,
-              height: '48px',
-              backgroundColor: '#4686FE',
-              border: 'none',
-              color: 'white',
-            }}
-            styles={{
-              root: {
-                '&:hover': {
-                  backgroundColor: '#3366E5',
-                },
-              },
-            }}
-          >
-            New Entry
-          </Button>
         </Stack>
       )}
 
@@ -294,60 +289,53 @@ export default function JournalPage() {
         </Box>
       )}
 
-      {/* Conditional Content Based on Filter */}
-      {currentFilter === 'archived' ? (
-        <ArchivedJournalGrid
-          entries={archivedEntries || []}
-          onUnarchive={handleUnarchive}
-          onDelete={handleDeleteFromGrid}
-          onView={handleViewFromGrid}
-        />
+      {/* Entries List */}
+      {filteredEntries && filteredEntries.length > 0 ? (
+        <Grid>
+          {filteredEntries.map((entry) => (
+            <Grid.Col key={entry.id} span={{ base: 12, md: 6, lg: 4 }}>
+              <EntryCard
+                entry={entry}
+                onClick={() => handleEntryClick(entry)}
+                isArchived={currentFilter === 'archived'}
+                onUnarchive={currentFilter === 'archived' ? handleUnarchive : undefined}
+              />
+            </Grid.Col>
+          ))}
+        </Grid>
       ) : (
-        <>
-          {/* Entries List */}
-          {filteredEntries && filteredEntries.length > 0 ? (
-            <Grid>
-              {filteredEntries.map((entry) => (
-                <Grid.Col key={entry.id} span={{ base: 12, md: 6, lg: 4 }}>
-                  <EntryCard
-                    entry={entry}
-                    onClick={() => handleEntryClick(entry)}
-                  />
-                </Grid.Col>
-              ))}
-            </Grid>
+        <Alert
+          variant="light"
+          color="gray"
+          title={currentFilter === 'archived' ? "No archived entries" : "No entries found"}
+          radius={12}
+          styles={{
+            root: {
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+            },
+            title: {
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              fontWeight: 600,
+              color: '#334155',
+            },
+            message: {
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 400,
+              color: '#64748B',
+            },
+          }}
+        >
+          {currentFilter === 'archived' ? (
+            "Journal entries you archive will appear here. You can unarchive them at any time."
           ) : (
-            <Alert
-              variant="light"
-              color="gray"
-              title="No entries found"
-              radius={12}
-              styles={{
-                root: {
-                  backgroundColor: '#F8FAFC',
-                  border: '1px solid #E2E8F0',
-                },
-                title: {
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  color: '#334155',
-                },
-                message: {
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '14px',
-                  fontWeight: 400,
-                  color: '#64748B',
-                },
-              }}
-            >
-              {searchTerm || dateRange[0] || dateRange[1]
-                ? `No entries found matching your filters${searchTerm ? ` for "${searchTerm}"` : ''}. Try adjusting your search criteria.`
-                : "You haven't written any journal entries yet. Click 'New Entry' to start writing!"
-              }
-            </Alert>
+            searchTerm || dateRange[0] || dateRange[1]
+              ? `No entries found matching your filters${searchTerm ? ` for "${searchTerm}"` : ''}. Try adjusting your search criteria.`
+              : "You haven't written any journal entries yet. Click 'New Entry' to start writing!"
           )}
-        </>
+        </Alert>
       )}
 
       {/* Entry Modal */}
