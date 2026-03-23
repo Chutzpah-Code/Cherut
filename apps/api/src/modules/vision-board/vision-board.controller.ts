@@ -11,6 +11,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express } from 'express';
@@ -96,9 +97,12 @@ export class VisionBoardController {
    * 📋 LISTAR TODOS OS ITENS
    */
   @Get()
-  findAll(@Request() req) {
+  findAll(@Request() req, @Query('archived') archived?: string) {
     const userId = req.user.uid;
-    return this.visionBoardService.findAll(userId);
+    return this.visionBoardService.findAll(
+      userId,
+      archived === 'true'
+    );
   }
 
   /**
@@ -151,5 +155,14 @@ export class VisionBoardController {
   ) {
     const userId = req.user.uid;
     return this.visionBoardService.updateOrder(userId, body.items);
+  }
+
+  /**
+   * 📦 ARQUIVAR/DESARQUIVAR ITEM (toggle isActive status)
+   */
+  @Patch(':id/archive')
+  toggleArchive(@Param('id') id: string, @Request() req) {
+    const userId = req.user.uid;
+    return this.visionBoardService.toggleArchive(userId, id);
   }
 }

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, MaxLength, IsDateString } from 'class-validator';
+import { IsString, IsOptional, MaxLength, IsDateString, IsBoolean } from 'class-validator';
 
 export class UpdateVisionBoardItemDto {
   @IsString()
@@ -26,4 +26,8 @@ export class UpdateVisionBoardItemDto {
 
   @IsOptional()
   order?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
 }

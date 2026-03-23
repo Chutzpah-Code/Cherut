@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsUrl, MaxLength, IsDateString } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsUrl, MaxLength, IsDateString, IsBoolean } from 'class-validator';
 
 export class CreateVisionBoardItemDto {
   @IsString()
@@ -29,4 +29,9 @@ export class CreateVisionBoardItemDto {
   // Ordem para drag-and-drop
   @IsOptional()
   order?: number;
+
+  // Status ativo/arquivado (defaults to true)
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
 }

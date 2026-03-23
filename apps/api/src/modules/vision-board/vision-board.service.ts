@@ -88,12 +88,21 @@ export class VisionBoardService {
       throw new BadRequestException('Invalid image URL. Must be a Cloudinary URL.');
     }
 
-    const itemData = {
-      ...dto,
+    // Remove campos undefined (Firestore não aceita undefined)
+    const itemData: any = {
       userId,
+      title: dto.title,
+      imageUrl: dto.imageUrl,
+      isActive: dto.isActive !== undefined ? dto.isActive : true,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
+
+    // Só adiciona campos opcionais que não são undefined
+    if (dto.description !== undefined) itemData.description = dto.description;
+    if (dto.fullDescription !== undefined) itemData.fullDescription = dto.fullDescription;
+    if (dto.dueDate !== undefined) itemData.dueDate = dto.dueDate;
+    if (dto.order !== undefined) itemData.order = dto.order;
 
     const docRef = await db.collection(this.COLLECTION_NAME).add(itemData);
     const doc = await docRef.get();
@@ -107,7 +116,7 @@ export class VisionBoardService {
   /**
    * Listar todos os itens do Vision Board do usuário
    */
-  async findAll(userId: string) {
+  async findAll(userId: string, archived?: boolean) {
     const db = this.firebaseService.getFirestore();
 
     const snapshot = await db
@@ -117,10 +126,24 @@ export class VisionBoardService {
       .orderBy('createdAt', 'desc')
       .get();
 
-    return snapshot.docs.map((doc) => ({
+    const items = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+
+    // Filter by archived status in code to handle legacy data
+    if (archived !== undefined) {
+      return items.filter((item: any) => {
+        const isActive = item.isActive !== undefined ? item.isActive : true; // Default to true for legacy data
+        return !isActive === archived; // archived=true means !isActive, archived=false means isActive
+      });
+    }
+
+    // Return only active items by default (legacy behavior)
+    return items.filter((item: any) => {
+      const isActive = item.isActive !== undefined ? item.isActive : true;
+      return isActive;
+    });
   }
 
   /**
@@ -192,6 +215,7 @@ export class VisionBoardService {
       if (dto.imageUrl !== undefined) updateData.imageUrl = dto.imageUrl;
       if (dto.dueDate !== undefined) updateData.dueDate = dto.dueDate;
       if (dto.order !== undefined) updateData.order = dto.order;
+      if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
 
       await docRef.update(updateData);
 
@@ -283,6 +307,32 @@ export class VisionBoardService {
     return { message: 'Order updated successfully' };
   }
 
+
+  /**
+   * Archive/Unarchive vision board item (toggle isActive status)
+   */
+  async toggleArchive(userId: string, itemId: string) {
+    const item: any = await this.findOne(userId, itemId);
+    const db = this.firebaseService.getFirestore();
+
+    // Handle legacy data - if isActive is undefined, default to true (active)
+    const currentActiveStatus = item.isActive !== undefined ? item.isActive : true;
+    const newActiveStatus = !currentActiveStatus;
+
+    await db.collection(this.COLLECTION_NAME).doc(itemId).update({
+      isActive: newActiveStatus,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    this.logger.log(`Vision board item ${itemId} isActive changed from ${currentActiveStatus} to ${newActiveStatus}`);
+
+    const updatedDoc = await db.collection(this.COLLECTION_NAME).doc(itemId).get();
+
+    return {
+      id: updatedDoc.id,
+      ...updatedDoc.data(),
+    };
+  }
 
   /**
    * Helper: Deletar imagem do Cloudinary
