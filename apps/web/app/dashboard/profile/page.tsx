@@ -152,18 +152,20 @@ export default function ProfilePage() {
     setPasswordLoading(false);
   };
 
-  // Handle theme change with bidirectional sync
+  // Handle theme change with bidirectional sync - Force light mode only for now
   const handleThemeChange = async (newTheme: 'light' | 'dark') => {
+    // Force light mode only - dark mode coming soon
+    const forcedTheme = 'light';
     // 1. Update Mantine theme immediately for instant visual feedback
-    setColorScheme(newTheme);
-    localStorage.setItem('mantine-color-scheme-cherut', newTheme);
+    setColorScheme(forcedTheme);
+    localStorage.setItem('mantine-color-scheme-cherut', forcedTheme);
 
     // 2. Update form data
     setFormData({
       ...formData,
       preferences: {
         ...formData.preferences,
-        theme: newTheme,
+        theme: forcedTheme,
       },
     });
 
@@ -173,7 +175,7 @@ export default function ProfilePage() {
         ...formData,
         preferences: {
           ...formData.preferences,
-          theme: newTheme,
+          theme: forcedTheme,
         },
       });
     } catch (error) {

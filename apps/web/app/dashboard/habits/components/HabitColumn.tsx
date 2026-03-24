@@ -5,6 +5,7 @@ import { Box, Stack, Title, Button, Group, Alert, ScrollArea } from '@mantine/co
 import { Plus } from 'lucide-react';
 import { Habit, HabitLog } from '@/lib/api/services/habits';
 import { HabitCard } from './HabitCard';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface HabitColumnProps {
   title: string;
@@ -33,16 +34,18 @@ export function HabitColumn({
   emptyStateTitle,
   emptyStateMessage,
 }: HabitColumnProps) {
+  const colors = useThemeColors();
   return (
     <Box
       style={{
         display: 'flex',
         flexDirection: 'column',
         height: '548px', // Optimized to show 3.5 habits (desktop)
-        background: '#FBFBFB',
-        border: '1px solid rgba(0,0,0,0.06)',
+        background: colors.surface,
+        border: `1px solid ${colors.border}`,
         borderRadius: '24px',
         padding: '24px',
+        transition: 'all 200ms ease',
       }}
     >
       {/* Column Header */}
@@ -53,7 +56,7 @@ export function HabitColumn({
             fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             fontSize: '24px',
             fontWeight: 700,
-            color: '#000000',
+            color: colors.text.primary,
           }}
         >
           {title}
@@ -69,7 +72,7 @@ export function HabitColumn({
               fontWeight: 500,
               height: '48px',
               padding: '12px 24px',
-              background: 'linear-gradient(135deg, #659BFF 0%, #4686FE 100%)',
+              background: colors.primary,
               border: 'none',
               color: 'white',
               boxShadow: 'rgba(0,0,0,0.15) 0px 4px 8px 0px',
@@ -101,10 +104,10 @@ export function HabitColumn({
             },
           },
           thumb: {
-            backgroundColor: '#CCCCCC',
+            backgroundColor: colors.border,
             borderRadius: '6px',
             '&:hover': {
-              backgroundColor: '#4686FE',
+              backgroundColor: colors.primary,
             },
           },
         }}
@@ -117,20 +120,20 @@ export function HabitColumn({
             radius={12}
             styles={{
               root: {
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0',
+                backgroundColor: colors.surface,
+                border: `1px solid ${colors.border}`,
               },
               title: {
                 fontFamily: 'Inter, sans-serif',
                 fontSize: '16px',
                 fontWeight: 600,
-                color: '#334155',
+                color: colors.text.primary,
               },
               message: {
                 fontFamily: 'Inter, sans-serif',
                 fontSize: '14px',
                 fontWeight: 400,
-                color: '#64748B',
+                color: colors.text.secondary,
               },
             }}
           >

@@ -7,9 +7,11 @@ import { useObjectives } from '@/hooks/useObjectives';
 import { useTasks } from '@/hooks/useTasks';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { useHabits } from '@/hooks/useHabits';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const colors = useThemeColors();
   const { data: objectives, isLoading: objectivesLoading } = useObjectives();
   const { data: tasks, isLoading: tasksLoading } = useTasks();
   const { data: lifeAreas, isLoading: lifeAreasLoading } = useLifeAreas();
@@ -85,7 +87,7 @@ export default function DashboardPage() {
             fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             fontSize: '32px',
             fontWeight: 700,
-            color: '#000000',
+            color: colors.text.primary,
             letterSpacing: '-0.02em',
           }}
         >
@@ -96,7 +98,7 @@ export default function DashboardPage() {
             fontFamily: 'Inter, sans-serif',
             fontSize: '16px',
             fontWeight: 400,
-            color: '#666666',
+            color: colors.text.secondary,
             lineHeight: '24px',
           }}
         >
@@ -114,9 +116,10 @@ export default function DashboardPage() {
               padding="xl"
               radius={16}
               style={{
-                background: 'white',
-                border: '1px solid #CCCCCC',
+                background: colors.surfaceElevated,
+                border: `1px solid ${colors.border}`,
                 boxShadow: 'none',
+                transition: 'all 200ms ease',
               }}
             >
               <Group justify="space-between" mb="lg">
@@ -124,8 +127,8 @@ export default function DashboardPage() {
                   size={48}
                   radius={12}
                   style={{
-                    background: '#F5F5F5',
-                    color: '#4686FE',
+                    background: colors.surface,
+                    color: colors.primary,
                     border: 'none',
                   }}
                 >
@@ -137,7 +140,7 @@ export default function DashboardPage() {
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '14px',
                   fontWeight: 500,
-                  color: '#666666',
+                  color: colors.text.secondary,
                   marginBottom: '8px',
                 }}
               >
@@ -149,10 +152,10 @@ export default function DashboardPage() {
                   fontFamily: 'Inter Display, sans-serif',
                   fontSize: '28px',
                   fontWeight: 700,
-                  color: '#000000',
+                  color: colors.text.primary,
                 }}
               >
-                {isLoading ? <Loader size="sm" color="#4686FE" /> : stat.value}
+                {isLoading ? <Loader size="sm" color={colors.primary} /> : stat.value}
               </Title>
             </Card>
           );
@@ -164,8 +167,8 @@ export default function DashboardPage() {
         padding="xl"
         radius={16}
         style={{
-          background: 'white',
-          border: '1px solid #CCCCCC',
+          background: colors.surfaceElevated,
+          border: `1px solid ${colors.border}`,
           boxShadow: 'none',
         }}
       >
@@ -176,7 +179,7 @@ export default function DashboardPage() {
             fontFamily: 'Inter Display, sans-serif',
             fontSize: '20px',
             fontWeight: 600,
-            color: '#000000',
+            color: colors.text.primary,
           }}
         >
           Quick Actions
@@ -189,7 +192,7 @@ export default function DashboardPage() {
             radius={8}
             style={{
               fontFamily: 'Inter, sans-serif',
-              background: '#4686FE',
+              background: colors.primary,
               border: 'none',
               fontSize: '16px',
               fontWeight: 600,
@@ -199,7 +202,8 @@ export default function DashboardPage() {
             styles={{
               root: {
                 '&:hover': {
-                  background: '#3366E5',
+                  opacity: 0.9,
+                  transform: 'translateY(-1px)',
                 },
               },
             }}
@@ -214,18 +218,19 @@ export default function DashboardPage() {
             variant="outline"
             style={{
               fontFamily: 'Inter, sans-serif',
-              borderColor: '#CCCCCC',
-              color: '#333333',
+              borderColor: colors.border,
+              color: colors.text.primary,
               fontSize: '16px',
               fontWeight: 600,
               height: '48px',
-              background: 'white',
+              background: colors.surfaceElevated,
             }}
             styles={{
               root: {
                 '&:hover': {
-                  borderColor: '#4686FE',
-                  color: '#4686FE',
+                  borderColor: colors.primary,
+                  color: colors.primary,
+                  transform: 'translateY(-1px)',
                 },
               },
             }}
@@ -240,18 +245,19 @@ export default function DashboardPage() {
             variant="outline"
             style={{
               fontFamily: 'Inter, sans-serif',
-              borderColor: '#CCCCCC',
-              color: '#333333',
+              borderColor: colors.border,
+              color: colors.text.primary,
               fontSize: '16px',
               fontWeight: 600,
               height: '48px',
-              background: 'white',
+              background: colors.surfaceElevated,
             }}
             styles={{
               root: {
                 '&:hover': {
-                  borderColor: '#4686FE',
-                  color: '#4686FE',
+                  borderColor: colors.primary,
+                  color: colors.primary,
+                  transform: 'translateY(-1px)',
                 },
               },
             }}
@@ -266,8 +272,8 @@ export default function DashboardPage() {
         padding="xl"
         radius={16}
         style={{
-          background: 'white',
-          border: '1px solid #CCCCCC',
+          background: colors.surfaceElevated,
+          border: `1px solid ${colors.border}`,
           boxShadow: 'none',
         }}
       >
@@ -278,14 +284,14 @@ export default function DashboardPage() {
             fontFamily: 'Inter Display, sans-serif',
             fontSize: '20px',
             fontWeight: 600,
-            color: '#000000',
+            color: colors.text.primary,
           }}
         >
           Recent Activity
         </Title>
         {isLoading ? (
           <Group justify="center" py="xl">
-            <Loader color="#4686FE" />
+            <Loader color={colors.primary} />
           </Group>
         ) : recentActivity.length > 0 ? (
           <Stack gap="lg">
@@ -295,8 +301,8 @@ export default function DashboardPage() {
                 padding="lg"
                 radius={12}
                 style={{
-                  background: '#F5F5F5',
-                  border: '1px solid #CCCCCC',
+                  background: colors.surface,
+                  border: `1px solid ${colors.border}`,
                   boxShadow: 'none',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
@@ -304,8 +310,9 @@ export default function DashboardPage() {
                 styles={{
                   root: {
                     '&:hover': {
-                      borderColor: '#4686FE',
-                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+                      borderColor: colors.primary,
+                      background: colors.hover,
+                      transform: 'translateY(-1px)',
                     },
                   },
                 }}
@@ -315,9 +322,9 @@ export default function DashboardPage() {
                     size="lg"
                     radius={8}
                     style={{
-                      background: 'white',
-                      color: '#4686FE',
-                      border: '1px solid #CCCCCC',
+                      background: colors.surfaceElevated,
+                      color: colors.primary,
+                      border: `1px solid ${colors.border}`,
                     }}
                   >
                     <Clock size={20} />
@@ -329,7 +336,7 @@ export default function DashboardPage() {
                           fontFamily: 'Inter, sans-serif',
                           fontSize: '14px',
                           fontWeight: 500,
-                          color: '#4686FE',
+                          color: colors.primary,
                         }}
                       >
                         {activity.type}
@@ -338,7 +345,7 @@ export default function DashboardPage() {
                         style={{
                           fontFamily: 'Inter, sans-serif',
                           fontSize: '12px',
-                          color: '#999999',
+                          color: colors.text.tertiary,
                         }}
                       >
                         •
@@ -347,7 +354,7 @@ export default function DashboardPage() {
                         style={{
                           fontFamily: 'Inter, sans-serif',
                           fontSize: '12px',
-                          color: '#999999',
+                          color: colors.text.tertiary,
                         }}
                       >
                         {activity.time}
@@ -359,7 +366,7 @@ export default function DashboardPage() {
                         fontFamily: 'Inter, sans-serif',
                         fontSize: '14px',
                         fontWeight: 400,
-                        color: '#333333',
+                        color: colors.text.primary,
                         lineHeight: '20px',
                       }}
                     >
@@ -377,7 +384,7 @@ export default function DashboardPage() {
                 fontFamily: 'Inter, sans-serif',
                 fontSize: '16px',
                 fontWeight: 400,
-                color: '#666666',
+                color: colors.text.secondary,
               }}
             >
               No recent activity yet
@@ -387,7 +394,7 @@ export default function DashboardPage() {
                 fontFamily: 'Inter, sans-serif',
                 fontSize: '14px',
                 fontWeight: 400,
-                color: '#999999',
+                color: colors.text.tertiary,
               }}
             >
               Start by creating your first objective or task

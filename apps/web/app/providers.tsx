@@ -34,18 +34,119 @@ const green: MantineColorsTuple = [
   '#2b8a3e',
 ];
 
-// Trello-inspired theme with light/dark mode support
+// Semantic color tokens for professional dark mode
+const surface: MantineColorsTuple = [
+  '#FFFFFF',
+  '#FAFBFF',
+  '#F4F6FA',
+  '#F8FAFC',
+  '#F1F5F9',
+  '#E2E8F0',
+  '#CBD5E1',
+  '#94A3B8',
+  '#64748B',
+  '#475569',
+];
+
+const textColors: MantineColorsTuple = [
+  '#F8FAFC',
+  '#F1F5F9',
+  '#E2E8F0',
+  '#CBD5E1',
+  '#94A3B8',
+  '#64748B',
+  '#475569',
+  '#334155',
+  '#1E293B',
+  '#0F172A',
+];
+
+const brand: MantineColorsTuple = [
+  '#EBF4FF',
+  '#C3DAFE',
+  '#A3BFFA',
+  '#7C93F0',
+  '#5A67E6',
+  '#4338CA',
+  '#3730A3',
+  '#312E81',
+  '#1E1B4B',
+  '#0F0F23',
+];
+
+// Professional theme with comprehensive dark mode support
 const theme = createTheme({
   primaryColor: 'blue',
   primaryShade: { light: 6, dark: 7 },
   colors: {
     blue,
     green,
+    brand,
+    surface,
+    text: textColors,
   },
   defaultRadius: 'md',
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  headings: {
+    fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  },
   white: '#ffffff',
   black: '#000000',
+  other: {
+    // Semantic colors that adapt to light/dark mode
+    semanticColors: {
+      primary: {
+        light: '#4686FE',
+        dark: '#5A67E6'
+      },
+      background: {
+        light: '#FFFFFF',
+        dark: '#0F172A'
+      },
+      surface: {
+        light: '#FAFBFF',
+        dark: '#1E293B'
+      },
+      surfaceElevated: {
+        light: '#FFFFFF',
+        dark: '#334155'
+      },
+      border: {
+        light: '#E2E8F0',
+        dark: '#475569'
+      },
+      borderSubtle: {
+        light: '#CCCCCC',
+        dark: '#64748B'
+      },
+      text: {
+        primary: {
+          light: '#0F172A',
+          dark: '#F8FAFC'
+        },
+        secondary: {
+          light: '#64748B',
+          dark: '#CBD5E1'
+        },
+        tertiary: {
+          light: '#94A3B8',
+          dark: '#94A3B8'
+        },
+        muted: {
+          light: '#666666',
+          dark: '#94A3B8'
+        }
+      },
+      hover: {
+        light: 'rgba(70, 134, 254, 0.04)',
+        dark: 'rgba(148, 163, 184, 0.08)'
+      },
+      active: {
+        light: 'rgba(70, 134, 254, 0.08)',
+        dark: 'rgba(148, 163, 184, 0.12)'
+      }
+    }
+  },
   components: {
     Button: {
       defaultProps: {
@@ -99,49 +200,19 @@ interface AuthAwareMantineProviderProps {
 }
 
 function AuthAwareMantineProvider({ children, isAuthenticated = false }: AuthAwareMantineProviderProps) {
+  // Force light mode for now - dark mode coming soon
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    // Always force light mode for now
+    setColorScheme('light');
+    localStorage.setItem('mantine-color-scheme-cherut', 'light');
+  }, []);
 
-    // Only load saved theme if user is authenticated
-    if (isAuthenticated) {
-      const saved = localStorage.getItem('mantine-color-scheme-cherut');
-      if (saved === 'light' || saved === 'dark') {
-        setColorScheme(saved);
-      }
-    } else {
-      // For public pages, always use light mode
-      setColorScheme('light');
-    }
-
-    // Listen for storage changes (like when auth context clears the theme)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'mantine-color-scheme-cherut') {
-        if (e.newValue === null) {
-          // Theme was cleared - reset to light
-          setColorScheme('light');
-        } else if ((e.newValue === 'light' || e.newValue === 'dark') && isAuthenticated) {
-          // Only apply saved theme if user is authenticated
-          setColorScheme(e.newValue);
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    if (mounted && isAuthenticated) {
-      // Only save preference if user is authenticated
-      localStorage.setItem('mantine-color-scheme-cherut', colorScheme);
-    }
-  }, [colorScheme, mounted, isAuthenticated]);
-
-  // Force light mode for unauthenticated users
-  const effectiveColorScheme = isAuthenticated ? colorScheme : 'light';
+  // Always use light mode
+  const effectiveColorScheme = 'light';
 
   // During SSR and first render, always use light
   if (!mounted) {

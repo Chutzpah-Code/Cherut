@@ -7,6 +7,7 @@ import { Task } from '@/lib/api/services/tasks';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { memo, useMemo } from 'react';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface KanbanCardProps {
   task: Task;
@@ -17,6 +18,7 @@ interface KanbanCardProps {
 
 export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComplete, onEdit }: KanbanCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const colors = useThemeColors();
   const {
     attributes,
     listeners,
@@ -72,7 +74,7 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
         touchAction: 'none',
         borderLeft: `4px solid var(--mantine-color-${priorityColor}-6)`,
         transition: isDragging ? 'none' : 'all 0.2s ease',
-        backgroundColor: task.archived ? 'var(--mantine-color-gray-1)' : (isDragging ? '#f8f9fa' : undefined),
+        backgroundColor: task.archived ? colors.surface : (isDragging ? colors.hover : colors.surfaceElevated),
         opacity: isDragging ? 0.8 : (task.archived ? 0.7 : 1),
         cursor: isDragging ? 'grabbing' : 'grab',
         transform: isDragging ? 'translate3d(0, 0, 0) rotate(3deg) scale(1.02)' : 'translate3d(0, 0, 0)',
@@ -104,8 +106,8 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
                 fontFamily: 'Inter, sans-serif',
                 fontSize: '11px',
                 fontWeight: 500,
-                backgroundColor: '#F3F4F6',
-                color: '#6B7280',
+                backgroundColor: colors.surface,
+                color: colors.text.secondary,
               }}
             >
               Archived
@@ -172,7 +174,7 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
                 opacity: isHovered ? 1 : 0,
                 visibility: isHovered ? 'visible' : 'hidden',
                 transition: 'all 0.15s ease',
-                color: isHovered ? '#4686FE' : '#D1D5DB',
+                color: isHovered ? colors.primary : colors.text.tertiary,
                 flexShrink: 0,
                 marginTop: '2px',
               }}

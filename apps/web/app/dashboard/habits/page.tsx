@@ -25,6 +25,7 @@ import { modals } from '@mantine/modals';
 import { useHabits, useAllHabits, useCreateHabit, useUpdateHabit, useDeleteHabit, useLogHabit, useArchivedHabits, useHabitCounts, useToggleArchive, usePermanentDeleteHabit } from '@/hooks/useHabits';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { CreateHabitDto, Habit } from '@/lib/api/services/habits';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { HabitCard } from './components/HabitCard';
 import { HabitModal } from './components/HabitModal';
 import { HabitsFilter, HabitsFilterType } from './components/HabitsFilter';
@@ -33,6 +34,7 @@ import { habitsApi } from '@/lib/api/services/habits';
 
 export default function HabitsPage() {
   const [currentFilter, setCurrentFilter] = useState<HabitsFilterType>('active');
+  const colors = useThemeColors();
 
   const { data: activeHabits, isLoading: activeLoading } = useHabits(); // Only active habits
   const { data: allHabits, isLoading: allLoading } = useAllHabits(); // All habits (active + archived)
@@ -270,7 +272,7 @@ export default function HabitsPage() {
   if (isPageLoading) {
     return (
       <Center h={300}>
-        <Loader size="lg" color="#4686FE" />
+        <Loader size="lg" color={colors.primary} />
       </Center>
     );
   }
@@ -295,7 +297,7 @@ export default function HabitsPage() {
               fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               fontSize: '32px',
               fontWeight: 700,
-              color: '#000000',
+              color: colors.text.primary,
               letterSpacing: '-0.02em',
             }}
           >
@@ -306,7 +308,7 @@ export default function HabitsPage() {
               fontFamily: 'Inter, sans-serif',
               fontSize: '16px',
               fontWeight: 400,
-              color: '#666666',
+              color: colors.text.secondary,
               lineHeight: '24px',
             }}
           >
@@ -407,7 +409,7 @@ export default function HabitsPage() {
               fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               fontSize: '20px',
               fontWeight: 600,
-              color: '#000000',
+              color: colors.text.primary,
             }}
           >
             {creatingCategory === 'good' ? 'New Good Habit' : 'New Bad Habit'}
@@ -442,22 +444,22 @@ export default function HabitsPage() {
               styles={{
                 root: {
                   backgroundColor: '#EBF8FF',
-                  border: '1px solid #4686FE',
+                  border: `1px solid ${colors.primary}`,
                 },
                 icon: {
-                  color: '#4686FE',
+                  color: colors.primary,
                 },
                 title: {
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '16px',
                   fontWeight: 600,
-                  color: '#334155',
+                  color: colors.text.primary,
                 },
                 message: {
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '14px',
                   fontWeight: 400,
-                  color: '#64748B',
+                  color: colors.text.secondary,
                 },
               }}
             >
@@ -537,18 +539,18 @@ export default function HabitsPage() {
                   radius={8}
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    borderColor: '#CCCCCC',
-                    color: '#333333',
+                    borderColor: colors.border,
+                    color: colors.text.primary,
                     fontSize: '16px',
                     fontWeight: 600,
                     height: '48px',
-                    background: 'white',
+                    background: colors.surfaceElevated,
                   }}
                   styles={{
                     root: {
                       '&:hover': {
-                        borderColor: '#4686FE',
-                        color: '#4686FE',
+                        borderColor: colors.primary,
+                        color: colors.primary,
                       },
                     },
                   }}
@@ -576,6 +578,7 @@ export default function HabitsPage() {
                     root: {
                       '&:hover': {
                         backgroundColor: creatingCategory === 'good' ? '#16A34A' : '#DC2626',
+                        transform: 'translateY(-1px)',
                       },
                     },
                   }}

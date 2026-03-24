@@ -21,6 +21,7 @@ import { Stack, NavLink, ScrollArea, Box, Divider, Button, Group, Badge, Text, T
 import { logoutUser } from '@/lib/firebase/auth';
 import CherutLogo from '@/components/ui/CherutLogo';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -57,6 +58,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { isCompact, screenSize } = useSidebar();
+  const colors = useThemeColors();
 
   useEffect(() => {
     navigation.forEach((item) => {
@@ -87,7 +89,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
         /* Premium Sidebar Styles */
         .premium-sidebar {
           background: linear-gradient(180deg, #fafbff 0%, #f4f6fa 100%);
-          border-right: 1px solid rgba(0,0,0,0.06);
+          border-right: 1px solid ${colors.border};
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           transition: width 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -114,13 +116,13 @@ export default function Sidebar({ onClose }: SidebarProps) {
         }
 
         .premium-nav-item:hover {
-          background: rgba(70, 134, 254, 0.04);
+          background: ${colors.hover};
           transform: translateX(2px);
         }
 
         .premium-nav-item.active {
-          background: rgba(70, 134, 254, 0.08);
-          color: #4686FE;
+          background: ${colors.active};
+          color: ${colors.primary};
           font-weight: 600;
         }
 
@@ -132,7 +134,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           transform: translateY(-50%);
           width: 3px;
           height: 20px;
-          background: #4686FE;
+          background: ${colors.primary};
           border-radius: 0 2px 2px 0;
           animation: slideIn 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
         }
@@ -149,16 +151,16 @@ export default function Sidebar({ onClose }: SidebarProps) {
         }
 
         .premium-nav-icon {
-          color: #6B7280;
+          color: ${colors.text.secondary};
           transition: color 200ms ease;
         }
 
         .premium-nav-item.active .premium-nav-icon {
-          color: #4686FE;
+          color: ${colors.primary};
         }
 
         .premium-nav-item:hover .premium-nav-icon {
-          color: #4686FE;
+          color: ${colors.primary};
         }
 
         .premium-section-header {
@@ -167,7 +169,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           font-size: 13px;
           letter-spacing: 0.5px;
           text-transform: uppercase;
-          color: #9CA3AF;
+          color: ${colors.text.tertiary};
           margin: 24px 0 12px 16px;
         }
 
@@ -225,11 +227,11 @@ export default function Sidebar({ onClose }: SidebarProps) {
         }
 
         .premium-compact-icon-wrapper:hover {
-          background: rgba(70, 134, 254, 0.08);
+          background: ${colors.hover};
         }
 
         .premium-compact-icon-wrapper.active {
-          background: rgba(70, 134, 254, 0.12);
+          background: ${colors.active};
         }
 
         .premium-coming-soon-compact {
@@ -238,7 +240,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
         }
 
         .premium-divider {
-          border-color: rgba(0,0,0,0.08);
+          border-color: ${colors.border};
           margin: 16px 0;
         }
 
@@ -323,7 +325,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
                   }}
                 >
                   <div className={`premium-compact-icon-wrapper ${isActive ? 'active' : ''}`}>
-                    <Icon size={20} strokeWidth={1.5} style={{ color: isActive ? '#4686FE' : '#6B7280' }} />
+                    <Icon size={20} strokeWidth={1.5} style={{ color: isActive ? colors.primary : colors.text.secondary }} />
                   </div>
                 </Tooltip>
               ) : (
@@ -332,7 +334,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
                   <Text
                     className="premium-nav-text"
                     style={{
-                      color: isActive ? '#4686FE' : '#374151',
+                      color: isActive ? colors.primary : colors.text.primary,
                       fontWeight: isActive ? 600 : 500,
                       fontSize: '15px',
                       fontFamily: 'Inter, sans-serif',
@@ -386,7 +388,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
                   >
                     <div className="premium-coming-soon-compact">
                       <div className="premium-compact-icon-wrapper">
-                        <Icon size={20} strokeWidth={1.5} style={{ color: '#9CA3AF' }} />
+                        <Icon size={20} strokeWidth={1.5} style={{ color: colors.text.tertiary }} />
                       </div>
                     </div>
                   </Tooltip>
@@ -397,11 +399,11 @@ export default function Sidebar({ onClose }: SidebarProps) {
                 <div key={item.name} className="premium-nav-item" style={{ opacity: 0.6, cursor: 'not-allowed' }}>
                   <Group gap="16px" align="center" h="100%" justify="space-between">
                     <Group gap="16px" align="center">
-                      <Icon size={20} strokeWidth={1.5} className="premium-nav-icon" style={{ color: '#9CA3AF' }} />
+                      <Icon size={20} strokeWidth={1.5} className="premium-nav-icon" style={{ color: colors.text.tertiary }} />
                       <div>
                         <Text
                           style={{
-                            color: '#6B7280',
+                            color: colors.text.secondary,
                             fontWeight: 500,
                             fontSize: '15px',
                             fontFamily: 'Inter, sans-serif',
@@ -416,7 +418,8 @@ export default function Sidebar({ onClose }: SidebarProps) {
                           style={{
                             fontSize: '13px',
                             lineHeight: 1.3,
-                            marginTop: '2px'
+                            marginTop: '2px',
+                            color: colors.text.tertiary
                           }}
                         >
                           {item.description}

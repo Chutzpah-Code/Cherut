@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { Bell, Moon, Sun, Sparkles, HelpCircle } from 'lucide-react';
-import { Group, Burger, Text, ActionIcon, Avatar, Box, useMantineColorScheme, useComputedColorScheme, Badge, Stack, Indicator } from '@mantine/core';
+import { Group, Burger, Text, ActionIcon, Avatar, Box, useMantineColorScheme, useComputedColorScheme, Badge, Stack, Indicator, Tooltip } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
@@ -53,28 +53,8 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
     }
   }, []);
 
-  const toggleColorScheme = async () => {
-    const newScheme = computedColorScheme === 'dark' ? 'light' : 'dark';
-
-    // 1. Update Mantine theme immediately
-    setColorScheme(newScheme);
-    localStorage.setItem('mantine-color-scheme-cherut', newScheme);
-
-    // 2. Sync with backend profile if available
-    if (profile && updateMutation) {
-      try {
-        await updateMutation.mutateAsync({
-          ...profile,
-          preferences: {
-            ...profile.preferences,
-            theme: newScheme,
-          },
-        });
-      } catch (error) {
-        console.error('Error syncing theme to profile:', error);
-      }
-    }
-  };
+  // Dark mode functionality temporarily disabled
+  // Will be available soon!
 
   const getFirstName = () => {
     if (!user?.email) return 'there';
@@ -95,22 +75,37 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
 
       <Group gap="xs">
         {mounted && (
-          <ActionIcon
-            variant="subtle"
-            size="lg"
-            radius="xl"
-            onClick={toggleColorScheme}
-            title={`Switch to ${computedColorScheme === 'dark' ? 'light' : 'dark'} mode`}
-            style={{
-              transition: 'all 0.3s ease',
+          <Tooltip
+            label="Dark mode coming soon"
+            position="bottom"
+            withArrow
+            styles={{
+              tooltip: {
+                backgroundColor: '#1F2937',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: 500,
+                fontFamily: 'Inter, sans-serif',
+                borderRadius: '8px',
+                padding: '8px 12px'
+              }
             }}
           >
-            {computedColorScheme === 'dark' ? (
-              <Sun size={20} style={{ color: 'var(--mantine-color-yellow-5)' }} />
-            ) : (
-              <Moon size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            )}
-          </ActionIcon>
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              radius="xl"
+              disabled
+              title="Dark mode coming soon"
+              style={{
+                transition: 'all 0.3s ease',
+                opacity: 0.5,
+                cursor: 'not-allowed',
+              }}
+            >
+              <Moon size={20} style={{ color: 'var(--mantine-color-gray-5)' }} />
+            </ActionIcon>
+          </Tooltip>
         )}
 
         {mounted && onOpenWelcome && (

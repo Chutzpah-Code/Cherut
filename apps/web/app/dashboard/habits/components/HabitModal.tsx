@@ -399,7 +399,7 @@ export function HabitModal({
                 radius={40}
                 style={{
                   fontFamily: 'Inter, sans-serif',
-                  background: '#000',
+                  background: '#4686FE',
                   color: 'white',
                   padding: '12px 28px',
                   fontSize: '15px',
@@ -410,7 +410,8 @@ export function HabitModal({
                 styles={{
                   root: {
                     '&:hover': {
-                      background: '#1e1e1e',
+                      background: '#3366E5',
+                      opacity: 0.9,
                     },
                   },
                 }}

@@ -1,0 +1,98 @@
+/* Theme transition styles for smooth dark mode switching */
+
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent transitions on specific elements that shouldn't animate */
+*:focus,
+*:focus-within,
+.no-transition,
+.no-transition * {
+  transition: none !important;
+}
+
+/* Smooth transitions for Mantine components */
+[data-mantine-color-scheme] {
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Enhanced transitions for cards and surfaces */
+.mantine-Card-root,
+.mantine-Paper-root {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth transitions for buttons */
+.mantine-Button-root {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth transitions for inputs */
+.mantine-Input-input,
+.mantine-TextInput-input,
+.mantine-Textarea-input {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom loading animation for theme switching */
+.theme-switching-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 9999;
+  animation: themeSwipe 0.3s ease-out;
+}
+
+@keyframes themeSwipe {
+  0% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Smooth transitions for custom components */
+.premium-sidebar,
+.premium-nav-item,
+.kanban-card {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth border transitions */
+[style*="border"] {
+  transition: border-color 200ms ease;
+}
+
+/* Smooth shadow transitions */
+[style*="box-shadow"] {
+  transition: box-shadow 200ms ease;
+}
+
+/* Prevent flash of unstyled content - force light mode only */
+html {
+  color-scheme: light;
+  background-color: white;
+}
+
+/* Prefers-reduced-motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

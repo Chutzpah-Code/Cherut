@@ -7,6 +7,7 @@ import '@mantine/dropzone/styles.css';
 import '@mantine/carousel/styles.css';
 import '@mantine/spotlight/styles.css';
 import '@mantine/nprogress/styles.css';
+import '../styles/theme-transitions.css';
 import './globals.css';
 import { Providers } from './providers';
 import Script from 'next/script';
