@@ -18,10 +18,12 @@ export interface TimeTrackingEntry {
 export interface Task {
   id: string;
   userId: string;
-  lifeAreaId: string;
+  lifeAreaId?: string;
   objectiveId?: string;
   keyResultId?: string;
   actionPlanId?: string;
+  boardId?: string;
+  columnId?: string;
   title: string;
   description?: string;
   status: 'todo' | 'in_progress' | 'done';
@@ -40,12 +42,15 @@ export interface Task {
 }
 
 export interface CreateTaskDto {
-  lifeAreaId: string;
+  lifeAreaId?: string;
   objectiveId?: string;
   keyResultId?: string;
   actionPlanId?: string;
+  boardId?: string;
+  columnId?: string;
   title: string;
   description?: string;
+  status?: 'todo' | 'in_progress' | 'done';
   priority?: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
   estimatedPomodoros?: number;
@@ -58,6 +63,8 @@ export interface UpdateTaskDto {
   objectiveId?: string;
   keyResultId?: string;
   actionPlanId?: string;
+  boardId?: string;
+  columnId?: string;
   title?: string;
   description?: string;
   status?: 'todo' | 'in_progress' | 'done';
@@ -71,6 +78,7 @@ export interface UpdateTaskDto {
 export interface UpdateTaskOrderDto {
   newOrder: number;
   newStatus?: 'todo' | 'in_progress' | 'done';
+  newColumnId?: string;
 }
 
 export interface KanbanBoard {
@@ -129,7 +137,11 @@ export const tasksApi = {
   },
 
   updateOrder: async (id: string, dto: UpdateTaskOrderDto): Promise<Task> => {
-    const { data } = await apiClient.patch(`/tasks/${id}/order`, dto);
+    const { data } = await apiClient.patch(`/tasks/${id}/order`, {
+      newOrder: dto.newOrder,
+      ...(dto.newStatus && { newStatus: dto.newStatus }),
+      ...(dto.newColumnId !== undefined && { newColumnId: dto.newColumnId }),
+    });
     return data;
   },
 

@@ -98,8 +98,9 @@ export class TasksController {
     @Param('id') id: string,
     @Body('newOrder') order: number,
     @Body('newStatus') status?: string,
+    @Body('newColumnId') columnId?: string,
   ) {
-    return this.tasksService.updateOrder(req.user.uid, id, order, status);
+    return this.tasksService.updateOrder(req.user.uid, id, order, status, columnId);
   }
 
 

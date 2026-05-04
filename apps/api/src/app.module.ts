@@ -20,6 +20,7 @@ import { VisionBoardModule } from './modules/vision-board/vision-board.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { JournalModule } from './modules/journal/journal.module';
 import { ValuesModule } from './modules/values/values.module';
+import { BoardsModule } from './modules/boards/boards.module';
 
 /**
  * 📚 EXPLICAÇÃO: App Module (Módulo Raiz)
@@ -83,6 +84,8 @@ import { ValuesModule } from './modules/values/values.module';
     JournalModule,
     // Values (core personal values definition and alignment)
     ValuesModule,
+    // Boards (Trello-like boards and columns for tasks)
+    BoardsModule,
   ],
   controllers: [AppController],
   providers: [

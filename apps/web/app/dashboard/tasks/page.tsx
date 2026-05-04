@@ -1,155 +1,221 @@
 'use client';
 
-import { useState, Suspense } from 'react';
-import { Title, Text, Stack, Box, Alert } from '@mantine/core';
-import { Calendar as CalendarIcon, Clock } from 'lucide-react';
-import { KanbanView } from './components/KanbanView';
-import { ViewSwitcher, TaskView } from './components/ViewSwitcher';
-import { OptimizedLoader } from '@/components/ui/OptimizedLoader';
-import { TaskFilter as TaskFilterType } from './components/TaskFilter';
+import { useState, useEffect } from 'react';
+import {
+  Title,
+  Text,
+  Stack,
+  Box,
+  SimpleGrid,
+  Card,
+  Group,
+  TextInput,
+  ActionIcon,
+  Button,
+  Modal,
+  Loader,
+  Center,
+} from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
+import { Plus, Search } from 'lucide-react';
+import { BoardCard } from './components/BoardCard';
+import {
+  useBoards,
+  useCreateBoard,
+  useUpdateBoard,
+  useDeleteBoard,
+  useEnsureDefaultBoard,
+} from '@/hooks/useBoards';
 
 export default function TasksPage() {
-  const [currentView, setCurrentView] = useState<TaskView>('kanban');
-  const [currentFilter, setCurrentFilter] = useState<TaskFilterType>('active');
+  const [search, setSearch] = useState('');
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [newBoardName, setNewBoardName] = useState('');
+  const isMobile = useMediaQuery('(max-width: 600px)');
+
+  const { data: boards, isLoading } = useBoards();
+  const ensureDefault = useEnsureDefaultBoard();
+  const createBoard = useCreateBoard();
+  const updateBoard = useUpdateBoard();
+  const deleteBoard = useDeleteBoard();
+
+  // Ensure user has at least a default board on first visit
+  useEffect(() => {
+    if (!isLoading && boards?.length === 0) {
+      ensureDefault.mutate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, boards?.length]);
+
+  const filtered = (boards ?? []).filter((b) =>
+    b.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleCreate = () => {
+    if (!newBoardName.trim()) return;
+    createBoard.mutate(
+      { name: newBoardName.trim(), colorIndex: (boards?.length ?? 0) % 8 },
+      {
+        onSuccess: () => {
+          setNewBoardName('');
+          setCreateModalOpen(false);
+        },
+      }
+    );
+  };
+
+  const handleRename = (id: string, name: string) => {
+    updateBoard.mutate({ boardId: id, dto: { name } });
+  };
+
+  const handleDelete = (id: string) => {
+    deleteBoard.mutate(id);
+  };
 
   return (
-    <Stack
-      gap="xl"
-      style={{
-        position: 'relative',
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      }}
-    >
+    <>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
 
-      {/* Header */}
-      <Box>
-        <Title
-          order={1}
-          mb="xs"
-          style={{
-            fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            fontSize: '32px',
-            fontWeight: 700,
-            color: '#000000',
-            letterSpacing: '-0.02em',
-          }}
-        >
-          Tasks
-        </Title>
-        <Text
-          style={{
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '16px',
-            fontWeight: 400,
-            color: '#666666',
-            lineHeight: '24px',
-          }}
-        >
-          Manage your tasks with drag & drop Kanban board, calendar and time tracking
-        </Text>
-      </Box>
+      <Stack gap="xl" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <Box>
+          <Title
+            order={1}
+            mb="xs"
+            style={{
+              fontFamily: 'Inter Display, sans-serif',
+              fontSize: '32px',
+              fontWeight: 700,
+              color: '#000000',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Tasks
+          </Title>
+          <Text size="md" c="dimmed">
+            Organize your work across multiple boards
+          </Text>
+        </Box>
 
-      {/* Content based on view */}
-      {currentView === 'kanban' && (
-        <Suspense fallback={<OptimizedLoader text="Loading tasks..." variant="skeleton" lines={4} />}>
-          <KanbanView
-            currentFilter={currentFilter}
-            onFilterChange={setCurrentFilter}
+        <Group
+          justify="space-between"
+          align="center"
+          style={{ flexWrap: isMobile ? 'wrap' : 'nowrap', gap: 10 }}
+        >
+          <TextInput
+            placeholder="Search boards..."
+            leftSection={<Search size={16} />}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
+            radius={10}
+            style={{ width: isMobile ? '100%' : 260 }}
           />
-        </Suspense>
-      )}
+          <Button
+            leftSection={<Plus size={16} />}
+            onClick={() => setCreateModalOpen(true)}
+            radius={10}
+            fullWidth={isMobile}
+            style={{ backgroundColor: '#4686FE', fontFamily: 'Inter, sans-serif' }}
+          >
+            New board
+          </Button>
+        </Group>
 
-      {currentView === 'calendar' && (
-        <Alert
-          icon={<CalendarIcon size={20} />}
-          radius={16}
-          style={{
-            backgroundColor: 'rgba(70, 134, 254, 0.08)',
-            border: '1px solid rgba(70, 134, 254, 0.2)',
-          }}
-          styles={{
-            icon: {
-              color: '#4686FE',
-            },
-            wrapper: {
-              alignItems: 'flex-start',
-            },
-          }}
-        >
-          <Text
-            mb="xs"
-            style={{
-              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '16px',
-              fontWeight: 600,
-              color: '#000000',
-            }}
-          >
-            Calendar View - Coming Soon!
-          </Text>
-          <Text
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '14px',
-              fontWeight: 400,
-              color: '#666666',
-              lineHeight: '20px',
-            }}
-          >
-            View your tasks organized by due date in a calendar format. Track deadlines and plan your
-            schedule effectively.
-          </Text>
-        </Alert>
-      )}
+        {isLoading ? (
+          <Center py="xl">
+            <Loader size="sm" color="#4686FE" />
+          </Center>
+        ) : (
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="md">
+            {filtered.map((board) => (
+              <BoardCard
+                key={board.id}
+                board={{ id: board.id, name: board.name, colorIndex: board.colorIndex }}
+                onRename={handleRename}
+                onDelete={handleDelete}
+              />
+            ))}
 
-      {currentView === 'timetracker' && (
-        <Alert
-          icon={<Clock size={20} />}
-          radius={16}
-          style={{
-            backgroundColor: 'rgba(70, 134, 254, 0.08)',
-            border: '1px solid rgba(70, 134, 254, 0.2)',
-          }}
-          styles={{
-            icon: {
-              color: '#4686FE',
-            },
-            wrapper: {
-              alignItems: 'flex-start',
-            },
-          }}
-        >
-          <Text
-            mb="xs"
-            style={{
-              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '16px',
-              fontWeight: 600,
-              color: '#000000',
-            }}
-          >
-            Time Tracker View - Coming Soon!
-          </Text>
-          <Text
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '14px',
-              fontWeight: 400,
-              color: '#666666',
-              lineHeight: '20px',
-            }}
-          >
-            View and analyze your time tracking data. See how much time you&apos;ve spent on each task and
-            optimize your productivity.
-          </Text>
-        </Alert>
-      )}
+            <Card
+              radius="lg"
+              padding="md"
+              style={{
+                cursor: 'pointer',
+                border: '2px dashed #E9ECEF',
+                background: 'transparent',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 148,
+                transition: 'all 0.2s ease',
+              }}
+              onClick={() => setCreateModalOpen(true)}
+            >
+              <ActionIcon size={40} variant="light" color="blue" radius={12} mb="xs">
+                <Plus size={20} />
+              </ActionIcon>
+              <Text size="sm" fw={500} c="dimmed">
+                Create new board
+              </Text>
+            </Card>
+          </SimpleGrid>
+        )}
 
-      {/* Floating View Switcher */}
-      <ViewSwitcher currentView={currentView} onViewChange={setCurrentView} />
-    </Stack>
+        {!isLoading && filtered.length === 0 && (boards?.length ?? 0) > 0 && (
+          <Text ta="center" c="dimmed" py="xl">
+            No boards found for &quot;{search}&quot;
+          </Text>
+        )}
+      </Stack>
+
+      <Modal
+        opened={createModalOpen}
+        onClose={() => {
+          setCreateModalOpen(false);
+          setNewBoardName('');
+        }}
+        title={
+          <Text fw={600} style={{ fontFamily: 'Inter Display, sans-serif' }}>
+            Create new board
+          </Text>
+        }
+        radius="lg"
+        centered
+      >
+        <Stack>
+          <TextInput
+            label="Board name"
+            placeholder="e.g. Work, Personal, Q2 Goals..."
+            value={newBoardName}
+            onChange={(e) => setNewBoardName(e.currentTarget.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+            autoFocus
+            radius={10}
+          />
+          <Group justify="flex-end" mt="sm">
+            <Button
+              variant="subtle"
+              color="gray"
+              onClick={() => {
+                setCreateModalOpen(false);
+                setNewBoardName('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreate}
+              loading={createBoard.isPending}
+              disabled={!newBoardName.trim()}
+              style={{ backgroundColor: '#4686FE' }}
+            >
+              Create board
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+    </>
   );
 }

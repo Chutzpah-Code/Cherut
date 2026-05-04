@@ -150,6 +150,7 @@ export class TasksService {
     taskId: string,
     newOrder: number,
     newStatus?: string,
+    newColumnId?: string,
   ) {
     await this.findOne(userId, taskId);
 
@@ -160,6 +161,10 @@ export class TasksService {
 
     if (newStatus) {
       updateData.status = newStatus;
+    }
+
+    if (newColumnId !== undefined) {
+      updateData.columnId = newColumnId;
     }
 
     const db = this.firebaseService.getFirestore();

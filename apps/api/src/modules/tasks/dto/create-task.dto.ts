@@ -155,4 +155,13 @@ export class CreateTaskDto {
   @Min(0)
   @IsOptional()
   order?: number;
+
+  // Board and column references
+  @IsString()
+  @IsOptional()
+  boardId?: string;
+
+  @IsString()
+  @IsOptional()
+  columnId?: string;
 }

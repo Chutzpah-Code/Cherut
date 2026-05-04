@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, Text, Badge, Stack, Button, TextInput, ActionIcon, Group, ScrollArea, Box } from '@mantine/core';
+import { Card, Text, Badge, Stack, Button, TextInput, ActionIcon, Group, ScrollArea } from '@mantine/core';
 import { Plus, X, Check } from 'lucide-react';
 import { Task } from '@/lib/api/services/tasks';
 import { useDroppable } from '@dnd-kit/core';
@@ -13,10 +13,10 @@ import { useState } from 'react';
 interface KanbanListProps {
   id: string;
   title: string;
-  color: string;
+  color?: string;
   tasks: Task[];
   onTaskClick: (task: Task) => void;
-  onAddTask?: (status: string) => void;
+  onAddTask?: (columnId: string, title: string) => void;
   onEditTitle?: (newTitle: string) => void;
   onDelete?: () => void;
   activeId?: string | null;
@@ -28,7 +28,6 @@ interface KanbanListProps {
 export function KanbanList({
   id,
   title,
-  color,
   tasks,
   onTaskClick,
   onAddTask,
@@ -41,6 +40,7 @@ export function KanbanList({
 }: KanbanListProps) {
   const { setNodeRef, isOver } = useDroppable({ id });
   const [isAddingCard, setIsAddingCard] = useState(false);
+  const [newCardTitle, setNewCardTitle] = useState('');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(title);
 
@@ -51,47 +51,25 @@ export function KanbanList({
     setIsEditingTitle(false);
   };
 
-  // Show placeholder when dragging over this column or over a task in this column
   const showPlaceholder = activeId && (overId === id || tasks.some(task => task.id === overId));
-
-  // Find the task being dragged over for insertion positioning
   const overTask = overId && tasks.find(task => task.id === overId);
   const overTaskIndex = overTask ? tasks.indexOf(overTask) : -1;
 
   return (
-    <React.Fragment>
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
-
-        .kanban-list {
-          @media (max-width: 1024px) {
-            height: 400px !important;
-          }
-          @media (max-width: 768px) {
-            height: 350px !important;
-          }
-        }
-      `}</style>
-      <Card
-      shadow="sm"
+    <Card
+      shadow="xs"
       padding="md"
-      radius="md"
-      withBorder
+      radius="lg"
       style={{
-        height: '450px', // Fixed height optimized for 4.5 tasks
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'all 0.2s cubic-bezier(0.2, 0, 0, 1)',
-        willChange: 'transform, border-color, box-shadow', // Hardware acceleration
-        borderColor: isOver ? `var(--mantine-color-${color}-6)` : '#e9ecef',
-        borderWidth: isOver ? '2px' : '1px',
-        backgroundColor: isOver ? `var(--mantine-color-${color}-0)` : undefined,
-        transform: isOver ? 'scale(1.02)' : 'scale(1)',
-        boxShadow: isOver
-          ? `0 4px 12px rgba(0,0,0,0.1), 0 0 0 2px var(--mantine-color-${color}-2)`
-          : '0 1px 3px rgba(0,0,0,0.1)',
+        transition: 'box-shadow 0.15s ease, border-color 0.15s ease',
+        borderColor: isOver ? '#CBD5E1' : '#E9ECEF',
+        borderWidth: '1px',
+        backgroundColor: isOver ? '#F8FAFC' : '#F4F5F7',
+        boxShadow: isOver ? '0 4px 16px rgba(0,0,0,0.08)' : 'none',
       }}
-      className="kanban-list"
     >
       {/* Header */}
       <Group justify="space-between" mb="md" wrap="nowrap">
@@ -114,95 +92,83 @@ export function KanbanList({
             <ActionIcon size="sm" color="green" onClick={handleSaveTitle}>
               <Check size={16} />
             </ActionIcon>
-            <ActionIcon
-              size="sm"
-              color="gray"
-              onClick={() => {
-                setTitleValue(title);
-                setIsEditingTitle(false);
-              }}
-            >
+            <ActionIcon size="sm" color="gray" variant="subtle" onClick={() => { setTitleValue(title); setIsEditingTitle(false); }}>
               <X size={16} />
             </ActionIcon>
           </Group>
         ) : (
-          <Group gap="xs" style={{ flex: 1 }} wrap="nowrap">
-            <div
-              style={{
-                width: 12,
-                height: 12,
-                backgroundColor: `var(--mantine-color-${color}-6)`,
-                borderRadius: '50%',
-              }}
-            />
+          <Group gap="xs" style={{ flex: 1 }} wrap="nowrap" align="center">
             <Text
               fw={600}
-              size="lg"
+              size="sm"
               onClick={() => onEditTitle && setIsEditingTitle(true)}
-              style={{ cursor: onEditTitle ? 'pointer' : 'default', flex: 1 }}
+              style={{
+                cursor: onEditTitle ? 'pointer' : 'default',
+                flex: 1,
+                color: '#172B4D',
+                letterSpacing: '-0.01em',
+                fontFamily: 'Inter Display, sans-serif',
+              }}
             >
               {title}
             </Text>
-            <Badge color="gray" size="sm" variant="light">
+            <Badge
+              size="sm"
+              variant="filled"
+              radius="xl"
+              style={{
+                backgroundColor: '#DFE1E6',
+                color: '#42526E',
+                fontWeight: 700,
+                fontSize: 11,
+                minWidth: 22,
+                padding: '0 7px',
+              }}
+            >
               {tasks.length}
             </Badge>
           </Group>
         )}
 
         {onDelete && (
-          <ActionIcon size="sm" color="red" variant="subtle" onClick={onDelete}>
-            <X size={16} />
+          <ActionIcon
+            size="sm"
+            color="gray"
+            variant="subtle"
+            onClick={onDelete}
+            style={{ color: '#97A0AF' }}
+          >
+            <X size={14} />
           </ActionIcon>
         )}
       </Group>
 
-      {/* Tasks - Drop Zone with ScrollArea */}
+      {/* Drop zone */}
       <ScrollArea
-        style={{
-          flex: 1,
-          marginRight: '-12px',
-          paddingRight: '12px'
-        }}
+        style={{ flex: 1 }}
         type="auto"
-        scrollbarSize={6}
+        scrollbarSize={4}
         styles={{
-          scrollbar: {
-            backgroundColor: 'transparent',
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.05)',
-            },
-          },
-          thumb: {
-            backgroundColor: '#CCCCCC',
-            borderRadius: '6px',
-            '&:hover': {
-              backgroundColor: `var(--mantine-color-${color}-6)`,
-            },
-          },
+          thumb: { backgroundColor: '#CBD5E1', borderRadius: 4 },
         }}
       >
         <div
           ref={setNodeRef}
           style={{
-            minHeight: '200px',
-            transition: 'all 0.2s cubic-bezier(0.2, 0, 0, 1)',
-            willChange: 'background-color, border-radius, border, margin, padding', // Hardware acceleration
-            backgroundColor: isOver ? 'rgba(70, 134, 254, 0.05)' : 'transparent',
-            borderRadius: isOver ? '8px' : '0px',
-            border: isOver ? '2px dashed rgba(70, 134, 254, 0.3)' : '2px dashed transparent',
-            margin: isOver ? '4px' : '0px',
-            padding: isOver ? '8px' : '0px',
+            minHeight: 120,
+            transition: 'background-color 0.15s ease',
+            backgroundColor: isOver ? 'rgba(9, 30, 66, 0.04)' : 'transparent',
+            borderRadius: 8,
+            padding: isOver ? 4 : 0,
           }}
         >
           <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
             <Stack gap="sm">
               {tasks.length === 0 ? (
                 <>
-                  {showPlaceholder && overId === id && (
-                    <DragPlaceholder color={color} />
-                  )}
+                  {showPlaceholder && overId === id && <DragPlaceholder color="gray" />}
                   {!isAddingCard && (
-                    <Text c="dimmed" size="sm" ta="center" py="xl">
+                    <Text c="dimmed" size="xs" ta="center" py="xl" style={{ color: '#97A0AF' }}>
                       No tasks
                     </Text>
                   )}
@@ -210,12 +176,9 @@ export function KanbanList({
               ) : (
                 tasks.map((task, index) => (
                   <React.Fragment key={task.id}>
-                    {/* Show placeholder before the task if hovering over it */}
                     {showPlaceholder && overTask && overTaskIndex === index && (
-                      <DragPlaceholder color={color} />
+                      <DragPlaceholder color="gray" />
                     )}
-
-                    {/* Only show the task if it's not being dragged */}
                     {task.id !== activeId && (
                       <KanbanCard
                         task={task}
@@ -224,10 +187,8 @@ export function KanbanList({
                         onEdit={onEditTask ? () => onEditTask(task) : undefined}
                       />
                     )}
-
-                    {/* Show placeholder after the last task if dropping at the end */}
                     {showPlaceholder && overId === id && index === tasks.length - 1 && !overTask && (
-                      <DragPlaceholder color={color} />
+                      <DragPlaceholder color="gray" />
                     )}
                   </React.Fragment>
                 ))
@@ -237,37 +198,80 @@ export function KanbanList({
         </div>
       </ScrollArea>
 
-        {/* Add Card Button */}
-        {onAddTask && !isAddingCard && (
-          <Button
-            variant="outline"
-            leftSection={<Plus size={16} />}
-            onClick={() => onAddTask(id)}
-            fullWidth
-            mt="lg"
+      {/* Add card */}
+      {onAddTask && !isAddingCard && (
+        <Button
+          variant="subtle"
+          leftSection={<Plus size={14} />}
+          onClick={() => { setIsAddingCard(true); setNewCardTitle(''); }}
+          fullWidth
+          mt="sm"
+          radius={8}
+          size="sm"
+          style={{
+            color: '#6B778C',
+            fontWeight: 500,
+            justifyContent: 'flex-start',
+            paddingLeft: 8,
+          }}
+          styles={{
+            root: {
+              '&:hover': { backgroundColor: 'rgba(9,30,66,0.06)', color: '#172B4D' },
+            },
+          }}
+        >
+          Add a card
+        </Button>
+      )}
+
+      {onAddTask && isAddingCard && (
+        <Stack gap={6} mt="sm">
+          <TextInput
+            placeholder="Card title..."
+            value={newCardTitle}
+            onChange={(e) => setNewCardTitle(e.currentTarget.value)}
+            autoFocus
             radius={8}
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              borderColor: '#CCCCCC',
-              color: '#333333',
-              fontSize: '14px',
-              fontWeight: 600,
-              height: '40px',
-              background: 'white',
+            size="sm"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && newCardTitle.trim()) {
+                onAddTask(id, newCardTitle.trim());
+                setNewCardTitle('');
+                setIsAddingCard(false);
+              }
+              if (e.key === 'Escape') {
+                setIsAddingCard(false);
+                setNewCardTitle('');
+              }
             }}
-            styles={{
-              root: {
-                '&:hover': {
-                  borderColor: '#4686FE',
-                  color: '#4686FE',
-                },
-              },
-            }}
-          >
-            Add card
-          </Button>
-        )}
-      </Card>
-    </React.Fragment>
+          />
+          <Group gap={6}>
+            <Button
+              size="xs"
+              radius={6}
+              style={{ backgroundColor: '#4686FE' }}
+              disabled={!newCardTitle.trim()}
+              onClick={() => {
+                if (newCardTitle.trim()) {
+                  onAddTask(id, newCardTitle.trim());
+                  setNewCardTitle('');
+                  setIsAddingCard(false);
+                }
+              }}
+            >
+              Add card
+            </Button>
+            <ActionIcon
+              size="sm"
+              variant="subtle"
+              color="gray"
+              onClick={() => { setIsAddingCard(false); setNewCardTitle(''); }}
+            >
+              <X size={14} />
+            </ActionIcon>
+          </Group>
+        </Stack>
+      )}
+    </Card>
   );
 }
