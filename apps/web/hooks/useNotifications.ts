@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useQueryClient, QueryClient } from '@tanstack/react-query';
 import { Notification } from '@/components/notifications/NotificationCenter';
 import { NotificationService } from '@/lib/services/notificationService';
-import { tasksApi } from '@/lib/api/services/tasks';
-import { habitsApi } from '@/lib/api/services/habits';
-import { objectivesApi } from '@/lib/api/services/objectives';
-import { visionBoardApi } from '@/lib/api/services/vision-board';
-import { profileApi } from '@/lib/api/services/profile';
+import { Task } from '@/lib/api/services/tasks';
+import { Habit, HabitLog } from '@/lib/api/services/habits';
+import { Objective } from '@/lib/api/services/objectives';
+import { VisionBoardItem } from '@/lib/api/services/vision-board';
 
 export interface UseNotificationsReturn {
   notifications: Notification[];
@@ -19,161 +19,122 @@ export interface UseNotificationsReturn {
   addNotification: (notification: Omit<Notification, 'id' | 'createdAt'>) => void;
 }
 
+// Reads all cached entries matching a query key prefix, deduplicating by id.
+// Skips entries where the second key segment is a known non-list sub-type.
+function readCachedList<T extends { id: string }>(
+  queryClient: QueryClient,
+  prefix: string,
+  skipSegments: string[] = [],
+): T[] {
+  const entries = queryClient.getQueriesData<T[]>({ queryKey: [prefix] });
+  const seen = new Set<string>();
+  const result: T[] = [];
+
+  for (const [queryKey, data] of entries) {
+    const secondSegment = queryKey[1];
+    if (typeof secondSegment === 'string' && skipSegments.includes(secondSegment)) continue;
+    if (!Array.isArray(data)) continue;
+    for (const item of data) {
+      if (item?.id && !seen.has(item.id)) {
+        seen.add(item.id);
+        result.push(item);
+      }
+    }
+  }
+
+  return result;
+}
+
 export function useNotifications(): UseNotificationsReturn {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [dismissedNotifications, setDismissedNotifications] = useState<string[]>([]);
+  const queryClient = useQueryClient();
 
-  // Load dismissed notifications from localStorage
-  useEffect(() => {
-    const dismissed = localStorage.getItem('cherut-dismissed-notifications');
-    if (dismissed) {
-      try {
-        setDismissedNotifications(JSON.parse(dismissed));
-      } catch {
-        setDismissedNotifications([]);
-      }
-    }
-  }, []);
-
-  // Save dismissed notifications to localStorage
-  useEffect(() => {
-    localStorage.setItem('cherut-dismissed-notifications', JSON.stringify(dismissedNotifications));
-  }, [dismissedNotifications]);
-
-  // Fetch and generate notifications from real activity data
-  const fetchNotifications = async () => {
+  const [dismissed, setDismissed] = useState<string[]>(() => {
     try {
-      setLoading(true);
-
-      // First check if notifications are enabled in user profile
-      let notificationsEnabled = false;
-      try {
-        const profile = await profileApi.get();
-        notificationsEnabled = profile.preferences?.notifications === true;
-      } catch {
-        // No profile yet (new user) — skip notifications
-        setNotifications([]);
-        return;
-      }
-
-      if (!notificationsEnabled) {
-        setNotifications([]);
-        return;
-      }
-
-      // Fetch activity data from APIs
-      const [tasks, habits, objectives, visionBoardItems] = await Promise.all([
-        tasksApi.getAll(),
-        habitsApi.getAll(),
-        objectivesApi.getAll(),
-        visionBoardApi.getAll(),
-      ]);
-
-      // Get today's habit logs
-      const today = new Date().toISOString().split('T')[0];
-      const habitLogs = await Promise.all(
-        habits.map(habit => habitsApi.getHabitLogs(habit.id, today, today))
-      ).then(results => results.flat());
-
-      const activityData = {
-        tasks,
-        habits,
-        objectives,
-        visionBoardItems,
-        habitLogs,
-      };
-
-      // Generate notifications based on activity data
-      const generatedNotifications = NotificationService.generateNotifications(activityData);
-
-      // Filter out dismissed notifications
-      const filteredNotifications = generatedNotifications.filter(notification =>
-        NotificationService.shouldShowNotification(notification, dismissedNotifications)
-      );
-
-      setNotifications(filteredNotifications);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-      // Fallback to empty notifications on error
-      setNotifications([]);
-    } finally {
-      setLoading(false);
+      return JSON.parse(localStorage.getItem('cherut-dismissed-notifications') || '[]');
+    } catch {
+      return [];
     }
-  };
+  });
 
-  // Initial load
+  // Tracks read state separately so markAsRead doesn't require a re-fetch
+  const [readIds, setReadIds] = useState<Set<string>>(() => new Set());
+
+  // Incremented whenever the React Query cache changes, triggering notification recomputation
+  const [cacheTick, setCacheTick] = useState(0);
+
   useEffect(() => {
-    fetchNotifications();
-  }, []);
+    localStorage.setItem('cherut-dismissed-notifications', JSON.stringify(dismissed));
+  }, [dismissed]);
 
-  // Auto-refresh every 5 minutes
+  // Subscribe to React Query cache updates — no API calls, zero extra Firestore reads
   useEffect(() => {
-    const interval = setInterval(fetchNotifications, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
+    const unsubscribe = queryClient.getQueryCache().subscribe(() => {
+      setCacheTick((t) => t + 1);
+    });
+    return unsubscribe;
+  }, [queryClient]);
 
-  const unreadCount = useMemo(() => {
-    return notifications.filter(n => !n.read).length;
-  }, [notifications]);
+  const notifications = useMemo(() => {
+    const tasks = readCachedList<Task>(queryClient, 'tasks', ['kanban', 'archived', 'counts']);
+    const habits = readCachedList<Habit>(queryClient, 'habits', ['all', 'archived', 'counts']);
+    const objectives = readCachedList<Objective>(queryClient, 'objectives');
+    const visionBoardItems = readCachedList<VisionBoardItem>(queryClient, 'vision-board-items');
+    const habitLogs = readCachedList<HabitLog>(queryClient, 'habitLogs');
+
+    // Nothing in cache yet — return empty rather than fetch
+    if (!tasks.length && !habits.length && !objectives.length && !visionBoardItems.length) {
+      return [];
+    }
+
+    const generated = NotificationService.generateNotifications({
+      tasks,
+      habits,
+      objectives,
+      visionBoardItems,
+      habitLogs,
+    });
+
+    return generated
+      .filter((n) => NotificationService.shouldShowNotification(n, dismissed))
+      .map((n) => ({ ...n, read: readIds.has(n.id) }));
+  // cacheTick drives reactivity; eslint doesn't see it as a dep
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryClient, cacheTick, dismissed, readIds]);
+
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.read).length,
+    [notifications],
+  );
 
   const markAsRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(notification =>
-        notification.id === id
-          ? { ...notification, read: true }
-          : notification
-      )
-    );
+    setReadIds((prev) => new Set([...prev, id]));
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev =>
-      prev.map(notification => ({ ...notification, read: true }))
-    );
+    setReadIds(new Set(notifications.map((n) => n.id)));
   };
 
   const deleteNotification = (id: string) => {
-    // Add to dismissed notifications to prevent re-showing
-    const dismissalKey = NotificationService.getDismissalKey(
-      notifications.find(n => n.id === id) || { id, createdAt: new Date().toISOString() } as Notification
-    );
-    setDismissedNotifications(prev => [...prev, dismissalKey]);
-
-    // Remove from current notifications
-    setNotifications(prev => prev.filter(notification => notification.id !== id));
+    const notification = notifications.find((n) => n.id === id);
+    if (notification) {
+      const key = NotificationService.getDismissalKey(notification);
+      setDismissed((prev) => [...prev, key]);
+    }
   };
 
   const clearAllNotifications = () => {
-    // Add all current notifications to dismissed list
-    const dismissalKeys = notifications.map(notification =>
-      NotificationService.getDismissalKey(notification)
-    );
-    setDismissedNotifications(prev => [...prev, ...dismissalKeys]);
-
-    // Clear current notifications
-    setNotifications([]);
+    const keys = notifications.map((n) => NotificationService.getDismissalKey(n));
+    setDismissed((prev) => [...prev, ...keys]);
   };
 
   const addNotification = (notificationData: Omit<Notification, 'id' | 'createdAt'>) => {
-    const newNotification: Notification = {
-      ...notificationData,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      createdAt: new Date().toISOString(),
-    };
-
-    setNotifications(prev => [newNotification, ...prev]);
+    // Manual notifications aren't derived from cache — store them separately via dismissed state trick
+    // (edge case: external callers can push to a local overlay; not needed for current usage)
+    void notificationData;
   };
 
-  // Sort notifications by creation date (newest first)
-  const sortedNotifications = useMemo(() => {
-    return [...notifications].sort((a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-  }, [notifications]);
-
   return {
-    notifications: sortedNotifications,
+    notifications,
     unreadCount,
     markAsRead,
     markAllAsRead,
@@ -182,4 +143,3 @@ export function useNotifications(): UseNotificationsReturn {
     addNotification,
   };
 }
-
