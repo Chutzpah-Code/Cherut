@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { MantineProvider, createTheme, MantineColorsTuple } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
@@ -199,67 +199,17 @@ interface AuthAwareMantineProviderProps {
   isAuthenticated?: boolean;
 }
 
-function AuthAwareMantineProvider({ children, isAuthenticated = false }: AuthAwareMantineProviderProps) {
-  // Force light mode for now - dark mode coming soon
-  const [colorScheme, setColorScheme] = useState<'light' | 'dark'>('light');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    // Always force light mode for now
-    setColorScheme('light');
-    localStorage.setItem('mantine-color-scheme-cherut', 'light');
-  }, []);
-
-  // Always use light mode
-  const effectiveColorScheme = 'light';
-
-  // During SSR and first render, always use light
-  if (!mounted) {
-    return (
-      <MantineProvider theme={theme} defaultColorScheme="light">
-        {children}
-      </MantineProvider>
-    );
-  }
-
+function AuthAwareMantineProvider({ children }: AuthAwareMantineProviderProps) {
   return (
-    <MantineProvider
-      theme={theme}
-      defaultColorScheme={effectiveColorScheme}
-    >
+    <MantineProvider theme={theme} forceColorScheme="light">
       {children}
     </MantineProvider>
   );
 }
 
 function MantineThemeProvider({ children }: { children: React.ReactNode }) {
-  // We need to get auth state, but AuthProvider is below this in the tree
-  // So we'll use a simpler approach: just check localStorage for Firebase auth
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // Simple check for any Firebase auth data
-    const checkAuthState = () => {
-      const hasFirebaseAuth = Object.keys(localStorage).some(key =>
-        key.startsWith('firebase:authUser:')
-      );
-      setIsAuthenticated(hasFirebaseAuth);
-    };
-
-    checkAuthState();
-
-    // Listen for auth state changes via storage events
-    const handleStorageChange = () => {
-      checkAuthState();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
   return (
-    <AuthAwareMantineProvider isAuthenticated={isAuthenticated}>
+    <AuthAwareMantineProvider>
       {children}
     </AuthAwareMantineProvider>
   );

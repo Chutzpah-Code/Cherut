@@ -2,5 +2,15 @@
 @tailwind components;
 @tailwind utilities; */
 
-/* NÃO force cores de fundo ou texto aqui */
-/* Deixe o Mantine controlar completamente */
+/* Force light mode globally — dark mode is not supported */
+html,
+html[data-mantine-color-scheme="dark"] {
+  color-scheme: light !important;
+  background-color: #ffffff !important;
+}
+
+body,
+html[data-mantine-color-scheme="dark"] body {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}

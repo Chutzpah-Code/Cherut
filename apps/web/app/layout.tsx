@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <ColorSchemeScript defaultColorScheme="light" />
+        <ColorSchemeScript forceColorScheme="light" />
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <Script src="/debug-logger.js" strategy="beforeInteractive" />

@@ -47,8 +47,15 @@ export function useNotifications(): UseNotificationsReturn {
       setLoading(true);
 
       // First check if notifications are enabled in user profile
-      const profile = await profileApi.get();
-      const notificationsEnabled = profile.preferences?.notifications === true;
+      let notificationsEnabled = false;
+      try {
+        const profile = await profileApi.get();
+        notificationsEnabled = profile.preferences?.notifications === true;
+      } catch {
+        // No profile yet (new user) — skip notifications
+        setNotifications([]);
+        return;
+      }
 
       if (!notificationsEnabled) {
         setNotifications([]);
