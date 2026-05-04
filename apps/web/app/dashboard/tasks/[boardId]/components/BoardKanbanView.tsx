@@ -329,7 +329,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           onStartTimeTracking={(id) => startTrackingMutation.mutate(id)}
           onPauseTimeTracking={(id, trackingId) => pauseTrackingMutation.mutate({ id, trackingId })}
           onStopTimeTracking={(id, trackingId) => stopTrackingMutation.mutate({ id, trackingId })}
-          onToggleChecklistItem={(taskId, itemId) => toggleChecklistMutation.mutate({ taskId, checklistItemId: itemId })}
+          onToggleChecklistItem={(taskId, itemId) => toggleChecklistMutation.mutate({ id: taskId, checklistItemId: itemId })}
         />
       )}
     </>
