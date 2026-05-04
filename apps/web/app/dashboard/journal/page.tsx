@@ -12,7 +12,7 @@ import {
   Center,
   Box,
   Group,
-  Alert,
+  Card,
   Grid,
   ActionIcon,
   Popover,
@@ -131,7 +131,7 @@ export default function JournalPage() {
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
       <Stack
-        gap="lg"
+        gap="xl"
         style={{
           fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         }}
@@ -304,38 +304,30 @@ export default function JournalPage() {
           ))}
         </Grid>
       ) : (
-        <Alert
-          variant="light"
-          color="gray"
-          title={currentFilter === 'archived' ? "No archived entries" : "No entries found"}
-          radius={12}
-          styles={{
-            root: {
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
-            },
-            title: {
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '16px',
-              fontWeight: 600,
-              color: '#334155',
-            },
-            message: {
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '14px',
-              fontWeight: 400,
-              color: '#64748B',
-            },
+        <Card
+          padding="xl"
+          radius={16}
+          style={{
+            background: '#F9FAFB',
+            border: '1px solid #E5E7EB',
+            textAlign: 'center',
           }}
         >
-          {currentFilter === 'archived' ? (
-            "Journal entries you archive will appear here. You can unarchive them at any time."
-          ) : (
-            searchTerm || dateRange[0] || dateRange[1]
-              ? `No entries found matching your filters${searchTerm ? ` for "${searchTerm}"` : ''}. Try adjusting your search criteria.`
-              : "You haven't written any journal entries yet. Click 'New Entry' to start writing!"
-          )}
-        </Alert>
+          <Center>
+            <Stack align="center" gap="sm">
+              <Text style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: 500, color: '#6B7280' }}>
+                {currentFilter === 'archived' ? 'No archived entries' : 'No entries found'}
+              </Text>
+              <Text style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', fontWeight: 400, color: '#6B7280', lineHeight: '20px', maxWidth: 400 }}>
+                {currentFilter === 'archived'
+                  ? 'Journal entries you archive will appear here. You can unarchive them at any time.'
+                  : searchTerm || dateRange[0] || dateRange[1]
+                    ? `No entries found matching your filters${searchTerm ? ` for "${searchTerm}"` : ''}. Try adjusting your search criteria.`
+                    : "You haven't written any journal entries yet. Click 'New Entry' to start writing!"}
+              </Text>
+            </Stack>
+          </Center>
+        </Card>
       )}
 
       {/* Entry Modal */}

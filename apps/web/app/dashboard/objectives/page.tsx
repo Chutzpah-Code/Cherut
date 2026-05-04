@@ -743,31 +743,20 @@ export default function ObjectivesPage() {
           mt="lg"
           radius={16}
           style={{
-            background: '#F5F5F5',
-            border: '1px solid #CCCCCC',
+            background: '#F9FAFB',
+            border: '1px solid #E5E7EB',
           }}
         >
           <Center>
             <Stack align="center">
-              <ThemeIcon
-                size={60}
-                radius={16}
-                style={{
-                  background: '#F5F5F5',
-                  color: '#4686FE',
-                  border: '1px solid #CCCCCC',
-                }}
-              >
-                <Target size={30} />
-              </ThemeIcon>
               <div style={{ textAlign: 'center' }}>
                 <Text
                   mb="xs"
                   style={{
-                    fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                    fontSize: '20px',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
                     fontWeight: 500,
-                    color: '#000000',
+                    color: '#6B7280',
                   }}
                 >
                   {viewFilter === 'archived' ? 'No archived objectives' : viewFilter === 'active' ? 'No active objectives' : 'No objectives yet'}

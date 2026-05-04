@@ -536,24 +536,18 @@ export default function ValuesPage() {
               Start defining your core values to guide your decisions and actions
             </Text>
             <Button
-              variant="outline"
+              leftSection={<Plus size={16} />}
               onClick={handleNew}
               radius={8}
               style={{
                 fontFamily: 'Inter, sans-serif',
-                borderColor: '#4686FE',
-                color: '#4686FE',
+                background: '#4686FE',
+                border: 'none',
                 fontSize: '16px',
                 fontWeight: 600,
+                color: 'white',
                 height: '48px',
-                background: 'white',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    backgroundColor: 'rgba(70, 134, 254, 0.08)',
-                  },
-                },
+                padding: '0 24px',
               }}
             >
               Create your first value

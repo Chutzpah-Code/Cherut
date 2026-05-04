@@ -34,7 +34,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
       `}</style>
       <Card
         withBorder
-        radius={12}
+        radius={16}
         style={{
           cursor: 'pointer',
           transition: 'all 0.2s ease',
@@ -45,7 +45,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
         }}
         styles={{
           root: {
-            border: '1px solid #E2E8F0',
+            border: '1px solid #E5E7EB',
             '&:hover': {
               transform: 'translateY(-2px)',
               borderColor: '#4686FE',
@@ -225,7 +225,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
         {previewText}
       </Text>
 
-      <Group justify="space-between" align="center" mt="md" pt="xs" style={{ borderTop: '1px solid #E2E8F0' }}>
+      <Group justify="space-between" align="center" mt="md" pt="xs" style={{ borderTop: '1px solid #E5E7EB' }}>
         <Text
           size="xs"
           c="dimmed"

@@ -348,10 +348,10 @@ export default function LifeAreasPage() {
           <Stack align="center" gap="lg">
             <Text
               style={{
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '18px',
-                fontWeight: 600,
-                color: '#111827',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+                fontWeight: 500,
+                color: '#6B7280',
               }}
             >
               No life areas yet
@@ -369,24 +369,18 @@ export default function LifeAreasPage() {
               Life areas help you organize and focus on the key aspects of your personal and professional development.
             </Text>
             <Button
-              variant="outline"
+              leftSection={<Plus size={16} />}
               onClick={handleNew}
               radius={8}
               style={{
                 fontFamily: 'Inter, sans-serif',
-                borderColor: '#4686FE',
-                color: '#4686FE',
+                background: '#4686FE',
+                border: 'none',
                 fontSize: '16px',
                 fontWeight: 600,
+                color: 'white',
                 height: '48px',
-                background: 'white',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    backgroundColor: 'rgba(70, 134, 254, 0.08)',
-                  },
-                },
+                padding: '0 24px',
               }}
             >
               Create your first life area

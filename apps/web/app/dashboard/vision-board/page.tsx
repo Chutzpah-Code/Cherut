@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Title, Text, Button, Stack, Box, SimpleGrid, Loader, Center, Alert, Group, Badge } from '@mantine/core';
-import { Plus, Sparkles, Archive } from 'lucide-react';
+import { Title, Text, Button, Stack, Box, SimpleGrid, Loader, Center, Card, Group } from '@mantine/core';
+import { Plus } from 'lucide-react';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
@@ -340,66 +340,59 @@ export default function VisionBoardPage() {
       {currentFilter === 'active' ? (
         // Active Items View
         !activeItems || activeItems.length === 0 ? (
-          <Alert
-            icon={<Sparkles size={20} />}
+          <Card
+            padding="xl"
             radius={16}
             style={{
-              background: '#F5F5F5',
-              border: '1px solid #CCCCCC',
+              background: '#F9FAFB',
+              border: '1px solid #E5E7EB',
+              textAlign: 'center',
             }}
-            styles={{
-              icon: {
-                color: '#4686FE',
-              },
-              title: {
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '18px',
-                fontWeight: 600,
-                color: '#000000',
-              },
-              message: {
-                color: '#666666',
-              },
-            }}
-            title="Start Your Vision Board"
           >
-            <Text
-              mb="md"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
-                fontWeight: 400,
-                color: '#666666',
-                lineHeight: '20px',
-              }}
-            >
-              Create a visual representation of your dreams and goals. Add images that inspire you and
-              track your progress towards achieving them!
-            </Text>
-            <Button
-              leftSection={<Plus size={16} />}
-              onClick={() => setIsCreateModalOpen(true)}
-              radius={8}
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                background: '#4686FE',
-                border: 'none',
-                fontSize: '14px',
-                fontWeight: 600,
-                color: 'white',
-                height: '40px',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    background: '#3366E5',
-                  },
-                },
-              }}
-            >
-              Add Your First Goal
-            </Button>
-          </Alert>
+            <Center>
+              <Stack align="center" gap="md">
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 500,
+                    color: '#6B7280',
+                  }}
+                >
+                  Start Your Vision Board
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: '#6B7280',
+                    lineHeight: '20px',
+                    maxWidth: 400,
+                  }}
+                >
+                  Create a visual representation of your dreams and goals. Add images that inspire you and track your progress towards achieving them!
+                </Text>
+                <Button
+                  leftSection={<Plus size={16} />}
+                  onClick={() => setIsCreateModalOpen(true)}
+                  radius={8}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    background: '#4686FE',
+                    border: 'none',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: 'white',
+                    height: '48px',
+                    padding: '0 24px',
+                  }}
+                >
+                  Add Your First Goal
+                </Button>
+              </Stack>
+            </Center>
+          </Card>
         ) : (
           <SimpleGrid
             cols={{

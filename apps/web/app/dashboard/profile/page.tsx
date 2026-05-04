@@ -198,7 +198,7 @@ export default function ProfilePage() {
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
       <Stack
-        gap="lg"
+        gap="xl"
         style={{
           fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         }}
@@ -238,10 +238,10 @@ export default function ProfilePage() {
             shadow="sm"
             padding="lg"
             withBorder
-            radius={12}
+            radius={16}
             styles={{
               root: {
-                border: '1px solid #E2E8F0',
+                border: '1px solid #E5E7EB',
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               },
             }}
@@ -347,10 +347,10 @@ export default function ProfilePage() {
             shadow="sm"
             padding="lg"
             withBorder
-            radius={12}
+            radius={16}
             styles={{
               root: {
-                border: '1px solid #E2E8F0',
+                border: '1px solid #E5E7EB',
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               },
             }}
@@ -790,7 +790,7 @@ export default function ProfilePage() {
           </Group>
         }
         centered
-        radius={12}
+        radius={16}
         styles={{
           header: {
             padding: '24px 24px 0 24px',

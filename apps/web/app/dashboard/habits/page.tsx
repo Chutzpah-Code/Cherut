@@ -308,7 +308,7 @@ export default function HabitsPage() {
               fontFamily: 'Inter, sans-serif',
               fontSize: '16px',
               fontWeight: 400,
-              color: colors.text.secondary,
+              color: '#666666',
               lineHeight: '24px',
             }}
           >

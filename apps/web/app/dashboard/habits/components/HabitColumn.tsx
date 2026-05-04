@@ -41,9 +41,9 @@ export function HabitColumn({
         display: 'flex',
         flexDirection: 'column',
         height: '548px', // Optimized to show 3.5 habits (desktop)
-        background: colors.surface,
-        border: `1px solid ${colors.border}`,
-        borderRadius: '24px',
+        background: '#FFFFFF',
+        border: '1px solid #E5E7EB',
+        borderRadius: '16px',
         padding: '24px',
         transition: 'all 200ms ease',
       }}

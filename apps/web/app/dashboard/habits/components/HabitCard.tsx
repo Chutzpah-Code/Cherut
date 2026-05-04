@@ -56,10 +56,10 @@ export function HabitCard({ habit, logs, onEdit, onDayClick, isArchived = false,
       <Card
         padding={24}
         withBorder
-        radius={24}
+        radius={16}
         style={{
-          background: '#FBFBFB',
-          border: '1px solid rgba(0,0,0,0.06)',
+          background: '#FFFFFF',
+          border: '1px solid #E5E7EB',
           transition: 'all 0.2s ease',
         }}
         styles={{
