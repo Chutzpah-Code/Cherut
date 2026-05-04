@@ -65,10 +65,11 @@ export class BoardsService {
     const snap = await db
       .collection(this.boardsCollection)
       .where('userId', '==', userId)
-      .orderBy('createdAt', 'asc')
       .get();
 
-    return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return snap.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() } as any))
+      .sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
   }
 
   async findOneBoard(userId: string, boardId: string) {
@@ -145,10 +146,11 @@ export class BoardsService {
     const snap = await db
       .collection(this.columnsCollection)
       .where('boardId', '==', boardId)
-      .orderBy('order', 'asc')
       .get();
 
-    return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return snap.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() } as any))
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   }
 
   async updateColumn(
@@ -191,7 +193,6 @@ export class BoardsService {
       db
         .collection(this.columnsCollection)
         .where('boardId', '==', boardId)
-        .orderBy('order', 'asc')
         .get(),
       db
         .collection(this.tasksCollection)
@@ -200,11 +201,9 @@ export class BoardsService {
         .get(),
     ]);
 
-    const columns = colSnap.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      tasks: [] as any[],
-    }));
+    const columns = colSnap.docs
+      .map((doc) => ({ id: doc.id, ...doc.data(), tasks: [] as any[] } as any))
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     const tasksByColumn: Record<string, any[]> = {};
     taskSnap.docs.forEach((doc) => {
