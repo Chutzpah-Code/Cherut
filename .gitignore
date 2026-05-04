@@ -40,6 +40,9 @@ Thumbs.db
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Docs (private, not published)
+docs/
+
 # misc
 /.sass-cache
 /connect.lock
@@ -95,3 +98,7 @@ out/
 
 # Generated files
 *.generated.*
+
+# Python virtual environment
+venv/
+.venv/
