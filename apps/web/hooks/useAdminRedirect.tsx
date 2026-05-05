@@ -65,12 +65,6 @@ export function useAdminRedirect(options: UseAdminRedirectOptions = {}) {
     // Não redirecionar se usuário não está logado
     if (!user || !userData) return;
 
-      uid: user.uid,
-      role: userData.role,
-      pathname,
-      isAdmin,
-    });
-
     // REGRAS DE REDIRECIONAMENTO
 
     // 1. Se admin está em página de usuário comum, redirecionar para admin
