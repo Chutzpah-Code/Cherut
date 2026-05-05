@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  ServiceUnavailableException,
   Logger,
   BadRequestException,
 } from '@nestjs/common';
@@ -249,13 +250,16 @@ export class AuthService {
         return null;
       }
 
-      return {
-        uid,
-        ...userDoc.data(),
-      };
+      return { uid, ...userDoc.data() };
     } catch (error) {
       this.logger.error('Token validation error:', error);
-      return null;
+
+      // Firestore quota or connectivity errors should surface as 503, not 401
+      if (error?.code === 8 || error?.details?.includes('Quota') || error?.message?.includes('RESOURCE_EXHAUSTED')) {
+        throw new ServiceUnavailableException('Database temporarily unavailable. Please try again later.');
+      }
+
+      throw error;
     }
   }
 }
