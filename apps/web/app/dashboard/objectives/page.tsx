@@ -69,16 +69,6 @@ export default function ObjectivesPage() {
   const { data: objectives, isLoading, error } = useObjectives();
   const { data: lifeAreas } = useLifeAreas();
 
-    objectives: objectives?.length || 0,
-    isLoading,
-    error: error?.message || 'none',
-    lifeAreas: lifeAreas?.length || 0
-  });
-
-  if (objectives && objectives.length > 0) {
-    objectives.forEach((obj, index) => {
-    });
-  }
   const createMutation = useCreateObjective();
   const updateMutation = useUpdateObjective();
   const deleteMutation = useDeleteObjective();
