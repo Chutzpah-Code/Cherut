@@ -46,6 +46,8 @@ import { RegisterDto, LoginDto } from './dto';
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
+  private readonly userCache = new Map<string, { data: any; expiry: number }>();
+  private readonly USER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor(
     private readonly firebaseService: FirebaseService,
@@ -242,6 +244,12 @@ export class AuthService {
    * Usado pelo FirebaseStrategy para autenticar requisições
    */
   async validateToken(uid: string) {
+    const now = Date.now();
+    const cached = this.userCache.get(uid);
+    if (cached && cached.expiry > now) {
+      return cached.data;
+    }
+
     try {
       const db = this.firebaseService.getFirestore();
       const userDoc = await db.collection('users').doc(uid).get();
@@ -250,11 +258,12 @@ export class AuthService {
         return null;
       }
 
-      return { uid, ...userDoc.data() };
+      const userData = { uid, ...userDoc.data() };
+      this.userCache.set(uid, { data: userData, expiry: now + this.USER_CACHE_TTL });
+      return userData;
     } catch (error) {
       this.logger.error('Token validation error:', error);
 
-      // Firestore quota or connectivity errors should surface as 503, not 401
       if (error?.code === 8 || error?.details?.includes('Quota') || error?.message?.includes('RESOURCE_EXHAUSTED')) {
         throw new ServiceUnavailableException('Database temporarily unavailable. Please try again later.');
       }
