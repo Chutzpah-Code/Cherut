@@ -66,10 +66,12 @@ export function useNotifications(): UseNotificationsReturn {
     localStorage.setItem('cherut-dismissed-notifications', JSON.stringify(dismissed));
   }, [dismissed]);
 
-  // Subscribe to React Query cache updates — no API calls, zero extra Firestore reads
+  // Subscribe to React Query cache updates — only fire when a query successfully loads new data
   useEffect(() => {
-    const unsubscribe = queryClient.getQueryCache().subscribe(() => {
-      setCacheTick((t) => t + 1);
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event.type === 'updated' && event.action.type === 'success') {
+        setCacheTick((t) => t + 1);
+      }
     });
     return unsubscribe;
   }, [queryClient]);
