@@ -65,7 +65,6 @@ export function useAdminRedirect(options: UseAdminRedirectOptions = {}) {
     // Não redirecionar se usuário não está logado
     if (!user || !userData) return;
 
-    console.log('[AdminRedirect] Checking redirect for user:', {
       uid: user.uid,
       role: userData.role,
       pathname,
@@ -76,14 +75,12 @@ export function useAdminRedirect(options: UseAdminRedirectOptions = {}) {
 
     // 1. Se admin está em página de usuário comum, redirecionar para admin
     if (isAdmin && pathname.startsWith('/dashboard') && !pathname.startsWith('/dashboard/admin')) {
-      console.log('[AdminRedirect] 👑 Admin detected, redirecting to admin panel');
       router.replace(adminFallback);
       return;
     }
 
     // 2. Se usuário comum tenta acessar área admin, redirecionar para dashboard
     if (!isAdmin && pathname.startsWith('/admin')) {
-      console.log('[AdminRedirect] 🚫 Non-admin trying to access admin area, redirecting to dashboard');
       router.replace(userFallback);
       return;
     }
@@ -91,7 +88,6 @@ export function useAdminRedirect(options: UseAdminRedirectOptions = {}) {
     // 3. Se está na página inicial (/) após login, redirecionar para área apropriada
     if (pathname === '/' && user) {
       const targetUrl = isAdmin ? adminFallback : userFallback;
-      console.log(`[AdminRedirect] 🏠 Redirecting from home to ${targetUrl}`);
       router.replace(targetUrl);
       return;
     }
@@ -104,20 +100,17 @@ export function useAdminRedirect(options: UseAdminRedirectOptions = {}) {
       if (redirectParam) {
         // Verificar se o redirect é válido para o role do usuário
         if (isAdmin && redirectParam.startsWith('/admin')) {
-          console.log('[AdminRedirect] 🎯 Admin redirect to:', redirectParam);
           router.replace(redirectParam);
           return;
         }
 
         if (!isAdmin && !redirectParam.startsWith('/admin')) {
-          console.log('[AdminRedirect] 🎯 User redirect to:', redirectParam);
           router.replace(redirectParam);
           return;
         }
 
         // Se redirect não é válido para o role, usar fallback
         const fallback = isAdmin ? adminFallback : userFallback;
-        console.log('[AdminRedirect] ⚠️ Invalid redirect for role, using fallback:', fallback);
         router.replace(fallback);
       }
     }
@@ -142,7 +135,6 @@ export function useAdminRedirect(options: UseAdminRedirectOptions = {}) {
      */
     redirectToAppropriateArea: () => {
       const targetUrl = isAdmin ? adminFallback : userFallback;
-      console.log('[AdminRedirect] 🔄 Manual redirect to:', targetUrl);
       router.push(targetUrl);
     },
 

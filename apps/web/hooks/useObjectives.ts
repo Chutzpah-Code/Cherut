@@ -5,9 +5,7 @@ export const useObjectives = (lifeAreaId?: string) => {
   return useQuery({
     queryKey: ['objectives', lifeAreaId],
     queryFn: async () => {
-      console.log('[useObjectives] Fetching objectives...');
       const result = await objectivesApi.getAll(lifeAreaId);
-      console.log('[useObjectives] Success:', result?.length || 0, 'objectives');
       return result;
     },
     staleTime: 15 * 60 * 1000, // 15 minutes - muito mais cache

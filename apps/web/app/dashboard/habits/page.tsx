@@ -103,15 +103,7 @@ export default function HabitsPage() {
     }
   };
 
-  // Carregar logs de todos os hábitos quando a lista de hábitos mudar
-  React.useEffect(() => {
-    if (habits) {
-      habits.forEach((habit) => {
-        loadHabitLogs(habit.id);
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [habits]);
+  // Logs are loaded on-demand via loadHabitLogs when user interacts with a habit
 
   const handleOpenCreateModal = (category: 'good' | 'bad') => {
     setCreatingCategory(category);

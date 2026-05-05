@@ -79,7 +79,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Only subscribe if Firebase is configured
     if (typeof subscribeToAuthChanges === 'function') {
       const unsubscribe = subscribeToAuthChanges(async (firebaseUser) => {
-        console.log('[Auth] Firebase user changed:', firebaseUser?.uid);
         setUser(firebaseUser);
 
         if (firebaseUser) {
@@ -87,7 +86,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           await authenticateWithBackend(firebaseUser);
         } else {
           // User signed out - clear backend auth and reset theme
-          console.log('[Auth] User signed out - clearing theme preferences');
           setBackendAuthenticated(false);
           setUserData(null);
 

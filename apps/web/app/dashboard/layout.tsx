@@ -26,17 +26,8 @@ export default function DashboardLayout({
   // Usar hook de redirecionamento automático
   useAdminRedirect();
 
-  console.log('[Dashboard] Auth state:', {
-    user: !!user,
-    loading,
-    backendAuthenticated,
-    isAdmin
-  });
-
-  // Redirect to home if not authenticated
   useEffect(() => {
     if (!loading && !user) {
-      console.log('[Dashboard] No user, redirecting to home');
       router.push('/');
     }
   }, [loading, user, router]);

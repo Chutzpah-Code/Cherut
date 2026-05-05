@@ -10,6 +10,8 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "npx nest start",
     "start:dev": "npx nest start --watch",
+    "emulator": "firebase emulators:start",
+    "emulator:export": "firebase emulators:start --export-on-exit ./emulator-data --import ./emulator-data",
     "start:debug": "npx nest start --debug --watch",
     "start:prod": "node dist/main.js",
     "start:prod:render": "cd ../../ && ls -la apps/api/dist/ && node apps/api/dist/main.js",

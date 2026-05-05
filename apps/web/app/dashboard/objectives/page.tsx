@@ -65,22 +65,18 @@ interface KeyResultFormData {
 }
 
 export default function ObjectivesPage() {
-  console.log('[Objectives Page] Component rendering...');
 
   const { data: objectives, isLoading, error } = useObjectives();
   const { data: lifeAreas } = useLifeAreas();
 
-  console.log('[Objectives Page] State:', {
     objectives: objectives?.length || 0,
     isLoading,
     error: error?.message || 'none',
     lifeAreas: lifeAreas?.length || 0
   });
 
-  console.log('📊 Current objectives data:', objectives);
   if (objectives && objectives.length > 0) {
     objectives.forEach((obj, index) => {
-      console.log(`🎯 Objective ${index}: "${obj.title}" - keyResults:`, obj.keyResults);
     });
   }
   const createMutation = useCreateObjective();
@@ -144,9 +140,6 @@ export default function ObjectivesPage() {
         await updateMutation.mutateAsync({ id: editingObjective.id, dto: updateDto });
 
         // Handle Key Results updates (simplified approach)
-        console.log('🔄 Processing Key Results updates...');
-        console.log('📊 Current keyResults state:', keyResults);
-        console.log('📊 Original objective keyResults:', editingObjective.keyResults);
 
         const existingKRs = editingObjective.keyResults || [];
         const currentKRs = keyResults.filter(kr => kr.title && kr.targetValue && kr.unit);
@@ -157,7 +150,6 @@ export default function ObjectivesPage() {
         // 1. Update existing Key Results - BATCH OPTIMIZATION
         const existingKRsToUpdate = currentKRs.filter(kr => kr.id);
         if (existingKRsToUpdate.length > 0) {
-          console.log(`🚀 Batch updating ${existingKRsToUpdate.length} existing Key Results`);
           try {
             const batchUpdates = existingKRsToUpdate.map(kr => ({
               id: kr.id!,
@@ -177,10 +169,8 @@ export default function ObjectivesPage() {
 
             updateResults.success += batchResult.success;
             updateResults.errors += batchResult.errors;
-            console.log(`✅ Batch update completed: ${batchResult.success} success, ${batchResult.errors} errors`);
           } catch (error) {
             console.error(`❌ Batch update failed:`, error);
-            console.log(`🔄 Falling back to individual updates for ${existingKRsToUpdate.length} Key Results`);
 
             // Fallback: Update each Key Result individually
             for (const kr of existingKRsToUpdate) {
@@ -198,7 +188,6 @@ export default function ObjectivesPage() {
                   skipInvalidation: true,
                 });
                 updateResults.success++;
-                console.log(`✅ Individual update success for KR: ${kr.title}`);
               } catch (individualError) {
                 console.error(`❌ Individual update failed for KR ${kr.id}:`, individualError);
                 updateResults.errors++;
@@ -209,7 +198,6 @@ export default function ObjectivesPage() {
 
         // 2. Create new Key Results (those without id) - WITH BATCH OPTIMIZATION
         for (const kr of currentKRs.filter(kr => !kr.id)) {
-          console.log(`➕ Creating new KR: ${kr.title}`);
           try {
             await createKRMutation.mutateAsync({
               objectiveId: editingObjective.id,
@@ -233,7 +221,6 @@ export default function ObjectivesPage() {
         const currentKRIds = currentKRs.filter(kr => kr.id).map(kr => kr.id);
         for (const existingKR of existingKRs) {
           if (!currentKRIds.includes(existingKR.id)) {
-            console.log(`🗑️ Deleting removed KR: ${existingKR.id} - ${existingKR.title}`);
             try {
               await deleteKRMutation.mutateAsync({
                 objectiveId: editingObjective.id,
@@ -248,7 +235,6 @@ export default function ObjectivesPage() {
           }
         }
 
-        console.log(`✅ Key Results update completed: ${updateResults.success} success, ${updateResults.errors} errors`);
 
         // Manually invalidate queries ONCE at the end for better performance
         queryClient.invalidateQueries({ queryKey: ['objectives'] });
@@ -335,8 +321,6 @@ export default function ObjectivesPage() {
   };
 
   const handleEditObjective = (objective: Objective) => {
-    console.log('🔍 handleEditObjective called with:', objective);
-    console.log('🔑 objective.keyResults:', objective.keyResults);
 
     setEditingObjective(objective);
 
@@ -366,10 +350,8 @@ export default function ObjectivesPage() {
         unit: kr.unit,
         isCompleted: kr.isCompleted,
       }));
-      console.log('✅ Setting keyResults to:', krFormData);
       setKeyResults(krFormData);
     } else {
-      console.log('❌ No keyResults found, setting to empty array');
       setKeyResults([]);
     }
 
@@ -1247,7 +1229,6 @@ export default function ObjectivesPage() {
               </Group>
 
               <Stack gap="md">
-                {(() => { console.log('🔍 Rendering keyResults in modal:', keyResults); return null; })()}
                 {keyResults.map((kr, index) => (
                   <Paper key={index} p="md" withBorder>
                     <Group justify="space-between" align="center" mb="sm">
