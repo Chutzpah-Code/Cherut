@@ -57,7 +57,7 @@ export default function DashboardLayout({
     }
   }, [mobileOpened]);
 
-  const shouldShowDashboard = !loading && user && backendAuthenticated;
+  const shouldShowDashboard = !loading && !!user;
 
   if (!shouldShowDashboard) {
     return (

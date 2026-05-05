@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from 'firebase/auth';
 import { subscribeToAuthChanges, getIdToken } from '@/lib/firebase/auth';
-import { loginWithBackend } from '@/lib/api/services/auth';
 
 interface UserData {
   uid: string;
@@ -48,62 +47,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Authenticate with backend when Firebase user changes
   const authenticateWithBackend = async (firebaseUser: User) => {
+    // Populate userData from Firebase immediately so the dashboard is never blocked
+    const baseUserData: UserData = {
+      uid: firebaseUser.uid,
+      email: firebaseUser.email || '',
+      displayName: firebaseUser.displayName || undefined,
+      role: 'user',
+      subscription: { plan: 'free', status: 'active' },
+    };
+    setUserData(baseUserData);
+    setBackendAuthenticated(true);
+
+    // Best-effort: sync with backend and detect admin role
     try {
-      console.log('[Auth] Authenticating with backend for user:', firebaseUser.uid);
-      console.log('[Auth] Getting Firebase ID token...');
-
       const token = await getIdToken();
-      console.log('[Auth] Firebase token retrieved:', token ? `✅ (${token.length} chars)` : '❌ null');
+      if (!token) return;
 
-      if (!token) {
-        console.error('[Auth] No Firebase token available');
-        setBackendAuthenticated(false);
-        setUserData(null);
-        return;
-      }
-
-      console.log('[Auth] Calling backend login...');
-      const loginResponse = await loginWithBackend(token);
-      console.log('[Auth] ✅ Backend authentication successful');
-
-      // Buscar dados completos do usuário incluindo role
-      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/health`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      // Detect admin role
+      const adminCheck = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/health`, {
+        headers: { 'Authorization': `Bearer ${token}` },
       });
-
-      let role: 'user' | 'admin' = 'user';
-
-      // Se conseguiu acessar endpoint admin, é admin
-      if (userResponse.ok) {
-        console.log('[Auth] ✅ User has admin role');
-        role = 'admin';
-      } else {
-        console.log('[Auth] ℹ️ User has regular user role');
+      if (adminCheck.ok) {
+        setUserData((prev) => prev ? { ...prev, role: 'admin' } : prev);
       }
-
-      // Construir userData
-      const userData: UserData = {
-        uid: firebaseUser.uid,
-        email: firebaseUser.email || '',
-        displayName: firebaseUser.displayName || undefined,
-        role,
-        subscription: {
-          plan: 'free', // Default - poderia buscar do backend se necessário
-          status: 'active',
-        },
-      };
-
-      setUserData(userData);
-      setBackendAuthenticated(true);
-
-      console.log('[Auth] ✅ User data loaded:', { role, email: userData.email });
-
-    } catch (error) {
-      console.error('[Auth] ❌ Backend authentication failed:', error);
-      setBackendAuthenticated(false);
-      setUserData(null);
+    } catch {
+      // Backend unreachable — dashboard still works via Firebase Bearer token
     }
   };
 
