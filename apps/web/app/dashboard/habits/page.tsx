@@ -36,7 +36,7 @@ export default function HabitsPage() {
   const [currentFilter, setCurrentFilter] = useState<HabitsFilterType>('active');
   const colors = useThemeColors();
 
-  const { data: activeHabits, isLoading: activeLoading } = useHabits(); // Only active habits
+  const { data: activeHabits, isLoading: activeLoading } = useHabits(undefined, false); // Only active habits
   const { data: allHabits, isLoading: allLoading } = useAllHabits(); // All habits (active + archived)
   const { data: archivedHabits, isLoading: archivedLoading } = useArchivedHabits();
   const { data: habitCounts } = useHabitCounts();

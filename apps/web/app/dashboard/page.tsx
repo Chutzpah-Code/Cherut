@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const { data: objectives, isLoading: objectivesLoading } = useObjectives();
   const { data: tasks, isLoading: tasksLoading } = useTasks();
   const { data: lifeAreas, isLoading: lifeAreasLoading } = useLifeAreas();
-  const { data: habits, isLoading: habitsLoading } = useHabits();
+  const { data: habits, isLoading: habitsLoading } = useHabits(undefined, false);
 
   // Calculate stats
   const activeObjectives = objectives?.filter((obj) => obj.status !== 'completed').length || 0;
