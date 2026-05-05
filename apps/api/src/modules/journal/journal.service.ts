@@ -173,39 +173,18 @@ export class JournalService {
    * Get journal entry counts (active, archived, total)
    */
   async getJournalCounts(userId: string) {
-    // Get all journal entries regardless of archived status
-    const allEntries = await this.findAllWithoutFilter(userId);
-
-    const active = allEntries.filter((entry: any) => {
-      const isArchived = entry.isArchived !== undefined ? entry.isArchived : false; // default to active for legacy data
-      return !isArchived;
-    }).length;
-
-    const archived = allEntries.filter((entry: any) => {
-      const isArchived = entry.isArchived !== undefined ? entry.isArchived : false; // default to active for legacy data
-      return isArchived;
-    }).length;
-
-    const total = allEntries.length;
-
-    return { active, archived, total };
-  }
-
-  /**
-   * Helper method to get all journal entries without isArchived filter
-   */
-  private async findAllWithoutFilter(userId: string) {
     const db = this.firebaseService.getFirestore();
 
-    let query = db
-      .collection(this.journalCollection)
-      .where('userId', '==', userId);
+    const baseRef = db.collection(this.journalCollection).where('userId', '==', userId);
 
-    const snapshot = await query.get();
+    const [activeResult, archivedResult] = await Promise.all([
+      baseRef.where('isArchived', '==', false).count().get(),
+      baseRef.where('isArchived', '==', true).count().get(),
+    ]);
 
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const active = activeResult.data().count as number;
+    const archived = archivedResult.data().count as number;
+
+    return { active, archived, total: active + archived };
   }
 }

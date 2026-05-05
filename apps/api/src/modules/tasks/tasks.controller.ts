@@ -41,14 +41,12 @@ export class TasksController {
   findAll(
     @Request() req,
     @Query('lifeAreaId') lifeAreaId?: string,
-    @Query('actionPlanId') actionPlanId?: string,
     @Query('status') status?: string,
     @Query('archived') archived?: string,
   ) {
     return this.tasksService.findAll(
       req.user.uid,
       lifeAreaId,
-      actionPlanId,
       status,
       archived === 'true',
     );

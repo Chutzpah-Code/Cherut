@@ -68,6 +68,29 @@ export class KeyResultsService {
     }));
   }
 
+  async findAllByObjectiveIds(userId: string, objectiveIds: string[]) {
+    if (objectiveIds.length === 0) return [];
+    const db = this.firebaseService.getFirestore();
+
+    const chunks: string[][] = [];
+    for (let i = 0; i < objectiveIds.length; i += 30) {
+      chunks.push(objectiveIds.slice(i, i + 30));
+    }
+
+    const snapshots = await Promise.all(
+      chunks.map(chunk =>
+        db.collection(this.collection)
+          .where('userId', '==', userId)
+          .where('objectiveId', 'in', chunk)
+          .get()
+      )
+    );
+
+    return snapshots.flatMap(snapshot =>
+      snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    );
+  }
+
   async findOne(userId: string, id: string) {
     const db = this.firebaseService.getFirestore();
     const doc = await db.collection(this.collection).doc(id).get();

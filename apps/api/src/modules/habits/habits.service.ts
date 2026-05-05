@@ -45,7 +45,7 @@ export class HabitsService {
   async findAll(userId: string, lifeAreaId?: string, archived?: boolean) {
     const db = this.firebaseService.getFirestore();
 
-    let query = db
+    let query: any = db
       .collection(this.habitsCollection)
       .where('userId', '==', userId);
 
@@ -53,28 +53,16 @@ export class HabitsService {
       query = query.where('lifeAreaId', '==', lifeAreaId);
     }
 
+    // Push active/archived filter to Firestore to avoid fetching all documents
+    // archived=true → isActive==false, archived=false or default → isActive==true
+    query = query.where('isActive', '==', archived !== true);
+
     const snapshot = await query.get();
 
-    let habits = snapshot.docs.map((doc) => ({
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
-    // Filter by archived status in code to handle legacy data
-    if (archived !== undefined) {
-      habits = habits.filter((habit: any) => {
-        const isActive = habit.isActive !== undefined ? habit.isActive : true; // default to active for legacy data
-        return !isActive === archived; // archived=true means !isActive, archived=false means isActive
-      });
-    } else {
-      // Default behavior: only active habits (including legacy habits without isActive field)
-      habits = habits.filter((habit: any) => {
-        const isActive = habit.isActive !== undefined ? habit.isActive : true;
-        return isActive;
-      });
-    }
-
-    return habits;
   }
 
   async findOne(userId: string, id: string) {
@@ -306,22 +294,22 @@ export class HabitsService {
    * Get habit counts (active, archived, total)
    */
   async getHabitCounts(userId: string, lifeAreaId?: string) {
-    // Get all habits regardless of archived status
-    const allHabits = await this.findAllWithoutFilter(userId, lifeAreaId);
+    const db = this.firebaseService.getFirestore();
 
-    const active = allHabits.filter((habit: any) => {
-      const isActive = habit.isActive !== undefined ? habit.isActive : true; // default to active for legacy data
-      return isActive;
-    }).length;
+    let baseRef: any = db.collection(this.habitsCollection).where('userId', '==', userId);
+    if (lifeAreaId) {
+      baseRef = baseRef.where('lifeAreaId', '==', lifeAreaId);
+    }
 
-    const archived = allHabits.filter((habit: any) => {
-      const isActive = habit.isActive !== undefined ? habit.isActive : true; // default to active for legacy data
-      return !isActive;
-    }).length;
+    const [activeResult, archivedResult] = await Promise.all([
+      baseRef.where('isActive', '==', true).count().get(),
+      baseRef.where('isActive', '==', false).count().get(),
+    ]);
 
-    const total = allHabits.length;
+    const active = activeResult.data().count as number;
+    const archived = archivedResult.data().count as number;
 
-    return { active, archived, total };
+    return { active, archived, total: active + archived };
   }
 
   /**
@@ -356,25 +344,4 @@ export class HabitsService {
     return { message: 'Habit permanently deleted successfully' };
   }
 
-  /**
-   * Helper method to get all habits without isActive filter
-   */
-  private async findAllWithoutFilter(userId: string, lifeAreaId?: string) {
-    const db = this.firebaseService.getFirestore();
-
-    let query = db
-      .collection(this.habitsCollection)
-      .where('userId', '==', userId);
-
-    if (lifeAreaId) {
-      query = query.where('lifeAreaId', '==', lifeAreaId);
-    }
-
-    const snapshot = await query.get();
-
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-  }
 }

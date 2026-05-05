@@ -21,7 +21,6 @@ export interface Task {
   lifeAreaId?: string;
   objectiveId?: string;
   keyResultId?: string;
-  actionPlanId?: string;
   boardId?: string;
   columnId?: string;
   title: string;
@@ -45,7 +44,6 @@ export interface CreateTaskDto {
   lifeAreaId?: string;
   objectiveId?: string;
   keyResultId?: string;
-  actionPlanId?: string;
   boardId?: string;
   columnId?: string;
   title: string;
@@ -62,7 +60,6 @@ export interface UpdateTaskDto {
   lifeAreaId?: string;
   objectiveId?: string;
   keyResultId?: string;
-  actionPlanId?: string;
   boardId?: string;
   columnId?: string;
   title?: string;

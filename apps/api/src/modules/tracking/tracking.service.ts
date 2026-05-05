@@ -3,7 +3,6 @@ import { FirebaseService } from '../../config/firebase.service';
 import { LifeAreasService } from '../life-areas/life-areas.service';
 import { ObjectivesService } from '../objectives/objectives.service';
 import { KeyResultsService } from '../key-results/key-results.service';
-import { ActionPlansService } from '../action-plans/action-plans.service';
 import { HabitsService } from '../habits/habits.service';
 import { TrackingQueryDto, TimeRange } from './dto';
 
@@ -14,7 +13,6 @@ export class TrackingService {
     private readonly lifeAreasService: LifeAreasService,
     private readonly objectivesService: ObjectivesService,
     private readonly keyResultsService: KeyResultsService,
-    private readonly actionPlansService: ActionPlansService,
     private readonly habitsService: HabitsService,
   ) {}
 
@@ -28,38 +26,31 @@ export class TrackingService {
       lifeAreas,
       objectives,
       keyResults,
-      actionPlans,
       habits,
       habitLogs,
     ] = await Promise.all([
       this.lifeAreasService.findAll(userId),
       this.objectivesService.findAll(userId),
       this.keyResultsService.findAll(userId),
-      this.actionPlansService.findAll(userId),
       this.habitsService.findAll(userId),
       this.getHabitLogsInRange(userId, startDate, endDate),
     ]);
 
-    // Calculate completion rates
     const objectivesCompletion = this.calculateCompletion(objectives);
     const keyResultsCompletion = this.calculateCompletion(keyResults);
-    const actionPlansCompletion = this.calculateCompletion(actionPlans);
     const habitsCompletion = this.calculateHabitsCompletion(habitLogs);
 
     return {
       summary: {
         totalLifeAreas: lifeAreas.length,
-        activeObjectives: objectives.filter((o: any) => o.status === 'in_progress')
-          .length,
+        activeObjectives: objectives.filter((o: any) => o.status === 'in_progress').length,
         totalObjectives: objectives.length,
         totalKeyResults: keyResults.length,
-        totalActionPlans: actionPlans.length,
         totalHabits: habits.length,
       },
       completion: {
         objectives: objectivesCompletion,
         keyResults: keyResultsCompletion,
-        actionPlans: actionPlansCompletion,
         habits: habitsCompletion,
       },
       timeRange: {
@@ -85,15 +76,8 @@ export class TrackingService {
       this.habitsService.findAll(userId, lifeAreaId),
     ]);
 
-    const keyResultsPromises = objectives.map((obj) =>
-      this.keyResultsService.findAll(userId, obj.id),
-    );
-    const allKeyResults = (await Promise.all(keyResultsPromises)).flat();
-
-    const actionPlansPromises = allKeyResults.map((kr) =>
-      this.actionPlansService.findAll(userId, kr.id),
-    );
-    const allActionPlans = (await Promise.all(actionPlansPromises)).flat();
+    const objectiveIds = objectives.map((obj) => obj.id);
+    const allKeyResults = await this.keyResultsService.findAllByObjectiveIds(userId, objectiveIds);
 
     return {
       lifeArea,
@@ -106,11 +90,6 @@ export class TrackingService {
         keyResults: {
           total: allKeyResults.length,
           completion: this.calculateCompletion(allKeyResults),
-        },
-        actionPlans: {
-          total: allActionPlans.length,
-          byStatus: this.groupByStatus(allActionPlans),
-          completion: this.calculateCompletion(allActionPlans),
         },
         habits: {
           total: habits.length,
@@ -139,12 +118,6 @@ export class TrackingService {
       this.keyResultsService.findAll(userId, objectiveId),
     ]);
 
-    const actionPlansPromises = keyResults.map((kr) =>
-      this.actionPlansService.findAll(userId, kr.id),
-    );
-    const allActionPlans = (await Promise.all(actionPlansPromises)).flat();
-
-    // Calculate overall objective completion based on KR progress
     const avgKeyResultProgress =
       keyResults.length > 0
         ? keyResults.reduce(
@@ -160,15 +133,7 @@ export class TrackingService {
       keyResults: keyResults.map((kr: any) => ({
         ...kr,
         progress: ((kr.currentValue || 0) / kr.targetValue) * 100,
-        actionPlansCount: allActionPlans.filter(
-          (ap: any) => ap.keyResultId === kr.id,
-        ).length,
       })),
-      actionPlans: {
-        total: allActionPlans.length,
-        byStatus: this.groupByStatus(allActionPlans),
-        completion: this.calculateCompletion(allActionPlans),
-      },
       timeRange: {
         startDate,
         endDate,
@@ -187,34 +152,35 @@ export class TrackingService {
       query.lifeAreaId,
     );
 
-    const habitsWithStats = await Promise.all(
-      habits.map(async (habit) => {
-        const logs = await this.habitsService.getHabitLogs(
-          userId,
-          habit.id,
-          startDate,
-          endDate,
-        );
+    const allLogs = await this.getHabitLogsInRange(userId, startDate, endDate);
 
-        const streak = this.calculateStreak(logs);
-        const completionRate = this.calculateHabitCompletionRate(
-          habit,
-          logs,
-          startDate,
-          endDate,
-        );
+    const logsByHabit = allLogs.reduce((acc: Record<string, any[]>, log: any) => {
+      if (!acc[log.habitId]) acc[log.habitId] = [];
+      acc[log.habitId].push(log);
+      return acc;
+    }, {});
 
-        return {
-          ...habit,
-          stats: {
-            totalLogs: logs.length,
-            currentStreak: streak.current,
-            longestStreak: streak.longest,
-            completionRate,
-          },
-        };
-      }),
-    );
+    const habitsWithStats = habits.map((habit) => {
+      const logs = logsByHabit[habit.id] || [];
+
+      const streak = this.calculateStreak(logs);
+      const completionRate = this.calculateHabitCompletionRate(
+        habit,
+        logs,
+        startDate,
+        endDate,
+      );
+
+      return {
+        ...habit,
+        stats: {
+          totalLogs: logs.length,
+          currentStreak: streak.current,
+          longestStreak: streak.longest,
+          completionRate,
+        },
+      };
+    });
 
     return {
       habits: habitsWithStats,

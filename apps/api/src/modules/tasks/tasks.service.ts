@@ -43,7 +43,6 @@ export class TasksService {
   async findAll(
     userId: string,
     lifeAreaId?: string,
-    actionPlanId?: string,
     status?: string,
     archived?: boolean,
   ) {
@@ -57,10 +56,6 @@ export class TasksService {
 
     if (lifeAreaId) {
       query = query.where('lifeAreaId', '==', lifeAreaId);
-    }
-
-    if (actionPlanId) {
-      query = query.where('actionPlanId', '==', actionPlanId);
     }
 
     if (status) {
@@ -180,7 +175,7 @@ export class TasksService {
    * Get tasks grouped by status (for Kanban board)
    */
   async getKanbanBoard(userId: string, lifeAreaId?: string, includeArchived = false) {
-    let tasks: any[] = await this.findAll(userId, lifeAreaId);
+    let tasks: any[] = await this.findAll(userId, lifeAreaId, undefined);
 
     // Filter out archived tasks by default
     if (!includeArchived) {
@@ -385,7 +380,7 @@ export class TasksService {
    * Get task counts (active, archived, total)
    */
   async getTaskCounts(userId: string, lifeAreaId?: string) {
-    const allTasks = await this.findAll(userId, lifeAreaId);
+    const allTasks = await this.findAll(userId, lifeAreaId, undefined);
 
     const active = allTasks.filter((task: any) => !task.archived).length;
     const archived = allTasks.filter((task: any) => task.archived).length;

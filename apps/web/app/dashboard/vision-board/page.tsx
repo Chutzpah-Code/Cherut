@@ -25,8 +25,9 @@ type VisionBoardFilterType = 'active' | 'archived';
 export default function VisionBoardPage() {
   const [currentFilter, setCurrentFilter] = useState<VisionBoardFilterType>('active');
 
-  const { data: activeItems, isLoading: activeLoading } = useVisionBoardItems(false); // Only active items
-  const { data: archivedItems, isLoading: archivedLoading } = useVisionBoardItems(true); // Only archived items
+  const { data: activeItems, isLoading: activeLoading } = useVisionBoardItems(false);
+  // Lazy-load archived items — only fetch when the user switches to the archived tab
+  const { data: archivedItems, isLoading: archivedLoading } = useVisionBoardItems(true, currentFilter === 'archived');
   const createMutation = useCreateVisionBoardItem();
   const updateMutation = useUpdateVisionBoardItem();
   const deleteMutation = useDeleteVisionBoardItem();

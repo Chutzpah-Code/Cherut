@@ -14,10 +14,13 @@ import { visionBoardApi, CreateVisionBoardItemDto, UpdateVisionBoardItemDto } fr
  * - useReorderVisionBoard() - Reordenar itens (drag-and-drop)
  */
 
-export const useVisionBoardItems = (archived?: boolean) => {
+export const useVisionBoardItems = (archived?: boolean, enabled = true) => {
   return useQuery({
     queryKey: ['vision-board-items', archived],
     queryFn: () => visionBoardApi.getAll(archived),
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 };
 

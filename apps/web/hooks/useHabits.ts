@@ -11,19 +11,29 @@ export const useHabits = (lifeAreaId?: string, archived?: boolean) => {
 };
 
 export const useAllHabits = (lifeAreaId?: string) => {
-  return useQuery({
-    queryKey: ['habits', 'all', lifeAreaId],
-    queryFn: async () => {
-      // Get both active and archived habits
-      const [activeHabits, archivedHabits] = await Promise.all([
-        habitsApi.getAll(lifeAreaId, false), // active
-        habitsApi.getAll(lifeAreaId, true),  // archived
-      ]);
-      return [...activeHabits, ...archivedHabits];
-    },
-    staleTime: 3 * 60 * 1000, // 3 minutes
-    gcTime: 8 * 60 * 1000, // 8 minutes
+  // Reuse the same query keys as useHabits(active) and useArchivedHabits so
+  // React Query deduplicates the requests when both hooks are mounted on the same page.
+  const activeQuery = useQuery({
+    queryKey: ['habits', lifeAreaId, false],
+    queryFn: () => habitsApi.getAll(lifeAreaId, false),
+    staleTime: 3 * 60 * 1000,
+    gcTime: 8 * 60 * 1000,
   });
+
+  const archivedQuery = useQuery({
+    queryKey: ['habits', 'archived', lifeAreaId],
+    queryFn: () => habitsApi.getArchived(lifeAreaId),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+  return {
+    data: (activeQuery.data || archivedQuery.data)
+      ? [...(activeQuery.data ?? []), ...(archivedQuery.data ?? [])]
+      : undefined,
+    isLoading: activeQuery.isLoading || archivedQuery.isLoading,
+    error: activeQuery.error ?? archivedQuery.error,
+  };
 };
 
 export const useHabit = (id: string) => {
@@ -42,7 +52,10 @@ export const useCreateHabit = () => {
   return useMutation({
     mutationFn: (dto: CreateHabitDto) => habitsApi.create(dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits'] });
+      // Invalidate active list and counts; archived list is unaffected
+      queryClient.invalidateQueries({ queryKey: ['habits', undefined, false] });
+      queryClient.invalidateQueries({ queryKey: ['habits', undefined, undefined] });
+      queryClient.invalidateQueries({ queryKey: ['habits', 'counts'] });
     },
   });
 };
@@ -53,8 +66,11 @@ export const useUpdateHabit = () => {
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateHabitDto }) =>
       habitsApi.update(id, dto),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits'] });
+    onSuccess: (_data, { id }) => {
+      // Only invalidate the specific habit and list queries; counts/archived unaffected by edits
+      queryClient.invalidateQueries({ queryKey: ['habits', id], exact: true });
+      queryClient.invalidateQueries({ queryKey: ['habits', undefined, false] });
+      queryClient.invalidateQueries({ queryKey: ['habits', undefined, undefined] });
     },
   });
 };
@@ -65,7 +81,9 @@ export const useDeleteHabit = () => {
   return useMutation({
     mutationFn: (id: string) => habitsApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits'] });
+      queryClient.invalidateQueries({ queryKey: ['habits', undefined, false] });
+      queryClient.invalidateQueries({ queryKey: ['habits', undefined, undefined] });
+      queryClient.invalidateQueries({ queryKey: ['habits', 'counts'] });
     },
   });
 };
@@ -76,7 +94,11 @@ export const usePermanentDeleteHabit = () => {
   return useMutation({
     mutationFn: (id: string) => habitsApi.permanentDelete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits'] });
+      // Could be active or archived — invalidate both lists and counts
+      queryClient.invalidateQueries({ queryKey: ['habits', undefined, false] });
+      queryClient.invalidateQueries({ queryKey: ['habits', undefined, undefined] });
+      queryClient.invalidateQueries({ queryKey: ['habits', 'archived'] });
+      queryClient.invalidateQueries({ queryKey: ['habits', 'counts'] });
     },
   });
 };
@@ -88,7 +110,7 @@ export const useLogHabit = () => {
     mutationFn: (dto: LogHabitDto) => habitsApi.logHabit(dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['habitLogs'] });
-      queryClient.invalidateQueries({ queryKey: ['habits'] });
+      // Habit logs don't change habit metadata — no habit list invalidation needed
     },
   });
 };
@@ -127,7 +149,11 @@ export const useToggleArchive = () => {
   return useMutation({
     mutationFn: (id: string) => habitsApi.toggleArchive(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits'] });
+      // Archive toggle moves between active/archived — both lists and counts change
+      queryClient.invalidateQueries({ queryKey: ['habits', undefined, false] });
+      queryClient.invalidateQueries({ queryKey: ['habits', undefined, undefined] });
+      queryClient.invalidateQueries({ queryKey: ['habits', 'archived'] });
+      queryClient.invalidateQueries({ queryKey: ['habits', 'counts'] });
     },
   });
 };

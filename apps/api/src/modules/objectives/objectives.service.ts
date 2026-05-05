@@ -606,13 +606,15 @@ export class ObjectivesService {
     let successCount = 0;
     let errorCount = 0;
 
+    // Pre-fetch all key result docs in a single round-trip
+    const refs = updates.map(u => db.collection(this.keyResultsCollection).doc(u.id));
+    const docs = await db.getAll(...refs);
+    const docMap = new Map(docs.map(doc => [doc.id, doc]));
+
     for (const update of updates) {
       try {
-        const keyResultRef = db.collection(this.keyResultsCollection).doc(update.id);
-
-        // Verify key result exists and belongs to user/objective
-        const keyResultDoc = await keyResultRef.get();
-        if (!keyResultDoc.exists) {
+        const keyResultDoc = docMap.get(update.id);
+        if (!keyResultDoc?.exists) {
           throw new Error(`Key result ${update.id} not found`);
         }
 
@@ -621,7 +623,7 @@ export class ObjectivesService {
           throw new Error(`Key result ${update.id} access denied`);
         }
 
-        // Add to batch
+        const keyResultRef = db.collection(this.keyResultsCollection).doc(update.id);
         batch.update(keyResultRef, {
           ...update.dto,
           updatedAt: new Date().toISOString(),
@@ -636,7 +638,6 @@ export class ObjectivesService {
       }
     }
 
-    // Execute batch
     if (successCount > 0) {
       try {
         await batch.commit();
