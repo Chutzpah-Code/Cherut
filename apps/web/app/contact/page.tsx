@@ -122,7 +122,7 @@ export default function ContactPage() {
               <div className="ct-info-card">
                 <div className="ct-info-title">Community</div>
                 <p style={{ fontSize: 14, color: MUTED, margin: '0 0 12px', lineHeight: 1.5 }}>For feature requests and discussion, join the community.</p>
-                <a href="#" style={{ fontSize: 14, fontWeight: 600, color: BLUE, padding: '10px 16px', background: BLUE_SOFT, borderRadius: 999, display: 'inline-block' }}>
+                <a href="https://discord.gg/AyjZ58KXGy" target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 600, color: BLUE, padding: '10px 16px', background: BLUE_SOFT, borderRadius: 999, display: 'inline-block' }}>
                   Open community →
                 </a>
               </div>

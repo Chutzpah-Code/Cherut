@@ -286,7 +286,7 @@ export function PageShell({ children, kicker, title, lead }: PageShellProps) {
           {[
             { label: 'Product',   links: [['Features', '/#features'], ['Pricing', '/#pricing'], ['Changelog', '/changelog'], ['Roadmap', '/roadmap']] },
             { label: 'Company',   links: [['About', '/about'], ['Careers', '/careers'], ['Contact', '/contact']] },
-            { label: 'Resources', links: [['Community', '#'], ['Help center', '/help-center'], ['Privacy', '/privacy-policy']] },
+            { label: 'Resources', links: [['Community', 'https://discord.gg/AyjZ58KXGy'], ['Help center', '/help-center'], ['Privacy', '/privacy-policy']] },
           ].map(col => (
             <div key={col.label} style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
               <div style={{ fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(15,15,30,0.55)', marginBottom: 4, fontWeight: 600 }}>{col.label}</div>
