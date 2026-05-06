@@ -2,91 +2,46 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { registerUser } from '@/lib/firebase/auth';
 import apiClient from '@/lib/api/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { getRegistrationErrorMessage, createRateLimitError } from '@/lib/utils/auth-errors';
+import { getRegistrationErrorMessage } from '@/lib/utils/auth-errors';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
-import {
-  Container,
-  Paper,
-  Title,
-  Text,
-  TextInput,
-  PasswordInput,
-  Button,
-  Stack,
-  Alert,
-  Anchor,
-  Box,
-} from '@mantine/core';
-import { ArrowRight, AlertCircle } from 'lucide-react';
-import CherutLogo from '@/components/ui/CherutLogo';
+import { CMark, SHELL_TOKENS } from '@/components/shell/Shell';
+
+const { BLUE, BLUE_SOFT, INK, PAPER, PAPER_2, MUTED, RULE, GRID } = SHELL_TOKENS;
 
 export default function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail]                       = useState('');
+  const [password, setPassword]                 = useState('');
+  const [confirmPassword, setConfirmPassword]   = useState('');
+  const [showPassword, setShowPassword]         = useState(false);
+  const [showConfirm, setShowConfirm]           = useState(false);
+  const [error, setError]                       = useState('');
+  const [loading, setLoading]                   = useState(false);
   const router = useRouter();
   const { user } = useAuth();
-
-  // Rate limiting
   const registerRateLimit = useRateLimit({ action: 'register' });
 
   useEffect(() => {
-    if (user) {
-      router.push('/dashboard');
-    }
+    if (user) router.push('/dashboard');
   }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    // Check rate limit before proceeding
-    if (!registerRateLimit.canSubmit) {
-      setError(registerRateLimit.warningMessage);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
+    if (!registerRateLimit.canSubmit) { setError(registerRateLimit.warningMessage); return; }
+    if (password !== confirmPassword) { setError('Passwords do not match'); return; }
+    if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
     setLoading(true);
-
     try {
-      // Register with Firebase
       const firebaseUser = await registerUser(email, password);
-
-      // Get Firebase ID token
       const token = await firebaseUser.getIdToken();
-
-      // Register with backend API
-      await apiClient.post('/auth/register', {
-        email,
-        password,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // Record successful registration
+      await apiClient.post('/auth/register', { email, password }, { headers: { Authorization: `Bearer ${token}` } });
       registerRateLimit.recordSuccess();
       router.push('/dashboard');
     } catch (err: any) {
-      // Record failed registration attempt
       registerRateLimit.recordFailure();
       setError(getRegistrationErrorMessage(err));
     } finally {
@@ -95,272 +50,113 @@ export default function RegisterPage() {
   };
 
   return (
-    <Box
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#FFFFFF',
-        padding: '20px',
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      }}
-    >
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+    <div style={{ minHeight: '100vh', background: PAPER, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', position: 'relative', fontFamily: '"Inter", -apple-system, system-ui, sans-serif' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        *, *::before, *::after { box-sizing: border-box; }
+        .auth-input {
+          width: 100%; padding: 12px 14px; font-size: 15px; font-family: inherit;
+          background: ${PAPER_2}; border: 1px solid ${RULE}; border-radius: 8px;
+          color: ${INK}; outline: none; transition: border-color .15s, box-shadow .15s;
+          appearance: none;
+        }
+        .auth-input:focus { border-color: ${BLUE}; box-shadow: 0 0 0 3px ${BLUE_SOFT}; background: #fff; }
+        .auth-input::placeholder { color: rgba(15,15,30,0.35); }
+        .auth-pw-wrap { position: relative; }
+        .auth-pw-wrap .auth-input { padding-right: 44px; }
+        .auth-pw-toggle {
+          position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+          background: none; border: none; cursor: pointer; color: ${MUTED};
+          font-size: 13px; font-family: inherit; padding: 4px;
+        }
+        .auth-btn {
+          width: 100%; padding: 14px; background: ${INK}; color: ${PAPER};
+          font-size: 15px; font-weight: 600; font-family: inherit;
+          border: none; border-radius: 999px; cursor: pointer;
+          transition: opacity .15s; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .auth-btn:hover:not(:disabled) { opacity: .85; }
+        .auth-btn:disabled { opacity: .5; cursor: not-allowed; }
+        .auth-label { font-size: 13px; font-weight: 600; color: rgba(15,15,30,0.7); display: block; margin-bottom: 6px; }
+        .auth-link { color: ${BLUE}; font-weight: 600; text-decoration: none; }
+        .auth-link:hover { text-decoration: underline; }
+        .auth-error { background: rgba(220,38,38,0.07); border: 1px solid rgba(220,38,38,0.2); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: #dc2626; }
+        .auth-card { padding: 22px 18px; }
+        @media (min-width: 420px) { .auth-card { padding: 28px 28px; } }
       `}</style>
-      <Container size="xs" style={{ width: '100%' }}>
-        <Stack gap="xl">
-          {/* Logo/Brand */}
-          <Stack gap="xs" align="center">
-            <CherutLogo size={120} />
-            <Title
-              order={1}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: 'clamp(28px, 5vw, 40px)',
-                fontWeight: 700,
-                color: '#000000',
-                lineHeight: 1.2,
-                letterSpacing: '-0.01em',
-              }}
-            >
-              Create Account
-            </Title>
-            <Text
-              ta="center"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-                fontWeight: 500,
-                color: '#666666',
-                lineHeight: '24px',
-              }}
-            >
-              Start your journey to elite performance
-            </Text>
-          </Stack>
 
-          {/* Form Card */}
-          <Paper
-            radius={16}
-            p="xl"
-            style={{
-              background: 'white',
-              border: '1px solid #CCCCCC',
-              boxShadow: 'none',
-            }}
-          >
-            <form onSubmit={handleSubmit}>
-              <Stack gap="lg">
-                {/* Rate limit display */}
-                <RateLimitDisplay
-                  result={registerRateLimit.result}
-                  message={registerRateLimit.warningMessage}
-                  showProgress={true}
-                />
+      {/* Grid background */}
+      <div style={{
+        position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
+        backgroundImage: `linear-gradient(${GRID} 1px, transparent 1px), linear-gradient(90deg, ${GRID} 1px, transparent 1px)`,
+        backgroundSize: '90px 90px',
+        maskImage: 'radial-gradient(ellipse at 50% 30%, #000 30%, transparent 70%)',
+        WebkitMaskImage: 'radial-gradient(ellipse at 50% 30%, #000 30%, transparent 70%)',
+      }} />
 
-                {error && (
-                  <Alert
-                    icon={<AlertCircle size={20} />}
-                    title="Error"
-                    color="red"
-                    radius={16}
-                    styles={{
-                      root: {
-                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                        border: '1px solid rgba(239, 68, 68, 0.2)',
-                      },
-                      title: { color: '#dc2626', fontWeight: 600 },
-                      message: { color: '#dc2626' },
-                    }}
-                  >
-                    {error}
-                  </Alert>
-                )}
+      <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 28 }}>
 
-                <TextInput
-                  label="Email"
-                  placeholder="you@example.com"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  size="md"
-                  radius={8}
-                  styles={{
-                    label: {
-                      fontFamily: 'Inter, sans-serif',
-                      color: '#000000',
-                      fontWeight: 600,
-                      marginBottom: 8,
-                      fontSize: '14px',
-                    },
-                    input: {
-                      fontFamily: 'Inter, sans-serif',
-                      backgroundColor: 'white',
-                      border: '1px solid #CCCCCC',
-                      color: '#000000',
-                      height: '48px',
-                      fontSize: '16px',
-                      '&::placeholder': {
-                        color: '#999999',
-                      },
-                      '&:focus': {
-                        borderColor: '#4686FE',
-                        boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                      },
-                    },
-                  }}
-                />
+        {/* Logo */}
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: INK }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CMark size={40} color={PAPER} />
+            </div>
+            <span style={{ fontWeight: 700, fontSize: 22, letterSpacing: '-0.02em' }}>Cherut</span>
+          </a>
+          <div>
+            <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '0 0 6px', color: INK }}>Create your account</h1>
+            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>Start building your system today</p>
+          </div>
+        </div>
 
-                <PasswordInput
-                  label="Password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  size="md"
-                  radius={8}
-                  styles={{
-                    label: {
-                      fontFamily: 'Inter, sans-serif',
-                      color: '#000000',
-                      fontWeight: 600,
-                      marginBottom: 8,
-                      fontSize: '14px',
-                    },
-                    input: {
-                      fontFamily: 'Inter, sans-serif',
-                      backgroundColor: 'white',
-                      border: '1px solid #CCCCCC',
-                      color: '#000000',
-                      height: '48px',
-                      fontSize: '16px',
-                      '&::placeholder': {
-                        color: '#999999',
-                      },
-                      '&:focus': {
-                        borderColor: '#4686FE',
-                        boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                      },
-                    },
-                    innerInput: {
-                      fontFamily: 'Inter, sans-serif',
-                      color: '#000000',
-                    },
-                  }}
-                />
+        {/* Card */}
+        <div className="auth-card" style={{ background: PAPER, border: `1px solid ${RULE}`, borderRadius: 16 }}>
+          <RateLimitDisplay result={registerRateLimit.result} message={registerRateLimit.warningMessage} showProgress />
 
-                <PasswordInput
-                  label="Confirm Password"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  size="md"
-                  radius={8}
-                  styles={{
-                    label: {
-                      fontFamily: 'Inter, sans-serif',
-                      color: '#000000',
-                      fontWeight: 600,
-                      marginBottom: 8,
-                      fontSize: '14px',
-                    },
-                    input: {
-                      fontFamily: 'Inter, sans-serif',
-                      backgroundColor: 'white',
-                      border: '1px solid #CCCCCC',
-                      color: '#000000',
-                      height: '48px',
-                      fontSize: '16px',
-                      '&::placeholder': {
-                        color: '#999999',
-                      },
-                      '&:focus': {
-                        borderColor: '#4686FE',
-                        boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                      },
-                    },
-                    innerInput: {
-                      fontFamily: 'Inter, sans-serif',
-                      color: '#000000',
-                    },
-                  }}
-                />
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            {error && <div className="auth-error">{error}</div>}
 
-                <Button
-                  type="submit"
-                  size="lg"
-                  radius={8}
-                  fullWidth
-                  loading={loading}
-                  rightSection={<ArrowRight size={20} />}
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    background: '#4686FE',
-                    border: 'none',
-                    height: '56px',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    color: 'white',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        background: '#3366E5',
-                      },
-                    },
-                  }}
-                >
-                  Create Account
-                </Button>
-              </Stack>
-            </form>
-          </Paper>
+            <div>
+              <label className="auth-label" htmlFor="reg-email">Email</label>
+              <input id="reg-email" className="auth-input" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+            </div>
 
-          {/* Footer Links */}
-          <Stack gap="md" align="center">
-            <Text
-              ta="center"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
-                color: '#666666',
-              }}
-            >
-              Already have an account?{' '}
-              <Anchor
-                component="a"
-                href="/auth/login"
-                fw={600}
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#4686FE',
-                  textDecoration: 'none',
-                }}
-              >
-                Sign in
-              </Anchor>
-            </Text>
+            <div>
+              <label className="auth-label" htmlFor="reg-password">Password</label>
+              <div className="auth-pw-wrap">
+                <input id="reg-password" className="auth-input" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" />
+                <button type="button" className="auth-pw-toggle" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </div>
 
-            <Anchor
-              component="a"
-              href="/"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
-                color: '#666666',
-                textDecoration: 'none',
-              }}
-            >
-              ← Back to home
-            </Anchor>
-          </Stack>
-        </Stack>
-      </Container>
-    </Box>
+            <div>
+              <label className="auth-label" htmlFor="reg-confirm">Confirm password</label>
+              <div className="auth-pw-wrap">
+                <input id="reg-confirm" className="auth-input" type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required autoComplete="new-password" />
+                <button type="button" className="auth-pw-toggle" onClick={() => setShowConfirm(v => !v)} aria-label={showConfirm ? 'Hide password' : 'Show password'}>
+                  {showConfirm ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" className="auth-btn" disabled={loading}>
+              {loading ? 'Creating account…' : <>Create account <span>→</span></>}
+            </button>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>
+            Already have an account?{' '}
+            <a href="/auth/login" className="auth-link">Sign in</a>
+          </p>
+          <a href="/" style={{ fontSize: 13, color: MUTED, textDecoration: 'none' }}>← Back to home</a>
+        </div>
+      </div>
+    </div>
   );
 }
