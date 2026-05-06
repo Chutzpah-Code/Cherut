@@ -59,12 +59,12 @@ function CMark({ size = 32, color = INK }: { size?: number; color?: string }) {
 }
 
 const tabs = [
-  { label: 'Today',       sub: 'Your day at a glance',     icon: '◐' },
-  { label: 'Habits',      sub: 'Streaks that compound',    icon: '◇' },
-  { label: 'OKRs',        sub: 'Goals with method',        icon: '◯' },
-  { label: 'Dream Board', sub: 'Pin the future you want',  icon: '✦' },
-  { label: 'Journal',     sub: 'Think clearly, daily',     icon: '◈' },
-  { label: 'Finances',    sub: 'Money on the same page',   icon: '□' },
+  { label: 'Today',       sub: 'Your day at a glance',    icon: '◐' },
+  { label: 'Habits',      sub: 'Streaks that compound',   icon: '◇' },
+  { label: 'OKRs',        sub: 'Goals with method',       icon: '◯' },
+  { label: 'Dream Board', sub: 'Pin the future you want', icon: '✦' },
+  { label: 'Journal',     sub: 'Think clearly, daily',    icon: '◈' },
+  { label: 'Finances',    sub: 'Money on the same page',  icon: '□' },
 ];
 
 const featureIcons = ['◆', '◐', '◯', '✦', '◇', '◈', '□', '◉'];
@@ -72,10 +72,11 @@ const featureIcons = ['◆', '◐', '◯', '✦', '◇', '◈', '□', '◉'];
 export default function Home() {
   useAdminRedirect();
 
-  const [scrolled, setScrolled] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
-  const [openFaq, setOpenFaq] = useState<number>(0);
-  const [billing, setBilling] = useState<'monthly' | 'annual'>('annual');
+  const [scrolled, setScrolled]         = useState(false);
+  const [activeTab, setActiveTab]       = useState(0);
+  const [openFaq, setOpenFaq]           = useState<number>(0);
+  const [billing, setBilling]           = useState<'monthly' | 'annual'>('annual');
+  const [menuOpen, setMenuOpen]         = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -84,21 +85,30 @@ export default function Home() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <div style={{ background: PAPER, color: INK, fontFamily: '"Inter", -apple-system, system-ui, sans-serif', fontSize: 16, lineHeight: 1.5, minHeight: '100vh' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; }
+        body { margin: 0; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
-        a:hover { opacity: 0.7; transition: opacity .15s; }
         button { font-family: inherit; cursor: pointer; border: none; background: none; }
         ul, ol { margin: 0; padding: 0; list-style: none; }
         figure { margin: 0; }
 
-        .lp-nav-cta-dark { transition: opacity .15s, transform .1s; }
-        .lp-nav-cta-dark:hover { opacity: 0.85; transform: translateY(-1px); }
-        .lp-cta-outline { transition: background .15s, border-color .15s; }
+        /* ── Hover micro-interactions ── */
+        .lp-cta-dark  { transition: opacity .15s, transform .1s; }
+        .lp-cta-dark:hover  { opacity: .85; transform: translateY(-1px); }
+        .lp-cta-outline { transition: background .15s, border-color .15s, color .15s; }
         .lp-cta-outline:hover { background: ${INK}; color: ${PAPER}; border-color: ${INK}; }
         .lp-tab { transition: opacity .15s; }
         .lp-tab:hover { opacity: 1 !important; }
@@ -108,12 +118,217 @@ export default function Home() {
         .lp-faq-item:hover { background: ${PAPER_2}; }
         .lp-pricing-card { transition: transform .3s, box-shadow .3s; }
         .lp-pricing-card:hover { transform: translateY(-4px); }
+        .lp-mobile-link { transition: background .1s; }
+        .lp-mobile-link:hover { background: ${PAPER_2}; }
 
+        /* ── Animation ── */
         @keyframes lp-float {
           0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-12px) rotate(2deg); }
+          50%       { transform: translateY(-12px) rotate(2deg); }
         }
         .lp-shape { animation: lp-float 8s ease-in-out infinite; }
+
+        /* ── Nav ── */
+        .lp-nav-inner   { max-width: 1280px; margin: 0 auto; padding: 18px 32px; display: flex; align-items: center; gap: 32px; }
+        .lp-nav-links   { display: flex; gap: 28px; margin-left: 24px; font-size: 14px; font-weight: 500; color: rgba(15,15,30,.78); }
+        .lp-nav-ctas    { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+        .lp-nav-tour    { display: inline-block; }
+        .lp-hamburger   { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; margin-left: auto; }
+        .lp-hamburger:hover { background: ${PAPER_2}; }
+        .lp-mobile-menu {
+          display: none; flex-direction: column;
+          background: ${PAPER}; border-top: 1px solid ${RULE};
+          padding: 8px 0 16px;
+        }
+        .lp-mobile-menu.open { display: flex; }
+        .lp-mobile-link {
+          padding: 14px 24px; font-size: 16px; font-weight: 500; color: ${INK};
+          border-radius: 0; display: block;
+        }
+        .lp-mobile-ctas {
+          display: flex; gap: 10px; padding: 12px 24px 4px; flex-wrap: wrap;
+        }
+
+        /* ── Hero ── */
+        .lp-hero-inner {
+          position: relative; z-index: 1;
+          max-width: 1200px; margin: 0 auto;
+          display: grid; grid-template-columns: 1fr 1.4fr;
+          gap: 32px; align-items: center; min-height: 420px;
+        }
+        .lp-hero-shape-wrap {
+          width: 320px; height: 360px;
+          filter: drop-shadow(0 30px 50px rgba(60,50,200,.35));
+        }
+        .lp-hero-text { text-align: center; padding-top: 24px; padding-bottom: 24px; }
+        .lp-hero-h1 {
+          font-size: clamp(40px, 5.6vw, 72px);
+          line-height: 1.05; letter-spacing: -.035em;
+          font-weight: 700; margin: 0 0 24px; color: ${INK};
+        }
+        .lp-hero-sub {
+          font-size: 18px; line-height: 1.55; color: ${MUTED};
+          max-width: 540px; margin: 0 auto 36px;
+        }
+        .lp-hero-ctas {
+          display: flex; gap: 14px; justify-content: center;
+          align-items: center; flex-wrap: wrap;
+        }
+        /* Mobile-only C mark decoration above headline */
+        .lp-hero-cmark-mobile {
+          display: none; justify-content: center; margin-bottom: 24px;
+          filter: drop-shadow(0 12px 24px rgba(60,50,200,.25));
+        }
+
+        /* ── Dashboard mockup ── */
+        .lp-dash-section { padding: 0 32px 100px; background: linear-gradient(180deg, ${PAPER} 0%, ${PAPER_2} 100%); }
+        .lp-dash-outer   { max-width: 1200px; margin: 0 auto; }
+        .lp-tab-bar {
+          display: grid; grid-template-columns: repeat(6, 1fr);
+          background: ${PAPER}; padding: 8px 8px 0;
+          border-radius: 16px 16px 0 0;
+          border: 1px solid ${RULE}; border-bottom: none;
+        }
+        .lp-dash-frame {
+          position: relative; background: #E9E8E4;
+          border: 1px solid ${RULE}; border-top: none;
+          border-radius: 0 0 16px 16px; min-height: 480px;
+          display: grid; grid-template-columns: 180px 1fr; overflow: hidden;
+        }
+        .lp-dash-sidebar { display: flex; }
+        /* Mobile: hide entire dashboard, show welcome-card only */
+        .lp-dash-mobile-preview { display: none; justify-content: center; padding: 0 24px 80px; }
+
+        /* ── Sections ── */
+        .lp-section         { padding: 120px 32px; }
+        .lp-section-alt     { padding: 120px 32px; background: ${PAPER_2}; }
+        .lp-section-head    { max-width: 760px; margin: 0 auto 64px; text-align: center; }
+        .lp-features-grid   { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .lp-steps-grid      { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; }
+        .lp-testimonials-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .lp-pricing-grid    { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: stretch; }
+
+        /* ── About ── */
+        .lp-about-grid { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+
+        /* ── Trust strip ── */
+        .lp-strip        { max-width: 1280px; margin: 0 auto; padding: 0 32px 100px; text-align: center; }
+        .lp-strip-logos  { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px 40px; align-items: center; }
+
+        /* ── Footer ── */
+        .lp-footer-inner {
+          max-width: 1280px; margin: 0 auto;
+          display: grid; grid-template-columns: repeat(5, 1fr);
+          gap: 32px; padding-bottom: 48px; border-bottom: 1px solid ${RULE};
+        }
+        .lp-footer-brand { grid-column: span 2; }
+        .lp-footer-bottom {
+          max-width: 1280px; margin: 0 auto; padding-top: 24px;
+          display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+          font-size: 13px; color: rgba(15,15,30,.5);
+        }
+
+        /* ── Kicker badge ── */
+        .lp-kicker {
+          display: inline-block; font-size: 12px; color: ${BLUE};
+          letter-spacing: .1em; text-transform: uppercase;
+          margin-bottom: 18px; font-weight: 600;
+          padding: 5px 12px; border-radius: 999px; background: ${BLUE_SOFT};
+        }
+        .lp-h2 {
+          font-size: clamp(36px, 5vw, 60px); line-height: 1.05;
+          letter-spacing: -.03em; font-weight: 700; margin: 0;
+        }
+        .lp-h2-sub {
+          font-size: 18px; color: ${MUTED}; line-height: 1.5;
+          margin: 20px auto 0; max-width: 580px;
+        }
+
+        /* ════════════════════════════════
+           RESPONSIVE BREAKPOINTS
+        ════════════════════════════════ */
+
+        /* ── Laptop (< 1200px) ── */
+        @media (max-width: 1199px) {
+          .lp-hero-shape-wrap { width: 260px; height: 300px; }
+        }
+
+        /* ── Tablet landscape (< 1024px) ── */
+        @media (max-width: 1023px) {
+          .lp-nav-inner   { padding: 16px 24px; gap: 20px; }
+          .lp-nav-links   { gap: 20px; }
+          .lp-nav-tour    { display: none; }
+          .lp-section     { padding: 80px 24px; }
+          .lp-section-alt { padding: 80px 24px; }
+          .lp-section-head { margin-bottom: 48px; }
+          .lp-strip       { padding: 0 24px 80px; }
+          .lp-dash-section { padding: 0 24px 80px; }
+          .lp-about-grid  { gap: 40px; }
+          /* Tabs: 3+3 two-row visual or horizontal scroll */
+          .lp-tab-bar     { grid-template-columns: repeat(3, 1fr); }
+          /* Sidebar hidden on tablet — dashboard goes full-width */
+          .lp-dash-frame  { grid-template-columns: 1fr; }
+          .lp-dash-sidebar { display: none; }
+        }
+
+        /* ── Tablet portrait (< 768px) ── */
+        @media (max-width: 767px) {
+          /* Nav: hamburger replaces links */
+          .lp-nav-links  { display: none; }
+          .lp-nav-ctas   { display: none; }
+          .lp-hamburger  { display: flex; }
+          .lp-nav-inner  { padding: 14px 20px; }
+
+          /* Hero: single column, C mark above headline */
+          .lp-hero-inner              { grid-template-columns: 1fr; gap: 0; min-height: unset; }
+          .lp-hero-shape-wrap         { display: none; }
+          .lp-hero-cmark-mobile       { display: flex; }
+          .lp-hero-text               { padding-top: 0; }
+          .lp-hero-h1                 { font-size: clamp(36px, 9vw, 56px); }
+          .lp-hero-sub                { font-size: 16px; }
+
+          /* Dashboard mockup: hide complex version, show welcome card preview */
+          .lp-dash-outer     { display: none; }
+          .lp-dash-mobile-preview { display: flex; }
+
+          /* Sections */
+          .lp-section     { padding: 64px 20px; }
+          .lp-section-alt { padding: 64px 20px; }
+          .lp-section-head { margin-bottom: 40px; }
+          .lp-strip       { padding: 0 20px 64px; }
+          .lp-dash-section { padding: 0 20px 64px; }
+          .lp-features-grid { grid-template-columns: 1fr; }
+          .lp-steps-grid    { grid-template-columns: 1fr 1fr; gap: 24px; }
+          .lp-testimonials-grid { grid-template-columns: 1fr; }
+          .lp-pricing-grid  { grid-template-columns: 1fr; }
+
+          /* About */
+          .lp-about-grid { grid-template-columns: 1fr; gap: 32px; }
+
+          /* Footer */
+          .lp-footer-inner {
+            grid-template-columns: 1fr 1fr;
+          }
+          .lp-footer-brand { grid-column: span 2; }
+          .lp-footer-bottom { flex-direction: column; gap: 8px; }
+
+          /* Final CTA padding */
+          .lp-final-cta { padding: 80px 20px !important; }
+        }
+
+        /* ── Mobile (< 480px) ── */
+        @media (max-width: 479px) {
+          .lp-steps-grid     { grid-template-columns: 1fr; }
+          .lp-hero-ctas      { flex-direction: column; align-items: stretch; }
+          .lp-hero-ctas a    { text-align: center; }
+          .lp-footer-inner   { grid-template-columns: 1fr; }
+          .lp-footer-brand   { grid-column: span 1; }
+          .lp-section        { padding: 56px 16px; }
+          .lp-section-alt    { padding: 56px 16px; }
+          .lp-strip          { padding: 0 16px 56px; }
+          .lp-dash-section   { padding: 0 16px 56px; }
+          .lp-final-cta      { padding: 64px 16px !important; }
+        }
       `}</style>
 
       {/* ── Nav ── */}
@@ -126,27 +341,61 @@ export default function Home() {
         boxShadow: scrolled ? '0 1px 0 rgba(15,15,14,0.02), 0 8px 24px -16px rgba(15,15,14,0.08)' : 'none',
         transition: 'background .25s, border-color .25s, box-shadow .25s',
       }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '18px 32px', display: 'flex', alignItems: 'center', gap: 32 }}>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div className="lp-nav-inner">
+          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <div style={{ width: 28, height: 28, borderRadius: '50%', background: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               <CMark size={28} color={PAPER} />
             </div>
             <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: '-0.02em' }}>Cherut</span>
           </a>
-          <div style={{ display: 'flex', gap: 28, marginLeft: 24, fontSize: 14, fontWeight: 500, color: 'rgba(15,15,30,0.78)' }}>
+
+          {/* Desktop nav links */}
+          <div className="lp-nav-links">
             <a href="#features">Features <span style={{ fontSize: 9, opacity: 0.6 }}>▾</span></a>
             <a href="#how">Method</a>
             <a href="#pricing">Pricing</a>
             <a href="#about">Resources <span style={{ fontSize: 9, opacity: 0.6 }}>▾</span></a>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 'auto' }}>
+
+          {/* Desktop CTAs */}
+          <div className="lp-nav-ctas">
             <a href="/auth/login" style={{ fontSize: 14, color: 'rgba(15,15,30,0.7)', fontWeight: 500, padding: '8px 12px' }}>Login</a>
-            <a href="/auth/register" className="lp-cta-outline" style={{ fontSize: 14, fontWeight: 500, padding: '9px 18px', border: `1px solid ${RULE}`, borderRadius: 999, background: PAPER, color: INK }}>
+            <a href="/auth/register" className="lp-cta-outline lp-nav-tour" style={{ fontSize: 14, fontWeight: 500, padding: '9px 18px', border: `1px solid ${RULE}`, borderRadius: 999, background: PAPER, color: INK, display: 'inline-block' }}>
               Watch tour
             </a>
-            <a href="/auth/register" className="lp-nav-cta-dark" style={{ fontSize: 14, fontWeight: 600, padding: '10px 18px', background: INK, color: PAPER, borderRadius: 999 }}>
+            <a href="/auth/register" className="lp-cta-dark" style={{ fontSize: 14, fontWeight: 600, padding: '10px 18px', background: INK, color: PAPER, borderRadius: 999 }}>
               Try for free
             </a>
+          </div>
+
+          {/* Hamburger (mobile only) */}
+          <button
+            className="lp-hamburger"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            onClick={() => setMenuOpen(v => !v)}
+            style={{ color: INK }}
+          >
+            {menuOpen ? (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+            )}
+          </button>
+        </div>
+
+        {/* Mobile dropdown menu */}
+        <div className={`lp-mobile-menu${menuOpen ? ' open' : ''}`}>
+          <a href="#features" className="lp-mobile-link" onClick={closeMenu}>Features</a>
+          <a href="#how"      className="lp-mobile-link" onClick={closeMenu}>Method</a>
+          <a href="#pricing"  className="lp-mobile-link" onClick={closeMenu}>Pricing</a>
+          <a href="#about"    className="lp-mobile-link" onClick={closeMenu}>Resources</a>
+          <div className="lp-mobile-ctas">
+            <a href="/auth/login"    className="lp-cta-outline" style={{ fontSize: 14, fontWeight: 600, padding: '11px 20px', border: `1px solid ${RULE}`, borderRadius: 999, flex: 1, textAlign: 'center' }}>Login</a>
+            <a href="/auth/register" className="lp-cta-dark"    style={{ fontSize: 14, fontWeight: 600, padding: '11px 20px', background: INK, color: PAPER, borderRadius: 999, flex: 1, textAlign: 'center' }}>Try for free</a>
           </div>
         </div>
       </nav>
@@ -161,20 +410,29 @@ export default function Home() {
           WebkitMaskImage: 'radial-gradient(ellipse at 50% 40%, #000 40%, transparent 80%)',
           pointerEvents: 'none',
         }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 32, alignItems: 'center', minHeight: 420 }}>
-          <div className="lp-shape" style={{ width: 320, height: 360, filter: 'drop-shadow(0 30px 50px rgba(60,50,200,0.35))' }}>
+        <div className="lp-hero-inner">
+          {/* Desktop: large floating shape on the left */}
+          <div className="lp-shape lp-hero-shape-wrap">
             <CMark size={320} color={BLUE} />
           </div>
-          <div style={{ textAlign: 'center', paddingTop: 24, paddingBottom: 24 }}>
-            <h1 style={{ fontSize: 'clamp(40px, 5.6vw, 72px)', lineHeight: 1.05, letterSpacing: '-0.035em', fontWeight: 700, margin: '0 0 24px', color: INK }}>
+
+          <div className="lp-hero-text">
+            {/* Mobile: small C mark above headline */}
+            <div className="lp-hero-cmark-mobile">
+              <div style={{ filter: 'drop-shadow(0 8px 20px rgba(60,50,200,.3))' }}>
+                <CMark size={80} color={BLUE} />
+              </div>
+            </div>
+
+            <h1 className="lp-hero-h1">
               <span style={{ whiteSpace: 'nowrap' }}>Silence the noise.</span><br />
               <span style={{ whiteSpace: 'nowrap' }}>Make your dreams real</span>
             </h1>
-            <p style={{ fontSize: 18, lineHeight: 1.55, color: MUTED, maxWidth: 540, margin: '0 auto 36px' }}>
+            <p className="lp-hero-sub">
               You know what you want. Cherut gives you the system to get there — habits, OKRs, calendar and journal in one quiet place.
             </p>
-            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-              <a href="/auth/register" className="lp-nav-cta-dark" style={{ background: INK, color: PAPER, fontSize: 15, fontWeight: 600, padding: '14px 26px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+            <div className="lp-hero-ctas">
+              <a href="/auth/register" className="lp-cta-dark" style={{ background: INK, color: PAPER, fontSize: 15, fontWeight: 600, padding: '14px 26px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 10 }}>
                 Try for free <span>→</span>
               </a>
               <a href="#how" className="lp-cta-outline" style={{ fontSize: 15, fontWeight: 500, padding: '13px 26px', border: `1px solid ${RULE}`, borderRadius: 999, background: PAPER, color: INK }}>
@@ -185,20 +443,28 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Dashboard mockup ── */}
-      <section style={{ padding: '0 32px 100px', background: `linear-gradient(180deg, ${PAPER} 0%, ${PAPER_2} 100%)` }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', background: PAPER, padding: '8px 8px 0', borderRadius: '16px 16px 0 0', border: `1px solid ${RULE}`, borderBottom: 'none' }}>
+      {/* ── Dashboard mockup (desktop / tablet) ── */}
+      <section className="lp-dash-section">
+        <div className="lp-dash-outer">
+          {/* Tab strip */}
+          <div className="lp-tab-bar">
             {tabs.map((t, i) => (
-              <button key={i} className="lp-tab" onClick={() => setActiveTab(i)} style={{ padding: '16px 12px 18px', textAlign: 'center', borderRadius: 10, background: 'transparent', color: INK, opacity: activeTab === i ? 1 : 0.55, display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center', borderBottom: activeTab === i ? `2px solid ${BLUE}` : '2px solid transparent', transition: 'opacity .15s, border-color .2s' }}>
+              <button key={i} className="lp-tab" onClick={() => setActiveTab(i)} style={{
+                padding: '16px 12px 18px', textAlign: 'center', borderRadius: 10,
+                background: 'transparent', color: INK, opacity: activeTab === i ? 1 : 0.55,
+                display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center',
+                borderBottom: activeTab === i ? `2px solid ${BLUE}` : '2px solid transparent',
+                transition: 'opacity .15s, border-color .2s',
+              }}>
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: activeTab === i ? BLUE : BLUE_SOFT, color: activeTab === i ? PAPER : BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 600 }}>{t.icon}</div>
                 <div style={{ fontSize: 13, fontWeight: 600, marginTop: 2 }}>{t.label}</div>
                 <div style={{ fontSize: 11, opacity: 0.7 }}>{t.sub}</div>
               </button>
             ))}
           </div>
-          <div style={{ position: 'relative', background: '#E9E8E4', border: `1px solid ${RULE}`, borderTop: 'none', borderRadius: '0 0 16px 16px', minHeight: 480, display: 'grid', gridTemplateColumns: '180px 1fr', overflow: 'hidden' }}>
-            <div style={{ background: '#DEDDD8', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 14, borderRight: '1px solid rgba(15,15,30,0.06)' }}>
+          {/* Dashboard frame */}
+          <div className="lp-dash-frame">
+            <div className="lp-dash-sidebar" style={{ background: '#DEDDD8', padding: '20px 16px', flexDirection: 'column', gap: 14, borderRight: '1px solid rgba(15,15,30,0.06)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 4px', marginBottom: 4 }}>
                 <div style={{ width: 28, height: 28, borderRadius: '50%', background: BLUE_SOFT, color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 12 }}>M</div>
                 <div>
@@ -230,51 +496,40 @@ export default function Home() {
               </div>
             </div>
             {/* Floating welcome card */}
-            <div style={{ position: 'absolute', top: '36%', left: '50%', transform: 'translateX(-50%)', width: 320, background: PAPER, borderRadius: 14, boxShadow: '0 24px 60px rgba(15,15,30,0.18), 0 0 0 1px rgba(15,15,30,0.05)', overflow: 'hidden' }}>
-              <div style={{ padding: '10px 14px', borderBottom: `1px solid ${RULE}`, background: PAPER_2 }}>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF5F57', display: 'inline-block' }} />
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#FEBC2E', display: 'inline-block' }} />
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#28C840', display: 'inline-block' }} />
-                </div>
-              </div>
-              <div style={{ padding: '18px 20px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: BLUE_SOFT, color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 13 }}>M</div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>Marina A.</div>
-                    <div style={{ fontSize: 11, color: MUTED }}>Designer · São Paulo</div>
-                  </div>
-                </div>
-                <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em' }}>Welcome to your system ✨</div>
-                <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.5 }}>Your habits, OKRs, dream board and journal — woven together, ready when you are.</div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
-                  <a href="/auth/register" style={{ background: BLUE, color: PAPER, padding: '8px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600 }}>Start your day</a>
-                </div>
-              </div>
+            <WelcomeCard />
+          </div>
+        </div>
+
+        {/* Mobile: welcome card preview standalone */}
+        <div className="lp-dash-mobile-preview">
+          <div style={{ width: '100%', maxWidth: 360 }}>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <span className="lp-kicker">Product preview</span>
+              <p style={{ fontSize: 15, color: MUTED, margin: '8px 0 0' }}>Your entire life system, in one place.</p>
             </div>
+            <WelcomeCardStatic />
           </div>
         </div>
       </section>
 
       {/* ── Trust strip ── */}
-      <section style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px 100px', textAlign: 'center' }}>
+      <div className="lp-strip">
         <div style={{ fontSize: 12, color: MUTED, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 24, fontWeight: 600 }}>Plays well with the tools you already use</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px 40px', alignItems: 'center' }}>
+        <div className="lp-strip-logos">
           {['Google Calendar', 'Notion', 'Apple Health', 'Outlook', 'Slack', 'Todoist'].map((t, i) => (
             <span key={i} style={{ fontSize: 15, fontWeight: 600, color: 'rgba(15,15,30,0.4)', letterSpacing: '-0.01em' }}>{t}</span>
           ))}
         </div>
-      </section>
+      </div>
 
       {/* ── Features ── */}
-      <section id="features" style={{ padding: '120px 32px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto 64px', textAlign: 'center' }}>
-          <span style={{ display: 'inline-block', fontSize: 12, color: BLUE, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 18, fontWeight: 600, padding: '5px 12px', borderRadius: 999, background: BLUE_SOFT }}>Features</span>
-          <h2 style={{ fontSize: 'clamp(36px, 5vw, 60px)', lineHeight: 1.05, letterSpacing: '-0.03em', fontWeight: 700, margin: 0 }}>Everything you carry, in one quiet place.</h2>
-          <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.5, margin: '20px auto 0', maxWidth: 580 }}>Eight modules. One method. Turn each on as you grow into it.</p>
+      <section id="features" className="lp-section">
+        <div className="lp-section-head">
+          <span className="lp-kicker">Features</span>
+          <h2 className="lp-h2">Everything you carry, in one quiet place.</h2>
+          <p className="lp-h2-sub">Eight modules. One method. Turn each on as you grow into it.</p>
         </div>
-        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+        <div className="lp-features-grid">
           {content.features.map((f, i) => (
             <div key={i} className="lp-feature-card" style={{ background: PAPER, padding: '28px', borderRadius: 16, border: `1px solid ${RULE}`, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 240 }}>
               <div style={{ width: 44, height: 44, borderRadius: 10, background: BLUE_SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -289,13 +544,13 @@ export default function Home() {
       </section>
 
       {/* ── How it works ── */}
-      <section id="how" style={{ padding: '120px 32px', background: PAPER_2 }}>
-        <div style={{ maxWidth: 760, margin: '0 auto 64px', textAlign: 'center' }}>
-          <span style={{ display: 'inline-block', fontSize: 12, color: BLUE, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 18, fontWeight: 600, padding: '5px 12px', borderRadius: 999, background: BLUE_SOFT }}>How it works</span>
-          <h2 style={{ fontSize: 'clamp(36px, 5vw, 60px)', lineHeight: 1.05, letterSpacing: '-0.03em', fontWeight: 700, margin: 0 }}>A method, not just an app.</h2>
-          <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.5, margin: '20px auto 0', maxWidth: 580 }}>From values to dreams to weekly action — Cherut walks the path with you.</p>
+      <section id="how" className="lp-section-alt">
+        <div className="lp-section-head">
+          <span className="lp-kicker">How it works</span>
+          <h2 className="lp-h2">A method, not just an app.</h2>
+          <p className="lp-h2-sub">From values to dreams to weekly action — Cherut walks the path with you.</p>
         </div>
-        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 32 }}>
+        <div className="lp-steps-grid">
           {content.steps.map((s, i) => (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ fontSize: 13, color: BLUE, fontWeight: 700, letterSpacing: '0.05em' }}>{s.n}</div>
@@ -308,18 +563,18 @@ export default function Home() {
       </section>
 
       {/* ── Testimonials ── */}
-      <section style={{ padding: '120px 32px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto 64px', textAlign: 'center' }}>
-          <span style={{ display: 'inline-block', fontSize: 12, color: BLUE, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 18, fontWeight: 600, padding: '5px 12px', borderRadius: 999, background: BLUE_SOFT }}>Loved by builders of intentional lives</span>
-          <h2 style={{ fontSize: 'clamp(36px, 5vw, 60px)', lineHeight: 1.05, letterSpacing: '-0.03em', fontWeight: 700, margin: 0 }}>What our community is saying.</h2>
+      <section className="lp-section">
+        <div className="lp-section-head">
+          <span className="lp-kicker">Loved by builders of intentional lives</span>
+          <h2 className="lp-h2">What our community is saying.</h2>
         </div>
-        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+        <div className="lp-testimonials-grid">
           {content.testimonials.map((t, i) => (
             <figure key={i} style={{ padding: '28px', background: PAPER, borderRadius: 16, border: `1px solid ${RULE}`, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ color: BLUE, fontSize: 14, letterSpacing: '0.1em' }}>★★★★★</div>
-              <blockquote style={{ fontSize: 16, lineHeight: 1.55, fontWeight: 500, margin: 0, letterSpacing: '-0.005em', color: 'rgba(15,15,30,0.85)' }}>"{t.quote}"</blockquote>
+              <blockquote style={{ fontSize: 16, lineHeight: 1.55, fontWeight: 500, margin: 0, color: 'rgba(15,15,30,0.85)' }}>"{t.quote}"</blockquote>
               <figcaption style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 'auto' }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: BLUE_SOFT, color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 14 }}>{t.name.charAt(0)}</div>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: BLUE_SOFT, color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 14, flexShrink: 0 }}>{t.name.charAt(0)}</div>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 600 }}>{t.name}</div>
                   <div style={{ fontSize: 12, color: MUTED }}>{t.role}</div>
@@ -331,11 +586,11 @@ export default function Home() {
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" style={{ padding: '120px 32px', background: PAPER_2 }}>
-        <div style={{ maxWidth: 760, margin: '0 auto 64px', textAlign: 'center' }}>
-          <span style={{ display: 'inline-block', fontSize: 12, color: BLUE, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 18, fontWeight: 600, padding: '5px 12px', borderRadius: 999, background: BLUE_SOFT }}>Pricing</span>
-          <h2 style={{ fontSize: 'clamp(36px, 5vw, 60px)', lineHeight: 1.05, letterSpacing: '-0.03em', fontWeight: 700, margin: 0 }}>Honest pricing, no surprises.</h2>
-          <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.5, margin: '20px auto 0', maxWidth: 580 }}>Start free. Upgrade when your system asks for more.</p>
+      <section id="pricing" className="lp-section-alt">
+        <div className="lp-section-head">
+          <span className="lp-kicker">Pricing</span>
+          <h2 className="lp-h2">Honest pricing, no surprises.</h2>
+          <p className="lp-h2-sub">Start free. Upgrade when your system asks for more.</p>
           <div style={{ display: 'inline-flex', gap: 4, marginTop: 28, padding: 4, background: PAPER, border: `1px solid ${RULE}`, borderRadius: 999 }}>
             <button onClick={() => setBilling('monthly')} style={{ padding: '8px 18px', borderRadius: 999, fontSize: 13, fontWeight: 600, color: billing === 'monthly' ? PAPER : 'rgba(15,15,30,0.65)', background: billing === 'monthly' ? INK : 'transparent', transition: 'background .15s, color .15s' }}>Monthly</button>
             <button onClick={() => setBilling('annual')} style={{ padding: '8px 18px', borderRadius: 999, fontSize: 13, fontWeight: 600, color: billing === 'annual' ? PAPER : 'rgba(15,15,30,0.65)', background: billing === 'annual' ? INK : 'transparent', transition: 'background .15s, color .15s', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
@@ -343,11 +598,11 @@ export default function Home() {
             </button>
           </div>
         </div>
-        <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, alignItems: 'stretch' }}>
+        <div className="lp-pricing-grid">
           {content.pricing.map((p, i) => {
             const price = billing === 'annual' ? p.annual : p.monthly;
             const cadence = billing === 'annual' ? p.cadenceAnnual : p.cadenceMonthly;
-            const cadenceLabel = cadence === 'forever' || cadence === 'one time' ? cadence : '/' + cadence.replace('per ', '').replace(', billed annually', '');
+            const cadenceLabel = cadence === 'forever' || cadence === 'one time' ? cadence : '/' + cadence.replace('per ', '');
             return (
               <div key={i} className="lp-pricing-card" style={{ padding: '32px 28px', background: p.highlight ? INK : PAPER, color: p.highlight ? PAPER : INK, border: `1px solid ${p.highlight ? INK : RULE}`, borderRadius: 18, display: 'flex', flexDirection: 'column', gap: 14, position: 'relative' }}>
                 {p.highlight && <div style={{ position: 'absolute', top: -12, right: 24, background: BLUE, color: PAPER, fontSize: 10, fontWeight: 700, padding: '5px 12px', borderRadius: 999, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Most popular</div>}
@@ -376,10 +631,10 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ── */}
-      <section style={{ padding: '120px 32px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto 64px', textAlign: 'center' }}>
-          <span style={{ display: 'inline-block', fontSize: 12, color: BLUE, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 18, fontWeight: 600, padding: '5px 12px', borderRadius: 999, background: BLUE_SOFT }}>FAQ</span>
-          <h2 style={{ fontSize: 'clamp(36px, 5vw, 60px)', lineHeight: 1.05, letterSpacing: '-0.03em', fontWeight: 700, margin: 0 }}>Questions, answered.</h2>
+      <section className="lp-section">
+        <div className="lp-section-head">
+          <span className="lp-kicker">FAQ</span>
+          <h2 className="lp-h2">Questions, answered.</h2>
         </div>
         <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', border: `1px solid ${RULE}`, borderRadius: 14, overflow: 'hidden', background: PAPER }}>
           {content.faq.map((item, i) => (
@@ -395,17 +650,17 @@ export default function Home() {
       </section>
 
       {/* ── About ── */}
-      <section id="about" style={{ padding: '120px 32px', background: PAPER_2 }}>
-        <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'start' }}>
+      <section id="about" className="lp-section-alt">
+        <div className="lp-about-grid">
           <div>
-            <span style={{ display: 'inline-block', fontSize: 12, color: BLUE, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 18, fontWeight: 600, padding: '5px 12px', borderRadius: 999, background: BLUE_SOFT }}>About</span>
-            <h2 style={{ fontSize: 'clamp(36px, 5vw, 60px)', lineHeight: 1.05, letterSpacing: '-0.03em', fontWeight: 700, margin: 0, textAlign: 'left' }}>Built by people who needed it themselves</h2>
+            <span className="lp-kicker">About</span>
+            <h2 className="lp-h2" style={{ textAlign: 'left' }}>Built by people who needed it themselves</h2>
           </div>
           <div>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'rgba(15,15,30,0.8)', margin: 0 }}>Cherut started when our founder spent a year hopping between Notion, Todoist, journals and spreadsheets — and realized the missing piece was not another tool, it was a system. We are a small team building the app we wanted to use: opinionated about method, gentle about how you get there.</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 28 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 28, flexWrap: 'wrap' }}>
               {[0, 1, 2, 3].map(i => (
-                <div key={i} style={{ width: 36, height: 36, borderRadius: '50%', background: BLUE_SOFT, border: `2px solid ${PAPER_2}`, marginLeft: i > 0 ? -8 : 0 }} />
+                <div key={i} style={{ width: 36, height: 36, borderRadius: '50%', background: BLUE_SOFT, border: `2px solid ${PAPER_2}`, marginLeft: i > 0 ? -8 : 0, flexShrink: 0 }} />
               ))}
               <div style={{ fontSize: 14, color: MUTED, marginLeft: 8, fontWeight: 500 }}>+ a small, focused team</div>
             </div>
@@ -414,13 +669,13 @@ export default function Home() {
       </section>
 
       {/* ── Final CTA ── */}
-      <section style={{ position: 'relative', padding: '120px 32px', textAlign: 'center', overflow: 'hidden', background: PAPER }}>
+      <section className="lp-final-cta" style={{ position: 'relative', padding: '120px 32px', textAlign: 'center', overflow: 'hidden', background: PAPER }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(${GRID} 1px, transparent 1px), linear-gradient(90deg, ${GRID} 1px, transparent 1px)`, backgroundSize: '90px 90px', maskImage: 'radial-gradient(ellipse at 50% 50%, #000 30%, transparent 70%)', WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, #000 30%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', maxWidth: 720, margin: '0 auto', zIndex: 1 }}>
-          <h2 style={{ fontSize: 'clamp(40px, 6vw, 72px)', lineHeight: 1.05, letterSpacing: '-0.03em', fontWeight: 700, margin: '0 0 22px' }}>Your dreams are waiting.</h2>
+          <h2 style={{ fontSize: 'clamp(36px, 6vw, 72px)', lineHeight: 1.05, letterSpacing: '-0.03em', fontWeight: 700, margin: '0 0 22px' }}>Your dreams are waiting.</h2>
           <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.5, maxWidth: 520, margin: '0 auto 36px' }}>Start with the free plan. Bring your noise. We will help you turn it down.</p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-            <a href="/auth/register" className="lp-nav-cta-dark" style={{ background: INK, color: PAPER, fontSize: 15, fontWeight: 600, padding: '14px 26px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+          <div className="lp-hero-ctas">
+            <a href="/auth/register" className="lp-cta-dark" style={{ background: INK, color: PAPER, fontSize: 15, fontWeight: 600, padding: '14px 26px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 10 }}>
               Start free <span>→</span>
             </a>
             <a href="#" className="lp-cta-outline" style={{ fontSize: 15, fontWeight: 500, padding: '13px 26px', border: `1px solid ${RULE}`, borderRadius: 999, background: PAPER, color: INK }}>
@@ -432,8 +687,8 @@ export default function Home() {
 
       {/* ── Footer ── */}
       <footer style={{ background: PAPER, color: 'rgba(15,15,30,0.7)', padding: '64px 32px 32px', borderTop: `1px solid ${RULE}` }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 32, paddingBottom: 48, borderBottom: `1px solid ${RULE}` }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14, gridColumn: 'span 2' }}>
+        <div className="lp-footer-inner">
+          <div className="lp-footer-brand" style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 28, height: 28, borderRadius: '50%', background: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                 <CMark size={28} color={PAPER} />
@@ -442,33 +697,66 @@ export default function Home() {
             </div>
             <p style={{ fontSize: 14, color: MUTED, margin: '8px 0 0', lineHeight: 1.5, maxWidth: 280 }}>Cherut (חירות) — freedom in Hebrew. Not freedom from responsibility, freedom through it.</p>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
-            <div style={{ fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(15,15,30,0.55)', marginBottom: 4, fontWeight: 600 }}>Product</div>
-            <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#">Changelog</a>
-            <a href="#">Roadmap</a>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
-            <div style={{ fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(15,15,30,0.55)', marginBottom: 4, fontWeight: 600 }}>Company</div>
-            <a href="#about">About</a>
-            <a href="#">Blog</a>
-            <a href="#">Careers</a>
-            <a href="#">Contact</a>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
-            <div style={{ fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(15,15,30,0.55)', marginBottom: 4, fontWeight: 600 }}>Resources</div>
-            <a href="#">Community</a>
-            <a href="#">Help center</a>
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-          </div>
+          {[
+            { label: 'Product',   links: [['Features', '#features'], ['Pricing', '#pricing'], ['Changelog', '#'], ['Roadmap', '#']] },
+            { label: 'Company',   links: [['About', '#about'], ['Blog', '#'], ['Careers', '#'], ['Contact', '#']] },
+            { label: 'Resources', links: [['Community', '#'], ['Help center', '#'], ['Privacy', '#'], ['Terms', '#']] },
+          ].map(col => (
+            <div key={col.label} style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
+              <div style={{ fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(15,15,30,0.55)', marginBottom: 4, fontWeight: 600 }}>{col.label}</div>
+              {col.links.map(([text, href]) => <a key={text} href={href}>{text}</a>)}
+            </div>
+          ))}
         </div>
-        <div style={{ maxWidth: 1280, margin: '0 auto', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, fontSize: 13, color: 'rgba(15,15,30,0.5)' }}>
+        <div className="lp-footer-bottom">
           <span>© 2026 Cherut. Built with intention.</span>
           <span>Made for the dreamers who do.</span>
         </div>
       </footer>
     </div>
+  );
+}
+
+/* ── Sub-components ── */
+
+function WelcomeCard() {
+  return (
+    <div style={{ position: 'absolute', top: '36%', left: '50%', transform: 'translateX(-50%)', width: 320, background: PAPER, borderRadius: 14, boxShadow: '0 24px 60px rgba(15,15,30,0.18), 0 0 0 1px rgba(15,15,30,0.05)', overflow: 'hidden', zIndex: 10 }}>
+      <WelcomeCardInner />
+    </div>
+  );
+}
+
+function WelcomeCardStatic() {
+  return (
+    <div style={{ background: PAPER, borderRadius: 14, boxShadow: '0 16px 40px rgba(15,15,30,0.12), 0 0 0 1px rgba(15,15,30,0.05)', overflow: 'hidden' }}>
+      <WelcomeCardInner />
+    </div>
+  );
+}
+
+function WelcomeCardInner() {
+  return (
+    <>
+      <div style={{ padding: '10px 14px', borderBottom: `1px solid ${RULE}`, background: PAPER_2 }}>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {['#FF5F57', '#FEBC2E', '#28C840'].map(c => <span key={c} style={{ width: 10, height: 10, borderRadius: '50%', background: c, display: 'inline-block' }} />)}
+        </div>
+      </div>
+      <div style={{ padding: '18px 20px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 32, height: 32, borderRadius: '50%', background: BLUE_SOFT, color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 13 }}>M</div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600 }}>Marina A.</div>
+            <div style={{ fontSize: 11, color: MUTED }}>Designer · São Paulo</div>
+          </div>
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em' }}>Welcome to your system ✨</div>
+        <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.5 }}>Your habits, OKRs, dream board and journal — woven together, ready when you are.</div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+          <a href="/auth/register" style={{ background: BLUE, color: PAPER, padding: '8px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600 }}>Start your day</a>
+        </div>
+      </div>
+    </>
   );
 }
