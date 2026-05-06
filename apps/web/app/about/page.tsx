@@ -1,504 +1,109 @@
 'use client';
 
-import { Container, Title, Text, Stack, Card, Group, SimpleGrid, ThemeIcon, Box, Button } from '@mantine/core';
-import { Target, Heart, Zap, Users, Award, Globe, CheckCircle2, ArrowRight } from 'lucide-react';
-import Header from '@/components/ui/Header';
-import Footer from '@/components/ui/Footer';
+import { PageShell, SHELL_TOKENS } from '@/components/shell/Shell';
 
-export default function About() {
+const { BLUE, BLUE_SOFT, INK, PAPER, PAPER_2, MUTED, RULE } = SHELL_TOKENS;
+
+const principles = [
+  {
+    icon: '◐',
+    title: 'System over willpower',
+    body: 'Motivation is unreliable. A well-designed system works on the hard days too. We build for consistency, not inspiration bursts.',
+  },
+  {
+    icon: '◇',
+    title: 'Method not mood',
+    body: 'The OKR framework, habit science and spaced reflection are not motivational fluff — they are engineering applied to human behaviour.',
+  },
+  {
+    icon: '◯',
+    title: 'Freedom through responsibility',
+    body: 'Cherut (חירות) means freedom in Hebrew. Owning your commitments is what makes real freedom possible, not avoiding them.',
+  },
+  {
+    icon: '◈',
+    title: 'Quiet, not loud',
+    body: 'No gamification. No streaks designed to make you feel guilty. No dark patterns. Just your system, doing its job.',
+  },
+];
+
+export default function AboutPage() {
   return (
-    <Box style={{
-      minHeight: '100vh',
-      background: '#FFFFFF',
-      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    }}>
-      <Header />
+    <PageShell
+      kicker="About"
+      title="Built by people who needed it themselves"
+      lead="We are Cherut — a small team making the app we could not find."
+    >
+      <style>{`
+        .ab-section { max-width: 1180px; margin: 0 auto; padding: 64px 20px; }
+        .ab-manifesto { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        .ab-manifesto p { font-size: 18px; line-height: 1.7; color: rgba(15,15,30,0.82); margin: 0; }
+        .ab-principles { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 48px; }
+        .ab-card { background: ${PAPER}; border: 1px solid ${RULE}; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 14px; transition: transform .2s, border-color .2s; }
+        .ab-card:hover { transform: translateY(-2px); border-color: ${BLUE}; }
+        .ab-icon { width: 44px; height: 44px; border-radius: 10px; background: ${BLUE_SOFT}; color: ${BLUE}; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .ab-card-title { font-size: 18px; font-weight: 700; color: ${INK}; letter-spacing: -0.015em; margin: 0; }
+        .ab-card-body { font-size: 15px; line-height: 1.6; color: ${MUTED}; margin: 0; }
+        .ab-divider { border: none; border-top: 1px solid ${RULE}; margin: 0; }
 
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+        @media (min-width: 640px) {
+          .ab-section { padding: 80px 32px; }
+          .ab-principles { grid-template-columns: 1fr 1fr; }
+        }
+        @media (min-width: 1024px) {
+          .ab-section { padding: 100px 32px; }
+          .ab-principles { grid-template-columns: repeat(4, 1fr); }
+        }
       `}</style>
 
-      <Container size="lg" py={80} style={{ marginTop: '100px' }}>
-        <Stack gap={80}>
-          {/* Hero Section */}
-          <Stack align="center" gap="lg">
-            <Title
-              order={1}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: 'clamp(36px, 6vw, 48px)',
-                lineHeight: 1.2,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                color: '#000000',
-              }}
-            >
-              About <span style={{ color: '#4686FE' }}>Cherut</span>
-            </Title>
-            <Text
-              ta="center"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '24px',
-                lineHeight: '32px',
-                color: '#666666',
-                fontWeight: 400,
-                maxWidth: '700px',
-                margin: '0 auto',
-              }}
-            >
-              We're building the world's most comprehensive personal excellence platform,
-              designed for ambitious individuals who refuse to settle for ordinary.
-            </Text>
-          </Stack>
+      {/* Manifesto */}
+      <section style={{ background: PAPER_2, borderBottom: `1px solid ${RULE}` }}>
+        <div className="ab-section">
+          <div className="ab-manifesto">
+            <p>
+              Cherut started with a simple frustration: every tool that claimed to help you live better only made the system more complicated. Separate apps for habits, tasks, goals, finances, journaling — none of them talking to each other, none of them tied to a why.
+            </p>
+            <p>
+              We spent a year hopping between Notion, Todoist, spreadsheets and paper notebooks. The missing piece was never another app. It was a coherent method — one that connects what you do today to who you are becoming.
+            </p>
+            <p>
+              So we built Cherut. Opinionated about method. Quiet about everything else. We believe the best productivity tool is the one you actually use — one that respects your attention and earns your trust by getting out of the way.
+            </p>
+          </div>
+        </div>
+      </section>
 
-          {/* Mission Statement */}
-          <Card
-            padding="xl"
-            radius={16}
-            style={{
-              background: '#F5F5F5',
-              border: '1px solid #CCCCCC',
-              boxShadow: 'none',
-            }}
-          >
-            <Stack align="center" gap="lg">
-              <ThemeIcon
-                size={64}
-                radius={16}
-                style={{
-                  background: '#4686FE',
-                  color: 'white',
-                  border: 'none',
-                }}
-              >
-                <Target size={32} />
-              </ThemeIcon>
-              <Title
-                order={2}
-                ta="center"
-                style={{
-                  fontFamily: 'Inter Display, sans-serif',
-                  fontSize: '32px',
-                  fontWeight: 700,
-                  color: '#000000',
-                }}
-              >
-                Our Mission
-              </Title>
-              <Text
-                ta="center"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '20px',
-                  lineHeight: '28px',
-                  color: '#666666',
-                  fontWeight: 400,
-                  maxWidth: '800px',
-                }}
-              >
-                To empower elite performers with the tools, insights, and systems they need to achieve
-                extraordinary results across all areas of life. We believe that with the right framework,
-                anyone can transform their potential into reality.
-              </Text>
-            </Stack>
-          </Card>
+      <hr className="ab-divider" />
 
-          {/* Core Values */}
-          <Stack gap="xl">
-            <Title
-              order={2}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '32px',
-                fontWeight: 700,
-                color: '#000000',
-              }}
-            >
-              What Drives Us
-            </Title>
+      {/* Principles */}
+      <section style={{ background: PAPER }}>
+        <div className="ab-section">
+          <div style={{ maxWidth: 720, marginBottom: 40 }}>
+            <span style={{ fontSize: 12, color: BLUE, letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 600, padding: '5px 12px', borderRadius: 999, background: BLUE_SOFT, display: 'inline-block', marginBottom: 16 }}>Principles</span>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 700, letterSpacing: '-0.025em', color: INK, margin: 0 }}>What we stand for</h2>
+          </div>
+          <div className="ab-principles">
+            {principles.map((p) => (
+              <div key={p.title} className="ab-card">
+                <div className="ab-icon">{p.icon}</div>
+                <h3 className="ab-card-title">{p.title}</h3>
+                <p className="ab-card-body">{p.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing={32}>
-              {[
-                {
-                  icon: Zap,
-                  title: 'Excellence First',
-                  description: "We're obsessed with creating tools that don't just work, but work exceptionally well. Every feature is designed with elite performance in mind.",
-                },
-                {
-                  icon: Heart,
-                  title: 'Human-Centered',
-                  description: 'Technology serves humans, not the other way around. Our platform adapts to your life, values, and goals, creating a truly personal experience.',
-                },
-                {
-                  icon: Globe,
-                  title: 'Global Impact',
-                  description: "By empowering individuals to reach their full potential, we're contributing to a world where excellence becomes the norm, not the exception.",
-                },
-              ].map((value, index) => (
-                <Card
-                  key={index}
-                  padding="xl"
-                  radius={16}
-                  style={{
-                    background: 'white',
-                    border: '1px solid #CCCCCC',
-                    boxShadow: 'none',
-                    height: '100%',
-                  }}
-                >
-                  <Stack gap="lg" h="100%">
-                    <ThemeIcon
-                      size={48}
-                      radius={12}
-                      style={{
-                        background: '#F5F5F5',
-                        color: '#4686FE',
-                        border: 'none',
-                      }}
-                    >
-                      <value.icon size={24} />
-                    </ThemeIcon>
-                    <Text
-                      style={{
-                        fontFamily: 'Inter Display, sans-serif',
-                        fontSize: '20px',
-                        fontWeight: 600,
-                        color: '#000000',
-                      }}
-                    >
-                      {value.title}
-                    </Text>
-                    <Text
-                      style={{
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: 400,
-                        color: '#666666',
-                        lineHeight: '24px',
-                      }}
-                    >
-                      {value.description}
-                    </Text>
-                  </Stack>
-                </Card>
-              ))}
-            </SimpleGrid>
-          </Stack>
-
-          {/* The Story */}
-          <Stack gap="xl">
-            <Title
-              order={2}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '32px',
-                fontWeight: 700,
-                color: '#000000',
-              }}
-            >
-              Our Story
-            </Title>
-
-            <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="xl">
-              <Stack gap="lg">
-                <Text
-                  style={{
-                    fontFamily: 'Inter Display, sans-serif',
-                    fontSize: '24px',
-                    fontWeight: 600,
-                    color: '#4686FE',
-                  }}
-                >
-                  Born from Frustration
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 400,
-                    color: '#666666',
-                    lineHeight: '24px',
-                  }}
-                >
-                  Cherut was born from the frustration of using disconnected productivity tools that promised
-                  everything but delivered mediocrity. We were tired of jumping between apps, losing track
-                  of goals, and feeling like our potential was being wasted on ineffective systems.
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 400,
-                    color: '#666666',
-                    lineHeight: '24px',
-                  }}
-                >
-                  We realized that high achievers needed more than just another task manager or habit tracker.
-                  They needed a comprehensive system that could handle the complexity of an ambitious life
-                  while remaining elegant and intuitive.
-                </Text>
-              </Stack>
-
-              <Stack gap="lg">
-                <Text
-                  style={{
-                    fontFamily: 'Inter Display, sans-serif',
-                    fontSize: '24px',
-                    fontWeight: 600,
-                    color: '#4686FE',
-                  }}
-                >
-                  Built for Elite Performance
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 400,
-                    color: '#666666',
-                    lineHeight: '24px',
-                  }}
-                >
-                  Every aspect of Cherut is designed with one question in mind: "How would the world's top
-                  performers approach this?" From our OKR framework inspired by Google and Intel, to our
-                  values-based decision making system, we study excellence to create excellence.
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 400,
-                    color: '#666666',
-                    lineHeight: '24px',
-                  }}
-                >
-                  We're not building another productivity app. We're crafting a performance operating system
-                  for the next generation of leaders, entrepreneurs, athletes, and change-makers.
-                </Text>
-              </Stack>
-            </SimpleGrid>
-          </Stack>
-
-          {/* Why Cherut */}
-          <Card
-            padding="xl"
-            radius={16}
-            style={{
-              background: '#F5F5F5',
-              border: '1px solid #CCCCCC',
-              boxShadow: 'none',
-            }}
-          >
-            <Stack gap="lg">
-              <Title
-                order={3}
-                ta="center"
-                style={{
-                  fontFamily: 'Inter Display, sans-serif',
-                  fontSize: '24px',
-                  fontWeight: 700,
-                  color: '#000000',
-                }}
-              >
-                Why "Cherut"?
-              </Title>
-              <Text
-                ta="center"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '16px',
-                  fontWeight: 400,
-                  color: '#666666',
-                  lineHeight: '24px',
-                  maxWidth: '700px',
-                  margin: '0 auto',
-                }}
-              >
-                "Cherut" (חרות) is a Hebrew word meaning "freedom" or "liberty" - not just political freedom,
-                but the deeper freedom that comes from self-mastery and the ability to shape your own destiny.
-                It represents the liberation you feel when you're operating at your highest potential.
-              </Text>
-              <Text
-                ta="center"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '16px',
-                  fontWeight: 400,
-                  color: '#666666',
-                  lineHeight: '24px',
-                  maxWidth: '700px',
-                  margin: '0 auto',
-                }}
-              >
-                This is the freedom we want to give you - the freedom to pursue your biggest dreams with
-                confidence, clarity, and the right tools to make them reality.
-              </Text>
-            </Stack>
-          </Card>
-
-          {/* What Makes Us Different */}
-          <Stack gap="xl">
-            <Title
-              order={2}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '32px',
-                fontWeight: 700,
-                color: '#000000',
-              }}
-            >
-              What Makes Us Different
-            </Title>
-
-            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing={32}>
-              {[
-                {
-                  icon: Award,
-                  title: 'No Compromises',
-                  description: "We don't build for the masses. We build for people who demand excellence and are willing to invest in their growth. Every feature is crafted for peak performance.",
-                },
-                {
-                  icon: Users,
-                  title: 'Community Driven',
-                  description: 'Our beta community shapes every decision. We listen, iterate, and improve based on real feedback from real high achievers using Cherut daily.',
-                },
-                {
-                  icon: CheckCircle2,
-                  title: 'Holistic Approach',
-                  description: "We understand that peak performance isn't just about productivity. It's about aligning your actions with your values and creating sustainable excellence.",
-                },
-                {
-                  icon: Zap,
-                  title: 'Future-Ready',
-                  description: "We're building for tomorrow's challenges today. Our platform evolves with you and incorporates cutting-edge insights from performance science.",
-                },
-              ].map((feature, index) => (
-                <Card
-                  key={index}
-                  padding="xl"
-                  radius={16}
-                  style={{
-                    background: 'white',
-                    border: '1px solid #CCCCCC',
-                    boxShadow: 'none',
-                  }}
-                >
-                  <Stack gap="md">
-                    <Group gap="md">
-                      <ThemeIcon
-                        size={40}
-                        radius={12}
-                        style={{
-                          background: '#F5F5F5',
-                          color: '#4686FE',
-                          border: 'none',
-                        }}
-                      >
-                        <feature.icon size={20} />
-                      </ThemeIcon>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter Display, sans-serif',
-                          fontSize: '20px',
-                          fontWeight: 600,
-                          color: '#000000',
-                        }}
-                      >
-                        {feature.title}
-                      </Text>
-                    </Group>
-                    <Text
-                      style={{
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: 400,
-                        color: '#666666',
-                        lineHeight: '24px',
-                      }}
-                    >
-                      {feature.description}
-                    </Text>
-                  </Stack>
-                </Card>
-              ))}
-            </SimpleGrid>
-          </Stack>
-
-          {/* CTA */}
-          <Card
-            padding="xl"
-            radius={16}
-            style={{
-              background: '#F5F5F5',
-              border: '1px solid #CCCCCC',
-              boxShadow: 'none',
-            }}
-          >
-            <Stack align="center" gap="lg">
-              <Title
-                order={3}
-                ta="center"
-                style={{
-                  fontFamily: 'Inter Display, sans-serif',
-                  fontSize: '24px',
-                  fontWeight: 700,
-                  color: '#000000',
-                }}
-              >
-                Join the Elite Performance Revolution
-              </Title>
-              <Text
-                ta="center"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '18px',
-                  lineHeight: '26px',
-                  color: '#666666',
-                  fontWeight: 400,
-                  maxWidth: '600px',
-                }}
-              >
-                Ready to unlock your full potential? Join our beta community and start building
-                your elite performance system today.
-              </Text>
-              <Button
-                component="a"
-                href="/auth/register"
-                size="lg"
-                rightSection={<ArrowRight size={20} />}
-                style={{
-                  background: '#4686FE',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  height: '56px',
-                  padding: '0 32px',
-                  color: 'white',
-                  transition: 'all 0.2s ease',
-                  fontFamily: 'Inter, sans-serif',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      background: '#3366E5',
-                    },
-                  },
-                }}
-              >
-                Start Your Journey
-              </Button>
-            </Stack>
-          </Card>
-        </Stack>
-      </Container>
-
-      <Footer />
-    </Box>
+      {/* CTA */}
+      <section style={{ background: PAPER_2, borderTop: `1px solid ${RULE}` }}>
+        <div style={{ maxWidth: 720, margin: '0 auto', padding: '64px 20px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 700, letterSpacing: '-0.025em', color: INK, margin: '0 0 16px' }}>Try it yourself</h2>
+          <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.55, margin: '0 0 32px' }}>Free to start. No credit card. No tricks.</p>
+          <a href="/auth/register" style={{ display: 'inline-block', background: INK, color: PAPER, fontSize: 15, fontWeight: 600, padding: '14px 28px', borderRadius: 999 }}>
+            Get started free →
+          </a>
+        </div>
+      </section>
+    </PageShell>
   );
 }

@@ -2,15 +2,9 @@
 
 import { useAdminRedirect } from '@/hooks/useAdminRedirect';
 import { useState, useEffect } from 'react';
+import { CMark, SHELL_TOKENS } from '@/components/shell/Shell';
 
-const BLUE = 'oklch(0.5 0.18 260)';
-const BLUE_SOFT = 'oklch(0.94 0.04 260)';
-const INK = '#0F0F1E';
-const PAPER = '#FAFAF7';
-const PAPER_2 = '#F5F5F2';
-const MUTED = 'rgba(15,15,30,0.6)';
-const RULE = 'rgba(15,15,30,0.1)';
-const GRID = 'rgba(15,15,30,0.07)';
+const { BLUE, BLUE_SOFT, INK, PAPER, PAPER_2, MUTED, RULE, GRID } = SHELL_TOKENS;
 
 const content = {
   features: [
@@ -50,13 +44,6 @@ const content = {
   ],
 };
 
-function CMark({ size = 32, color = INK }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-      <path d="M 50 6 A 44 44 0 1 0 50 94 L 50 72 A 22 22 0 1 1 50 28 Z" fill={color} />
-    </svg>
-  );
-}
 
 const tabs = [
   { label: 'Today',       sub: 'Your day at a glance',    icon: '◐' },
@@ -180,6 +167,9 @@ export default function Home() {
           filter: drop-shadow(0 12px 24px rgba(60,50,200,.25));
         }
 
+        /* Hero section padding (overrideable by media queries) */
+        .lp-hero-section { padding: 80px 32px 100px; }
+
         /* ── Dashboard mockup ── */
         .lp-dash-section { padding: 0 32px 100px; background: linear-gradient(180deg, ${PAPER} 0%, ${PAPER_2} 100%); }
         .lp-dash-outer   { max-width: 1200px; margin: 0 auto; }
@@ -280,12 +270,15 @@ export default function Home() {
           .lp-nav-inner  { padding: 14px 20px; }
 
           /* Hero: single column, C mark above headline */
+          .lp-hero-section            { padding: 56px 20px 72px; }
           .lp-hero-inner              { grid-template-columns: 1fr; gap: 0; min-height: unset; }
           .lp-hero-shape-wrap         { display: none; }
           .lp-hero-cmark-mobile       { display: flex; }
           .lp-hero-text               { padding-top: 0; }
-          .lp-hero-h1                 { font-size: clamp(36px, 9vw, 56px); }
-          .lp-hero-sub                { font-size: 16px; }
+          .lp-hero-h1                 { font-size: clamp(32px, 9vw, 52px); }
+          .lp-hero-sub                { font-size: 16px; margin-bottom: 28px; }
+          .lp-hero-ctas               { flex-direction: column; align-items: stretch; gap: 10px; }
+          .lp-hero-ctas a             { text-align: center; justify-content: center; }
 
           /* Dashboard mockup: hide complex version, show welcome card preview */
           .lp-dash-outer     { display: none; }
@@ -319,8 +312,8 @@ export default function Home() {
         /* ── Mobile (< 480px) ── */
         @media (max-width: 479px) {
           .lp-steps-grid     { grid-template-columns: 1fr; }
-          .lp-hero-ctas      { flex-direction: column; align-items: stretch; }
-          .lp-hero-ctas a    { text-align: center; }
+          .lp-hero-section   { padding: 48px 16px 64px; }
+          .lp-hero-h1        { font-size: clamp(28px, 9vw, 44px); }
           .lp-footer-inner   { grid-template-columns: 1fr; }
           .lp-footer-brand   { grid-column: span 1; }
           .lp-section        { padding: 56px 16px; }
@@ -401,7 +394,7 @@ export default function Home() {
       </nav>
 
       {/* ── Hero ── */}
-      <section style={{ position: 'relative', padding: '80px 32px 100px', overflow: 'hidden' }}>
+      <section className="lp-hero-section" style={{ position: 'relative', overflowX: 'clip' }}>
         <div style={{
           position: 'absolute', inset: 0,
           backgroundImage: `linear-gradient(${GRID} 1px, transparent 1px), linear-gradient(90deg, ${GRID} 1px, transparent 1px)`,
@@ -698,9 +691,9 @@ export default function Home() {
             <p style={{ fontSize: 14, color: MUTED, margin: '8px 0 0', lineHeight: 1.5, maxWidth: 280 }}>Cherut (חירות) — freedom in Hebrew. Not freedom from responsibility, freedom through it.</p>
           </div>
           {[
-            { label: 'Product',   links: [['Features', '#features'], ['Pricing', '#pricing'], ['Changelog', '#'], ['Roadmap', '#']] },
-            { label: 'Company',   links: [['About', '#about'], ['Blog', '#'], ['Careers', '#'], ['Contact', '#']] },
-            { label: 'Resources', links: [['Community', '#'], ['Help center', '#'], ['Privacy', '#'], ['Terms', '#']] },
+            { label: 'Product',   links: [['Features', '#features'], ['Pricing', '#pricing'], ['Changelog', '/changelog'], ['Roadmap', '/roadmap']] },
+            { label: 'Company',   links: [['About', '/about'], ['Careers', '/careers'], ['Contact', '/contact']] },
+            { label: 'Resources', links: [['Community', '#'], ['Help center', '/help-center'], ['Privacy', '/privacy-policy']] },
           ].map(col => (
             <div key={col.label} style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
               <div style={{ fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(15,15,30,0.55)', marginBottom: 4, fontWeight: 600 }}>{col.label}</div>

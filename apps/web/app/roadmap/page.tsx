@@ -1,692 +1,124 @@
 'use client';
 
-import { Container, Title, Text, Stack, Badge, Card, Group, SimpleGrid, ThemeIcon, Divider, Box, Button } from '@mantine/core';
-import { CheckCircle2, Clock, Target, Calendar, Sparkles, Zap, ArrowRight } from 'lucide-react';
-import Header from '@/components/ui/Header';
-import Footer from '@/components/ui/Footer';
+import { PageShell, SHELL_TOKENS } from '@/components/shell/Shell';
 
-export default function Roadmap() {
+const { BLUE, BLUE_SOFT, INK, PAPER, PAPER_2, MUTED, RULE } = SHELL_TOKENS;
+
+const shipped = [
+  { name: 'Habits', desc: 'Daily tracking with streaks, intent and reflection.' },
+  { name: 'Tasks & Boards', desc: 'Kanban boards, list view and task management.' },
+  { name: 'OKRs', desc: 'Objectives and key results with weekly check-ins.' },
+  { name: 'Journal', desc: 'Morning intentions, evening reflections, free-form notes.' },
+  { name: 'Vision Board', desc: 'A visual canvas for the future you are building.' },
+  { name: 'Values', desc: 'Define your compass and check decisions against it.' },
+  { name: 'Life Areas', desc: 'Segment your life and balance what matters.' },
+];
+
+const inProgress = [
+  { name: 'Calendar sync', desc: 'Two-way sync with Google Calendar.' },
+  { name: 'Mobile apps', desc: 'Native iOS and Android apps, currently in beta.' },
+  { name: 'Finances module', desc: 'Budgets, goals and net worth on the same page.' },
+];
+
+const planned = [
+  { name: 'AI weekly review', desc: 'Automated insights from your habits and OKRs.' },
+  { name: 'Open API', desc: 'Build your own integrations with Cherut data.' },
+  { name: 'Teams', desc: 'Shared goals and accountability for small teams.' },
+  { name: 'Integrations hub', desc: 'Notion, Apple Health, Outlook, Slack and more.' },
+  { name: 'Native widgets', desc: 'Home screen widgets for iOS and Android.' },
+];
+
+function StatusBadge({ status }: { status: 'shipped' | 'in-progress' | 'planned' }) {
+  const map = {
+    shipped:     { label: '✓ Shipped',     bg: '#E8F5EE', color: '#1A7A45' },
+    'in-progress': { label: '● In Progress', bg: BLUE_SOFT, color: BLUE },
+    planned:     { label: '○ Planned',     bg: '#F5F5F2', color: 'rgba(15,15,30,0.55)' },
+  };
+  const s = map[status];
   return (
-    <Box style={{
-      minHeight: '100vh',
-      background: '#FFFFFF',
-      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    }}>
-      <Header />
+    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 999, background: s.bg, color: s.color }}>
+      {s.label}
+    </span>
+  );
+}
 
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+function ItemCard({ name, desc, status }: { name: string; desc: string; status: 'shipped' | 'in-progress' | 'planned' }) {
+  return (
+    <div style={{ background: PAPER, border: `1px solid ${RULE}`, borderRadius: 12, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 16, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}>{name}</span>
+        <StatusBadge status={status} />
+      </div>
+      <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.55, margin: 0 }}>{desc}</p>
+    </div>
+  );
+}
+
+export default function RoadmapPage() {
+  return (
+    <PageShell
+      kicker="Roadmap"
+      title="What we're building"
+      lead="Honest about where we are and where we're going."
+    >
+      <style>{`
+        .rm-wrap { max-width: 1180px; margin: 0 auto; padding: 48px 20px 80px; }
+        .rm-cols { display: grid; grid-template-columns: 1fr; gap: 32px; }
+        .rm-col-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .rm-col-title { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+        .rm-items { display: flex; flex-direction: column; gap: 10px; }
+
+        @media (min-width: 768px) {
+          .rm-wrap { padding: 64px 32px 100px; }
+          .rm-cols { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        }
       `}</style>
 
-      <Container size="lg" py={80} style={{ marginTop: '100px' }}>
-        <Stack gap={60}>
-          {/* Hero Section */}
-          <Stack align="center" gap="lg">
-            <Title
-              order={1}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: 'clamp(36px, 6vw, 48px)',
-                lineHeight: 1.2,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                color: '#000000',
-              }}
-            >
-              Product <span style={{ color: '#4686FE' }}>Roadmap</span>
-            </Title>
-            <Text
-              ta="center"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '24px',
-                lineHeight: '32px',
-                color: '#666666',
-                fontWeight: 400,
-                maxWidth: '600px',
-                margin: '0 auto',
-              }}
-            >
-              Our journey to building the world's most comprehensive performance system
-            </Text>
-          </Stack>
+      <div style={{ background: PAPER_2, minHeight: '60vh' }}>
+        <div className="rm-wrap">
+          <div className="rm-cols">
+            <div>
+              <div className="rm-col-head">
+                <span style={{ fontSize: 18, color: '#1A7A45' }}>✓</span>
+                <span className="rm-col-title" style={{ color: '#1A7A45' }}>Shipped</span>
+                <span style={{ fontSize: 12, color: MUTED, marginLeft: 4 }}>{shipped.length} items</span>
+              </div>
+              <div className="rm-items">
+                {shipped.map(i => <ItemCard key={i.name} {...i} status="shipped" />)}
+              </div>
+            </div>
+            <div>
+              <div className="rm-col-head">
+                <span style={{ fontSize: 18, color: BLUE }}>●</span>
+                <span className="rm-col-title" style={{ color: BLUE }}>In Progress</span>
+                <span style={{ fontSize: 12, color: MUTED, marginLeft: 4 }}>{inProgress.length} items</span>
+              </div>
+              <div className="rm-items">
+                {inProgress.map(i => <ItemCard key={i.name} {...i} status="in-progress" />)}
+              </div>
+            </div>
+            <div>
+              <div className="rm-col-head">
+                <span style={{ fontSize: 18, color: MUTED }}>○</span>
+                <span className="rm-col-title" style={{ color: MUTED }}>Planned</span>
+                <span style={{ fontSize: 12, color: MUTED, marginLeft: 4 }}>{planned.length} items</span>
+              </div>
+              <div className="rm-items">
+                {planned.map(i => <ItemCard key={i.name} {...i} status="planned" />)}
+              </div>
+            </div>
+          </div>
 
-          {/* Current Status */}
-          <Card
-            padding="xl"
-            radius={16}
-            style={{
-              background: 'white',
-              border: '2px solid #4686FE',
-              boxShadow: 'none',
-            }}
-          >
-            <Stack gap="md">
-              <Group gap="md">
-                <ThemeIcon
-                  size={40}
-                  radius={12}
-                  style={{
-                    background: '#4686FE',
-                    color: 'white',
-                    border: 'none',
-                  }}
-                >
-                  <Target size={24} />
-                </ThemeIcon>
-                <Text
-                  style={{
-                    fontFamily: 'Inter Display, sans-serif',
-                    fontSize: '24px',
-                    fontWeight: 700,
-                    color: '#000000',
-                  }}
-                >
-                  Current Status - Beta Testing
-                </Text>
-              </Group>
-              <Text
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '16px',
-                  fontWeight: 400,
-                  color: '#666666',
-                  lineHeight: '24px',
-                }}
-              >
-                We're currently in private beta with select users, refining the core features and gathering feedback
-                to ensure we deliver an exceptional experience at launch.
-              </Text>
-            </Stack>
-          </Card>
-
-          {/* Roadmap Timeline */}
-          <Stack gap="xl">
-            <Title
-              order={2}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '32px',
-                fontWeight: 700,
-                color: '#000000',
-              }}
-            >
-              Development Timeline
-            </Title>
-
-            <Stack gap="xl">
-              {/* Q3 2025 - Beta Launch */}
-              <Card
-                padding="xl"
-                radius={16}
-                style={{
-                  background: 'white',
-                  border: '2px solid #22C55E',
-                  boxShadow: 'none',
-                }}
-              >
-                <Stack gap="lg">
-                  <Group gap="md">
-                    <ThemeIcon
-                      size={50}
-                      radius={16}
-                      style={{
-                        background: '#22C55E',
-                        color: 'white',
-                        border: 'none',
-                      }}
-                    >
-                      <CheckCircle2 size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Badge
-                        size="sm"
-                        style={{
-                          background: 'rgba(34, 197, 94, 0.1)',
-                          color: '#22C55E',
-                          border: 'none',
-                        }}
-                      >
-                        Completed
-                      </Badge>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter Display, sans-serif',
-                          fontSize: '20px',
-                          fontWeight: 700,
-                          color: '#000000',
-                        }}
-                      >
-                        Q3 2025 - Private Beta Launch
-                      </Text>
-                    </Stack>
-                  </Group>
-                  <Card
-                    padding="lg"
-                    radius={16}
-                    style={{
-                      background: '#F5F5F5',
-                      border: '1px solid #CCCCCC',
-                      boxShadow: 'none',
-                    }}
-                  >
-                    <Stack gap="xs">
-                      <Text
-                        style={{
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 600,
-                          color: '#000000',
-                        }}
-                      >
-                        Core Features Released:
-                      </Text>
-                      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
-                        {['OKR Framework', 'Task Management', 'Habit Tracking', 'Vision Board', 'Life Areas', 'Daily Journal'].map((feature) => (
-                          <Text
-                            key={feature}
-                            style={{
-                              fontFamily: 'Inter, sans-serif',
-                              fontSize: '12px',
-                              color: '#666666',
-                            }}
-                          >
-                            • {feature}
-                          </Text>
-                        ))}
-                      </SimpleGrid>
-                    </Stack>
-                  </Card>
-                </Stack>
-              </Card>
-
-              {/* Q4 2025 - Public Launch */}
-              <Card
-                padding="xl"
-                radius={16}
-                style={{
-                  background: 'white',
-                  border: '2px solid #4686FE',
-                  boxShadow: 'none',
-                }}
-              >
-                <Stack gap="lg">
-                  <Group gap="md">
-                    <ThemeIcon
-                      size={50}
-                      radius={16}
-                      style={{
-                        background: '#4686FE',
-                        color: 'white',
-                        border: 'none',
-                      }}
-                    >
-                      <Clock size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Badge
-                        size="sm"
-                        style={{
-                          background: 'rgba(70, 134, 254, 0.1)',
-                          color: '#4686FE',
-                          border: 'none',
-                        }}
-                      >
-                        In Progress
-                      </Badge>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter Display, sans-serif',
-                          fontSize: '20px',
-                          fontWeight: 700,
-                          color: '#000000',
-                        }}
-                      >
-                        Q4 2025 - Public Launch
-                      </Text>
-                    </Stack>
-                  </Group>
-                  <Card
-                    padding="lg"
-                    radius={16}
-                    style={{
-                      background: '#F5F5F5',
-                      border: '1px solid #CCCCCC',
-                      boxShadow: 'none',
-                    }}
-                  >
-                    <Stack gap="xs">
-                      <Text
-                        style={{
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 600,
-                          color: '#000000',
-                        }}
-                      >
-                        Launch Features:
-                      </Text>
-                      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
-                        {['Public release with pricing', 'Mobile app (iOS/Android)', 'Notification system', 'Profile photo CRUD', 'Basic payment system', 'Data export features'].map((feature) => (
-                          <Text
-                            key={feature}
-                            style={{
-                              fontFamily: 'Inter, sans-serif',
-                              fontSize: '12px',
-                              color: '#666666',
-                            }}
-                          >
-                            • {feature}
-                          </Text>
-                        ))}
-                      </SimpleGrid>
-                    </Stack>
-                  </Card>
-                </Stack>
-              </Card>
-
-              {/* Q1 2026 - Advanced Features */}
-              <Card
-                padding="xl"
-                radius={16}
-                style={{
-                  background: 'white',
-                  border: '1px solid #CCCCCC',
-                  boxShadow: 'none',
-                }}
-              >
-                <Stack gap="lg">
-                  <Group gap="md">
-                    <ThemeIcon
-                      size={50}
-                      radius={16}
-                      style={{
-                        background: '#F5F5F5',
-                        color: '#4686FE',
-                        border: 'none',
-                      }}
-                    >
-                      <Sparkles size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Badge
-                        size="sm"
-                        style={{
-                          background: 'rgba(168, 85, 247, 0.1)',
-                          color: '#A855F7',
-                          border: 'none',
-                        }}
-                      >
-                        Planned
-                      </Badge>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter Display, sans-serif',
-                          fontSize: '20px',
-                          fontWeight: 700,
-                          color: '#000000',
-                        }}
-                      >
-                        Q1 2026 - Advanced Features
-                      </Text>
-                    </Stack>
-                  </Group>
-                  <Card
-                    padding="lg"
-                    radius={16}
-                    style={{
-                      background: '#F5F5F5',
-                      border: '1px solid #CCCCCC',
-                      boxShadow: 'none',
-                    }}
-                  >
-                    <Stack gap="xs">
-                      <Text
-                        style={{
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 600,
-                          color: '#000000',
-                        }}
-                      >
-                        Enhanced Capabilities:
-                      </Text>
-                      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
-                        {['Values module with alignment scoring', 'Advanced journal with AI insights', 'Calendar integrations', 'Time tracking integration', 'Advanced analytics & reports', 'Community features'].map((feature) => (
-                          <Text
-                            key={feature}
-                            style={{
-                              fontFamily: 'Inter, sans-serif',
-                              fontSize: '12px',
-                              color: '#666666',
-                            }}
-                          >
-                            • {feature}
-                          </Text>
-                        ))}
-                      </SimpleGrid>
-                    </Stack>
-                  </Card>
-                </Stack>
-              </Card>
-
-              {/* Q2 2026 - CherutOS */}
-              <Card
-                padding="xl"
-                radius={16}
-                style={{
-                  background: 'white',
-                  border: '1px solid #CCCCCC',
-                  boxShadow: 'none',
-                }}
-              >
-                <Stack gap="lg">
-                  <Group gap="md">
-                    <ThemeIcon
-                      size={50}
-                      radius={16}
-                      style={{
-                        background: '#F5F5F5',
-                        color: '#4686FE',
-                        border: 'none',
-                      }}
-                    >
-                      <Zap size={28} />
-                    </ThemeIcon>
-                    <Stack gap="xs">
-                      <Badge
-                        size="sm"
-                        style={{
-                          background: 'rgba(250, 173, 24, 0.1)',
-                          color: '#FAAD18',
-                          border: 'none',
-                        }}
-                      >
-                        Future
-                      </Badge>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter Display, sans-serif',
-                          fontSize: '20px',
-                          fontWeight: 700,
-                          color: '#000000',
-                        }}
-                      >
-                        Q2 2026 - CherutOS & Enterprise
-                      </Text>
-                    </Stack>
-                  </Group>
-                  <Card
-                    padding="lg"
-                    radius={16}
-                    style={{
-                      background: '#F5F5F5',
-                      border: '1px solid #CCCCCC',
-                      boxShadow: 'none',
-                    }}
-                  >
-                    <Stack gap="xs">
-                      <Text
-                        style={{
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 600,
-                          color: '#000000',
-                        }}
-                      >
-                        Revolutionary Platform:
-                      </Text>
-                      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
-                        {['CherutOS workspace', 'Custom apps & extensions', 'Enterprise team features', 'Admin dashboard', 'Full payment ecosystem', 'External platform integrations'].map((feature) => (
-                          <Text
-                            key={feature}
-                            style={{
-                              fontFamily: 'Inter, sans-serif',
-                              fontSize: '12px',
-                              color: '#666666',
-                            }}
-                          >
-                            • {feature}
-                          </Text>
-                        ))}
-                      </SimpleGrid>
-                    </Stack>
-                  </Card>
-                </Stack>
-              </Card>
-            </Stack>
-          </Stack>
-
-          {/* Feature Categories */}
-          <Stack gap="xl">
-            <Title
-              order={2}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '32px',
-                fontWeight: 700,
-                color: '#000000',
-              }}
-            >
-              Feature Categories
-            </Title>
-
-            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing={32}>
-              {[
-                {
-                  icon: Target,
-                  title: 'Core Performance',
-                  features: [
-                    { name: 'OKR Framework', status: 'completed' },
-                    { name: 'Task Management', status: 'completed' },
-                    { name: 'Habit Tracking', status: 'completed' },
-                    { name: 'Life Areas', status: 'completed' },
-                    { name: 'Time Tracking', status: 'progress' },
-                  ],
-                },
-                {
-                  icon: Sparkles,
-                  title: 'Personal Growth',
-                  features: [
-                    { name: 'Vision Board', status: 'completed' },
-                    { name: 'Daily Journal', status: 'completed' },
-                    { name: 'Values Module', status: 'progress' },
-                    { name: 'AI Insights', status: 'planned' },
-                    { name: 'Semantic Search', status: 'planned' },
-                  ],
-                },
-                {
-                  icon: Calendar,
-                  title: 'Ecosystem',
-                  features: [
-                    { name: 'Mobile App', status: 'progress' },
-                    { name: 'Calendar Integration', status: 'planned' },
-                    { name: 'Third-party Apps', status: 'planned' },
-                    { name: 'CherutOS', status: 'planned' },
-                    { name: 'Extensions', status: 'planned' },
-                  ],
-                },
-              ].map((category, index) => (
-                <Card
-                  key={index}
-                  padding="xl"
-                  radius={16}
-                  style={{
-                    background: 'white',
-                    border: '1px solid #CCCCCC',
-                    boxShadow: 'none',
-                  }}
-                >
-                  <Stack gap="md">
-                    <ThemeIcon
-                      size={48}
-                      radius={12}
-                      style={{
-                        background: '#F5F5F5',
-                        color: '#4686FE',
-                        border: 'none',
-                      }}
-                    >
-                      <category.icon size={24} />
-                    </ThemeIcon>
-                    <Text
-                      style={{
-                        fontFamily: 'Inter Display, sans-serif',
-                        fontSize: '20px',
-                        fontWeight: 600,
-                        color: '#000000',
-                      }}
-                    >
-                      {category.title}
-                    </Text>
-                    <Stack gap="xs">
-                      {category.features.map((feature) => (
-                        <Text
-                          key={feature.name}
-                          style={{
-                            fontFamily: 'Inter, sans-serif',
-                            fontSize: '12px',
-                            color: '#666666',
-                          }}
-                        >
-                          {feature.status === 'completed' ? '✅' : feature.status === 'progress' ? '🔄' : '📅'} {feature.name}
-                        </Text>
-                      ))}
-                    </Stack>
-                  </Stack>
-                </Card>
-              ))}
-            </SimpleGrid>
-          </Stack>
-
-          {/* Beta Information */}
-          <Card
-            padding="xl"
-            radius={16}
-            style={{
-              background: '#F5F5F5',
-              border: '1px solid #CCCCCC',
-              boxShadow: 'none',
-            }}
-          >
-            <Stack align="center" gap="lg">
-              <ThemeIcon
-                size={60}
-                radius={16}
-                style={{
-                  background: '#4686FE',
-                  color: 'white',
-                  border: 'none',
-                }}
-              >
-                <CheckCircle2 size={32} />
-              </ThemeIcon>
-              <Title
-                order={3}
-                ta="center"
-                style={{
-                  fontFamily: 'Inter Display, sans-serif',
-                  fontSize: '24px',
-                  fontWeight: 700,
-                  color: '#000000',
-                }}
-              >
-                Join Our Beta
-              </Title>
-              <Text
-                ta="center"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '18px',
-                  lineHeight: '26px',
-                  color: '#666666',
-                  fontWeight: 400,
-                  maxWidth: '600px',
-                }}
-              >
-                Get early access to Cherut and help shape the future of performance systems.
-                Your feedback during beta will directly influence our final product.
-              </Text>
-              <Button
-                component="a"
-                href="/auth/register"
-                size="lg"
-                rightSection={<ArrowRight size={20} />}
-                style={{
-                  background: '#4686FE',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  height: '56px',
-                  padding: '0 32px',
-                  color: 'white',
-                  transition: 'all 0.2s ease',
-                  fontFamily: 'Inter, sans-serif',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      background: '#3366E5',
-                    },
-                  },
-                }}
-              >
-                Start Your Journey
-              </Button>
-            </Stack>
-          </Card>
-
-          <Divider style={{ borderColor: '#CCCCCC' }} />
-
-          {/* Legend */}
-          <Stack gap="md">
-            <Text
-              ta="center"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
-                fontWeight: 600,
-                color: '#000000',
-              }}
-            >
-              Legend
-            </Text>
-            <Group justify="center" gap="xl">
-              {[
-                { symbol: '✅', label: 'Completed' },
-                { symbol: '🔄', label: 'In Development' },
-                { symbol: '📅', label: 'Planned' },
-              ].map((item) => (
-                <Group key={item.label} gap="xs">
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '12px',
-                    }}
-                  >
-                    {item.symbol}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '12px',
-                      color: '#666666',
-                    }}
-                  >
-                    {item.label}
-                  </Text>
-                </Group>
-              ))}
-            </Group>
-          </Stack>
-        </Stack>
-      </Container>
-
-      <Footer />
-    </Box>
+          <div style={{ marginTop: 64, padding: '28px 24px', background: PAPER, border: `1px solid ${RULE}`, borderRadius: 14, textAlign: 'center' }}>
+            <p style={{ fontSize: 15, color: MUTED, margin: '0 0 16px' }}>
+              The roadmap is shaped by what the community asks for.
+            </p>
+            <a href="/contact" style={{ display: 'inline-block', fontSize: 14, fontWeight: 600, color: BLUE, padding: '10px 20px', border: `1px solid ${BLUE_SOFT}`, borderRadius: 999, background: BLUE_SOFT }}>
+              Suggest a feature →
+            </a>
+          </div>
+        </div>
+      </div>
+    </PageShell>
   );
 }

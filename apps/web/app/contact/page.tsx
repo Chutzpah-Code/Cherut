@@ -1,718 +1,136 @@
 'use client';
 
-import { Container, Title, Text, Stack, Card, Group, Button, SimpleGrid, ThemeIcon, Box, Badge } from '@mantine/core';
-import { Mail, MessageSquare, Clock, Users, HelpCircle } from 'lucide-react';
-import Header from '@/components/ui/Header';
-import Footer from '@/components/ui/Footer';
+import { useState } from 'react';
+import { PageShell, SHELL_TOKENS } from '@/components/shell/Shell';
 
-export default function Contact() {
+const { BLUE, BLUE_SOFT, INK, PAPER, PAPER_2, MUTED, RULE } = SHELL_TOKENS;
+
+const subjects = ['General question', 'Feature request', 'Bug report', 'Press inquiry', 'Partnership', 'Other'];
+
+export default function ContactPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+
   return (
-    <Box style={{
-      minHeight: '100vh',
-      background: '#FFFFFF',
-      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    }}>
-      <Header />
+    <PageShell
+      kicker="Contact"
+      title="Let's talk"
+      lead="Question, idea, or just want to say hi?"
+    >
+      <style>{`
+        .ct-wrap { max-width: 1100px; margin: 0 auto; padding: 48px 20px 80px; }
+        .ct-grid { display: grid; grid-template-columns: 1fr; gap: 32px; }
+        .ct-form-box { background: ${PAPER}; border: 1px solid ${RULE}; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 20px; }
+        .ct-field { display: flex; flex-direction: column; gap: 6px; }
+        .ct-label { font-size: 13px; font-weight: 600; color: rgba(15,15,30,0.7); }
+        .ct-input {
+          width: 100%; padding: 12px 14px; font-size: 15px; font-family: inherit;
+          background: ${PAPER_2}; border: 1px solid ${RULE}; border-radius: 8px;
+          color: ${INK}; outline: none; transition: border-color .15s;
+        }
+        .ct-input:focus { border-color: ${BLUE}; background: #fff; }
+        .ct-textarea { min-height: 130px; resize: vertical; }
+        .ct-select { appearance: none; cursor: pointer; }
+        .ct-submit {
+          padding: 14px 24px; background: ${INK}; color: ${PAPER};
+          font-size: 15px; font-weight: 600; font-family: inherit;
+          border: none; border-radius: 999px; cursor: pointer;
+          transition: opacity .15s; width: 100%;
+        }
+        .ct-submit:hover { opacity: .85; }
+        .ct-success { text-align: center; padding: 40px 24px; }
+        .ct-sidebar { display: flex; flex-direction: column; gap: 16px; }
+        .ct-info-card { background: ${PAPER}; border: 1px solid ${RULE}; border-radius: 14px; padding: 24px; }
+        .ct-info-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: rgba(15,15,30,0.5); margin-bottom: 10px; }
+        .ct-form-row { display: grid; grid-template-columns: 1fr; gap: 16px; }
 
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+        @media (min-width: 640px) {
+          .ct-wrap { padding: 64px 32px 100px; }
+          .ct-form-row { grid-template-columns: 1fr 1fr; }
+        }
+        @media (min-width: 900px) {
+          .ct-grid { grid-template-columns: 1fr 380px; gap: 40px; }
+        }
+        @media (min-width: 1024px) {
+          .ct-wrap { padding: 80px 32px 120px; }
+        }
       `}</style>
 
-      <Container size="lg" py={80} style={{ marginTop: '100px' }}>
-        <Stack gap={80}>
-          {/* Hero Section */}
-          <Stack align="center" gap="lg">
-            <Title
-              order={1}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: 'clamp(36px, 6vw, 48px)',
-                lineHeight: 1.2,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                color: '#000000',
-              }}
-            >
-              Contact <span style={{ color: '#4686FE' }}>Us</span>
-            </Title>
-            <Text
-              ta="center"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '24px',
-                lineHeight: '32px',
-                color: '#666666',
-                fontWeight: 400,
-                maxWidth: '700px',
-                margin: '0 auto',
-              }}
-            >
-              Have questions, feedback, or need support? We'd love to hear from you.
-              Our team is here to help you achieve extraordinary results.
-            </Text>
-          </Stack>
+      <div style={{ background: PAPER_2 }}>
+        <div className="ct-wrap">
+          <div className="ct-grid">
 
-          {/* Contact Methods */}
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="xl">
-            <Card
-              padding="xl"
-              radius={16}
-              style={{
-                background: 'white',
-                border: '1px solid #CCCCCC',
-                boxShadow: 'none',
-                textAlign: 'center',
-                height: '100%',
-              }}
-            >
-              <Stack align="center" gap="lg" h="100%">
-                <ThemeIcon
-                  size={64}
-                  radius={16}
-                  style={{
-                    background: '#F5F5F5',
-                    color: '#4686FE',
-                    border: 'none',
-                  }}
-                >
-                  <Mail size={32} />
-                </ThemeIcon>
-                <Text
-                  style={{
-                    fontFamily: 'Inter Display, sans-serif',
-                    fontSize: '20px',
-                    fontWeight: 600,
-                    color: '#000000',
-                  }}
-                >
-                  Email
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 400,
-                    color: '#666666',
-                    lineHeight: '24px',
-                  }}
-                >
-                  chutzpahcode@gmail.com
-                </Text>
-              </Stack>
-            </Card>
+            {/* Form */}
+            <div>
+              {submitted ? (
+                <div className="ct-form-box ct-success">
+                  <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: INK, marginBottom: 8 }}>Message sent!</div>
+                  <p style={{ fontSize: 15, color: MUTED, margin: 0, maxWidth: 340, marginLeft: 'auto', marginRight: 'auto' }}>
+                    We'll get back to you within a day or two. Thanks for reaching out.
+                  </p>
+                </div>
+              ) : (
+                <form className="ct-form-box" onSubmit={handleSubmit}>
+                  <h2 style={{ fontSize: 20, fontWeight: 700, color: INK, margin: 0, letterSpacing: '-0.015em' }}>Send us a message</h2>
+                  <div className="ct-form-row">
+                    <div className="ct-field">
+                      <label className="ct-label" htmlFor="ct-name">Name</label>
+                      <input id="ct-name" className="ct-input" type="text" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} required />
+                    </div>
+                    <div className="ct-field">
+                      <label className="ct-label" htmlFor="ct-email">Email</label>
+                      <input id="ct-email" className="ct-input" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
+                    </div>
+                  </div>
+                  <div className="ct-field">
+                    <label className="ct-label" htmlFor="ct-subject">Subject</label>
+                    <select id="ct-subject" className="ct-input ct-select" value={subject} onChange={e => setSubject(e.target.value)} required>
+                      <option value="">Select a topic…</option>
+                      {subjects.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div className="ct-field">
+                    <label className="ct-label" htmlFor="ct-message">Message</label>
+                    <textarea id="ct-message" className="ct-input ct-textarea" placeholder="Tell us what's on your mind…" value={message} onChange={e => setMessage(e.target.value)} required />
+                  </div>
+                  <button type="submit" className="ct-submit">Send message →</button>
+                </form>
+              )}
+            </div>
 
-            <Card
-              component="a"
-              href="https://discord.gg/AyjZ58KXGy"
-              target="_blank"
-              padding="xl"
-              radius={16}
-              style={{
-                background: 'white',
-                border: '1px solid #CCCCCC',
-                boxShadow: 'none',
-                textAlign: 'center',
-                textDecoration: 'none',
-                color: 'inherit',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                height: '100%',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    borderColor: '#4686FE',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-                  }
-                }
-              }}
-            >
-              <Stack align="center" gap="lg" h="100%">
-                <ThemeIcon
-                  size={64}
-                  radius={16}
-                  style={{
-                    background: '#F5F5F5',
-                    color: '#4686FE',
-                    border: 'none',
-                  }}
-                >
-                  <Users size={32} />
-                </ThemeIcon>
-                <Text
-                  style={{
-                    fontFamily: 'Inter Display, sans-serif',
-                    fontSize: '20px',
-                    fontWeight: 600,
-                    color: '#000000',
-                  }}
-                >
-                  Community
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 400,
-                    color: '#666666',
-                    lineHeight: '24px',
-                  }}
-                >
-                  Join Discord
-                </Text>
-              </Stack>
-            </Card>
+            {/* Sidebar */}
+            <div className="ct-sidebar">
+              <div className="ct-info-card">
+                <div className="ct-info-title">Email</div>
+                <a href="mailto:hello@cherut.app" style={{ fontSize: 16, fontWeight: 600, color: BLUE, display: 'block', marginBottom: 6 }}>hello@cherut.app</a>
+                <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.5 }}>For general inquiries and support.</p>
+              </div>
+              <div className="ct-info-card">
+                <div className="ct-info-title">Response time</div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: INK, marginBottom: 6 }}>Within 1–2 business days</div>
+                <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.5 }}>We read every message. No ticket queues, no bots.</p>
+              </div>
+              <div className="ct-info-card">
+                <div className="ct-info-title">Community</div>
+                <p style={{ fontSize: 14, color: MUTED, margin: '0 0 12px', lineHeight: 1.5 }}>For feature requests and discussion, join the community.</p>
+                <a href="#" style={{ fontSize: 14, fontWeight: 600, color: BLUE, padding: '10px 16px', background: BLUE_SOFT, borderRadius: 999, display: 'inline-block' }}>
+                  Open community →
+                </a>
+              </div>
+            </div>
 
-            <Card
-              component="a"
-              href="mailto:chutzpahcode@gmail.com"
-              padding="xl"
-              radius={16}
-              style={{
-                background: 'white',
-                border: '1px solid #CCCCCC',
-                boxShadow: 'none',
-                textAlign: 'center',
-                textDecoration: 'none',
-                color: 'inherit',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                height: '100%',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    borderColor: '#4686FE',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-                  }
-                }
-              }}
-            >
-              <Stack align="center" gap="lg" h="100%">
-                <ThemeIcon
-                  size={64}
-                  radius={16}
-                  style={{
-                    background: '#F5F5F5',
-                    color: '#4686FE',
-                    border: 'none',
-                  }}
-                >
-                  <HelpCircle size={32} />
-                </ThemeIcon>
-                <Text
-                  style={{
-                    fontFamily: 'Inter Display, sans-serif',
-                    fontSize: '20px',
-                    fontWeight: 600,
-                    color: '#000000',
-                  }}
-                >
-                  Support
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 400,
-                    color: '#666666',
-                    lineHeight: '24px',
-                  }}
-                >
-                  Get help
-                </Text>
-              </Stack>
-            </Card>
-
-            <Card
-              padding="xl"
-              radius={16}
-              style={{
-                background: 'white',
-                border: '1px solid #CCCCCC',
-                boxShadow: 'none',
-                textAlign: 'center',
-                height: '100%',
-              }}
-            >
-              <Stack align="center" gap="lg" h="100%">
-                <ThemeIcon
-                  size={64}
-                  radius={16}
-                  style={{
-                    background: '#F5F5F5',
-                    color: '#4686FE',
-                    border: 'none',
-                  }}
-                >
-                  <Clock size={32} />
-                </ThemeIcon>
-                <Text
-                  style={{
-                    fontFamily: 'Inter Display, sans-serif',
-                    fontSize: '20px',
-                    fontWeight: 600,
-                    color: '#000000',
-                  }}
-                >
-                  Response Time
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 400,
-                    color: '#666666',
-                    lineHeight: '24px',
-                  }}
-                >
-                  Within 24 hours
-                </Text>
-              </Stack>
-            </Card>
-          </SimpleGrid>
-
-          {/* Contact Info */}
-          <Stack gap="lg">
-            <Card
-              padding="xl"
-              radius={16}
-              style={{
-                background: 'white',
-                border: '1px solid #CCCCCC',
-                boxShadow: 'none',
-              }}
-            >
-              <Group gap="lg" align="flex-start">
-                <ThemeIcon
-                  size={60}
-                  radius={16}
-                  style={{
-                    background: '#F5F5F5',
-                    color: '#4686FE',
-                    border: 'none',
-                    flexShrink: 0,
-                  }}
-                >
-                  <MessageSquare size={28} />
-                </ThemeIcon>
-                <Stack gap="xs" style={{ flex: 1 }}>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter Display, sans-serif',
-                      fontSize: '24px',
-                      fontWeight: 700,
-                      color: '#000000',
-                    }}
-                  >
-                    General Inquiries
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 400,
-                      color: '#666666',
-                      lineHeight: '24px',
-                    }}
-                  >
-                    For general questions about Cherut, pricing, or features.
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      color: '#4686FE',
-                      lineHeight: '24px',
-                    }}
-                  >
-                    chutzpahcode@gmail.com
-                  </Text>
-                </Stack>
-              </Group>
-            </Card>
-
-            <Card
-              padding="xl"
-              radius={16}
-              style={{
-                background: 'white',
-                border: '1px solid #CCCCCC',
-                boxShadow: 'none',
-              }}
-            >
-              <Group gap="lg" align="flex-start">
-                <ThemeIcon
-                  size={60}
-                  radius={16}
-                  style={{
-                    background: '#F5F5F5',
-                    color: '#4686FE',
-                    border: 'none',
-                    flexShrink: 0,
-                  }}
-                >
-                  <HelpCircle size={28} />
-                </ThemeIcon>
-                <Stack gap="xs" style={{ flex: 1 }}>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter Display, sans-serif',
-                      fontSize: '24px',
-                      fontWeight: 700,
-                      color: '#000000',
-                    }}
-                  >
-                    Technical Support
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 400,
-                      color: '#666666',
-                      lineHeight: '24px',
-                    }}
-                  >
-                    Need help with your account, bugs, or technical issues?
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      color: '#4686FE',
-                      lineHeight: '24px',
-                    }}
-                  >
-                    chutzpahcode@gmail.com
-                  </Text>
-                </Stack>
-              </Group>
-            </Card>
-
-            <Card
-              padding="xl"
-              radius={16}
-              style={{
-                background: 'white',
-                border: '1px solid #CCCCCC',
-                boxShadow: 'none',
-              }}
-            >
-              <Group gap="lg" align="flex-start">
-                <ThemeIcon
-                  size={60}
-                  radius={16}
-                  style={{
-                    background: '#F5F5F5',
-                    color: '#4686FE',
-                    border: 'none',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Users size={28} />
-                </ThemeIcon>
-                <Stack gap="xs" style={{ flex: 1 }}>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter Display, sans-serif',
-                      fontSize: '24px',
-                      fontWeight: 700,
-                      color: '#000000',
-                    }}
-                  >
-                    Partnership & Media
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 400,
-                      color: '#666666',
-                      lineHeight: '24px',
-                    }}
-                  >
-                    Interested in partnerships, press inquiries, or media coverage?
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      color: '#4686FE',
-                      lineHeight: '24px',
-                    }}
-                  >
-                    chutzpahcode@gmail.com
-                  </Text>
-                </Stack>
-              </Group>
-            </Card>
-          </Stack>
-
-          {/* Quick Links */}
-          <Stack gap="xl">
-            <Title
-              order={2}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '32px',
-                fontWeight: 700,
-                color: '#000000',
-              }}
-            >
-              Looking for Something Specific?
-            </Title>
-
-            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="xl">
-              <Card
-                component="a"
-                href="/help-center"
-                padding="xl"
-                radius={16}
-                style={{
-                  background: 'white',
-                  border: '1px solid #CCCCCC',
-                  boxShadow: 'none',
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  height: '100%',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      borderColor: '#4686FE',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-                    }
-                  }
-                }}
-              >
-                <Stack align="center" gap="lg" h="100%">
-                  <ThemeIcon
-                    size={64}
-                    radius={16}
-                    style={{
-                      background: '#F5F5F5',
-                      color: '#4686FE',
-                      border: 'none',
-                    }}
-                  >
-                    <HelpCircle size={32} />
-                  </ThemeIcon>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter Display, sans-serif',
-                      fontSize: '20px',
-                      fontWeight: 600,
-                      color: '#000000',
-                      textAlign: 'center',
-                    }}
-                  >
-                    Help Center
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 400,
-                      color: '#666666',
-                      lineHeight: '24px',
-                      textAlign: 'center',
-                    }}
-                  >
-                    Browse FAQs, guides, and tutorials
-                  </Text>
-                </Stack>
-              </Card>
-
-              <Card
-                component="a"
-                href="/careers"
-                padding="xl"
-                radius={16}
-                style={{
-                  background: 'white',
-                  border: '1px solid #CCCCCC',
-                  boxShadow: 'none',
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  height: '100%',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      borderColor: '#4686FE',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-                    }
-                  }
-                }}
-              >
-                <Stack align="center" gap="lg" h="100%">
-                  <ThemeIcon
-                    size={64}
-                    radius={16}
-                    style={{
-                      background: '#F5F5F5',
-                      color: '#4686FE',
-                      border: 'none',
-                    }}
-                  >
-                    <Users size={32} />
-                  </ThemeIcon>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter Display, sans-serif',
-                      fontSize: '20px',
-                      fontWeight: 600,
-                      color: '#000000',
-                      textAlign: 'center',
-                    }}
-                  >
-                    Careers
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 400,
-                      color: '#666666',
-                      lineHeight: '24px',
-                      textAlign: 'center',
-                    }}
-                  >
-                    Join our team and build the future
-                  </Text>
-                </Stack>
-              </Card>
-
-              <Card
-                component="a"
-                href="mailto:chutzpahcode@gmail.com"
-                padding="xl"
-                radius={16}
-                style={{
-                  background: 'white',
-                  border: '1px solid #CCCCCC',
-                  boxShadow: 'none',
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  height: '100%',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      borderColor: '#4686FE',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-                    }
-                  }
-                }}
-              >
-                <Stack align="center" gap="lg" h="100%">
-                  <ThemeIcon
-                    size={64}
-                    radius={16}
-                    style={{
-                      background: '#F5F5F5',
-                      color: '#4686FE',
-                      border: 'none',
-                    }}
-                  >
-                    <MessageSquare size={32} />
-                  </ThemeIcon>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter Display, sans-serif',
-                      fontSize: '20px',
-                      fontWeight: 600,
-                      color: '#000000',
-                      textAlign: 'center',
-                    }}
-                  >
-                    Send Feedback
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 400,
-                      color: '#666666',
-                      lineHeight: '24px',
-                      textAlign: 'center',
-                    }}
-                  >
-                    Help us improve Cherut
-                  </Text>
-                </Stack>
-              </Card>
-            </SimpleGrid>
-          </Stack>
-
-          {/* Beta Notice */}
-          <Card
-            padding="xl"
-            radius={16}
-            style={{
-              background: '#F5F5F5',
-              border: '1px solid #CCCCCC',
-              boxShadow: 'none',
-            }}
-          >
-            <Stack align="center" gap="lg">
-              <Badge
-                size="lg"
-                style={{
-                  background: 'rgba(250, 173, 24, 0.1)',
-                  color: '#FAAD18',
-                  border: 'none',
-                  padding: '8px 16px',
-                  fontFamily: 'Inter, sans-serif',
-                  fontWeight: 500,
-                }}
-              >
-                Beta Testing Period
-              </Badge>
-              <Text
-                style={{
-                  fontFamily: 'Inter Display, sans-serif',
-                  fontSize: '24px',
-                  fontWeight: 700,
-                  color: '#000000',
-                  textAlign: 'center',
-                }}
-              >
-                Your Feedback Shapes Our Future
-              </Text>
-              <Text
-                ta="center"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '18px',
-                  lineHeight: '26px',
-                  color: '#666666',
-                  fontWeight: 400,
-                  maxWidth: '700px',
-                }}
-              >
-                During our beta phase, your input is incredibly valuable. Whether you've found a bug,
-                have a feature request, or just want to share your experience, we want to hear from you.
-                Every piece of feedback helps us build a better Cherut.
-              </Text>
-            </Stack>
-          </Card>
-        </Stack>
-      </Container>
-
-      <Footer />
-    </Box>
+          </div>
+        </div>
+      </div>
+    </PageShell>
   );
 }

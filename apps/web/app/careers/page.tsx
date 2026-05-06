@@ -1,497 +1,160 @@
 'use client';
 
-import { Container, Title, Text, Stack, Card, Group, Badge, ThemeIcon, Box, Button } from '@mantine/core';
-import { Briefcase, Users, Zap, Heart, Trophy, Globe, ArrowRight, Mail } from 'lucide-react';
-import Header from '@/components/ui/Header';
-import Footer from '@/components/ui/Footer';
+import { useState } from 'react';
+import { PageShell, SHELL_TOKENS } from '@/components/shell/Shell';
 
-export default function Careers() {
+const { BLUE, BLUE_SOFT, INK, PAPER, PAPER_2, MUTED, RULE } = SHELL_TOKENS;
+
+const whyJoin = [
+  { icon: '◐', title: 'Small team, real ownership', body: 'You will own features end-to-end. No silos, no waiting for sign-off chains. Your decisions ship.' },
+  { icon: '◇', title: 'Work that reaches real people', body: 'Cherut is used daily by people building their lives. What you build has direct, visible impact.' },
+  { icon: '◯', title: 'Async-first, no nonsense', body: 'We write well, document decisions and trust each other. No daily standups. Deep work by default.' },
+];
+
+const values = [
+  'Ownership over permission-asking',
+  'Craft over speed for its own sake',
+  'Honesty over comfortable ambiguity',
+  'Long-term thinking over short-term wins',
+];
+
+const skillAreas = ['Engineering', 'Design', 'Product', 'Marketing', 'Content', 'Operations', 'Other'];
+
+export default function CareersPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [skill, setSkill] = useState('');
+  const [message, setMessage] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+
   return (
-    <Box style={{
-      minHeight: '100vh',
-      background: '#FFFFFF',
-      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    }}>
-      <Header />
+    <PageShell
+      kicker="Careers"
+      title="Come build the future of intentional living"
+      lead="No open roles right now — but we always want to hear from exceptional people."
+    >
+      <style>{`
+        .ca-wrap { max-width: 1180px; margin: 0 auto; padding: 48px 20px 80px; }
+        .ca-section { margin-bottom: 64px; }
+        .ca-section-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: ${INK}; margin: 0 0 24px; }
+        .ca-why-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        .ca-card { background: ${PAPER}; border: 1px solid ${RULE}; border-radius: 14px; padding: 24px; display: flex; gap: 16px; }
+        .ca-icon { width: 40px; height: 40px; border-radius: 10px; background: ${BLUE_SOFT}; color: ${BLUE}; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .ca-values-list { display: flex; flex-direction: column; gap: 12px; }
+        .ca-value { display: flex; align-items: flex-start; gap: 12px; font-size: 16px; color: rgba(15,15,30,0.85); }
+        .ca-form { background: ${PAPER}; border: 1px solid ${RULE}; border-radius: 16px; padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+        .ca-field { display: flex; flex-direction: column; gap: 6px; }
+        .ca-label { font-size: 13px; font-weight: 600; color: rgba(15,15,30,0.75); }
+        .ca-input {
+          width: 100%; padding: 12px 14px; font-size: 15px; font-family: inherit;
+          background: ${PAPER_2}; border: 1px solid ${RULE}; border-radius: 8px;
+          color: ${INK}; outline: none; transition: border-color .15s;
+        }
+        .ca-input:focus { border-color: ${BLUE}; background: #fff; }
+        .ca-textarea { min-height: 120px; resize: vertical; }
+        .ca-select { appearance: none; cursor: pointer; }
+        .ca-submit {
+          padding: 14px 24px; background: ${INK}; color: ${PAPER};
+          font-size: 15px; font-weight: 600; font-family: inherit;
+          border: none; border-radius: 999px; cursor: pointer;
+          transition: opacity .15s;
+        }
+        .ca-submit:hover { opacity: .85; }
+        .ca-success { text-align: center; padding: 40px 24px; }
 
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+        @media (min-width: 640px) {
+          .ca-wrap { padding: 64px 32px 100px; }
+          .ca-why-grid { grid-template-columns: repeat(3, 1fr); }
+          .ca-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        }
+        @media (min-width: 1024px) {
+          .ca-wrap { padding: 80px 32px 120px; }
+        }
       `}</style>
 
-      <Container size="lg" py={80} style={{ marginTop: '100px' }}>
-        <Stack gap={80}>
-          {/* Hero Section */}
-          <Stack align="center" gap="lg">
-            <Title
-              order={1}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: 'clamp(36px, 6vw, 48px)',
-                lineHeight: 1.2,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                color: '#000000',
-              }}
-            >
-              Build the <span style={{ color: '#4686FE' }}>Future</span> with Us
-            </Title>
-            <Text
-              ta="center"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '24px',
-                lineHeight: '32px',
-                color: '#666666',
-                fontWeight: 400,
-                maxWidth: '700px',
-                margin: '0 auto',
-              }}
-            >
-              Join a team of exceptional individuals building the world's most comprehensive
-              personal excellence platform. Shape the future of human performance.
-            </Text>
-          </Stack>
+      <div style={{ background: PAPER_2 }}>
+        <div className="ca-wrap">
 
-          {/* Mission Statement */}
-          <Card
-            padding="xl"
-            radius={16}
-            style={{
-              background: '#F5F5F5',
-              border: '1px solid #CCCCCC',
-              boxShadow: 'none',
-            }}
-          >
-            <Stack align="center" gap="lg">
-              <ThemeIcon
-                size={64}
-                radius={16}
-                style={{
-                  background: '#4686FE',
-                  color: 'white',
-                  border: 'none',
-                }}
-              >
-                <Briefcase size={32} />
-              </ThemeIcon>
-              <Title
-                order={2}
-                ta="center"
-                style={{
-                  fontFamily: 'Inter Display, sans-serif',
-                  fontSize: '32px',
-                  fontWeight: 700,
-                  color: '#000000',
-                }}
-              >
-                Our Mission
-              </Title>
-              <Text
-                ta="center"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '20px',
-                  lineHeight: '28px',
-                  color: '#666666',
-                  fontWeight: 400,
-                  maxWidth: '800px',
-                }}
-              >
-                We're building more than just software - we're creating a movement. Our mission is to empower
-                every ambitious individual with the tools and insights they need to achieve extraordinary results
-                and live their highest potential.
-              </Text>
-            </Stack>
-          </Card>
-
-          {/* Why Work With Us */}
-          <Stack gap="xl">
-            <Title
-              order={2}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '32px',
-                fontWeight: 700,
-                color: '#000000',
-              }}
-            >
-              Why Work with Cherut?
-            </Title>
-
-            <Stack gap="lg">
-              {[
-                {
-                  icon: Trophy,
-                  title: 'Elite Performance Culture',
-                  description: 'We practice what we preach. Our team uses Cherut daily and embodies the principles of high performance in everything we do. You\'ll work alongside passionate, driven individuals committed to excellence.',
-                },
-                {
-                  icon: Zap,
-                  title: 'Cutting-Edge Innovation',
-                  description: 'Work with the latest technologies and methodologies. From AI-powered insights to revolutionary UX design, you\'ll be at the forefront of performance technology innovation.',
-                },
-                {
-                  icon: Users,
-                  title: 'Meaningful Impact',
-                  description: 'Your work directly impacts thousands of high achievers worldwide. Build features that help entrepreneurs scale businesses, athletes break records, and leaders drive change.',
-                },
-                {
-                  icon: Heart,
-                  title: 'Personal Growth Focus',
-                  description: 'We invest heavily in your development. Access to premium learning resources, mentorship from industry leaders, and dedicated time for skill development and personal projects.',
-                },
-                {
-                  icon: Globe,
-                  title: 'Global Remote Culture',
-                  description: 'Work from anywhere with a fully distributed team spanning multiple time zones. Flexibility to design your optimal work environment and schedule.',
-                },
-              ].map((benefit, index) => (
-                <Card
-                  key={index}
-                  padding="xl"
-                  radius={16}
-                  style={{
-                    background: 'white',
-                    border: '1px solid #CCCCCC',
-                    boxShadow: 'none',
-                  }}
-                >
-                  <Group gap="lg" align="flex-start">
-                    <ThemeIcon
-                      size={48}
-                      radius={12}
-                      style={{
-                        background: '#F5F5F5',
-                        color: '#4686FE',
-                        border: 'none',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <benefit.icon size={24} />
-                    </ThemeIcon>
-                    <Stack gap="xs" style={{ flex: 1 }}>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter Display, sans-serif',
-                          fontSize: '20px',
-                          fontWeight: 600,
-                          color: '#000000',
-                        }}
-                      >
-                        {benefit.title}
-                      </Text>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '16px',
-                          fontWeight: 400,
-                          color: '#666666',
-                          lineHeight: '24px',
-                        }}
-                      >
-                        {benefit.description}
-                      </Text>
-                    </Stack>
-                  </Group>
-                </Card>
+          {/* Why join */}
+          <div className="ca-section">
+            <h2 className="ca-section-title">Why join Cherut</h2>
+            <div className="ca-why-grid">
+              {whyJoin.map((w) => (
+                <div key={w.title} className="ca-card">
+                  <div className="ca-icon">{w.icon}</div>
+                  <div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: INK, marginBottom: 6 }}>{w.title}</div>
+                    <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.55, margin: 0 }}>{w.body}</p>
+                  </div>
+                </div>
               ))}
-            </Stack>
-          </Stack>
+            </div>
+          </div>
 
-          {/* Current Status */}
-          <Card
-            padding="xl"
-            radius={16}
-            style={{
-              background: '#F5F5F5',
-              border: '1px solid #CCCCCC',
-              boxShadow: 'none',
-            }}
-          >
-            <Stack align="center" gap="lg">
-              <Badge
-                size="lg"
-                style={{
-                  background: 'rgba(250, 173, 24, 0.1)',
-                  color: '#FAAD18',
-                  border: 'none',
-                  padding: '8px 16px',
-                  fontFamily: 'Inter, sans-serif',
-                  fontWeight: 500,
-                }}
-              >
-                Pre-Launch Phase
-              </Badge>
-              <Title
-                order={3}
-                ta="center"
-                style={{
-                  fontFamily: 'Inter Display, sans-serif',
-                  fontSize: '24px',
-                  fontWeight: 700,
-                  color: '#000000',
-                }}
-              >
-                Building Our Core Team
-              </Title>
-              <Text
-                ta="center"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '18px',
-                  lineHeight: '26px',
-                  color: '#666666',
-                  fontWeight: 400,
-                  maxWidth: '700px',
-                }}
-              >
-                We're currently in our pre-launch phase, carefully building our core team of exceptional
-                individuals. While we don't have open positions right now, we're always looking for
-                extraordinary talent to join our mission.
-              </Text>
-            </Stack>
-          </Card>
-
-          {/* What We Look For */}
-          <Stack gap="xl">
-            <Title
-              order={2}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '32px',
-                fontWeight: 700,
-                color: '#000000',
-              }}
-            >
-              What We Look For
-            </Title>
-
-            <Card
-              padding="xl"
-              radius={16}
-              style={{
-                background: 'white',
-                border: '1px solid #CCCCCC',
-                boxShadow: 'none',
-              }}
-            >
-              <Stack gap="lg">
-                <Title
-                  order={3}
-                  style={{
-                    fontFamily: 'Inter Display, sans-serif',
-                    fontSize: '20px',
-                    fontWeight: 600,
-                    color: '#4686FE',
-                  }}
-                >
-                  Core Traits
-                </Title>
-                <Stack gap="md">
-                  {[
-                    { label: 'Excellence Mindset', description: 'You\'re not satisfied with "good enough" - you strive for mastery in everything you do' },
-                    { label: 'Growth Orientation', description: 'You see challenges as opportunities and are constantly learning and evolving' },
-                    { label: 'Impact Focus', description: 'You want your work to matter and make a meaningful difference in people\'s lives' },
-                    { label: 'Collaborative Spirit', description: 'You thrive in team environments and lift others up while pursuing excellence' },
-                    { label: 'User-Centric Thinking', description: 'You deeply understand and empathize with our ambitious user base' },
-                  ].map((trait, index) => (
-                    <Text
-                      key={index}
-                      style={{
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: 400,
-                        color: '#666666',
-                        lineHeight: '24px',
-                      }}
-                    >
-                      • <span style={{ fontWeight: 600, color: '#000000' }}>{trait.label}:</span> {trait.description}
-                    </Text>
-                  ))}
-                </Stack>
-              </Stack>
-            </Card>
-          </Stack>
-
-          {/* Future Roles */}
-          <Stack gap="xl">
-            <Title
-              order={2}
-              ta="center"
-              style={{
-                fontFamily: 'Inter Display, sans-serif',
-                fontSize: '32px',
-                fontWeight: 700,
-                color: '#000000',
-              }}
-            >
-              Future Opportunities
-            </Title>
-
-            <Text
-              ta="center"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '18px',
-                lineHeight: '26px',
-                color: '#666666',
-                fontWeight: 400,
-                maxWidth: '600px',
-                margin: '0 auto',
-              }}
-            >
-              As we grow, we'll be looking for exceptional talent in these areas:
-            </Text>
-
-            <Stack gap="md">
-              {[
-                { role: 'Senior Full-Stack Engineers', category: 'Engineering', color: '#4686FE' },
-                { role: 'Product Designers (UX/UI)', category: 'Design', color: '#A855F7' },
-                { role: 'Performance Psychology Specialists', category: 'Research', color: '#22C55E' },
-                { role: 'AI/ML Engineers', category: 'AI/ML', color: '#FAAD18' },
-                { role: 'Growth & Marketing Leads', category: 'Marketing', color: '#EC4899' },
-              ].map((job, index) => (
-                <Card
-                  key={index}
-                  padding="lg"
-                  radius={16}
-                  style={{
-                    background: 'white',
-                    border: '1px solid #CCCCCC',
-                    boxShadow: 'none',
-                  }}
-                >
-                  <Group justify="space-between" align="center">
-                    <Text
-                      style={{
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: 600,
-                        color: '#000000',
-                      }}
-                    >
-                      {job.role}
-                    </Text>
-                    <Badge
-                      size="sm"
-                      style={{
-                        background: `${job.color}20`,
-                        color: job.color,
-                        border: 'none',
-                      }}
-                    >
-                      {job.category}
-                    </Badge>
-                  </Group>
-                </Card>
+          {/* What we value */}
+          <div className="ca-section">
+            <h2 className="ca-section-title">What we value</h2>
+            <div className="ca-values-list">
+              {values.map((v) => (
+                <div key={v} className="ca-value">
+                  <span style={{ color: BLUE, fontWeight: 700, flexShrink: 0 }}>✓</span>
+                  <span>{v}</span>
+                </div>
               ))}
-            </Stack>
-          </Stack>
+            </div>
+          </div>
 
-          {/* Get in Touch */}
-          <Card
-            padding="xl"
-            radius={16}
-            style={{
-              background: '#F5F5F5',
-              border: '1px solid #CCCCCC',
-              boxShadow: 'none',
-            }}
-          >
-            <Stack align="center" gap="lg">
-              <Title
-                order={3}
-                ta="center"
-                style={{
-                  fontFamily: 'Inter Display, sans-serif',
-                  fontSize: '24px',
-                  fontWeight: 700,
-                  color: '#000000',
-                }}
-              >
-                Ready to Shape the Future?
-              </Title>
-              <Text
-                ta="center"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '18px',
-                  lineHeight: '26px',
-                  color: '#666666',
-                  fontWeight: 400,
-                  maxWidth: '700px',
-                }}
-              >
-                Even if we don't have open positions right now, we'd love to hear from exceptional
-                individuals who share our vision. Send us your story, and let's explore how we
-                can build something extraordinary together.
-              </Text>
-              <Group gap="lg" justify="center">
-                <Button
-                  component="a"
-                  href="mailto:chutzpahcode@gmail.com"
-                  size="lg"
-                  rightSection={<Mail size={20} />}
-                  style={{
-                    background: '#4686FE',
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    height: '56px',
-                    padding: '0 32px',
-                    color: 'white',
-                    transition: 'all 0.2s ease',
-                    fontFamily: 'Inter, sans-serif',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        background: '#3366E5',
-                      },
-                    },
-                  }}
-                >
-                  Get in Touch
-                </Button>
-                <Button
-                  component="a"
-                  href="/contact"
-                  size="lg"
-                  variant="outline"
-                  style={{
-                    borderColor: '#CCCCCC',
-                    color: '#333333',
-                    borderRadius: '12px',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    height: '56px',
-                    padding: '0 32px',
-                    background: 'white',
-                    transition: 'all 0.2s ease',
-                    fontFamily: 'Inter, sans-serif',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        borderColor: '#4686FE',
-                        color: '#4686FE',
-                      },
-                    },
-                  }}
-                >
-                  Contact Us
-                </Button>
-              </Group>
-            </Stack>
-          </Card>
-        </Stack>
-      </Container>
+          {/* Talent pool form */}
+          <div className="ca-section">
+            <h2 className="ca-section-title">Join the talent pool</h2>
+            <p style={{ fontSize: 15, color: MUTED, margin: '0 0 24px', lineHeight: 1.55 }}>
+              When we do hire, we reach into this pool first. Introduce yourself — no CV required, just tell us who you are.
+            </p>
+            {submitted ? (
+              <div className="ca-form ca-success">
+                <div style={{ fontSize: 36, marginBottom: 16 }}>✓</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: INK, marginBottom: 8 }}>Got it — thank you!</div>
+                <p style={{ fontSize: 15, color: MUTED, margin: 0, maxWidth: 360, marginLeft: 'auto', marginRight: 'auto' }}>
+                  We'll reach out when something that fits opens up.
+                </p>
+              </div>
+            ) : (
+              <form className="ca-form" onSubmit={handleSubmit}>
+                <div className="ca-form-row">
+                  <div className="ca-field">
+                    <label className="ca-label" htmlFor="ca-name">Name</label>
+                    <input id="ca-name" className="ca-input" type="text" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} required />
+                  </div>
+                  <div className="ca-field">
+                    <label className="ca-label" htmlFor="ca-email">Email</label>
+                    <input id="ca-email" className="ca-input" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
+                  </div>
+                </div>
+                <div className="ca-field">
+                  <label className="ca-label" htmlFor="ca-skill">Skill area</label>
+                  <select id="ca-skill" className="ca-input ca-select" value={skill} onChange={e => setSkill(e.target.value)} required>
+                    <option value="">Select area…</option>
+                    {skillAreas.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div className="ca-field">
+                  <label className="ca-label" htmlFor="ca-message">Tell us about yourself</label>
+                  <textarea id="ca-message" className="ca-input ca-textarea" placeholder="What you've built, what excites you, what you're looking for…" value={message} onChange={e => setMessage(e.target.value)} required />
+                </div>
+                <div>
+                  <button type="submit" className="ca-submit">Send introduction →</button>
+                </div>
+              </form>
+            )}
+          </div>
 
-      <Footer />
-    </Box>
+        </div>
+      </div>
+    </PageShell>
   );
 }
