@@ -119,7 +119,7 @@ export default function Home() {
         .lp-nav-inner   { max-width: 1280px; margin: 0 auto; padding: 18px 32px; display: flex; align-items: center; gap: 32px; }
         .lp-nav-links   { display: flex; gap: 28px; margin-left: 24px; font-size: 14px; font-weight: 500; color: rgba(15,15,30,.78); }
         .lp-nav-ctas    { display: flex; align-items: center; gap: 12px; margin-left: auto; }
-        .lp-nav-tour    { display: inline-block; }
+
         .lp-hamburger   { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; margin-left: auto; }
         .lp-hamburger:hover { background: ${PAPER_2}; }
         .lp-mobile-menu {
@@ -353,9 +353,6 @@ export default function Home() {
           {/* Desktop CTAs */}
           <div className="lp-nav-ctas">
             <a href="/auth/login" style={{ fontSize: 14, color: 'rgba(15,15,30,0.7)', fontWeight: 500, padding: '8px 12px' }}>Login</a>
-            <a href="/auth/register" className="lp-cta-outline lp-nav-tour" style={{ fontSize: 14, fontWeight: 500, padding: '9px 18px', border: `1px solid ${RULE}`, borderRadius: 999, background: PAPER, color: INK, display: 'inline-block' }}>
-              Watch tour
-            </a>
             <a href="/auth/register" className="lp-cta-dark" style={{ fontSize: 14, fontWeight: 600, padding: '10px 18px', background: INK, color: PAPER, borderRadius: 999 }}>
               Try for free
             </a>
