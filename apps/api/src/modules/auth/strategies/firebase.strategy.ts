@@ -64,8 +64,8 @@ export class FirebaseStrategy extends PassportStrategy(Strategy, 'firebase') {
         this.logger.log(`Token claims: ${JSON.stringify(decodedToken)}`);
       }
 
-      // Busca dados do usuário no Firestore
-      const user = await this.authService.validateToken(decodedToken.uid);
+      // Busca (ou cria) dados do usuário no Firestore
+      const user = await this.authService.validateToken(decodedToken.uid, decodedToken);
 
       if (!user) {
         this.logger.error(`User not found in database: ${decodedToken.uid}`);

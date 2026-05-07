@@ -243,7 +243,7 @@ export class AuthService {
    * Valida Firebase ID token e retorna dados do usuário
    * Usado pelo FirebaseStrategy para autenticar requisições
    */
-  async validateToken(uid: string) {
+  async validateToken(uid: string, decodedToken?: any) {
     const now = Date.now();
     const cached = this.userCache.get(uid);
     if (cached && cached.expiry > now) {
@@ -255,6 +255,28 @@ export class AuthService {
       const userDoc = await db.collection('users').doc(uid).get();
 
       if (!userDoc.exists) {
+        // User exists in Firebase Auth but has no Firestore document yet.
+        // Auto-create it so users are never locked out after a valid login.
+        if (decodedToken) {
+          const userData = {
+            uid,
+            email: decodedToken.email || null,
+            displayName: decodedToken.name || decodedToken.email?.split('@')[0] || uid,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            onboardingCompleted: false,
+            lifePurpose: null,
+            subscription: {
+              plan: 'free',
+              status: 'active',
+              startDate: new Date().toISOString(),
+            },
+          };
+          await db.collection('users').doc(uid).set(userData);
+          this.logger.log(`Auto-created Firestore record for Firebase user: ${uid}`);
+          this.userCache.set(uid, { data: userData, expiry: now + this.USER_CACHE_TTL });
+          return userData;
+        }
         return null;
       }
 
