@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Box, Button, Group, Center, Loader, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { Plus } from 'lucide-react';
@@ -9,7 +9,6 @@ import {
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
-  DragMoveEvent,
   DragOverlay,
   PointerSensor,
   TouchSensor,
@@ -17,6 +16,7 @@ import {
   useSensor,
   useSensors,
   closestCenter,
+  MeasuringStrategy,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -46,23 +46,12 @@ interface BoardKanbanViewProps {
   boardId: string;
 }
 
-const EDGE_ZONE = 80;   // px from board edge where scroll activates
-const BASE_SPEED = 6;   // px/frame on entry
-const ACCEL = 12;       // extra px/frame per second held in edge zone
-const MAX_SPEED = 30;   // hard cap
-
 export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalOpened, setModalOpened] = useState(false);
-
-  const boardRef = useRef<HTMLDivElement>(null);
-  const scrollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const pointerXRef = useRef(0);
-  const dragStartXRef = useRef(0);
-  const edgeEntryTimeRef = useRef<number | null>(null);
 
   const queryClient = useQueryClient();
   const { data: kanbanColumns, isLoading } = useBoardKanban(boardId);
@@ -78,62 +67,6 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const createColumn = useCreateColumn();
   const updateColumn = useUpdateColumn();
   const deleteColumn = useDeleteColumn();
-
-  // Called from both onDragMove and the hold-interval
-  const scrollBoardIfNeeded = useCallback((pointerX: number) => {
-    const board = boardRef.current;
-    if (!board || pointerX === 0) return;
-
-    // Use VIEWPORT edges — the board element is inset by AppShell padding,
-    // so getBoundingClientRect().right < screen width. Using the viewport
-    // edges means the user naturally hits the scroll zone at the screen edge.
-    const vw = window.innerWidth;
-    const distFromLeft = pointerX;
-    const distFromRight = vw - pointerX;
-
-    const inLeft = distFromLeft >= 0 && distFromLeft < EDGE_ZONE;
-    const inRight = distFromRight >= 0 && distFromRight < EDGE_ZONE;
-
-    if (!inLeft && !inRight) {
-      edgeEntryTimeRef.current = null;
-      return;
-    }
-
-    if (!edgeEntryTimeRef.current) edgeEntryTimeRef.current = Date.now();
-    const secondsHeld = (Date.now() - edgeEntryTimeRef.current) / 1000;
-    const accelBoost = Math.min(secondsHeld * ACCEL, MAX_SPEED - BASE_SPEED);
-
-    if (inLeft) {
-      const speed = Math.ceil((1 - distFromLeft / EDGE_ZONE) * (BASE_SPEED + accelBoost));
-      board.scrollLeft -= Math.min(speed, MAX_SPEED);
-    } else {
-      const speed = Math.ceil((1 - distFromRight / EDGE_ZONE) * (BASE_SPEED + accelBoost));
-      board.scrollLeft += Math.min(speed, MAX_SPEED);
-    }
-  }, []);
-
-  // Interval keeps scrolling while pointer is stationary at the edge
-  useEffect(() => {
-    if (!activeId) {
-      if (scrollIntervalRef.current) {
-        clearInterval(scrollIntervalRef.current);
-        scrollIntervalRef.current = null;
-      }
-      edgeEntryTimeRef.current = null;
-      return;
-    }
-
-    scrollIntervalRef.current = setInterval(() => {
-      scrollBoardIfNeeded(pointerXRef.current);
-    }, 16);
-
-    return () => {
-      if (scrollIntervalRef.current) {
-        clearInterval(scrollIntervalRef.current);
-        scrollIntervalRef.current = null;
-      }
-    };
-  }, [activeId, scrollBoardIfNeeded]);
 
   const updateOrderMutation = useMutation({
     mutationFn: ({ taskId, newOrder, newColumnId }: { taskId: string; newOrder: number; newColumnId: string }) =>
@@ -199,21 +132,6 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id as string);
-    // Record initial pointer X from the activator event
-    const ae = event.activatorEvent as TouchEvent | PointerEvent | MouseEvent;
-    if ('touches' in ae) {
-      dragStartXRef.current = (ae as TouchEvent).changedTouches?.[0]?.clientX
-        ?? (ae as TouchEvent).touches?.[0]?.clientX
-        ?? 0;
-    } else {
-      dragStartXRef.current = (ae as PointerEvent).clientX ?? 0;
-    }
-    pointerXRef.current = dragStartXRef.current;
-  }, []);
-
-  const handleDragMove = useCallback((event: DragMoveEvent) => {
-    // delta.x is the viewport-relative offset from drag start — keeps pointerXRef current
-    pointerXRef.current = dragStartXRef.current + event.delta.x;
   }, []);
 
   const handleDragOver = useCallback((event: DragOverEvent) => {
@@ -224,9 +142,6 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
     (event: DragEndEvent) => {
       setActiveId(null);
       setOverId(null);
-      pointerXRef.current = 0;
-      dragStartXRef.current = 0;
-
       const { active, over } = event;
       if (!over || active.id === over.id || !kanbanColumns) return;
 
@@ -343,7 +258,6 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
       `}</style>
 
       <Box
-        ref={boardRef}
         className="board-scroll"
         style={{
           overflowX: 'auto',
@@ -357,9 +271,14 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          autoScroll={false}
+          measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
+          autoScroll={{
+            // Built-in autoScroll, tuned for mobile: slow start, accelerates on hold
+            threshold: { x: 0.2, y: 0.2 },
+            acceleration: 15,
+            interval: 5,
+          }}
           onDragStart={handleDragStart}
-          onDragMove={handleDragMove}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
