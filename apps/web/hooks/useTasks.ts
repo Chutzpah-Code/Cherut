@@ -123,29 +123,23 @@ export const useUpdateTaskOrder = () => {
     mutationFn: ({ id, dto }: { id: string; dto: UpdateTaskOrderDto }) =>
       tasksApi.updateOrder(id, dto),
     onMutate: async ({ id, dto }) => {
-      // Cancel all outgoing queries
-      await queryClient.cancelQueries({ queryKey: ['tasks'] });
+      await queryClient.cancelQueries({ queryKey: ['tasks', 'kanban'] });
 
-      // Save previous state for rollback
-      const previousKanban = queryClient.getQueryData(['tasks', 'kanban', undefined]);
+      // Snapshot all kanban cache entries (key includes lifeAreaId + includeArchived params)
+      const previousKanbanEntries = queryClient.getQueriesData<any>({ queryKey: ['tasks', 'kanban'] });
 
-      // Optimistically update the kanban board
-      queryClient.setQueryData(['tasks', 'kanban', undefined], (old: any) => {
+      const updater = (old: any) => {
         if (!old) return old;
-
         const { newStatus, newOrder } = dto;
-
-        // Create a copy of the board
         const newBoard = { ...old };
 
-        // Find the task in all columns
         let taskToMove: any = null;
         let sourceColumn: 'todo' | 'in_progress' | 'done' | null = null;
 
         for (const col of ['todo', 'in_progress', 'done'] as const) {
-          const taskIndex = newBoard[col]?.findIndex((t: any) => t.id === id);
-          if (taskIndex !== -1) {
-            taskToMove = { ...newBoard[col][taskIndex] };
+          const idx = newBoard[col]?.findIndex((t: any) => t.id === id);
+          if (idx !== -1) {
+            taskToMove = { ...newBoard[col][idx] };
             sourceColumn = col;
             break;
           }
@@ -153,37 +147,35 @@ export const useUpdateTaskOrder = () => {
 
         if (!taskToMove || !sourceColumn) return old;
 
-        // Update task properties
         if (newStatus) taskToMove.status = newStatus;
         taskToMove.order = newOrder;
 
         const targetColumn = newStatus || sourceColumn;
 
-        // Remove from source column
         newBoard[sourceColumn] = newBoard[sourceColumn].filter((t: any) => t.id !== id);
-
-        // Add to target column at the correct position
         if (!newBoard[targetColumn]) newBoard[targetColumn] = [];
 
-        // Insert at the correct index based on order
         const targetTasks = [...newBoard[targetColumn], taskToMove];
         targetTasks.sort((a: any, b: any) => a.order - b.order);
         newBoard[targetColumn] = targetTasks;
 
         return newBoard;
-      });
+      };
 
-      return { previousKanban };
+      // Apply optimistic update to ALL kanban cache entries regardless of params
+      queryClient.setQueriesData<any>({ queryKey: ['tasks', 'kanban'] }, updater);
+
+      return { previousKanbanEntries };
     },
     onError: (_err, _vars, context: any) => {
-      // Rollback on error
-      if (context?.previousKanban) {
-        queryClient.setQueryData(['tasks', 'kanban', undefined], context.previousKanban);
+      if (context?.previousKanbanEntries) {
+        for (const [key, data] of context.previousKanbanEntries) {
+          queryClient.setQueryData(key, data);
+        }
       }
     },
     onSettled: () => {
-      // Refetch to sync with server
-      queryClient.invalidateQueries({ queryKey: ['tasks'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['tasks', 'kanban'], exact: false });
     },
   });
 };
