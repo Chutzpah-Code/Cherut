@@ -70,8 +70,36 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const updateOrderMutation = useMutation({
     mutationFn: ({ taskId, newOrder, newColumnId }: { taskId: string; newOrder: number; newColumnId: string }) =>
       tasksApi.updateOrder(taskId, { newOrder, newColumnId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'kanban'] });
+    onMutate: async ({ taskId, newOrder, newColumnId }) => {
+      await queryClient.cancelQueries({ queryKey: ['boards', boardId, 'kanban'] });
+      const previous = queryClient.getQueryData(['boards', boardId, 'kanban']);
+
+      queryClient.setQueryData(['boards', boardId, 'kanban'], (old: any) => {
+        if (!old) return old;
+        let taskToMove: any = null;
+        const newCols = old.map((col: any) => {
+          const idx = col.tasks.findIndex((t: any) => t.id === taskId);
+          if (idx === -1) return col;
+          taskToMove = { ...col.tasks[idx], order: newOrder };
+          return { ...col, tasks: col.tasks.filter((_: any, i: number) => i !== idx) };
+        });
+        if (!taskToMove) return old;
+        return newCols.map((col: any) => {
+          if (col.id !== newColumnId) return col;
+          const updated = [...col.tasks, taskToMove].sort((a: any, b: any) => a.order - b.order);
+          return { ...col, tasks: updated };
+        });
+      });
+
+      return { previous };
+    },
+    onError: (_err, _vars, context: any) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['boards', boardId, 'kanban'], context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'kanban'], refetchType: 'none' });
     },
   });
 
@@ -268,14 +296,29 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
                   activeId={activeId}
                   overId={overId}
                   onToggleComplete={(taskId) => {
-                    const task = kanbanColumns
-                      .flatMap((c) => c.tasks)
-                      .find((t) => t.id === taskId);
+                    const task = kanbanColumns.flatMap((c) => c.tasks).find((t) => t.id === taskId);
                     if (!task) return;
-                    updateMutation.mutate({
-                      id: taskId,
-                      dto: { status: task.status === 'done' ? 'todo' : 'done' },
+                    const newStatus = task.status === 'done' ? 'todo' : 'done';
+
+                    // Optimistically update board kanban cache
+                    queryClient.setQueryData(['boards', boardId, 'kanban'], (old: any) => {
+                      if (!old) return old;
+                      return old.map((col: any) => ({
+                        ...col,
+                        tasks: col.tasks.map((t: any) =>
+                          t.id === taskId ? { ...t, status: newStatus } : t
+                        ),
+                      }));
                     });
+
+                    updateMutation.mutate(
+                      { id: taskId, dto: { status: newStatus } },
+                      {
+                        onError: () => {
+                          queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'kanban'] });
+                        },
+                      }
+                    );
                   }}
                   onEditTask={(task) => { setSelectedTask(task); setModalOpened(true); }}
                 />
