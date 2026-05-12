@@ -39,7 +39,10 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
     transform: CSS.Transform.toString(transform),
     transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)',
     opacity: isDragging ? 0 : 1,
-    willChange: 'transform', // Enables hardware acceleration
+    willChange: 'transform',
+    // 'none' lets @dnd-kit take full control of touch events on this element,
+    // preventing the browser from starting a native scroll when a drag activates
+    touchAction: 'none' as const,
   };
 
   const priorityColor = useMemo(() => {
@@ -72,7 +75,6 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
       ref={setNodeRef}
       style={{
         ...style,
-        touchAction: 'manipulation',
         borderLeft: `4px solid var(--mantine-color-${priorityColor}-6)`,
         transition: isDragging ? 'none' : 'all 0.2s ease',
         backgroundColor: task.archived ? colors.surface : (isDragging ? colors.hover : colors.surfaceElevated),

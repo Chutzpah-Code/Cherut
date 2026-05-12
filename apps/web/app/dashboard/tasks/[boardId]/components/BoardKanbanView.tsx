@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Box, Button, Group, Center, Loader, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { Plus } from 'lucide-react';
@@ -52,6 +52,10 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalOpened, setModalOpened] = useState(false);
 
+  const boardRef = useRef<HTMLDivElement>(null);
+  const scrollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pointerXRef = useRef(0);
+
   const queryClient = useQueryClient();
   const { data: kanbanColumns, isLoading } = useBoardKanban(boardId);
 
@@ -66,6 +70,65 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const createColumn = useCreateColumn();
   const updateColumn = useUpdateColumn();
   const deleteColumn = useDeleteColumn();
+
+  // Track pointer position globally during drag
+  useEffect(() => {
+    if (!activeId) return;
+
+    const onTouchMove = (e: TouchEvent) => {
+      pointerXRef.current = e.touches[0].clientX;
+    };
+    const onMouseMove = (e: MouseEvent) => {
+      pointerXRef.current = e.clientX;
+    };
+
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('mousemove', onMouseMove);
+    };
+  }, [activeId]);
+
+  // Controlled auto-scroll: proportional speed based on distance to edge
+  useEffect(() => {
+    if (!activeId || !boardRef.current) {
+      if (scrollIntervalRef.current) {
+        clearInterval(scrollIntervalRef.current);
+        scrollIntervalRef.current = null;
+      }
+      return;
+    }
+
+    const EDGE_ZONE = 72; // px from edge where scroll starts
+    const MAX_SPEED = 7;  // px per frame at the very edge
+
+    scrollIntervalRef.current = setInterval(() => {
+      const board = boardRef.current;
+      if (!board) return;
+
+      const rect = board.getBoundingClientRect();
+      const x = pointerXRef.current;
+      const distFromLeft = x - rect.left;
+      const distFromRight = rect.right - x;
+
+      if (distFromLeft < EDGE_ZONE && distFromLeft > 0) {
+        const speed = Math.ceil((1 - distFromLeft / EDGE_ZONE) * MAX_SPEED);
+        board.scrollLeft -= speed;
+      } else if (distFromRight < EDGE_ZONE && distFromRight > 0) {
+        const speed = Math.ceil((1 - distFromRight / EDGE_ZONE) * MAX_SPEED);
+        board.scrollLeft += speed;
+      }
+    }, 16);
+
+    return () => {
+      if (scrollIntervalRef.current) {
+        clearInterval(scrollIntervalRef.current);
+        scrollIntervalRef.current = null;
+      }
+    };
+  }, [activeId]);
 
   const updateOrderMutation = useMutation({
     mutationFn: ({ taskId, newOrder, newColumnId }: { taskId: string; newOrder: number; newColumnId: string }) =>
@@ -103,9 +166,15 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
     },
   });
 
+  // Sensors: longer delay + higher tolerance for comfortable mobile drag
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 1 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 50, tolerance: 3 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,    // hold 250ms to start drag (distinguishes tap from drag)
+        tolerance: 8,  // allow 8px movement during hold without cancelling
+      },
+    }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -251,9 +320,17 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         .board-scroll::-webkit-scrollbar-thumb:hover {
           background: #94A3B8;
         }
+        .drag-overlay-card {
+          transform: rotate(2deg) scale(1.04);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.22), 0 0 0 2px rgba(70,134,254,0.35);
+          border-radius: 12px;
+          opacity: 0.97;
+          pointer-events: none;
+        }
       `}</style>
 
       <Box
+        ref={boardRef}
         className="board-scroll"
         style={{
           overflowX: 'auto',
@@ -262,11 +339,14 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           paddingBottom: 80,
           marginLeft: isMobile ? -4 : 0,
           marginRight: isMobile ? -4 : 0,
+          // Prevent browser from intercepting scroll during drag
+          WebkitOverflowScrolling: 'touch',
         }}
       >
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          autoScroll={false}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
@@ -278,7 +358,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
             style={{ minWidth: 'max-content', height: '100%', padding: '4px 2px 16px' }}
           >
             {kanbanColumns.map((col) => (
-              <Box key={col.id} style={{ width: 272, flexShrink: 0, height: '100%' }}>
+              <Box key={col.id} style={{ width: isMobile ? 260 : 272, flexShrink: 0, height: '100%' }}>
                 <KanbanList
                   id={col.id}
                   title={col.name}
@@ -300,7 +380,6 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
                     if (!task) return;
                     const newStatus = task.status === 'done' ? 'todo' : 'done';
 
-                    // Optimistically update board kanban cache
                     queryClient.setQueryData(['boards', boardId, 'kanban'], (old: any) => {
                       if (!old) return old;
                       return old.map((col: any) => ({
@@ -355,8 +434,17 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
             </Box>
           </Group>
 
-          <DragOverlay>
-            {activeTask && <KanbanCard task={activeTask} onClick={() => {}} />}
+          <DragOverlay
+            dropAnimation={{
+              duration: 180,
+              easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+            }}
+          >
+            {activeTask && (
+              <div className="drag-overlay-card">
+                <KanbanCard task={activeTask} onClick={() => {}} />
+              </div>
+            )}
           </DragOverlay>
         </DndContext>
       </Box>
