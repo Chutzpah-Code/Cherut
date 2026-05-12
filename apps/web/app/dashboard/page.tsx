@@ -18,8 +18,8 @@ export default function DashboardPage() {
   const { data: habits, isLoading: habitsLoading } = useHabits(undefined, false);
 
   // Calculate stats
-  const activeObjectives = objectives?.filter((obj) => obj.status !== 'completed').length || 0;
-  const openTasks = tasks?.filter((task) => task.status !== 'done').length || 0;
+  const activeObjectives = objectives?.filter((obj) => obj.status === 'active').length || 0;
+  const openTasks = tasks?.filter((task) => task.status !== 'done' && !task.archived).length || 0;
   const lifeAreasCount = lifeAreas?.length || 0;
   const activeHabits = habits?.filter((habit) => habit.isActive).length || 0;
 
