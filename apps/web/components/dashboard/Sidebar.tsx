@@ -293,7 +293,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
         >
           {!isCompact && (
             <div className="premium-logo-container">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0 }}>
                 <CMark size={34} color="#0F0F1E" />
                 <span style={{
                   fontWeight: 700,
@@ -302,6 +302,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
                   color: '#0F0F1E',
                   fontFamily: 'Inter, sans-serif',
                   lineHeight: 1,
+                  marginLeft: -13,
                 }}>herut.</span>
               </div>
             </div>
