@@ -40,7 +40,8 @@ export function HabitColumn({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: '548px', // Optimized to show 3.5 habits (desktop)
+        minHeight: '400px',
+        height: 'auto',
         background: '#FFFFFF',
         border: '1px solid #E5E7EB',
         borderRadius: '16px',
@@ -49,12 +50,12 @@ export function HabitColumn({
       }}
     >
       {/* Column Header */}
-      <Group justify="space-between" mb="md" style={{ flexShrink: 0 }}>
+      <Group justify="space-between" mb="md" style={{ flexShrink: 0, flexWrap: 'wrap', gap: '12px' }}>
         <Title
           order={3}
           style={{
             fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            fontSize: '24px',
+            fontSize: 'clamp(18px, 4vw, 24px)',
             fontWeight: 700,
             color: colors.text.primary,
           }}
@@ -63,19 +64,20 @@ export function HabitColumn({
         </Title>
         {!isArchived && (
           <Button
-            leftSection={<Plus size={20} />}
+            leftSection={<Plus size={18} />}
             onClick={onAddHabit}
             radius={40}
             style={{
               fontFamily: 'Inter, sans-serif',
-              fontSize: '16px',
+              fontSize: '14px',
               fontWeight: 500,
-              height: '48px',
-              padding: '12px 24px',
+              height: '44px',
+              padding: '0 16px',
               background: colors.primary,
               border: 'none',
               color: 'white',
               boxShadow: 'rgba(0,0,0,0.15) 0px 4px 8px 0px',
+              minWidth: '44px',
             }}
             styles={{
               root: {

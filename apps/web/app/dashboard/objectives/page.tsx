@@ -546,7 +546,7 @@ export default function ObjectivesPage() {
             mb="xs"
             style={{
               fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '32px',
+              fontSize: 'clamp(22px, 5vw, 32px)',
               fontWeight: 700,
               color: '#000000',
               letterSpacing: '-0.02em',
@@ -595,7 +595,7 @@ export default function ObjectivesPage() {
           </Button>
         </Box>
 
-        <Group justify="space-between" align="center">
+        <Group justify="space-between" align="center" wrap="wrap" gap="sm">
           <Group
             gap={0}
             style={{
@@ -603,6 +603,7 @@ export default function ObjectivesPage() {
               borderRadius: '40px',
               height: '48px',
               padding: '4px',
+              flexShrink: 0,
             }}
           >
             <Button
@@ -1048,7 +1049,7 @@ export default function ObjectivesPage() {
             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           },
           body: {
-            maxHeight: 'calc(100vh - 120px)',
+            maxHeight: 'calc(100dvh - 120px)',
             overflowY: 'auto',
           },
         }}

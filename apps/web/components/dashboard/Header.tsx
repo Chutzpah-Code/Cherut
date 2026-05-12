@@ -75,37 +75,41 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
 
       <Group gap="xs">
         {mounted && (
-          <Tooltip
-            label="Dark mode coming soon"
-            position="bottom"
-            withArrow
-            styles={{
-              tooltip: {
-                backgroundColor: '#1F2937',
-                color: 'white',
-                fontSize: '14px',
-                fontWeight: 500,
-                fontFamily: 'Inter, sans-serif',
-                borderRadius: '8px',
-                padding: '8px 12px'
-              }
-            }}
-          >
-            <ActionIcon
-              variant="subtle"
-              size="lg"
-              radius="xl"
-              disabled
-              title="Dark mode coming soon"
-              style={{
-                transition: 'all 0.3s ease',
-                opacity: 0.5,
-                cursor: 'not-allowed',
+          <Box visibleFrom="sm">
+            <Tooltip
+              label="Dark mode coming soon"
+              position="bottom"
+              withArrow
+              styles={{
+                tooltip: {
+                  backgroundColor: '#1F2937',
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  fontFamily: 'Inter, sans-serif',
+                  borderRadius: '8px',
+                  padding: '8px 12px'
+                }
               }}
             >
-              <Moon size={20} style={{ color: 'var(--mantine-color-gray-5)' }} />
-            </ActionIcon>
-          </Tooltip>
+              <ActionIcon
+                variant="subtle"
+                size="lg"
+                radius="xl"
+                disabled
+                title="Dark mode coming soon"
+                style={{
+                  transition: 'all 0.3s ease',
+                  opacity: 0.5,
+                  cursor: 'not-allowed',
+                  minWidth: '44px',
+                  minHeight: '44px',
+                }}
+              >
+                <Moon size={20} style={{ color: 'var(--mantine-color-gray-5)' }} />
+              </ActionIcon>
+            </Tooltip>
+          </Box>
         )}
 
         {mounted && onOpenWelcome && (
@@ -117,6 +121,8 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
             title="Help and instructions"
             style={{
               transition: 'all 0.3s ease',
+              minWidth: '44px',
+              minHeight: '44px',
             }}
           >
             <HelpCircle size={20} style={{ color: 'var(--mantine-color-gray-6)' }} />
@@ -145,6 +151,8 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
               title={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ''}`}
               style={{
                 transition: 'all 0.2s ease',
+                minWidth: '44px',
+                minHeight: '44px',
               }}
             >
               <Bell size={20} />

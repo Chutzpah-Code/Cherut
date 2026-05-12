@@ -202,7 +202,7 @@ export default function VisionBoardPage() {
           mb="xs"
           style={{
             fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            fontSize: '32px',
+            fontSize: 'clamp(22px, 5vw, 32px)',
             fontWeight: 700,
             color: '#000000',
             letterSpacing: '-0.02em',
@@ -250,7 +250,7 @@ export default function VisionBoardPage() {
           </Button>
         </Box>
 
-        <Group justify="space-between" align="center">
+        <Group justify="space-between" align="center" wrap="wrap" gap="sm">
           <Group
             gap={0}
             style={{
@@ -258,6 +258,7 @@ export default function VisionBoardPage() {
               borderRadius: '40px',
               height: '48px',
               padding: '4px',
+              flexShrink: 0,
             }}
           >
             <Button

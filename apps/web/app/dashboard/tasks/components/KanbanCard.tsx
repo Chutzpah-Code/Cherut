@@ -18,6 +18,7 @@ interface KanbanCardProps {
 
 export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComplete, onEdit }: KanbanCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isTouchDevice] = useState(() => typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches);
   const colors = useThemeColors();
   const {
     attributes,
@@ -71,7 +72,7 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
       ref={setNodeRef}
       style={{
         ...style,
-        touchAction: 'none',
+        touchAction: 'manipulation',
         borderLeft: `4px solid var(--mantine-color-${priorityColor}-6)`,
         transition: isDragging ? 'none' : 'all 0.2s ease',
         backgroundColor: task.archived ? colors.surface : (isDragging ? colors.hover : colors.surfaceElevated),
@@ -128,6 +129,19 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
                 }
               }}
               style={{
+                width: 44,
+                height: 44,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                flexShrink: 0,
+                marginTop: '-10px',
+                marginLeft: '-12px',
+                marginBottom: '-10px',
+              }}
+            >
+              <div style={{
                 width: 20,
                 height: 20,
                 borderRadius: '50%',
@@ -135,13 +149,9 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: 'pointer',
-                flexShrink: 0,
-                marginTop: '2px',
                 backgroundColor: task.status === 'done' ? `var(--mantine-color-green-6)` : 'transparent',
                 transition: 'all 0.2s ease',
-              }}
-            >
+              }}>
               {task.status === 'done' && (
                 <div
                   style={{
@@ -152,6 +162,7 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
                   }}
                 />
               )}
+              </div>
             </div>
 
             <Text fw={400} size="sm" lineClamp={2} style={{ wordBreak: 'break-word', flex: 1 }}>
@@ -159,27 +170,29 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
             </Text>
           </Group>
 
-          {/* Right side: edit button */}
+          {/* Right side: edit button — always visible on touch, hover-only on desktop */}
           {onEdit && (
             <ActionIcon
               variant="subtle"
               color="gray"
-              size={24}
+              size={isTouchDevice ? 36 : 24}
               radius={6}
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit();
               }}
               style={{
-                opacity: isHovered ? 1 : 0,
-                visibility: isHovered ? 'visible' : 'hidden',
+                opacity: isTouchDevice || isHovered ? 1 : 0,
+                visibility: isTouchDevice || isHovered ? 'visible' : 'hidden',
                 transition: 'all 0.15s ease',
-                color: isHovered ? colors.primary : colors.text.tertiary,
+                color: colors.primary,
                 flexShrink: 0,
                 marginTop: '2px',
+                minWidth: isTouchDevice ? '44px' : undefined,
+                minHeight: isTouchDevice ? '44px' : undefined,
               }}
             >
-              <Edit2 size={12} />
+              <Edit2 size={isTouchDevice ? 16 : 12} />
             </ActionIcon>
           )}
         </Group>

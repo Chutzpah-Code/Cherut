@@ -123,7 +123,7 @@ function ResponsiveDashboard({
         breakpoint: 'sm',
         collapsed: getSidebarCollapsed(),
       }}
-      padding="md"
+      padding={{ base: 'sm', sm: 'md' }}
     >
       <AppShell.Header>
         <Header

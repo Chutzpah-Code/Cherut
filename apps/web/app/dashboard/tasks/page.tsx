@@ -85,7 +85,7 @@ export default function TasksPage() {
             mb="xs"
             style={{
               fontFamily: 'Inter Display, sans-serif',
-              fontSize: '32px',
+              fontSize: 'clamp(22px, 5vw, 32px)',
               fontWeight: 700,
               color: '#000000',
               letterSpacing: '-0.02em',

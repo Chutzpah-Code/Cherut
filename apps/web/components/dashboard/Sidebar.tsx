@@ -76,7 +76,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
 
   const handleLinkClick = () => {
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+    if (screenSize === 'mobile') {
       onClose();
     }
   };

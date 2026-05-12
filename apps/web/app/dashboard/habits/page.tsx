@@ -287,7 +287,7 @@ export default function HabitsPage() {
             mb="xs"
             style={{
               fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '32px',
+              fontSize: 'clamp(22px, 5vw, 32px)',
               fontWeight: 700,
               color: colors.text.primary,
               letterSpacing: '-0.02em',
@@ -319,7 +319,7 @@ export default function HabitsPage() {
       <Box
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(400px, 100%), 1fr))',
           gap: '24px',
           width: '100%',
         }}

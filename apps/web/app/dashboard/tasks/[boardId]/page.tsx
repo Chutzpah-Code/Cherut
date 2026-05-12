@@ -95,7 +95,7 @@ export default function BoardDetailPage({ params }: { params: Promise<{ boardId:
             order={1}
             style={{
               fontFamily: 'Inter Display, sans-serif',
-              fontSize: '28px',
+              fontSize: 'clamp(18px, 4vw, 28px)',
               fontWeight: 700,
               color: '#000000',
               letterSpacing: '-0.02em',

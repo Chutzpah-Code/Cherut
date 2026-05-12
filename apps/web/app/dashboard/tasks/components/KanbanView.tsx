@@ -76,13 +76,13 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 1, // Ultra-sensitive for instant response
+        distance: 8,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 50, // Minimal delay for ultra-responsive touch
-        tolerance: 3, // Reduced tolerance for precision
+        delay: 250, // Long-press to distinguish drag from tap/scroll
+        tolerance: 8,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -340,11 +340,21 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
       >
         <Box
           style={{
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            marginLeft: '-4px',
+            marginRight: '-4px',
+            paddingLeft: '4px',
+            paddingRight: '4px',
+          }}
+        >
+        <Box
+          style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: 'repeat(3, minmax(280px, 1fr))',
             gap: '16px',
-            paddingBottom: '24px', // Reduced padding
-            // Removed minHeight to prevent page scroll
+            paddingBottom: '24px',
+            minWidth: '0',
           }}
         >
           {lists.map((list) => (
@@ -366,6 +376,7 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
               />
             </Box>
           ))}
+        </Box>
         </Box>
 
         {/* DragOverlay - Renders the dragged item on top of everything */}

@@ -249,7 +249,7 @@ export default function ValuesPage() {
           mb="xs"
           style={{
             fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            fontSize: '32px',
+            fontSize: 'clamp(22px, 5vw, 32px)',
             fontWeight: 700,
             color: '#000000',
             letterSpacing: '-0.02em',

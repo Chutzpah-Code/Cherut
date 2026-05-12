@@ -210,7 +210,7 @@ export default function ProfilePage() {
             mb="xs"
             style={{
               fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '32px',
+              fontSize: 'clamp(22px, 5vw, 32px)',
               fontWeight: 700,
               color: '#000000',
             }}
@@ -936,7 +936,7 @@ export default function ProfilePage() {
                 }}
               />
 
-              <Group justify="flex-end" gap="sm">
+              <Group justify="flex-end" gap="sm" wrap="wrap">
                 <Button
                   variant="outline"
                   onClick={handlePasswordModalClose}
@@ -950,6 +950,8 @@ export default function ProfilePage() {
                     borderColor: '#CCCCCC',
                     color: '#333333',
                     background: 'white',
+                    flex: '1 1 auto',
+                    minWidth: '110px',
                   }}
                   styles={{
                     root: {
@@ -979,6 +981,8 @@ export default function ProfilePage() {
                     backgroundColor: '#4686FE',
                     border: 'none',
                     color: 'white',
+                    flex: '1 1 auto',
+                    minWidth: '110px',
                   }}
                   styles={{
                     root: {
