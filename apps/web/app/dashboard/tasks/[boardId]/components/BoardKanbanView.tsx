@@ -84,12 +84,15 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
     const board = boardRef.current;
     if (!board || pointerX === 0) return;
 
-    const rect = board.getBoundingClientRect();
-    const distFromLeft = pointerX - rect.left;
-    const distFromRight = rect.right - pointerX;
+    // Use VIEWPORT edges — the board element is inset by AppShell padding,
+    // so getBoundingClientRect().right < screen width. Using the viewport
+    // edges means the user naturally hits the scroll zone at the screen edge.
+    const vw = window.innerWidth;
+    const distFromLeft = pointerX;
+    const distFromRight = vw - pointerX;
 
-    const inLeft = distFromLeft > 0 && distFromLeft < EDGE_ZONE;
-    const inRight = distFromRight > 0 && distFromRight < EDGE_ZONE;
+    const inLeft = distFromLeft >= 0 && distFromLeft < EDGE_ZONE;
+    const inRight = distFromRight >= 0 && distFromRight < EDGE_ZONE;
 
     if (!inLeft && !inRight) {
       edgeEntryTimeRef.current = null;
@@ -209,12 +212,9 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   }, []);
 
   const handleDragMove = useCallback((event: DragMoveEvent) => {
-    // delta.x is viewport-relative offset from the drag start position
-    const currentX = dragStartXRef.current + event.delta.x;
-    pointerXRef.current = currentX;
-    // Also scroll immediately on move (not just in the interval)
-    scrollBoardIfNeeded(currentX);
-  }, [scrollBoardIfNeeded]);
+    // delta.x is the viewport-relative offset from drag start — keeps pointerXRef current
+    pointerXRef.current = dragStartXRef.current + event.delta.x;
+  }, []);
 
   const handleDragOver = useCallback((event: DragOverEvent) => {
     setOverId((event.over?.id as string) || null);
