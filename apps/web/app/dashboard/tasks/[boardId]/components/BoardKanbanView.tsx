@@ -55,6 +55,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const boardRef = useRef<HTMLDivElement>(null);
   const scrollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pointerXRef = useRef(0);
+  const edgeEntryTimeRef = useRef<number | null>(null);
 
   const queryClient = useQueryClient();
   const { data: kanbanColumns, isLoading } = useBoardKanban(boardId);
@@ -101,8 +102,10 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
       return;
     }
 
-    const EDGE_ZONE = 72; // px from edge where scroll starts
-    const MAX_SPEED = 7;  // px per frame at the very edge
+    const EDGE_ZONE = 80;   // px from edge where scroll activates
+    const BASE_SPEED = 4;   // px/frame when first entering the edge zone
+    const ACCEL = 10;       // extra px/frame added per second held in edge zone
+    const MAX_SPEED = 32;   // hard cap so it never becomes uncontrollable
 
     scrollIntervalRef.current = setInterval(() => {
       const board = boardRef.current;
@@ -113,12 +116,30 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
       const distFromLeft = x - rect.left;
       const distFromRight = rect.right - x;
 
-      if (distFromLeft < EDGE_ZONE && distFromLeft > 0) {
-        const speed = Math.ceil((1 - distFromLeft / EDGE_ZONE) * MAX_SPEED);
-        board.scrollLeft -= speed;
-      } else if (distFromRight < EDGE_ZONE && distFromRight > 0) {
-        const speed = Math.ceil((1 - distFromRight / EDGE_ZONE) * MAX_SPEED);
-        board.scrollLeft += speed;
+      const inLeft = distFromLeft < EDGE_ZONE && distFromLeft > 0;
+      const inRight = distFromRight < EDGE_ZONE && distFromRight > 0;
+
+      if (!inLeft && !inRight) {
+        // Pointer left the edge zone — reset acceleration timer
+        edgeEntryTimeRef.current = null;
+        return;
+      }
+
+      // Start or keep the edge timer for progressive acceleration
+      if (!edgeEntryTimeRef.current) {
+        edgeEntryTimeRef.current = Date.now();
+      }
+      const secondsHeld = (Date.now() - edgeEntryTimeRef.current) / 1000;
+      const accelBoost = Math.min(secondsHeld * ACCEL, MAX_SPEED - BASE_SPEED);
+
+      if (inLeft) {
+        const edgeFactor = 1 - distFromLeft / EDGE_ZONE;
+        const speed = Math.ceil(edgeFactor * (BASE_SPEED + accelBoost));
+        board.scrollLeft -= Math.min(speed, MAX_SPEED);
+      } else {
+        const edgeFactor = 1 - distFromRight / EDGE_ZONE;
+        const speed = Math.ceil(edgeFactor * (BASE_SPEED + accelBoost));
+        board.scrollLeft += Math.min(speed, MAX_SPEED);
       }
     }, 16);
 
