@@ -41,7 +41,6 @@ export default function RootLayout({
         <ColorSchemeScript forceColorScheme="light" />
       </head>
       <body className="antialiased" suppressHydrationWarning>
-        <Script src="/debug-logger.js" strategy="beforeInteractive" />
         <Providers>
           {children}
         </Providers>

@@ -66,37 +66,18 @@ export class RateLimitService {
     this.clientId = clientId;
   }
 
-  /**
-   * Check if an action is allowed and get current rate limit status
-   */
   checkRateLimit(): RateLimitResult {
     const entry = this.getEntry();
     const now = Date.now();
 
-    // Clean up expired lockouts
     if (entry.lockoutUntil && now >= entry.lockoutUntil) {
-      console.log('🔓 [RateLimit] Lockout EXPIRED - resetting attempts');
-      // Lockout expired - reset attempts to allow new tries
       entry.lockoutUntil = undefined;
-      entry.attempts = 0; // RESET attempts after lockout expires!
+      entry.attempts = 0;
       this.saveEntry(entry);
-      console.log('💾 [RateLimit] Reset saved after lockout expiry');
     }
 
-    // Check if currently locked out
     if (entry.lockoutUntil && now < entry.lockoutUntil) {
       const lockoutTimeRemaining = Math.ceil((entry.lockoutUntil - now) / 1000);
-
-      console.log('⏰ [RateLimit] LOCKOUT ACTIVE:', {
-        now,
-        lockoutUntil: entry.lockoutUntil,
-        lockoutTimeRemaining,
-        lockoutLevel: entry.lockoutLevel,
-        action: this.config.storageKey,
-        lockoutUntilDate: new Date(entry.lockoutUntil),
-        currentDate: new Date(now),
-      });
-
       return {
         allowed: false,
         attemptsRemaining: 0,
@@ -106,87 +87,37 @@ export class RateLimitService {
       };
     }
 
-    // Check if within attempt limit
     const attemptsRemaining = Math.max(0, this.config.maxAttempts - entry.attempts);
-
-    const result = {
+    return {
       allowed: attemptsRemaining > 0,
       attemptsRemaining,
       lockoutTimeRemaining: 0,
       lockoutLevel: entry.lockoutLevel,
       totalAttempts: entry.attempts,
     };
-
-    // Enhanced debug logging
-    console.log('✅ [RateLimit] checkRateLimit SUCCESS:', {
-      action: this.config.storageKey,
-      maxAttempts: this.config.maxAttempts,
-      currentAttempts: entry.attempts,
-      attemptsRemaining,
-      allowed: result.allowed,
-      calculation: `${this.config.maxAttempts} - ${entry.attempts} = ${attemptsRemaining} (allowed: ${attemptsRemaining > 0})`,
-      entry,
-      result,
-      timestamp: new Date(now).toLocaleTimeString()
-    });
-
-    return result;
   }
 
-  /**
-   * Record a failed attempt and apply penalties if necessary
-   */
   recordFailure(): RateLimitResult {
     const entry = this.getEntry();
     const now = Date.now();
 
-    // Increment attempts
     entry.attempts += 1;
     entry.lastAttempt = now;
 
-    console.log('[RateLimit] recordFailure:', {
-      attempts: entry.attempts,
-      maxAttempts: this.config.maxAttempts,
-      willLockout: entry.attempts >= this.config.maxAttempts,
-      lockoutLevel: entry.lockoutLevel,
-      action: this.config.storageKey,
-    });
-
-    // Check if lockout should be applied (when we hit or exceed max attempts)
     if (entry.attempts >= this.config.maxAttempts) {
       const lockoutMinutes = this.calculateLockoutDuration(entry.lockoutLevel);
       entry.lockoutUntil = now + (lockoutMinutes * 60 * 1000);
       entry.lockoutLevel += 1;
-
-      console.log('🔒 [RateLimit] LOCKOUT APPLIED:', {
-        lockoutMinutes,
-        lockoutUntil: entry.lockoutUntil,
-        lockoutLevel: entry.lockoutLevel,
-        currentTime: now,
-        timeUntilLockout: entry.lockoutUntil - now,
-        lockoutSeconds: lockoutMinutes * 60,
-        action: this.config.storageKey,
-        maxAttempts: this.config.maxAttempts,
-        actualAttempts: entry.attempts,
-      });
-
-      // Force save immediately after lockout
       this.saveEntry(entry);
-      console.log('💾 [RateLimit] Entry saved after lockout');
     }
 
     this.saveEntry(entry);
     return this.checkRateLimit();
   }
 
-  /**
-   * Record a successful attempt (resets the counter)
-   */
   recordSuccess(): void {
     const entry = this.getEntry();
 
-    // Reset attempts but keep some history for progressive penalties
-    // If user was in lockout level 2+, reduce by 1 instead of full reset
     if (entry.lockoutLevel >= 2) {
       entry.lockoutLevel = Math.max(0, entry.lockoutLevel - 1);
     } else {
@@ -200,18 +131,13 @@ export class RateLimitService {
     this.saveEntry(entry);
   }
 
-  /**
-   * Get user-friendly message based on current state
-   */
   getMessage(result: RateLimitResult): string {
     if (result.lockoutTimeRemaining > 0) {
-      // Use same logic as formatTime component for consistency
       const minutes = Math.floor(result.lockoutTimeRemaining / 60);
       const seconds = result.lockoutTimeRemaining % 60;
 
       let timeStr: string;
       if (minutes > 0) {
-        // Format as "6 minutes 57 seconds" to match the visual timer logic
         timeStr = `${minutes} minute${minutes > 1 ? 's' : ''}`;
         if (seconds > 0) {
           timeStr += ` ${seconds} second${seconds > 1 ? 's' : ''}`;
@@ -238,19 +164,13 @@ export class RateLimitService {
     return '';
   }
 
-  /**
-   * Calculate lockout duration based on level
-   */
   private calculateLockoutDuration(currentLevel: number): number {
     if (currentLevel === 0) {
-      return this.config.firstLockoutMinutes; // First lockout: 2 minutes
+      return this.config.firstLockoutMinutes;
     }
-    return this.config.extendedLockoutMinutes; // Subsequent lockouts: 10 minutes
+    return this.config.extendedLockoutMinutes;
   }
 
-  /**
-   * Get current rate limit entry from storage
-   */
   private getEntry(): RateLimitEntry {
     try {
       const storageKey = `${this.config.storageKey}_${this.clientId}`;
@@ -259,106 +179,61 @@ export class RateLimitService {
         const parsed = JSON.parse(stored) as RateLimitEntry;
         const now = Date.now();
 
-        // Clean up old entries (older than 24 hours)
         if (now - parsed.lastAttempt > 24 * 60 * 60 * 1000) {
-          console.log('📅 [RateLimit] Clearing old entry (24h+)');
           this.clearEntry();
           return this.createNewEntry();
         }
 
-        // 🔧 CORRUPTION DETECTION & AUTO-FIX
         const isCorrupted = this.detectCorruption(parsed, now);
         if (isCorrupted) {
-          console.log('🩹 [RateLimit] Corrupted data detected - auto-fixing');
           const fixed = this.fixCorruptedEntry(parsed, now);
           this.saveEntry(fixed);
-          console.log('✅ [RateLimit] Data corruption fixed automatically');
           return fixed;
         }
 
-        console.log('📂 [RateLimit] Loaded entry:', { storageKey, entry: parsed });
         return parsed;
       }
-    } catch (error) {
-      console.warn('Error reading rate limit data:', error);
+    } catch {
+      // ignore
     }
 
     return this.createNewEntry();
   }
 
-  /**
-   * Detect if the rate limit data is corrupted
-   */
   private detectCorruption(entry: RateLimitEntry, now: number): boolean {
-    // Case 1: User has max attempts but no active lockout and lockout time has passed
     const hasMaxAttempts = entry.attempts >= this.config.maxAttempts;
     const noActiveLockout = !entry.lockoutUntil || now >= entry.lockoutUntil;
     const shouldHaveBeenReset = hasMaxAttempts && noActiveLockout;
-
-    // Case 2: Invalid attempt count (negative or way too high)
     const invalidAttempts = entry.attempts < 0 || entry.attempts > this.config.maxAttempts + 5;
+    const expiredLockoutWithAttempts = entry.lockoutUntil && now >= entry.lockoutUntil && entry.attempts > 0;
 
-    // Case 3: Lockout time is in the past but attempts weren't reset
-    const expiredLockoutWithAttempts = entry.lockoutUntil &&
-      now >= entry.lockoutUntil &&
-      entry.attempts > 0;
-
-    const isCorrupted = !!(shouldHaveBeenReset || invalidAttempts || expiredLockoutWithAttempts);
-
-    if (isCorrupted) {
-      console.log('🔍 [RateLimit] Corruption detected:', {
-        hasMaxAttempts,
-        noActiveLockout,
-        shouldHaveBeenReset,
-        invalidAttempts,
-        expiredLockoutWithAttempts,
-        currentEntry: entry,
-        now: new Date(now),
-        lockoutExpiry: entry.lockoutUntil ? new Date(entry.lockoutUntil) : null
-      });
-    }
-
-    return isCorrupted;
+    return !!(shouldHaveBeenReset || invalidAttempts || expiredLockoutWithAttempts);
   }
 
-  /**
-   * Fix corrupted rate limit entry
-   */
   private fixCorruptedEntry(entry: RateLimitEntry, now: number): RateLimitEntry {
-    console.log('🔧 [RateLimit] Fixing corrupted entry:', entry);
-
     const fixed: RateLimitEntry = {
-      attempts: 0, // Reset attempts to allow new tries
+      attempts: 0,
       lastAttempt: now,
-      lockoutLevel: entry.lockoutLevel || 0, // Preserve lockout level for progressive penalties
-      lockoutUntil: undefined, // Clear any expired lockout
+      lockoutLevel: entry.lockoutLevel || 0,
+      lockoutUntil: undefined,
     };
 
-    // If there's an active lockout that hasn't expired, preserve it
     if (entry.lockoutUntil && now < entry.lockoutUntil) {
       fixed.lockoutUntil = entry.lockoutUntil;
-      fixed.attempts = this.config.maxAttempts; // Keep max attempts during active lockout
-      console.log('🔒 [RateLimit] Preserving active lockout');
+      fixed.attempts = this.config.maxAttempts;
     }
 
-    console.log('✨ [RateLimit] Fixed entry:', fixed);
     return fixed;
   }
 
-  /**
-   * Save rate limit entry to storage
-   */
   private saveEntry(entry: RateLimitEntry): void {
     try {
       localStorage.setItem(`${this.config.storageKey}_${this.clientId}`, JSON.stringify(entry));
-    } catch (error) {
-      console.warn('Error saving rate limit data:', error);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Create new rate limit entry
-   */
   private createNewEntry(): RateLimitEntry {
     return {
       attempts: 0,
@@ -367,20 +242,14 @@ export class RateLimitService {
     };
   }
 
-  /**
-   * Clear rate limit entry
-   */
   private clearEntry(): void {
     try {
       localStorage.removeItem(`${this.config.storageKey}_${this.clientId}`);
-    } catch (error) {
-      console.warn('Error clearing rate limit data:', error);
+    } catch {
+      // ignore
     }
   }
 
-  /**
-   * Clean up all expired entries (maintenance function)
-   */
   static cleanupExpired(): void {
     if (typeof window === 'undefined') return;
 
@@ -394,8 +263,6 @@ export class RateLimitService {
 
         try {
           const data = JSON.parse(localStorage.getItem(key) || '');
-
-          // Remove if older than 24 hours or lockout expired more than 1 hour ago
           const isOld = now - data.lastAttempt > 24 * 60 * 60 * 1000;
           const lockoutExpiredLongAgo = data.lockoutUntil && now - data.lockoutUntil > 60 * 60 * 1000;
 
@@ -403,14 +270,13 @@ export class RateLimitService {
             keysToRemove.push(key);
           }
         } catch {
-          // Invalid data, remove it
           keysToRemove.push(key);
         }
       }
 
       keysToRemove.forEach(key => localStorage.removeItem(key));
-    } catch (error) {
-      console.warn('Error during rate limit cleanup:', error);
+    } catch {
+      // ignore
     }
   }
 }
