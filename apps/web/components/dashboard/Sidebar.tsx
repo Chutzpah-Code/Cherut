@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { Stack, NavLink, ScrollArea, Box, Divider, Button, Group, Badge, Text, Tooltip, ActionIcon } from '@mantine/core';
 import { logoutUser } from '@/lib/firebase/auth';
-import CherutLogo from '@/components/ui/CherutLogo';
+import { CMark } from '@/components/shell/Shell';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
@@ -293,7 +293,17 @@ export default function Sidebar({ onClose }: SidebarProps) {
         >
           {!isCompact && (
             <div className="premium-logo-container">
-              <CherutLogo size={180} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <CMark size={34} color="#0F0F1E" />
+                <span style={{
+                  fontWeight: 700,
+                  fontSize: 22,
+                  letterSpacing: '-0.02em',
+                  color: '#0F0F1E',
+                  fontFamily: 'Inter, sans-serif',
+                  lineHeight: 1,
+                }}>herut.</span>
+              </div>
             </div>
           )}
 
