@@ -3,24 +3,17 @@ import { getIdToken } from '@/lib/firebase/auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-// Debug logging
-console.log('[API Client] Environment API URL:', process.env.NEXT_PUBLIC_API_URL);
-console.log('[API Client] Using API URL:', API_URL);
-
 export const apiClient = axios.create({
   baseURL: API_URL,
-  timeout: 10000, // 10 seconds timeout
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add auth token to requests
 apiClient.interceptors.request.use(
   async (config) => {
-    // Skip adding auth token for auth endpoints
     if (config.url && (config.url.includes('/auth') || config.url.includes('/health'))) {
-      console.log('[DEBUG] Skipping token for auth endpoint:', config.url);
       return config;
     }
 
@@ -28,46 +21,33 @@ apiClient.interceptors.request.use(
       const token = await getIdToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('[DEBUG] Token added to request:', config.url, 'Token length:', token.length);
       } else {
-        console.warn('[DEBUG] No token available for request:', config.url);
-        console.warn('[DEBUG] Skipping authenticated request without token');
         throw new Error('Authentication required - no token available');
       }
     } catch (error) {
-      console.error('[DEBUG] Error getting token:', error);
       throw error;
     }
     return config;
   },
-  (error) => {
-    console.error('[API Client] Request error:', error);
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Handle errors
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      console.error('[API Client] 401 Unauthorized, attempting token refresh:', error.config?.url);
       originalRequest._retry = true;
 
       try {
-        // Try to get a fresh token
-        const newToken = await getIdToken(true); // Force refresh
+        const newToken = await getIdToken(true);
         if (newToken) {
-          console.log('[API Client] Token refreshed, retrying request');
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return apiClient(originalRequest);
         }
-      } catch (refreshError) {
-        console.error('[API Client] Token refresh failed:', refreshError);
-        // Don't auto-redirect - let the component handle it
-        // The dashboard layout will redirect if user is null
+      } catch {
+        // Let the dashboard layout handle the redirect if user is null
       }
     }
 
