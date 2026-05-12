@@ -9,6 +9,7 @@ import {
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
+  DragMoveEvent,
   DragOverlay,
   PointerSensor,
   TouchSensor,
@@ -45,6 +46,11 @@ interface BoardKanbanViewProps {
   boardId: string;
 }
 
+const EDGE_ZONE = 80;   // px from board edge where scroll activates
+const BASE_SPEED = 6;   // px/frame on entry
+const ACCEL = 12;       // extra px/frame per second held in edge zone
+const MAX_SPEED = 30;   // hard cap
+
 export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -55,6 +61,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const boardRef = useRef<HTMLDivElement>(null);
   const scrollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pointerXRef = useRef(0);
+  const dragStartXRef = useRef(0);
   const edgeEntryTimeRef = useRef<number | null>(null);
 
   const queryClient = useQueryClient();
@@ -72,75 +79,49 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const updateColumn = useUpdateColumn();
   const deleteColumn = useDeleteColumn();
 
-  // Track pointer position globally during drag
+  // Called from both onDragMove and the hold-interval
+  const scrollBoardIfNeeded = useCallback((pointerX: number) => {
+    const board = boardRef.current;
+    if (!board || pointerX === 0) return;
+
+    const rect = board.getBoundingClientRect();
+    const distFromLeft = pointerX - rect.left;
+    const distFromRight = rect.right - pointerX;
+
+    const inLeft = distFromLeft > 0 && distFromLeft < EDGE_ZONE;
+    const inRight = distFromRight > 0 && distFromRight < EDGE_ZONE;
+
+    if (!inLeft && !inRight) {
+      edgeEntryTimeRef.current = null;
+      return;
+    }
+
+    if (!edgeEntryTimeRef.current) edgeEntryTimeRef.current = Date.now();
+    const secondsHeld = (Date.now() - edgeEntryTimeRef.current) / 1000;
+    const accelBoost = Math.min(secondsHeld * ACCEL, MAX_SPEED - BASE_SPEED);
+
+    if (inLeft) {
+      const speed = Math.ceil((1 - distFromLeft / EDGE_ZONE) * (BASE_SPEED + accelBoost));
+      board.scrollLeft -= Math.min(speed, MAX_SPEED);
+    } else {
+      const speed = Math.ceil((1 - distFromRight / EDGE_ZONE) * (BASE_SPEED + accelBoost));
+      board.scrollLeft += Math.min(speed, MAX_SPEED);
+    }
+  }, []);
+
+  // Interval keeps scrolling while pointer is stationary at the edge
   useEffect(() => {
-    if (!activeId) return;
-
-    const onTouchMove = (e: TouchEvent) => {
-      pointerXRef.current = e.touches[0].clientX;
-    };
-    const onMouseMove = (e: MouseEvent) => {
-      pointerXRef.current = e.clientX;
-    };
-
-    window.addEventListener('touchmove', onTouchMove, { passive: true });
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
-
-    return () => {
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('mousemove', onMouseMove);
-    };
-  }, [activeId]);
-
-  // Controlled auto-scroll: proportional speed based on distance to edge
-  useEffect(() => {
-    if (!activeId || !boardRef.current) {
+    if (!activeId) {
       if (scrollIntervalRef.current) {
         clearInterval(scrollIntervalRef.current);
         scrollIntervalRef.current = null;
       }
+      edgeEntryTimeRef.current = null;
       return;
     }
 
-    const EDGE_ZONE = 80;   // px from edge where scroll activates
-    const BASE_SPEED = 4;   // px/frame when first entering the edge zone
-    const ACCEL = 10;       // extra px/frame added per second held in edge zone
-    const MAX_SPEED = 32;   // hard cap so it never becomes uncontrollable
-
     scrollIntervalRef.current = setInterval(() => {
-      const board = boardRef.current;
-      if (!board) return;
-
-      const rect = board.getBoundingClientRect();
-      const x = pointerXRef.current;
-      const distFromLeft = x - rect.left;
-      const distFromRight = rect.right - x;
-
-      const inLeft = distFromLeft < EDGE_ZONE && distFromLeft > 0;
-      const inRight = distFromRight < EDGE_ZONE && distFromRight > 0;
-
-      if (!inLeft && !inRight) {
-        // Pointer left the edge zone — reset acceleration timer
-        edgeEntryTimeRef.current = null;
-        return;
-      }
-
-      // Start or keep the edge timer for progressive acceleration
-      if (!edgeEntryTimeRef.current) {
-        edgeEntryTimeRef.current = Date.now();
-      }
-      const secondsHeld = (Date.now() - edgeEntryTimeRef.current) / 1000;
-      const accelBoost = Math.min(secondsHeld * ACCEL, MAX_SPEED - BASE_SPEED);
-
-      if (inLeft) {
-        const edgeFactor = 1 - distFromLeft / EDGE_ZONE;
-        const speed = Math.ceil(edgeFactor * (BASE_SPEED + accelBoost));
-        board.scrollLeft -= Math.min(speed, MAX_SPEED);
-      } else {
-        const edgeFactor = 1 - distFromRight / EDGE_ZONE;
-        const speed = Math.ceil(edgeFactor * (BASE_SPEED + accelBoost));
-        board.scrollLeft += Math.min(speed, MAX_SPEED);
-      }
+      scrollBoardIfNeeded(pointerXRef.current);
     }, 16);
 
     return () => {
@@ -149,7 +130,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         scrollIntervalRef.current = null;
       }
     };
-  }, [activeId]);
+  }, [activeId, scrollBoardIfNeeded]);
 
   const updateOrderMutation = useMutation({
     mutationFn: ({ taskId, newOrder, newColumnId }: { taskId: string; newOrder: number; newColumnId: string }) =>
@@ -187,13 +168,12 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
     },
   });
 
-  // Sensors: longer delay + higher tolerance for comfortable mobile drag
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250,    // hold 250ms to start drag (distinguishes tap from drag)
-        tolerance: 8,  // allow 8px movement during hold without cancelling
+        delay: 250,
+        tolerance: 8,
       },
     }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -216,7 +196,25 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id as string);
+    // Record initial pointer X from the activator event
+    const ae = event.activatorEvent as TouchEvent | PointerEvent | MouseEvent;
+    if ('touches' in ae) {
+      dragStartXRef.current = (ae as TouchEvent).changedTouches?.[0]?.clientX
+        ?? (ae as TouchEvent).touches?.[0]?.clientX
+        ?? 0;
+    } else {
+      dragStartXRef.current = (ae as PointerEvent).clientX ?? 0;
+    }
+    pointerXRef.current = dragStartXRef.current;
   }, []);
+
+  const handleDragMove = useCallback((event: DragMoveEvent) => {
+    // delta.x is viewport-relative offset from the drag start position
+    const currentX = dragStartXRef.current + event.delta.x;
+    pointerXRef.current = currentX;
+    // Also scroll immediately on move (not just in the interval)
+    scrollBoardIfNeeded(currentX);
+  }, [scrollBoardIfNeeded]);
 
   const handleDragOver = useCallback((event: DragOverEvent) => {
     setOverId((event.over?.id as string) || null);
@@ -226,6 +224,9 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
     (event: DragEndEvent) => {
       setActiveId(null);
       setOverId(null);
+      pointerXRef.current = 0;
+      dragStartXRef.current = 0;
+
       const { active, over } = event;
       if (!over || active.id === over.id || !kanbanColumns) return;
 
@@ -328,19 +329,10 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   return (
     <>
       <style>{`
-        .board-scroll::-webkit-scrollbar {
-          height: 8px;
-        }
-        .board-scroll::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .board-scroll::-webkit-scrollbar-thumb {
-          background: #CBD5E1;
-          border-radius: 4px;
-        }
-        .board-scroll::-webkit-scrollbar-thumb:hover {
-          background: #94A3B8;
-        }
+        .board-scroll::-webkit-scrollbar { height: 8px; }
+        .board-scroll::-webkit-scrollbar-track { background: transparent; }
+        .board-scroll::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        .board-scroll::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
         .drag-overlay-card {
           transform: rotate(2deg) scale(1.04);
           box-shadow: 0 20px 50px rgba(0,0,0,0.22), 0 0 0 2px rgba(70,134,254,0.35);
@@ -360,8 +352,6 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           paddingBottom: 80,
           marginLeft: isMobile ? -4 : 0,
           marginRight: isMobile ? -4 : 0,
-          // Prevent browser from intercepting scroll during drag
-          WebkitOverflowScrolling: 'touch',
         }}
       >
         <DndContext
@@ -369,6 +359,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           collisionDetection={closestCenter}
           autoScroll={false}
           onDragStart={handleDragStart}
+          onDragMove={handleDragMove}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
@@ -425,7 +416,6 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
               </Box>
             ))}
 
-            {/* Add list */}
             <Box style={{ width: 272, flexShrink: 0, paddingTop: 2 }}>
               <Button
                 variant="subtle"
