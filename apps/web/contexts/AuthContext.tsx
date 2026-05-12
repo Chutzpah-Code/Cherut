@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from 'firebase/auth';
-import { subscribeToAuthChanges, getIdToken } from '@/lib/firebase/auth';
+import { subscribeToAuthChanges } from '@/lib/firebase/auth';
 
 interface UserData {
   uid: string;
@@ -58,20 +58,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserData(baseUserData);
     setBackendAuthenticated(true);
 
-    // Best-effort: sync with backend and detect admin role
+    // Best-effort: read role from Firebase custom claims (JWT — cannot be forged by client)
     try {
-      const token = await getIdToken();
-      if (!token) return;
-
-      // Detect admin role
-      const adminCheck = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/health`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      if (adminCheck.ok) {
+      const tokenResult = await firebaseUser.getIdTokenResult(true);
+      if (tokenResult.claims.role === 'admin') {
         setUserData((prev) => prev ? { ...prev, role: 'admin' } : prev);
       }
     } catch {
-      // Backend unreachable — dashboard still works via Firebase Bearer token
+      // Token unreadable — role defaults to 'user'
     }
   };
 

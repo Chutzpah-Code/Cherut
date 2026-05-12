@@ -187,6 +187,10 @@ export class AdminService {
         },
       });
 
+      // Sync role to Firebase Auth custom claims so JWT carries it
+      const auth = this.firebaseService.getAuth();
+      await auth.setCustomUserClaims(userDoc.id, { role: 'admin' });
+
       this.logger.log(`User promoted to admin: ${userDoc.id} (${email})`);
 
       return {
