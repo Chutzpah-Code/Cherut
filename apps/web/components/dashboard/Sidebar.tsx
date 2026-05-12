@@ -245,7 +245,6 @@ export default function Sidebar({ onClose }: SidebarProps) {
         }
 
         .premium-logout-btn {
-          margin: 16px;
           border-radius: 12px;
           font-weight: 600;
           transition: all 200ms ease;
@@ -471,21 +470,23 @@ export default function Sidebar({ onClose }: SidebarProps) {
               </ActionIcon>
             </Tooltip>
           ) : (
-            <Button
-              leftSection={<LogOut size={20} strokeWidth={1.5} />}
-              onClick={handleLogout}
-              variant="subtle"
-              fullWidth
-              className="premium-logout-btn"
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '15px',
-                fontWeight: 600,
-                height: '48px'
-              }}
-            >
-              Logout
-            </Button>
+            <Box px="md" pb="md">
+              <Button
+                leftSection={<LogOut size={20} strokeWidth={1.5} />}
+                onClick={handleLogout}
+                variant="subtle"
+                fullWidth
+                className="premium-logout-btn"
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  height: '48px'
+                }}
+              >
+                Logout
+              </Button>
+            </Box>
           )}
         </ScrollArea>
       </Stack>
