@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { Box, Button, Group, Center, Loader, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { Plus } from 'lucide-react';
 import {
   DndContext,
   DragEndEvent,
+  DragMoveEvent,
   DragOverEvent,
   DragStartEvent,
   DragOverlay,
@@ -16,7 +17,6 @@ import {
   useSensor,
   useSensors,
   closestCenter,
-  MeasuringStrategy,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -52,6 +52,8 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const [overId, setOverId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalOpened, setModalOpened] = useState(false);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const scrollTimerRef = useRef<number | null>(null);
 
   const queryClient = useQueryClient();
   const { data: kanbanColumns, isLoading } = useBoardKanban(boardId);
@@ -109,11 +111,50 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
     useSensor(TouchSensor, {
       activationConstraint: {
         delay: 250,
-        tolerance: 8,
+        tolerance: 12,
       },
     }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
+
+  const stopEdgeScroll = useCallback(() => {
+    if (scrollTimerRef.current !== null) {
+      window.clearInterval(scrollTimerRef.current);
+      scrollTimerRef.current = null;
+    }
+  }, []);
+
+  const handleDragMove = useCallback((event: DragMoveEvent) => {
+    const board = boardRef.current;
+    if (!board) return;
+
+    const ae = event.activatorEvent;
+    const startX = 'touches' in ae
+      ? (ae as TouchEvent).changedTouches[0].clientX
+      : (ae as MouseEvent).clientX;
+    const currentX = startX + event.delta.x;
+
+    const { left, right } = board.getBoundingClientRect();
+    const ZONE = 80;
+    const MAX_SPEED = 22;
+
+    let speed = 0;
+    if (currentX < left + ZONE) {
+      speed = -Math.round(((left + ZONE - currentX) / ZONE) * MAX_SPEED);
+    } else if (currentX > right - ZONE) {
+      speed = Math.round(((currentX - (right - ZONE)) / ZONE) * MAX_SPEED);
+    }
+
+    if (scrollTimerRef.current !== null) {
+      window.clearInterval(scrollTimerRef.current);
+      scrollTimerRef.current = null;
+    }
+    if (speed !== 0) {
+      scrollTimerRef.current = window.setInterval(() => {
+        if (boardRef.current) boardRef.current.scrollLeft += speed;
+      }, 16);
+    }
+  }, []);
 
   const findColumnOfTask = useCallback(
     (taskId: string): KanbanColumn | undefined =>
@@ -135,11 +176,13 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   }, []);
 
   const handleDragOver = useCallback((event: DragOverEvent) => {
-    setOverId((event.over?.id as string) || null);
+    const newId = (event.over?.id as string) || null;
+    setOverId(prev => prev === newId ? prev : newId);
   }, []);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
+      stopEdgeScroll();
       setActiveId(null);
       setOverId(null);
       const { active, over } = event;
@@ -189,7 +232,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         updateOrderMutation.mutate({ taskId, newOrder, newColumnId: targetCol.id });
       }
     },
-    [kanbanColumns, findColumnOfTask, updateOrderMutation]
+    [kanbanColumns, findColumnOfTask, updateOrderMutation, stopEdgeScroll]
   );
 
   const handleAddTask = useCallback(
@@ -258,6 +301,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
       `}</style>
 
       <Box
+        ref={boardRef}
         className="board-scroll"
         style={{
           overflowX: 'auto',
@@ -271,16 +315,12 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
-          autoScroll={{
-            // Built-in autoScroll, tuned for mobile: slow start, accelerates on hold
-            threshold: { x: 0.2, y: 0.2 },
-            acceleration: 15,
-            interval: 5,
-          }}
+          autoScroll={false}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
+          onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
+          onDragCancel={stopEdgeScroll}
         >
           <Group
             align="flex-start"
