@@ -54,6 +54,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const [modalOpened, setModalOpened] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
   const scrollTimerRef = useRef<number | null>(null);
+  const scrollSpeedRef = useRef(0);
 
   const queryClient = useQueryClient();
   const { data: kanbanColumns, isLoading } = useBoardKanban(boardId);
@@ -110,7 +111,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250,
+        delay: 150,
         tolerance: 12,
       },
     }),
@@ -118,12 +119,15 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   );
 
   const stopEdgeScroll = useCallback(() => {
+    scrollSpeedRef.current = 0;
     if (scrollTimerRef.current !== null) {
       window.clearInterval(scrollTimerRef.current);
       scrollTimerRef.current = null;
     }
   }, []);
 
+  // Single persistent scroll interval — started on dragStart, stopped on dragEnd.
+  // handleDragMove only updates scrollSpeedRef (no interval churn per frame).
   const handleDragMove = useCallback((event: DragMoveEvent) => {
     const board = boardRef.current;
     if (!board) return;
@@ -144,16 +148,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
     } else if (currentX > right - ZONE) {
       speed = Math.round(((currentX - (right - ZONE)) / ZONE) * MAX_SPEED);
     }
-
-    if (scrollTimerRef.current !== null) {
-      window.clearInterval(scrollTimerRef.current);
-      scrollTimerRef.current = null;
-    }
-    if (speed !== 0) {
-      scrollTimerRef.current = window.setInterval(() => {
-        if (boardRef.current) boardRef.current.scrollLeft += speed;
-      }, 16);
-    }
+    scrollSpeedRef.current = speed;
   }, []);
 
   const findColumnOfTask = useCallback(
@@ -173,6 +168,13 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id as string);
+    scrollSpeedRef.current = 0;
+    scrollTimerRef.current = window.setInterval(() => {
+      const speed = scrollSpeedRef.current;
+      if (speed !== 0 && boardRef.current) {
+        boardRef.current.scrollLeft += speed;
+      }
+    }, 16);
   }, []);
 
   const handleDragOver = useCallback((event: DragOverEvent) => {
@@ -182,9 +184,14 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
+      const savedScroll = boardRef.current?.scrollLeft ?? 0;
       stopEdgeScroll();
       setActiveId(null);
       setOverId(null);
+      // Restore scroll position after React re-renders (dropAnimation can reset it)
+      requestAnimationFrame(() => {
+        if (boardRef.current) boardRef.current.scrollLeft = savedScroll;
+      });
       const { active, over } = event;
       if (!over || active.id === over.id || !kanbanColumns) return;
 
@@ -404,12 +411,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
             </Box>
           </Group>
 
-          <DragOverlay
-            dropAnimation={{
-              duration: 180,
-              easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
-            }}
-          >
+          <DragOverlay dropAnimation={null}>
             {activeTask && (
               <div className="drag-overlay-card">
                 <KanbanCard task={activeTask} onClick={() => {}} />

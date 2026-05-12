@@ -40,8 +40,6 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
     transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)',
     opacity: isDragging ? 0 : 1,
     willChange: 'transform',
-    // 'none' lets @dnd-kit take full control of touch events on this element,
-    // preventing the browser from starting a native scroll when a drag activates
     touchAction: 'none' as const,
   };
 
