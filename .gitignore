@@ -42,6 +42,7 @@ Thumbs.db
 
 # Docs (private, not published)
 docs/
+CLAUDE.md
 
 # misc
 /.sass-cache
