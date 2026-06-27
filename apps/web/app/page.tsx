@@ -322,7 +322,7 @@ export default function Home() {
           </h1>
 
           <p className="lp-hero-sub">
-            You came from the bottom with nothing but obsession. Obsession alone burns out — it needs a method. Cherut gives it one. Introducing <strong style={{ color: TEXT, fontWeight: 700 }}>FORGE</strong>: the system that turns raw intensity into compounding results.
+            You came from the bottom with nothing but obsession. Obsession alone burns out — it needs a method. Cherut gives it one. The method is called <strong style={{ color: TEXT, fontWeight: 700 }}>ALL IN ALL THE TIME</strong>.
           </p>
 
           <div className="lp-hero-ctas">
