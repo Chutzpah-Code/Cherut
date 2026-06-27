@@ -322,7 +322,7 @@ export default function Home() {
           </h1>
 
           <p className="lp-hero-sub">
-            You didn't end up here by accident. Cherut is the operating system for people who treat their goals like obligations — not wishes. Habits. OKRs. Journal. Finances. One system. Zero excuses.
+            You came from the bottom with nothing but obsession. Obsession alone burns out — it needs a method. Cherut gives it one. Introducing <strong style={{ color: TEXT, fontWeight: 700 }}>FORGE</strong>: the system that turns raw intensity into compounding results.
           </p>
 
           <div className="lp-hero-ctas">
