@@ -15,7 +15,6 @@ import { ProfileModule } from './modules/profile/profile.module';
 import { HabitsModule } from './modules/habits/habits.module';
 import { TrackingModule } from './modules/tracking/tracking.module';
 import { TasksModule } from './modules/tasks/tasks.module';
-import { EnterpriseWaitlistModule } from './enterprise-waitlist/enterprise-waitlist.module';
 import { VisionBoardModule } from './modules/vision-board/vision-board.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { JournalModule } from './modules/journal/journal.module';
@@ -36,7 +35,6 @@ import { FinanceModule } from './modules/finance/finance.module';
     HabitsModule,
     TrackingModule,
     TasksModule,
-    EnterpriseWaitlistModule,
     VisionBoardModule,
     AdminModule,
     JournalModule,
