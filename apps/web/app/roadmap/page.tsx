@@ -19,12 +19,12 @@ const shipped = [
   { name: 'Vision Board',    desc: 'A visual canvas for the future you are building.' },
   { name: 'Values',          desc: 'Define your compass and check decisions against it.' },
   { name: 'Life Areas',      desc: 'Segment your life and balance what matters.' },
+  { name: 'Finance',         desc: 'Accounts, transactions, budgets and investments.' },
 ];
 
 const inProgress = [
   { name: 'Calendar sync',   desc: 'Two-way sync with Google Calendar.' },
   { name: 'Mobile apps',     desc: 'Native iOS and Android apps, currently in beta.' },
-  { name: 'Finances module', desc: 'Budgets, goals and net worth on the same page.' },
 ];
 
 const planned = [
