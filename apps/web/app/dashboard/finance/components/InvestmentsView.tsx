@@ -12,7 +12,7 @@ import {
   useInvestmentEntries, useCreateInvestmentEntry, useDeleteInvestmentEntry,
   useFinanceAccounts,
 } from '@/hooks/useFinance';
-import { CreateInvestmentDto, CreateInvestmentEntryDto, FinanceAccount, FinanceInvestment } from '@/lib/api/services/finance';
+import { CreateInvestmentDto, CreateInvestmentEntryDto, FinanceAccount, FinanceInvestment, InvestmentType } from '@/lib/api/services/finance';
 
 function fmt(value: number, currency?: string) {
   try {
@@ -249,7 +249,7 @@ function InvestmentCard({ inv, accounts, onDelete }: { inv: FinanceInvestment; a
             label="Type"
             data={Object.entries(TYPE_LABELS).map(([v, l]) => ({ value: v, label: l }))}
             value={editForm.type}
-            onChange={(v) => setEditForm((f) => ({ ...f, type: v ?? f.type }))}
+            onChange={(v) => setEditForm((f) => ({ ...f, type: (v ?? f.type) as InvestmentType }))}
           />
           <TextInput
             label="Ticker (optional)"
