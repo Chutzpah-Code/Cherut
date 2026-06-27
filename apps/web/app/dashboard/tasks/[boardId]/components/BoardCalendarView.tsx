@@ -3,7 +3,8 @@
 import { useMemo, useCallback } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin, { EventDropArg } from '@fullcalendar/interaction';
+import interactionPlugin from '@fullcalendar/interaction';
+import type { EventDropArg } from '@fullcalendar/core';
 import { Box, Center, Loader, Text } from '@mantine/core';
 import { useBoardKanban } from '@/hooks/useBoards';
 import { useUpdateTask } from '@/hooks/useTasks';
