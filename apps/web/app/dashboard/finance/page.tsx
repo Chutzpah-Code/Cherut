@@ -2,13 +2,14 @@
 
 import { useState, useMemo } from 'react';
 import {
-  Stack, Group, Title, Text, Box, SimpleGrid, Card, Badge,
+  Stack, Group, Title, Text, Box, SimpleGrid, Card, Badge, Grid,
   Button, Loader, Center, UnstyledButton, Modal,
   TextInput, Select, NumberInput, ActionIcon,
 } from '@mantine/core';
+import { PieChart, Pie, Cell } from 'recharts';
 import { useDisclosure } from '@mantine/hooks';
 import {
-  TrendingUp, TrendingDown, Wallet, Plus, Trash2, Pencil,
+  TrendingUp, Wallet, Plus, Trash2, Pencil, Check, X,
   ArrowUpCircle, ArrowDownCircle,
 } from 'lucide-react';
 import {
@@ -22,6 +23,9 @@ import {
   useUpdateTransaction,
   useDeleteTransaction,
   useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+  useFinanceInvestments,
 } from '@/hooks/useFinance';
 import { CreateAccountDto, CreateTransactionDto, CreateCategoryDto, FinanceTransaction, FinanceAccount } from '@/lib/api/services/finance';
 import { RecurringView } from './components/RecurringView';
@@ -94,10 +98,340 @@ function TabBar({ current, onChange }: { current: FinanceView; onChange: (v: Fin
 
 // ─── Overview ─────────────────────────────────────────────────────────────────
 
-function OverviewView() {
-  const { data, isLoading } = useFinanceOverview();
+const CARD_LABEL: React.CSSProperties = {
+  fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
+  textTransform: 'uppercase', color: '#64748B',
+};
+
+
+function IconBox({ bg, children }: { bg: string; children: React.ReactNode }) {
+  return (
+    <Box style={{
+      width: 34, height: 34, borderRadius: 8, background: bg,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+    }}>
+      {children}
+    </Box>
+  );
+}
+
+
+function HeroBalanceCard({
+  totalConverted, displayCurrency, balanceByCurrency, availableCurrencies, onCurrencyChange,
+}: {
+  totalConverted: number;
+  displayCurrency: string;
+  balanceByCurrency: Record<string, number>;
+  availableCurrencies: string[];
+  onCurrencyChange: (c: string) => void;
+}) {
+  const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const breakdown = Object.entries(balanceByCurrency);
+
+  return (
+    <Box style={{
+      background: 'linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 100%)',
+      border: '1px solid #DBEAFE', borderLeft: '3px solid #0052CC',
+      borderRadius: 12, padding: '24px 28px', height: '100%', minHeight: 160,
+    }}>
+      <Group justify="space-between" mb={8}>
+        <Group gap={10}>
+          <IconBox bg="#DBEAFE"><Wallet size={16} color="#0052CC" /></IconBox>
+          <Box>
+            <Text style={CARD_LABEL}>Consolidated Total</Text>
+            <Text style={{ fontSize: 10, color: '#94A3B8' }}>All accounts converted to</Text>
+          </Box>
+        </Group>
+        <Select
+          data={availableCurrencies}
+          value={displayCurrency}
+          onChange={(v) => v && onCurrencyChange(v)}
+          size="xs"
+          w={80}
+          comboboxProps={{ withinPortal: true }}
+          styles={{ input: { fontSize: 12, fontWeight: 600, color: '#0052CC', border: '1px solid #DBEAFE', background: '#EFF6FF' } }}
+        />
+      </Group>
+
+      <Text style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-0.03em', color: '#0F172A', lineHeight: 1, marginBottom: 16 }}>
+        {fmt(totalConverted, displayCurrency)}
+      </Text>
+
+      {breakdown.length > 0 && (
+        <Box style={{ borderTop: '1px solid #DBEAFE', paddingTop: 12 }}>
+          <Text style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#94A3B8', marginBottom: 8 }}>
+            Original balance per currency
+          </Text>
+          <Stack gap={4}>
+            {breakdown.map(([cur, val]) => {
+              const isNeg = val < 0;
+              return (
+                <Group key={cur} justify="space-between">
+                  <Text style={{ fontSize: 12, color: '#64748B', fontWeight: 500 }}>{cur}</Text>
+                  <Text style={{ fontSize: 12, fontWeight: 600, color: isNeg ? '#c62828' : '#334155' }}>
+                    {fmt(val, cur)}
+                  </Text>
+                </Group>
+              );
+            })}
+          </Stack>
+        </Box>
+      )}
+
+      <Text style={{ fontSize: 11, color: '#94A3B8', letterSpacing: '0.02em', marginTop: 12 }}>
+        as of {today}
+      </Text>
+    </Box>
+  );
+}
+
+type DonutPeriod = 'today' | 'week' | 'month';
+
+const PERIOD_LABELS: Record<DonutPeriod, string> = {
+  today: 'Today',
+  week: 'This Week',
+  month: 'This Month',
+};
+
+function getPeriodDates(period: DonutPeriod): { startDate?: string; endDate?: string } {
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  if (period === 'today') return { startDate: today, endDate: today };
+  if (period === 'week') {
+    const mon = new Date(now);
+    mon.setDate(now.getDate() - ((now.getDay() + 6) % 7)); // Monday
+    return { startDate: mon.toISOString().slice(0, 10), endDate: today };
+  }
+  return {};
+}
+
+function DonutCard({ displayCurrency }: { displayCurrency: string }) {
+  const [period, setPeriod] = useState<DonutPeriod>('month');
+  const { startDate, endDate } = getPeriodDates(period);
+  const { data, isFetching } = useFinanceOverview(undefined, displayCurrency, startDate, endDate);
+
+  const totalIncome = data?.totalIncomeConverted ?? 0;
+  const totalExpenses = data?.totalExpensesConverted ?? 0;
+  const net = totalIncome - totalExpenses;
+  const hasData = totalIncome > 0 || totalExpenses > 0;
+
+  const slices = hasData
+    ? ([
+        totalIncome > 0 ? { name: 'Income', value: totalIncome } : null,
+        totalExpenses > 0 ? { name: 'Expenses', value: totalExpenses } : null,
+      ].filter(Boolean) as { name: string; value: number }[])
+    : [{ name: 'Empty', value: 1 }];
+
+  const SLICE_COLORS = hasData ? ['#2e7d32', '#c62828'] : ['#E2E8F0'];
+
+  return (
+    <Box style={{
+      border: '1px solid #E2E8F0', borderRadius: 12,
+      padding: '24px 28px', background: '#fff', height: '100%',
+    }}>
+      <Group justify="space-between" mb={16}>
+        <Text style={CARD_LABEL}>{PERIOD_LABELS[period]} · {displayCurrency}</Text>
+        <Group gap={2}>
+          {(['today', 'week', 'month'] as DonutPeriod[]).map((p) => (
+            <UnstyledButton
+              key={p}
+              onClick={() => setPeriod(p)}
+              style={{
+                fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 4,
+                color: period === p ? '#0052CC' : '#94A3B8',
+                background: period === p ? '#EFF6FF' : 'transparent',
+                transition: 'all 0.15s',
+              }}
+            >
+              {p === 'today' ? 'Today' : p === 'week' ? 'Week' : 'Month'}
+            </UnstyledButton>
+          ))}
+        </Group>
+      </Group>
+
+      <Box style={{ display: 'flex', justifyContent: 'center', position: 'relative', marginBottom: 16, opacity: isFetching ? 0.5 : 1, transition: 'opacity 0.2s' }}>
+        <PieChart width={156} height={156}>
+          <Pie data={slices} cx={74} cy={74} innerRadius={50} outerRadius={74}
+            dataKey="value" strokeWidth={0} startAngle={90} endAngle={-270}>
+            {slices.map((_, i) => <Cell key={i} fill={SLICE_COLORS[i % SLICE_COLORS.length]} />)}
+          </Pie>
+        </PieChart>
+        <Box style={{
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none',
+        }}>
+          <Text style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em', textTransform: 'uppercase' }}>net</Text>
+          <Text style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.2, color: !hasData ? '#94A3B8' : net >= 0 ? '#2e7d32' : '#c62828' }}>
+            {hasData ? `${net >= 0 ? '+' : ''}${fmt(net, displayCurrency)}` : '—'}
+          </Text>
+        </Box>
+      </Box>
+
+      {hasData ? (
+        <Stack gap={8}>
+          {[
+            { label: 'Income', value: totalIncome, color: '#2e7d32', sign: '+' },
+            { label: 'Expenses', value: totalExpenses, color: '#c62828', sign: '-' },
+          ].filter(r => r.value > 0).map(row => (
+            <Group key={row.label} justify="space-between">
+              <Group gap={6}>
+                <Box style={{ width: 8, height: 8, borderRadius: 2, background: row.color, flexShrink: 0 }} />
+                <Text style={{ fontSize: 12, color: '#64748B' }}>{row.label}</Text>
+              </Group>
+              <Text style={{ fontSize: 13, fontWeight: 600, color: row.color }}>
+                {row.sign}{fmt(row.value, displayCurrency)}
+              </Text>
+            </Group>
+          ))}
+        </Stack>
+      ) : (
+        <Text style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center' }}>No transactions</Text>
+      )}
+    </Box>
+  );
+}
+
+function RecentTxList({ transactions, accountMap, categoryMap, onViewAll }: {
+  transactions: (FinanceTransaction & { accountName: string })[];
+  accountMap: Record<string, FinanceAccount>;
+  categoryMap: Record<string, any>;
+  onViewAll: () => void;
+}) {
+  return (
+    <Box style={{ border: '1px solid #E2E8F0', borderRadius: 12, overflow: 'hidden', background: '#fff' }}>
+      <Group justify="space-between" style={{ padding: '14px 20px', borderBottom: '1px solid #F1F5F9' }}>
+        <Text style={CARD_LABEL}>Recent Transactions</Text>
+        <UnstyledButton onClick={onViewAll} style={{ fontSize: 12, color: '#0052CC', fontWeight: 500 }}>
+          View all →
+        </UnstyledButton>
+      </Group>
+
+      {transactions.length === 0 ? (
+        <Center py="xl"><Text style={{ fontSize: 13, color: '#94A3B8' }}>No transactions this month</Text></Center>
+      ) : (
+        transactions.map((tx, i) => {
+          const isIncome = tx.type === 'income';
+          const currency = accountMap[tx.accountId]?.currency;
+          const categoryName = categoryMap[tx.categoryId]?.name;
+          return (
+            <Group key={tx.id} justify="space-between" style={{
+              padding: '11px 20px',
+              borderBottom: i < transactions.length - 1 ? '1px solid #F8FAFC' : 'none',
+            }}>
+              <Group gap="sm">
+                <Box style={{
+                  width: 30, height: 30, borderRadius: 7, flexShrink: 0,
+                  background: isIncome ? '#F0FDF4' : '#FEF2F2',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {isIncome
+                    ? <ArrowUpCircle size={15} color="#2e7d32" />
+                    : <ArrowDownCircle size={15} color="#c62828" />}
+                </Box>
+                <Box>
+                  <Text style={{ fontSize: 13, fontWeight: 500, color: '#0F172A', lineHeight: 1.3 }}>
+                    {tx.description || categoryName || tx.type}
+                  </Text>
+                  <Group gap={4}>
+                    {tx.accountName && (
+                      <Badge size="xs" variant="light" color="blue" style={{ fontWeight: 500, textTransform: 'none' }}>
+                        {tx.accountName}
+                      </Badge>
+                    )}
+                    <Text style={{ fontSize: 11, color: '#94A3B8' }}>
+                      {categoryName ? `${categoryName} · ` : ''}{tx.date}
+                    </Text>
+                  </Group>
+                </Box>
+              </Group>
+              <Text style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: isIncome ? '#2e7d32' : '#c62828' }}>
+                {isIncome ? '+' : '-'}{fmt(tx.amount, currency)}
+              </Text>
+            </Group>
+          );
+        })
+      )}
+    </Box>
+  );
+}
+
+function InvestmentsPanel({ onViewAll }: { onViewAll: () => void }) {
+  const { data: investments = [] } = useFinanceInvestments();
+  const sorted = [...(investments as any[])].sort((a, b) => b.totalContributed - a.totalContributed).slice(0, 5);
+
+  const totalByCurrency: Record<string, number> = {};
+  for (const inv of investments as any[]) {
+    const cur = inv.currency ?? 'USD';
+    totalByCurrency[cur] = (totalByCurrency[cur] ?? 0) + (inv.totalContributed ?? 0);
+  }
+  const totalEntries = Object.entries(totalByCurrency);
+
+  return (
+    <Box style={{
+      border: '1px solid #E2E8F0', borderLeft: '3px solid #0052CC',
+      borderRadius: 12, overflow: 'hidden', background: '#fff',
+    }}>
+      <Group justify="space-between" style={{ padding: '14px 20px', borderBottom: '1px solid #F1F5F9' }}>
+        <Group gap={8}>
+          <IconBox bg="#EFF6FF"><TrendingUp size={14} color="#0052CC" /></IconBox>
+          <Text style={CARD_LABEL}>Portfolio</Text>
+        </Group>
+        <UnstyledButton onClick={onViewAll} style={{ fontSize: 12, color: '#0052CC', fontWeight: 500 }}>
+          View all →
+        </UnstyledButton>
+      </Group>
+
+      <Box style={{ padding: '16px 20px' }}>
+        <Text style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>
+          Total Contributed
+        </Text>
+        {totalEntries.length === 0
+          ? <Text style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', color: '#94A3B8', marginBottom: 16 }}>—</Text>
+          : totalEntries.map(([cur, val]) => (
+            <Text key={cur} style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', color: '#0052CC', marginBottom: 4 }}>
+              {fmt(val, cur)}
+            </Text>
+          ))}
+
+        {sorted.length === 0 ? (
+          <Text style={{ fontSize: 13, color: '#94A3B8', marginTop: 12 }}>No investments yet</Text>
+        ) : (
+          <Stack gap={10} mt={16}>
+            {sorted.map((inv) => (
+              <Group key={inv.id} justify="space-between">
+                <Group gap={8}>
+                  <Box style={{ width: 6, height: 6, borderRadius: '50%', background: '#0052CC', flexShrink: 0, marginTop: 1 }} />
+                  <Box>
+                    <Text style={{ fontSize: 13, fontWeight: 500, color: '#334155', lineHeight: 1.2 }}>{inv.name}</Text>
+                    {inv.ticker && <Text style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.04em' }}>{inv.ticker}</Text>}
+                  </Box>
+                </Group>
+                <Text style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', flexShrink: 0 }}>
+                  {fmt(inv.totalContributed ?? 0, inv.currency)}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
+        )}
+      </Box>
+    </Box>
+  );
+}
+
+function OverviewView({ onNavigate }: { onNavigate: (v: FinanceView) => void }) {
+  const [displayCurrency, setDisplayCurrency] = useState<string>(() => {
+    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
+  });
+
+  const handleCurrencyChange = (cur: string) => {
+    setDisplayCurrency(cur);
+    try { localStorage.setItem('finance_display_currency', cur); } catch {}
+  };
+
+  const { data, isLoading } = useFinanceOverview(undefined, displayCurrency);
   const { data: accounts = [] } = useFinanceAccounts();
   const { data: categories = [] } = useFinanceCategories();
+
   const accountMap = useMemo(
     () => Object.fromEntries((accounts as FinanceAccount[]).map((a) => [a.id, a])),
     [accounts],
@@ -107,51 +441,47 @@ function OverviewView() {
     [categories],
   );
 
+  const availableCurrencies = data ? Object.keys(data.balanceByCurrency) : [];
+
+  // If saved currency is no longer in accounts, fall back to first available
+  if (data && availableCurrencies.length > 0 && !availableCurrencies.includes(displayCurrency)) {
+    handleCurrencyChange(availableCurrencies[0]);
+  }
+
   if (isLoading) return <Center py="xl"><Loader size="sm" color="#4686FE" /></Center>;
   if (!data) return null;
 
   return (
-    <Stack gap="lg">
-      <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-        <SummaryCard label="Total Balance" value={data.totalBalance} color="#0052CC" icon={<Wallet size={20} />} />
-        <SummaryCard label="Income" value={data.income} color="#2e7d32" icon={<TrendingUp size={20} />} />
-        <SummaryCard label="Expenses" value={data.expenses} color="#c62828" icon={<TrendingDown size={20} />} />
-      </SimpleGrid>
+    <Stack gap="md" style={{ overflow: 'hidden' }}>
+      <Grid gutter="md">
+        <Grid.Col span={{ base: 12, sm: 7 }}>
+          <HeroBalanceCard
+            totalConverted={data.totalBalanceConverted}
+            displayCurrency={displayCurrency}
+            balanceByCurrency={data.balanceByCurrency}
+            availableCurrencies={availableCurrencies}
+            onCurrencyChange={handleCurrencyChange}
+          />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 5 }}>
+          <DonutCard displayCurrency={displayCurrency} />
+        </Grid.Col>
+      </Grid>
 
-      {data.recentTransactions.length > 0 && (
-        <Box>
-          <Text fw={600} size="sm" mb="sm" c="dimmed">Recent Transactions</Text>
-          <Stack gap="xs">
-            {data.recentTransactions.map((tx) => (
-              <TransactionRow
-                key={tx.id}
-                tx={tx}
-                currency={accountMap[tx.accountId]?.currency}
-                categoryName={categoryMap[tx.categoryId]?.name}
-              />
-            ))}
-          </Stack>
-        </Box>
-      )}
-
-      {data.recentTransactions.length === 0 && (
-        <Center py="xl">
-          <Text c="dimmed" size="sm">No transactions this month. Add your first one.</Text>
-        </Center>
-      )}
+      <Grid gutter="md">
+        <Grid.Col span={{ base: 12, sm: 7 }}>
+          <RecentTxList
+            transactions={data.recentTransactions}
+            accountMap={accountMap}
+            categoryMap={categoryMap}
+            onViewAll={() => onNavigate('transactions')}
+          />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 5 }}>
+          <InvestmentsPanel onViewAll={() => onNavigate('investments')} />
+        </Grid.Col>
+      </Grid>
     </Stack>
-  );
-}
-
-function SummaryCard({ label, value, color, icon }: { label: string; value: number; color: string; icon: React.ReactNode }) {
-  return (
-    <Card withBorder radius="md" p="md">
-      <Group gap="sm" mb="xs">
-        <Box style={{ color }}>{icon}</Box>
-        <Text size="sm" c="dimmed" fw={500}>{label}</Text>
-      </Group>
-      <Text size="xl" fw={700} style={{ color, letterSpacing: '-0.02em' }}>{fmt(value)}</Text>
-    </Card>
   );
 }
 
@@ -441,12 +771,17 @@ function AccountsView() {
   const [opened, { open, close }] = useDisclosure();
   const [catOpened, { open: openCat, close: closeCat }] = useDisclosure();
   const { data: accounts = [], isLoading } = useFinanceAccounts();
+  const { data: categories = [] } = useFinanceCategories();
   const createAccount = useCreateAccount();
   const deleteAccount = useDeleteAccount();
   const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
+  const deleteCategory = useDeleteCategory();
 
   const [form, setForm] = useState<Partial<CreateAccountDto>>({ type: 'checking', currency: 'USD', balance: 0 });
   const [catForm, setCatForm] = useState<Partial<CreateCategoryDto>>({ type: 'expense' });
+  const [editingCatId, setEditingCatId] = useState<string | null>(null);
+  const [editingCatName, setEditingCatName] = useState('');
 
   const handleCreate = () => {
     if (!form.name || !form.type) return;
@@ -455,29 +790,35 @@ function AccountsView() {
 
   const handleCreateCategory = () => {
     if (!catForm.name || !catForm.type) return;
-    createCategory.mutate(catForm as CreateCategoryDto, { onSuccess: closeCat });
+    createCategory.mutate(catForm as CreateCategoryDto, { onSuccess: () => { closeCat(); setCatForm({ type: 'expense' }); } });
+  };
+
+  const startEditCat = (cat: any) => {
+    setEditingCatId(cat.id);
+    setEditingCatName(cat.name);
+  };
+
+  const saveEditCat = (id: string) => {
+    if (!editingCatName.trim()) return;
+    updateCategory.mutate({ id, dto: { name: editingCatName.trim() } }, { onSuccess: () => setEditingCatId(null) });
   };
 
   if (isLoading) return <Center py="xl"><Loader size="sm" color="#4686FE" /></Center>;
 
   return (
     <>
+      {/* ── Accounts ── */}
       <Group justify="space-between" mb="md">
         <Text fw={600} size="sm" c="dimmed">Accounts</Text>
-        <Group gap="xs">
-          <Button size="xs" variant="subtle" onClick={openCat} leftSection={<Plus size={14} />}>
-            Category
-          </Button>
-          <Button size="xs" leftSection={<Plus size={14} />} onClick={open} style={{ backgroundColor: '#0052CC' }}>
-            Account
-          </Button>
-        </Group>
+        <Button size="xs" leftSection={<Plus size={14} />} onClick={open} style={{ backgroundColor: '#0052CC' }}>
+          Add Account
+        </Button>
       </Group>
 
       {accounts.length === 0 ? (
         <Center py="xl"><Text c="dimmed" size="sm">No accounts yet. Create your first one.</Text></Center>
       ) : (
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md" mb="xl">
           {accounts.map((acc: any) => (
             <Card key={acc.id} withBorder radius="md" p="md">
               <Group justify="space-between">
@@ -497,6 +838,63 @@ function AccountsView() {
             </Card>
           ))}
         </SimpleGrid>
+      )}
+
+      {/* ── Categories ── */}
+      <Group justify="space-between" mb="sm">
+        <Text fw={600} size="sm" c="dimmed">Categories</Text>
+        <Button size="xs" leftSection={<Plus size={14} />} onClick={openCat} variant="subtle">
+          Add Category
+        </Button>
+      </Group>
+
+      {categories.length === 0 ? (
+        <Center py="xl"><Text c="dimmed" size="sm">No categories yet.</Text></Center>
+      ) : (
+        <Stack gap="xs">
+          {(categories as any[]).map((cat) => (
+            <Group key={cat.id} justify="space-between" p="sm" style={{ borderRadius: 8, background: '#f8fafc', border: '1px solid #E2E8F0' }}>
+              {editingCatId === cat.id ? (
+                <TextInput
+                  value={editingCatName}
+                  onChange={(e) => setEditingCatName(e.target.value)}
+                  size="xs"
+                  style={{ flex: 1 }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') saveEditCat(cat.id); if (e.key === 'Escape') setEditingCatId(null); }}
+                  autoFocus
+                />
+              ) : (
+                <Group gap="sm" style={{ flex: 1 }}>
+                  <Text size="sm" fw={500}>{cat.name}</Text>
+                  <Badge size="xs" variant="light" color={cat.type === 'income' ? 'green' : 'red'}>
+                    {cat.type}
+                  </Badge>
+                </Group>
+              )}
+              <Group gap={4}>
+                {editingCatId === cat.id ? (
+                  <>
+                    <ActionIcon size="sm" color="green" onClick={() => saveEditCat(cat.id)} loading={updateCategory.isPending}>
+                      <Check size={12} />
+                    </ActionIcon>
+                    <ActionIcon size="sm" variant="subtle" color="gray" onClick={() => setEditingCatId(null)}>
+                      <X size={12} />
+                    </ActionIcon>
+                  </>
+                ) : (
+                  <>
+                    <ActionIcon size="sm" variant="subtle" color="blue" onClick={() => startEditCat(cat)}>
+                      <Pencil size={12} />
+                    </ActionIcon>
+                    <ActionIcon size="sm" variant="subtle" color="red" onClick={() => deleteCategory.mutate(cat.id)}>
+                      <Trash2 size={12} />
+                    </ActionIcon>
+                  </>
+                )}
+              </Group>
+            </Group>
+          ))}
+        </Stack>
       )}
 
       {/* Create account modal */}
@@ -560,7 +958,7 @@ export default function FinancePage() {
   const [view, setView] = useState<FinanceView>('overview');
 
   return (
-    <Stack gap={0} style={{ height: '100%' }}>
+    <Stack gap={0}>
       <Group mb="sm">
         <Title
           order={1}
@@ -577,8 +975,8 @@ export default function FinancePage() {
 
       <TabBar current={view} onChange={setView} />
 
-      <Box style={{ overflowY: 'auto', flex: 1 }}>
-        {view === 'overview' && <OverviewView />}
+      <Box style={{ overflowX: 'hidden', paddingBottom: 24 }}>
+        {view === 'overview' && <OverviewView onNavigate={setView} />}
         {view === 'transactions' && <TransactionsView />}
         {view === 'accounts' && <AccountsView />}
         {view === 'recurring' && <RecurringView />}

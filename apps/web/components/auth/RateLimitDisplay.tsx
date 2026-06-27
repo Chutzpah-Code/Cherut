@@ -79,21 +79,11 @@ export function RateLimitDisplay({
       // Show progress of lockout time
       const totalLockoutTime = result.lockoutLevel === 1 ? 120 : 600; // 2 min or 10 min
       const progress = ((totalLockoutTime - timeRemaining) / totalLockoutTime) * 100;
-      console.log('[Progress] Lockout:', { totalLockoutTime, timeRemaining, progress });
       return progress;
     }
 
-    // Calculate max attempts dynamically
     const maxAttempts = result.attemptsRemaining + result.totalAttempts;
     const progress = maxAttempts > 0 ? (result.attemptsRemaining / maxAttempts) * 100 : 0;
-
-    console.log('[Progress] Attempts:', {
-      maxAttempts,
-      attemptsRemaining: result.attemptsRemaining,
-      totalAttempts: result.totalAttempts,
-      progress
-    });
-
     return progress;
   };
 

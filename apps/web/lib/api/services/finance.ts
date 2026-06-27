@@ -83,6 +83,7 @@ export interface FinanceInvestment {
   currency: string;
   totalContributed: number;
   notes?: string;
+  accountId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -99,12 +100,15 @@ export interface FinanceInvestmentEntry {
 }
 
 export interface FinanceOverview {
-  totalBalance: number;
-  income: number;
-  expenses: number;
-  net: number;
+  displayCurrency: string;
+  totalBalanceConverted: number;
+  totalIncomeConverted: number;
+  totalExpensesConverted: number;
+  balanceByCurrency: Record<string, number>;
+  incomeByCurrency: Record<string, number>;
+  expensesByCurrency: Record<string, number>;
   month: string;
-  recentTransactions: FinanceTransaction[];
+  recentTransactions: (FinanceTransaction & { accountName: string })[];
 }
 
 export type CreateAccountDto = Pick<FinanceAccount, 'name' | 'type'> & { balance?: number; currency?: string; color?: string };
@@ -122,14 +126,19 @@ export type UpdateRecurringDto = Partial<CreateRecurringDto> & { isActive?: bool
 export type CreateBudgetDto = Pick<FinanceBudget, 'categoryId' | 'amount' | 'month'>;
 export type UpdateBudgetDto = Partial<CreateBudgetDto>;
 
-export type CreateInvestmentDto = Pick<FinanceInvestment, 'name' | 'type'> & { ticker?: string; currency?: string; notes?: string };
+export type CreateInvestmentDto = Pick<FinanceInvestment, 'name' | 'type'> & { ticker?: string; currency?: string; notes?: string; accountId: string };
 export type UpdateInvestmentDto = Partial<CreateInvestmentDto>;
 
 export type CreateInvestmentEntryDto = Pick<FinanceInvestmentEntry, 'investmentId' | 'amount' | 'date'> & { notes?: string };
 
 export const financeApi = {
-  getOverview: async (month?: string): Promise<FinanceOverview> => {
-    const { data } = await apiClient.get('/finance/overview', { params: month ? { month } : {} });
+  getOverview: async (month?: string, displayCurrency?: string, startDate?: string, endDate?: string): Promise<FinanceOverview> => {
+    const params: any = {};
+    if (month) params.month = month;
+    if (displayCurrency) params.displayCurrency = displayCurrency;
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    const { data } = await apiClient.get('/finance/overview', { params });
     return data;
   },
 

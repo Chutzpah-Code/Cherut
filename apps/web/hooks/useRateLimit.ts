@@ -71,7 +71,6 @@ export function useRateLimit({
   // Record a failed attempt
   const recordFailure = useCallback((): RateLimitResult => {
     const currentResult = rateLimiter.recordFailure();
-    console.log('[useRateLimit] recordFailure result:', currentResult);
     setResult(currentResult);
     setTimeRemaining(currentResult.lockoutTimeRemaining);
     return currentResult;
@@ -111,8 +110,6 @@ export function useRateLimit({
       setTimeRemaining((prev) => {
         const newTime = Math.max(0, prev - 1);
         if (newTime === 0) {
-          // When timer reaches zero, refresh the page to ensure clean state
-          console.log('⏰ [useRateLimit] Timer reached zero - refreshing page');
           setTimeout(() => {
             window.location.reload();
           }, 500);

@@ -27,4 +27,8 @@ export class CreateInvestmentDto {
   @IsString()
   @IsOptional()
   notes?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  accountId: string;
 }

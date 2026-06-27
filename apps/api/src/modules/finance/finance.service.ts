@@ -20,6 +20,33 @@ import {
 export class FinanceService {
   private readonly logger = new Logger(FinanceService.name);
   private readonly ACCOUNTS = 'finance_accounts';
+
+  // Exchange rate cache: base=USD, refreshed every 24h
+  private rateCache: { rates: Record<string, number>; expiresAt: number } | null = null;
+
+  private async getExchangeRates(): Promise<Record<string, number>> {
+    if (this.rateCache && Date.now() < this.rateCache.expiresAt) {
+      return this.rateCache.rates;
+    }
+    try {
+      const res = await fetch('https://api.frankfurter.app/latest?base=USD');
+      const data: any = await res.json();
+      const rates: Record<string, number> = { USD: 1, ...data.rates };
+      this.rateCache = { rates, expiresAt: Date.now() + 24 * 60 * 60 * 1000 };
+      return rates;
+    } catch (e) {
+      this.logger.warn(`Exchange rate fetch failed: ${e}`);
+      return this.rateCache?.rates ?? { USD: 1 };
+    }
+  }
+
+  private toDisplay(amount: number, from: string, to: string, rates: Record<string, number>): number {
+    if (from === to) return amount;
+    const fromRate = rates[from] ?? 1;
+    const toRate = rates[to] ?? 1;
+    // amount (in `from`) → USD → `to`
+    return (amount / fromRate) * toRate;
+  }
   private readonly CATEGORIES = 'finance_categories';
   private readonly TRANSACTIONS = 'finance_transactions';
   private readonly RECURRING = 'finance_recurring';
@@ -297,17 +324,41 @@ export class FinanceService {
 
   async createInvestmentEntry(userId: string, dto: CreateInvestmentEntryDto) {
     await this.assertOwner(this.INVESTMENTS, dto.investmentId, userId);
-    const data = { ...dto, userId, createdAt: this.now(), updatedAt: this.now() };
-    const ref = await this.db.collection(this.INVESTMENT_ENTRIES).add(data);
 
-    // Update totalContributed on the investment
-    const inv: any = await this.assertOwner(this.INVESTMENTS, dto.investmentId, userId);
-    await this.db.collection(this.INVESTMENTS).doc(dto.investmentId).update({
-      totalContributed: (inv.totalContributed ?? 0) + dto.amount,
+    const amount = Number(dto.amount);
+    if (!isFinite(amount) || amount <= 0) {
+      throw new Error(`Invalid amount: ${dto.amount}`);
+    }
+
+    const data = {
+      investmentId: dto.investmentId,
+      amount,
+      date: dto.date,
+      ...(dto.notes ? { notes: dto.notes } : {}),
+      userId,
+      createdAt: this.now(),
       updatedAt: this.now(),
-    });
+    };
 
-    return { id: ref.id, ...data };
+    try {
+      const ref = await this.db.collection(this.INVESTMENT_ENTRIES).add(data);
+
+      const inv: any = await this.assertOwner(this.INVESTMENTS, dto.investmentId, userId);
+      await this.db.collection(this.INVESTMENTS).doc(dto.investmentId).update({
+        totalContributed: (inv.totalContributed ?? 0) + amount,
+        updatedAt: this.now(),
+      });
+
+      // Deduct from linked account balance
+      if (inv.accountId) {
+        await this.adjustBalance(userId, inv.accountId, amount, 'expense');
+      }
+
+      return { id: ref.id, ...data };
+    } catch (e) {
+      this.logger.error(`createInvestmentEntry failed: ${e}`);
+      throw e;
+    }
   }
 
   async findInvestmentEntries(userId: string, investmentId: string) {
@@ -324,13 +375,16 @@ export class FinanceService {
     const entry: any = await this.assertOwner(this.INVESTMENT_ENTRIES, id, userId);
     await this.db.collection(this.INVESTMENT_ENTRIES).doc(id).delete();
 
-    // Reverse totalContributed
+    // Reverse totalContributed and restore account balance
     try {
       const inv: any = await this.assertOwner(this.INVESTMENTS, entry.investmentId, userId);
       await this.db.collection(this.INVESTMENTS).doc(entry.investmentId).update({
         totalContributed: Math.max(0, (inv.totalContributed ?? 0) - entry.amount),
         updatedAt: this.now(),
       });
+      if (inv.accountId) {
+        await this.adjustBalance(userId, inv.accountId, entry.amount, 'income');
+      }
     } catch { /* investment may have been deleted */ }
 
     return { message: 'Entry deleted' };
@@ -338,36 +392,75 @@ export class FinanceService {
 
   // ─── Overview ───────────────────────────────────────────────────────────────
 
-  async getOverview(userId: string, month?: string) {
+  async getOverview(userId: string, month?: string, displayCurrency = 'USD', startDate?: string, endDate?: string) {
     const now = new Date();
-    const start = month
-      ? `${month}-01`
-      : `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
-    const endDate = new Date(start);
-    endDate.setMonth(endDate.getMonth() + 1);
-    endDate.setDate(0);
-    const end = endDate.toISOString().slice(0, 10);
+    let start: string;
+    let end: string;
 
-    const [accountsSnap, txSnap] = await Promise.all([
+    if (startDate && endDate) {
+      start = startDate;
+      end = endDate;
+    } else {
+      start = month
+        ? `${month}-01`
+        : `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+      const endObj = new Date(start);
+      endObj.setMonth(endObj.getMonth() + 1);
+      endObj.setDate(0);
+      end = endObj.toISOString().slice(0, 10);
+    }
+
+    const [accountsSnap, txSnap, rates] = await Promise.all([
       this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
       this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
+      this.getExchangeRates(),
     ]);
 
     const accounts = accountsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
     const transactions = (txSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[])
       .filter((t) => t.date >= start && t.date <= end);
 
-    const totalBalance = accounts.reduce((sum, a) => sum + (a.balance ?? 0), 0);
-    const income = transactions.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-    const expenses = transactions.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+    const accountMap: Record<string, any> = {};
+    const accountCurrency: Record<string, string> = {};
+    const balanceByCurrency: Record<string, number> = {};
+    for (const a of accounts) {
+      const cur = a.currency ?? 'USD';
+      accountMap[a.id] = a;
+      accountCurrency[a.id] = cur;
+      balanceByCurrency[cur] = (balanceByCurrency[cur] ?? 0) + (a.balance ?? 0);
+    }
+
+    const incomeByCurrency: Record<string, number> = {};
+    const expensesByCurrency: Record<string, number> = {};
+    for (const t of transactions) {
+      const cur = accountCurrency[t.accountId] ?? 'USD';
+      if (t.type === 'income') incomeByCurrency[cur] = (incomeByCurrency[cur] ?? 0) + t.amount;
+      else if (t.type === 'expense') expensesByCurrency[cur] = (expensesByCurrency[cur] ?? 0) + t.amount;
+    }
+
+    // Converted totals in displayCurrency
+    const totalBalanceConverted = Object.entries(balanceByCurrency)
+      .reduce((s, [cur, val]) => s + this.toDisplay(val, cur, displayCurrency, rates), 0);
+    const totalIncomeConverted = Object.entries(incomeByCurrency)
+      .reduce((s, [cur, val]) => s + this.toDisplay(val, cur, displayCurrency, rates), 0);
+    const totalExpensesConverted = Object.entries(expensesByCurrency)
+      .reduce((s, [cur, val]) => s + this.toDisplay(val, cur, displayCurrency, rates), 0);
+
+    const recentTransactions = transactions
+      .sort((a, b) => (a.date < b.date ? 1 : -1))
+      .slice(0, 5)
+      .map((t) => ({ ...t, accountName: accountMap[t.accountId]?.name ?? '' }));
 
     return {
-      totalBalance,
-      income,
-      expenses,
-      net: income - expenses,
+      displayCurrency,
+      totalBalanceConverted,
+      totalIncomeConverted,
+      totalExpensesConverted,
+      balanceByCurrency,
+      incomeByCurrency,
+      expensesByCurrency,
       month: start.slice(0, 7),
-      recentTransactions: transactions.sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 5),
+      recentTransactions,
     };
   }
 

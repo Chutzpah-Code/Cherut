@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   financeApi,
-  CreateAccountDto, UpdateAccountDto,
+  CreateAccountDto,
   CreateCategoryDto, UpdateCategoryDto,
   CreateTransactionDto, UpdateTransactionDto,
   CreateRecurringDto, UpdateRecurringDto,
@@ -10,10 +10,10 @@ import {
   CreateInvestmentEntryDto,
 } from '@/lib/api/services/finance';
 
-export function useFinanceOverview(month?: string) {
+export function useFinanceOverview(month?: string, displayCurrency?: string, startDate?: string, endDate?: string) {
   return useQuery({
-    queryKey: ['finance', 'overview', month],
-    queryFn: () => financeApi.getOverview(month),
+    queryKey: ['finance', 'overview', month, displayCurrency, startDate, endDate],
+    queryFn: () => financeApi.getOverview(month, displayCurrency, startDate, endDate),
     staleTime: 60_000,
   });
 }
@@ -36,13 +36,6 @@ export function useCreateAccount() {
   });
 }
 
-export function useUpdateAccount() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, dto }: { id: string; dto: UpdateAccountDto }) => financeApi.updateAccount(id, dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'accounts'] }),
-  });
-}
 
 export function useDeleteAccount() {
   const qc = useQueryClient();
@@ -226,6 +219,14 @@ export function useCreateInvestment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: CreateInvestmentDto) => financeApi.createInvestment(dto),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'investments'] }),
+  });
+}
+
+export function useUpdateInvestment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, dto }: { id: string; dto: UpdateInvestmentDto }) => financeApi.updateInvestment(id, dto),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'investments'] }),
   });
 }

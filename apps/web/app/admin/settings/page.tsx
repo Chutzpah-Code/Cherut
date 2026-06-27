@@ -89,13 +89,9 @@ export default function AdminSettingsPage() {
       if (!user) return;
 
       try {
-        // For now, use mock data since /admin/settings endpoint doesn't exist yet
-        console.log('Loading mock settings data...');
-
-        // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        // Set default settings for demo
+        // TODO: replace with real /admin/settings API call
         setSettings({
           general: {
             siteName: 'Cherut',
@@ -140,16 +136,10 @@ export default function AdminSettingsPage() {
     try {
       setSaving(true);
 
-      // For now, simulate saving since /admin/settings endpoint doesn't exist yet
-      console.log('Saving settings...', settings);
-
-      // Simulate API delay
+      // TODO: replace with real /admin/settings API call
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       setError(null);
-      console.log('Settings saved successfully (mock)');
-
-      // Show success message (you might want to add a notification system)
     } catch (err) {
       console.error('Save error:', err);
       setError(`Error saving settings: ${err instanceof Error ? err.message : 'Unknown error'}`);
