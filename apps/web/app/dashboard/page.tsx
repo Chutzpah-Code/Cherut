@@ -1,407 +1,414 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Target, CheckSquare, TrendingUp, Calendar, Clock } from 'lucide-react';
-import { Card, Title, Text, Button, Group, Stack, SimpleGrid, Loader, ThemeIcon } from '@mantine/core';
+import { Grid, Progress, Box, Group, Stack, Text, Title, Loader } from '@mantine/core';
+import { CheckCircle2, Circle, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { useObjectives } from '@/hooks/useObjectives';
 import { useTasks } from '@/hooks/useTasks';
-import { useLifeAreas } from '@/hooks/useLifeAreas';
-import { useHabits } from '@/hooks/useHabits';
+import { useHabits, useLogHabit } from '@/hooks/useHabits';
+import { useFinanceOverview } from '@/hooks/useFinance';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useAuth } from '@/contexts/AuthContext';
 
-export default function DashboardPage() {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function localDateStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function fmtDate() {
+  return new Date().toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+  });
+}
+
+function fmtCurrency(value: number, currency = 'USD') {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency', currency, maximumFractionDigits: 0,
+    }).format(value);
+  } catch {
+    return `${currency} ${value.toFixed(0)}`;
+  }
+}
+
+const LABEL: React.CSSProperties = {
+  fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
+  textTransform: 'uppercase', color: '#64748B', marginBottom: 14,
+};
+
+function Panel({ children, accent = false, style }: {
+  children: React.ReactNode; accent?: boolean; style?: React.CSSProperties;
+}) {
+  return (
+    <Box style={{
+      background: '#fff',
+      border: '1px solid #E2E8F0',
+      borderLeft: accent ? '3px solid #0052CC' : '1px solid #E2E8F0',
+      borderRadius: 12,
+      padding: '20px 22px',
+      ...style,
+    }}>
+      {children}
+    </Box>
+  );
+}
+
+function NavLink({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
+  return (
+    <button onClick={onClick} style={{
+      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+      fontSize: 13, fontWeight: 500, color: '#0052CC', display: 'inline-flex',
+      alignItems: 'center', gap: 4,
+    }}>
+      {children} →
+    </button>
+  );
+}
+
+// ─── Section: Habits today ────────────────────────────────────────────────────
+
+function HabitsToday() {
   const router = useRouter();
-  const colors = useThemeColors();
-  const { data: objectives, isLoading: objectivesLoading } = useObjectives();
-  const { data: tasks, isLoading: tasksLoading } = useTasks();
-  const { data: lifeAreas, isLoading: lifeAreasLoading } = useLifeAreas();
-  const { data: habits, isLoading: habitsLoading } = useHabits(undefined, false);
+  const today = localDateStr();
+  const { data: habits = [], isLoading } = useHabits(undefined, false);
+  const logMutation = useLogHabit();
+  const [loggedIds, setLoggedIds] = useState<Set<string>>(new Set());
 
-  // Calculate stats
-  const activeObjectives = objectives?.filter((obj) => obj.status === 'active').length || 0;
-  const openTasks = tasks?.filter((task) => task.status !== 'done' && !task.archived).length || 0;
-  const lifeAreasCount = lifeAreas?.length || 0;
-  const activeHabits = habits?.filter((habit) => habit.isActive).length || 0;
+  const isLogged = (id: string, lastCompletedAt?: string) =>
+    loggedIds.has(id) || lastCompletedAt?.slice(0, 10) === today;
 
-  const stats = [
-    { name: 'Active Objectives', value: activeObjectives, icon: Target },
-    { name: 'Open Tasks', value: openTasks, icon: CheckSquare },
-    { name: 'Life Areas', value: lifeAreasCount, icon: TrendingUp },
-    { name: 'Active Habits', value: activeHabits, icon: Calendar },
-  ];
+  const visible = habits.filter(h => h.isActive).slice(0, 5);
+  const unloggedCount = visible.filter(h => !isLogged(h.id, h.lastCompletedAt)).length;
 
-  // Get recent activity from all sources
-  const getRecentActivity = () => {
-    const activities: Array<{ type: string; title: string; time: string }> = [];
-
-    // Add recent objectives
-    objectives?.slice(0, 3).forEach((obj) => {
-      activities.push({
-        type: 'Objective',
-        title: obj.title,
-        time: new Date(obj.createdAt).toLocaleDateString(),
-      });
-    });
-
-    // Add recent tasks
-    tasks?.slice(0, 3).forEach((task) => {
-      activities.push({
-        type: 'Task',
-        title: task.title,
-        time: new Date(task.createdAt).toLocaleDateString(),
-      });
-    });
-
-    // Add recent habits
-    habits?.slice(0, 3).forEach((habit) => {
-      activities.push({
-        type: 'Habit',
-        title: habit.title,
-        time: new Date(habit.createdAt).toLocaleDateString(),
-      });
-    });
-
-    // Sort by creation date and take top 5
-    return activities.slice(0, 5);
+  const handleLog = (habitId: string) => {
+    if (loggedIds.has(habitId)) return;
+    logMutation.mutate(
+      { habitId, date: today, completed: true },
+      { onSuccess: () => setLoggedIds(prev => new Set([...prev, habitId])) },
+    );
   };
 
-  const recentActivity = getRecentActivity();
-  const isLoading = objectivesLoading || tasksLoading || lifeAreasLoading || habitsLoading;
-
   return (
-    <Stack
-      gap="xl"
-      style={{
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      }}
-    >
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
-      `}</style>
+    <Panel>
+      <div style={LABEL}>Today — Habits</div>
 
-      <div>
-        <Title
-          order={1}
-          mb="xs"
-          style={{
-            fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            fontSize: 'clamp(22px, 5vw, 32px)',
-            fontWeight: 700,
-            color: colors.text.primary,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          Dashboard
-        </Title>
-        <Text
-          style={{
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '16px',
-            fontWeight: 400,
-            color: colors.text.secondary,
-            lineHeight: '24px',
-          }}
-        >
-          Overview of your personal excellence journey
-        </Text>
-      </div>
-
-      {/* Stats Grid */}
-      <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="xl">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Card
-              key={stat.name}
-              padding="xl"
-              radius={16}
-              style={{
-                background: colors.surfaceElevated,
-                border: `1px solid ${colors.border}`,
-                boxShadow: 'none',
-                transition: 'all 200ms ease',
-              }}
-            >
-              <Group justify="space-between" mb="lg">
-                <ThemeIcon
-                  size={48}
-                  radius={12}
-                  style={{
-                    background: colors.surface,
-                    color: colors.primary,
-                    border: 'none',
-                  }}
-                >
-                  <Icon size={24} />
-                </ThemeIcon>
-              </Group>
-              <Text
+      {isLoading ? (
+        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+      ) : visible.length === 0 ? (
+        <Text size="sm" c="dimmed" mb="sm">No active habits.</Text>
+      ) : (
+        <Stack gap={0}>
+          {visible.map((habit, i) => {
+            const done = isLogged(habit.id, habit.lastCompletedAt);
+            const pending = logMutation.isPending;
+            return (
+              <Group
+                key={habit.id}
+                justify="space-between"
                 style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  color: colors.text.secondary,
-                  marginBottom: '8px',
+                  padding: '10px 0',
+                  borderBottom: i < visible.length - 1 ? '1px solid #F1F5F9' : 'none',
                 }}
               >
-                {stat.name}
-              </Text>
-              <Title
-                order={2}
-                style={{
-                  fontFamily: 'Inter Display, sans-serif',
-                  fontSize: '28px',
-                  fontWeight: 700,
-                  color: colors.text.primary,
-                }}
-              >
-                {isLoading ? <Loader size="sm" color={colors.primary} /> : stat.value}
-              </Title>
-            </Card>
-          );
-        })}
-      </SimpleGrid>
-
-      {/* Quick Actions */}
-      <Card
-        padding="xl"
-        radius={16}
-        style={{
-          background: colors.surfaceElevated,
-          border: `1px solid ${colors.border}`,
-          boxShadow: 'none',
-        }}
-      >
-        <Title
-          order={3}
-          mb="lg"
-          style={{
-            fontFamily: 'Inter Display, sans-serif',
-            fontSize: '20px',
-            fontWeight: 600,
-            color: colors.text.primary,
-          }}
-        >
-          Quick Actions
-        </Title>
-        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="lg">
-          <Button
-            leftSection={<Target size={20} />}
-            onClick={() => router.push('/dashboard/objectives')}
-            fullWidth
-            radius={8}
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              background: colors.primary,
-              border: 'none',
-              fontSize: '16px',
-              fontWeight: 600,
-              color: 'white',
-              height: '48px',
-            }}
-            styles={{
-              root: {
-                '&:hover': {
-                  opacity: 0.9,
-                  transform: 'translateY(-1px)',
-                },
-              },
-            }}
-          >
-            New Objective
-          </Button>
-          <Button
-            leftSection={<CheckSquare size={20} />}
-            onClick={() => router.push('/dashboard/tasks')}
-            fullWidth
-            radius={8}
-            variant="outline"
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              borderColor: colors.border,
-              color: colors.text.primary,
-              fontSize: '16px',
-              fontWeight: 600,
-              height: '48px',
-              background: colors.surfaceElevated,
-            }}
-            styles={{
-              root: {
-                '&:hover': {
-                  borderColor: colors.primary,
-                  color: colors.primary,
-                  transform: 'translateY(-1px)',
-                },
-              },
-            }}
-          >
-            Add Task
-          </Button>
-          <Button
-            leftSection={<Calendar size={20} />}
-            onClick={() => router.push('/dashboard/habits')}
-            fullWidth
-            radius={8}
-            variant="outline"
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              borderColor: colors.border,
-              color: colors.text.primary,
-              fontSize: '16px',
-              fontWeight: 600,
-              height: '48px',
-              background: colors.surfaceElevated,
-            }}
-            styles={{
-              root: {
-                '&:hover': {
-                  borderColor: colors.primary,
-                  color: colors.primary,
-                  transform: 'translateY(-1px)',
-                },
-              },
-            }}
-          >
-            Track Habit
-          </Button>
-        </SimpleGrid>
-      </Card>
-
-      {/* Recent Activity */}
-      <Card
-        padding="xl"
-        radius={16}
-        style={{
-          background: colors.surfaceElevated,
-          border: `1px solid ${colors.border}`,
-          boxShadow: 'none',
-        }}
-      >
-        <Title
-          order={3}
-          mb="lg"
-          style={{
-            fontFamily: 'Inter Display, sans-serif',
-            fontSize: '20px',
-            fontWeight: 600,
-            color: colors.text.primary,
-          }}
-        >
-          Recent Activity
-        </Title>
-        {isLoading ? (
-          <Group justify="center" py="xl">
-            <Loader color={colors.primary} />
-          </Group>
-        ) : recentActivity.length > 0 ? (
-          <Stack gap="lg">
-            {recentActivity.map((activity, index) => (
-              <Card
-                key={index}
-                padding="lg"
-                radius={12}
-                style={{
-                  background: colors.surface,
-                  border: `1px solid ${colors.border}`,
-                  boxShadow: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      borderColor: colors.primary,
-                      background: colors.hover,
-                      transform: 'translateY(-1px)',
-                    },
-                  },
-                }}
-              >
-                <Group gap="lg" wrap="nowrap">
-                  <ThemeIcon
-                    size="lg"
-                    radius={8}
+                <Group gap={10} style={{ flex: 1, minWidth: 0 }}>
+                  <button
+                    onClick={() => handleLog(habit.id)}
+                    disabled={done || pending}
                     style={{
-                      background: colors.surfaceElevated,
-                      color: colors.primary,
-                      border: `1px solid ${colors.border}`,
+                      background: 'none', border: 'none', cursor: done ? 'default' : 'pointer',
+                      padding: 0, flexShrink: 0, display: 'flex', alignItems: 'center',
+                    }}
+                    aria-label={done ? 'Logged' : 'Log habit'}
+                  >
+                    {done
+                      ? <CheckCircle2 size={22} color="#2e7d32" strokeWidth={1.8} />
+                      : <Circle size={22} color="#CBD5E1" strokeWidth={1.8} />
+                    }
+                  </button>
+                  <Text
+                    size="sm"
+                    fw={500}
+                    style={{
+                      color: done ? '#94A3B8' : '#0F172A',
+                      textDecoration: done ? 'line-through' : 'none',
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}
                   >
-                    <Clock size={20} />
-                  </ThemeIcon>
-                  <div style={{ flex: 1 }}>
-                    <Group gap="xs">
-                      <Text
-                        style={{
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 500,
-                          color: colors.primary,
-                        }}
-                      >
-                        {activity.type}
-                      </Text>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '12px',
-                          color: colors.text.tertiary,
-                        }}
-                      >
-                        •
-                      </Text>
-                      <Text
-                        style={{
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '12px',
-                          color: colors.text.tertiary,
-                        }}
-                      >
-                        {activity.time}
-                      </Text>
-                    </Group>
-                    <Text
-                      mt={4}
-                      style={{
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '14px',
-                        fontWeight: 400,
-                        color: colors.text.primary,
-                        lineHeight: '20px',
-                      }}
-                    >
-                      {activity.title}
-                    </Text>
-                  </div>
+                    {habit.title}
+                  </Text>
                 </Group>
-              </Card>
-            ))}
-          </Stack>
-        ) : (
-          <Stack align="center" py="xl">
-            <Text
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-                fontWeight: 400,
-                color: colors.text.secondary,
-              }}
-            >
-              No recent activity yet
-            </Text>
-            <Text
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
-                fontWeight: 400,
-                color: colors.text.tertiary,
-              }}
-            >
-              Start by creating your first objective or task
-            </Text>
-          </Stack>
+                {habit.streak > 0 && (
+                  <span style={{
+                    fontSize: 11, fontWeight: 600, color: '#64748B',
+                    background: '#F1F5F9', borderRadius: 4, padding: '2px 6px', flexShrink: 0,
+                  }}>
+                    {habit.streak}d
+                  </span>
+                )}
+              </Group>
+            );
+          })}
+        </Stack>
+      )}
+
+      <Box mt={14}>
+        {unloggedCount > 0 && (
+          <Text size="xs" c="dimmed" mb={6}>{unloggedCount} to log today</Text>
         )}
-      </Card>
+        <NavLink onClick={() => router.push('/dashboard/habits')}>View all habits</NavLink>
+      </Box>
+    </Panel>
+  );
+}
+
+// ─── Section: Tasks due ───────────────────────────────────────────────────────
+
+function TasksDue() {
+  const router = useRouter();
+  const today = localDateStr();
+  const { data: tasks = [], isLoading } = useTasks();
+
+  const due = useMemo(() => {
+    return (tasks as any[])
+      .filter(t => t.dueDate && t.dueDate <= today && t.status !== 'done' && !t.archived)
+      .sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1))
+      .slice(0, 5);
+  }, [tasks, today]);
+
+  const totalDue = (tasks as any[]).filter(
+    t => t.dueDate && t.dueDate <= today && t.status !== 'done' && !t.archived
+  ).length;
+
+  return (
+    <Panel>
+      <div style={LABEL}>Tasks Due</div>
+
+      {isLoading ? (
+        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+      ) : due.length === 0 ? (
+        <Text size="sm" c="dimmed">No tasks due today.</Text>
+      ) : (
+        <Stack gap={0}>
+          {due.map((task, i) => {
+            const overdue = task.dueDate < today;
+            return (
+              <Group
+                key={task.id}
+                justify="space-between"
+                style={{
+                  padding: '10px 0',
+                  borderBottom: i < due.length - 1 ? '1px solid #F1F5F9' : 'none',
+                }}
+              >
+                <Text
+                  size="sm"
+                  fw={500}
+                  style={{
+                    color: '#0F172A', flex: 1, minWidth: 0,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}
+                >
+                  {task.title}
+                </Text>
+                <span style={{
+                  fontSize: 11, fontWeight: 600, borderRadius: 4, padding: '2px 7px',
+                  flexShrink: 0, marginLeft: 8,
+                  background: overdue ? '#FEF2F2' : '#EFF6FF',
+                  color: overdue ? '#c62828' : '#0052CC',
+                }}>
+                  {overdue ? 'Overdue' : 'Today'}
+                </span>
+              </Group>
+            );
+          })}
+        </Stack>
+      )}
+
+      <Box mt={14}>
+        {totalDue > 5 && (
+          <Text size="xs" c="dimmed" mb={6}>+{totalDue - 5} more</Text>
+        )}
+        <NavLink onClick={() => router.push('/dashboard/tasks')}>View all tasks</NavLink>
+      </Box>
+    </Panel>
+  );
+}
+
+// ─── Section: Finance snapshot ────────────────────────────────────────────────
+
+function FinanceSnapshot() {
+  const router = useRouter();
+  const [currency] = useState<string>(() => {
+    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
+  });
+  const { data, isLoading } = useFinanceOverview(undefined, currency);
+
+  const net = (data?.totalIncomeConverted ?? 0) - (data?.totalExpensesConverted ?? 0);
+  const hasData = !!data && (data.totalBalanceConverted !== undefined);
+
+  return (
+    <Panel accent>
+      <div style={LABEL}>Finance</div>
+
+      {isLoading ? (
+        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+      ) : !hasData ? (
+        <Text size="sm" c="dimmed">Set up Finance to start tracking your money.</Text>
+      ) : (
+        <Stack gap={8}>
+          <Box>
+            <Text style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 2 }}>
+              Total balance
+            </Text>
+            <Text style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', color: '#0052CC', lineHeight: 1 }}>
+              {fmtCurrency(data.totalBalanceConverted, currency)}
+            </Text>
+          </Box>
+
+          <Group gap={6} align="center">
+            {net >= 0
+              ? <ArrowUpCircle size={14} color="#2e7d32" />
+              : <ArrowDownCircle size={14} color="#c62828" />
+            }
+            <Text style={{ fontSize: 13, fontWeight: 600, color: net >= 0 ? '#2e7d32' : '#c62828' }}>
+              {net >= 0 ? '+' : ''}{fmtCurrency(net, currency)}
+            </Text>
+            <Text size="xs" c="dimmed">this month</Text>
+          </Group>
+        </Stack>
+      )}
+
+      <Box mt={14}>
+        <NavLink onClick={() => router.push('/dashboard/finance')}>View Finance</NavLink>
+      </Box>
+    </Panel>
+  );
+}
+
+// ─── Section: Objectives progress ─────────────────────────────────────────────
+
+function ObjectivesProgress() {
+  const router = useRouter();
+  const { data: objectives = [], isLoading } = useObjectives();
+
+  const top = useMemo(() => {
+    return (objectives as any[])
+      .filter(o => o.status === 'active')
+      .sort((a, b) => b.progress - a.progress)
+      .slice(0, 3);
+  }, [objectives]);
+
+  return (
+    <Panel>
+      <div style={LABEL}>Objectives</div>
+
+      {isLoading ? (
+        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+      ) : top.length === 0 ? (
+        <Text size="sm" c="dimmed">No active objectives.</Text>
+      ) : (
+        <Stack gap={14}>
+          {top.map(obj => (
+            <Box key={obj.id}>
+              <Group justify="space-between" mb={6}>
+                <Text
+                  size="sm"
+                  fw={500}
+                  style={{
+                    color: '#0F172A', flex: 1,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}
+                >
+                  {obj.title}
+                </Text>
+                <Text style={{ fontSize: 12, fontWeight: 600, color: '#64748B', flexShrink: 0, marginLeft: 8 }}>
+                  {Math.round(obj.progress)}%
+                </Text>
+              </Group>
+              <Progress value={obj.progress} size={6} color="#0052CC" radius={3} />
+            </Box>
+          ))}
+        </Stack>
+      )}
+
+      <Box mt={14}>
+        <NavLink onClick={() => router.push('/dashboard/objectives')}>View all objectives</NavLink>
+      </Box>
+    </Panel>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function DashboardPage() {
+  const { user } = useAuth();
+  const { data: habits = [] } = useHabits(undefined, false);
+  const { data: tasks = [] } = useTasks();
+  const today = localDateStr();
+
+  const habitsToLogCount = (habits as any[]).filter(
+    h => h.isActive && h.lastCompletedAt?.slice(0, 10) !== today
+  ).length;
+
+  const tasksDueCount = (tasks as any[]).filter(
+    t => t.dueDate && t.dueDate <= today && t.status !== 'done' && !t.archived
+  ).length;
+
+  const firstName = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? '';
+
+  const subtitle = [
+    habitsToLogCount > 0 && `${habitsToLogCount} habit${habitsToLogCount !== 1 ? 's' : ''} to log`,
+    tasksDueCount > 0 && `${tasksDueCount} task${tasksDueCount !== 1 ? 's' : ''} due`,
+  ].filter(Boolean).join(' · ') || 'Everything is up to date.';
+
+  return (
+    <Stack gap="lg">
+      {/* Hero greeting */}
+      <Panel accent>
+        <Group justify="space-between" align="flex-start" wrap="wrap" gap="xs">
+          <Box>
+            <Title
+              order={1}
+              style={{ fontSize: 'clamp(20px, 4vw, 26px)', fontWeight: 700, letterSpacing: '-0.02em', color: '#0F172A', lineHeight: 1.2 }}
+            >
+              {greeting()}{firstName ? `, ${firstName}` : ''}
+            </Title>
+            <Text size="sm" c="dimmed" mt={4}>{subtitle}</Text>
+          </Box>
+          <Text style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500, flexShrink: 0 }}>
+            {fmtDate()}
+          </Text>
+        </Group>
+      </Panel>
+
+      {/* Two-column grid */}
+      <Grid gutter="lg">
+        {/* Left — Today */}
+        <Grid.Col span={{ base: 12, md: 7 }}>
+          <Stack gap="lg">
+            <HabitsToday />
+            <TasksDue />
+          </Stack>
+        </Grid.Col>
+
+        {/* Right — Overview */}
+        <Grid.Col span={{ base: 12, md: 5 }}>
+          <Stack gap="lg">
+            <FinanceSnapshot />
+            <ObjectivesProgress />
+          </Stack>
+        </Grid.Col>
+      </Grid>
     </Stack>
   );
 }
