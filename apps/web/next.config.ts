@@ -1,13 +1,15 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
- 
+  transpilePackages: [
+    '@fullcalendar/core',
+    '@fullcalendar/react',
+    '@fullcalendar/daygrid',
+    '@fullcalendar/interaction',
+    '@fullcalendar/timegrid',
+  ],
 
-  // Turbopack agora é configurado diretamente:
-  turbopack: {
-    // Exemplo de configuração (opcional)
-    // outputFileTracingRoot: process.cwd(),
-  },
+  turbopack: {},
 };
 
 export default nextConfig;
