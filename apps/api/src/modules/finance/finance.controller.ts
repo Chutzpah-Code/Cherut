@@ -20,6 +20,7 @@ import {
   CreateInvestmentDto, UpdateInvestmentDto,
   CreateInvestmentEntryDto,
 } from './dto';
+import { PayStatementDto } from './dto/pay-statement.dto';
 import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
 
 @Controller('finance')
@@ -190,5 +191,26 @@ export class FinanceController {
   @Delete('investments/entries/:id')
   deleteInvestmentEntry(@Request() req, @Param('id') id: string) {
     return this.financeService.deleteInvestmentEntry(req.user.uid, id);
+  }
+
+  // Statements (credit card)
+  @Get('accounts/:id/statement/current')
+  getCurrentStatement(@Request() req, @Param('id') id: string) {
+    return this.financeService.getCurrentStatement(req.user.uid, id);
+  }
+
+  @Get('accounts/:id/statements')
+  getStatements(@Request() req, @Param('id') id: string) {
+    return this.financeService.getStatements(req.user.uid, id);
+  }
+
+  @Post('accounts/:id/statement/close')
+  closeStatement(@Request() req, @Param('id') id: string) {
+    return this.financeService.closeStatement(req.user.uid, id);
+  }
+
+  @Post('accounts/:id/statements/:sid/pay')
+  payStatement(@Request() req, @Param('id') id: string, @Param('sid') sid: string, @Body() dto: PayStatementDto) {
+    return this.financeService.payStatement(req.user.uid, id, sid, dto);
   }
 }

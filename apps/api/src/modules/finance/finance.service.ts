@@ -53,6 +53,7 @@ export class FinanceService {
   private readonly BUDGETS = 'finance_budgets';
   private readonly INVESTMENTS = 'finance_investments';
   private readonly INVESTMENT_ENTRIES = 'finance_investment_entries';
+  private readonly STATEMENTS = 'finance_statements';
 
   constructor(private readonly firebaseService: FirebaseService) {}
 
@@ -477,6 +478,148 @@ export class FinanceService {
     } catch {
       this.logger.warn(`Could not adjust balance for account ${accountId}`);
     }
+  }
+
+  // ─── Credit card statements ─────────────────────────────────────────────────
+
+  async getCurrentStatement(userId: string, accountId: string) {
+    const account: any = await this.assertOwner(this.ACCOUNTS, accountId, userId);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const closingDay: number = account.statementClosingDay ?? 1;
+    const dueDay: number = account.statementDueDay ?? 10;
+
+    // Find the most recent closed statement to determine periodStart
+    const statementsSnap = await this.db
+      .collection(this.STATEMENTS)
+      .where('userId', '==', userId)
+      .where('accountId', '==', accountId)
+      .get();
+    const statements = statementsSnap.docs
+      .map((d: any) => ({ id: d.id, ...d.data() }))
+      .sort((a: any, b: any) => (a.periodEnd < b.periodEnd ? 1 : -1)) as any[];
+
+    let periodStart: string;
+    if (statements.length > 0) {
+      const lastClosed = new Date(statements[0].periodEnd);
+      lastClosed.setDate(lastClosed.getDate() + 1);
+      periodStart = lastClosed.toISOString().slice(0, 10);
+    } else {
+      const created = account.createdAt?.slice(0, 10) ?? today.slice(0, 7) + '-01';
+      periodStart = created;
+    }
+
+    // Compute current period end (next closing day from periodStart)
+    const startDate = new Date(periodStart);
+    let periodEnd = new Date(startDate.getFullYear(), startDate.getMonth(), closingDay);
+    if (periodEnd < startDate) periodEnd = new Date(startDate.getFullYear(), startDate.getMonth() + 1, closingDay);
+    const periodEndStr = periodEnd.toISOString().slice(0, 10);
+
+    // Due date: same month as periodEnd + dueDay, or next month if due < closing
+    let dueDate = new Date(periodEnd.getFullYear(), periodEnd.getMonth(), dueDay);
+    if (dueDate <= periodEnd) dueDate = new Date(periodEnd.getFullYear(), periodEnd.getMonth() + 1, dueDay);
+    const dueDateStr = dueDate.toISOString().slice(0, 10);
+
+    // Fetch transactions for the current period
+    const txSnap = await this.db
+      .collection(this.TRANSACTIONS)
+      .where('userId', '==', userId)
+      .where('accountId', '==', accountId)
+      .get();
+    const transactions = (txSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as any[])
+      .filter((t) => t.date >= periodStart && t.date <= (today < periodEndStr ? today : periodEndStr))
+      .sort((a, b) => (a.date < b.date ? 1 : -1));
+
+    const total = transactions
+      .filter((t) => t.type === 'expense')
+      .reduce((s: number, t: any) => s + (t.amount ?? 0), 0);
+
+    return {
+      status: 'open' as const,
+      periodStart,
+      periodEnd: periodEndStr,
+      dueDate: dueDateStr,
+      total,
+      transactions,
+    };
+  }
+
+  async getStatements(userId: string, accountId: string) {
+    await this.assertOwner(this.ACCOUNTS, accountId, userId);
+    const snap = await this.db
+      .collection(this.STATEMENTS)
+      .where('userId', '==', userId)
+      .where('accountId', '==', accountId)
+      .get();
+    return snap.docs
+      .map((d: any) => ({ id: d.id, ...d.data() }))
+      .sort((a: any, b: any) => (a.periodEnd < b.periodEnd ? 1 : -1));
+  }
+
+  async closeStatement(userId: string, accountId: string) {
+    const current = await this.getCurrentStatement(userId, accountId);
+    const data = {
+      userId,
+      accountId,
+      periodStart: current.periodStart,
+      periodEnd: current.periodEnd,
+      dueDate: current.dueDate,
+      total: current.total,
+      status: 'closed' as const,
+      createdAt: this.now(),
+      updatedAt: this.now(),
+    };
+    const ref = await this.db.collection(this.STATEMENTS).add(data);
+    return { id: ref.id, ...data };
+  }
+
+  async payStatement(userId: string, accountId: string, statementId: string, dto: { fromAccountId: string; amount: number }) {
+    const statement: any = await this.assertOwner(this.STATEMENTS, statementId, userId);
+    if (statement.status === 'paid') throw new Error('Statement already paid');
+
+    const amount = Number(dto.amount);
+
+    // Transfer: debit fromAccount, credit card account
+    const categorySnap = await this.db
+      .collection(this.CATEGORIES)
+      .where('userId', '==', userId)
+      .where('name', '==', 'Credit Card Payment')
+      .get();
+    let categoryId: string;
+    if (!categorySnap.empty) {
+      categoryId = categorySnap.docs[0].id;
+    } else {
+      const catRef = await this.db.collection(this.CATEGORIES).add({
+        userId, name: 'Credit Card Payment', type: 'expense', createdAt: this.now(), updatedAt: this.now(),
+      });
+      categoryId = catRef.id;
+    }
+
+    const txData = {
+      userId,
+      accountId: dto.fromAccountId,
+      categoryId,
+      toAccountId: accountId,
+      amount,
+      type: 'transfer',
+      date: new Date().toISOString().slice(0, 10),
+      description: `Fatura ${statement.periodEnd?.slice(0, 7) ?? ''}`,
+      createdAt: this.now(),
+      updatedAt: this.now(),
+    };
+    const txRef = await this.db.collection(this.TRANSACTIONS).add(txData);
+
+    await this.adjustBalance(userId, dto.fromAccountId, amount, 'expense');
+    await this.adjustBalance(userId, accountId, amount, 'income');
+
+    await this.db.collection(this.STATEMENTS).doc(statementId).update({
+      status: 'paid',
+      paidAt: this.now(),
+      paymentTransactionId: txRef.id,
+      updatedAt: this.now(),
+    });
+
+    return { id: statementId, status: 'paid', paymentTransactionId: txRef.id };
   }
 
   private calcNextDueDate(current: string, frequency: string): string {

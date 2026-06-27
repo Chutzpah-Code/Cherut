@@ -15,8 +15,29 @@ export interface FinanceAccount {
   balance: number;
   currency: string;
   color?: string;
+  creditLimit?: number;
+  statementClosingDay?: number;
+  statementDueDay?: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export type StatementStatus = 'open' | 'closed' | 'paid';
+
+export interface FinanceStatement {
+  id: string;
+  userId: string;
+  accountId: string;
+  periodStart: string;
+  periodEnd: string;
+  dueDate: string;
+  total: number;
+  status: StatementStatus;
+  paidAt?: string;
+  paymentTransactionId?: string;
+  transactions?: FinanceTransaction[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface FinanceCategory {
@@ -111,7 +132,7 @@ export interface FinanceOverview {
   recentTransactions: (FinanceTransaction & { accountName: string })[];
 }
 
-export type CreateAccountDto = Pick<FinanceAccount, 'name' | 'type'> & { balance?: number; currency?: string; color?: string };
+export type CreateAccountDto = Pick<FinanceAccount, 'name' | 'type'> & { balance?: number; currency?: string; color?: string; creditLimit?: number; statementClosingDay?: number; statementDueDay?: number };
 export type UpdateAccountDto = Partial<CreateAccountDto>;
 
 export type CreateCategoryDto = Pick<FinanceCategory, 'name' | 'type'> & { color?: string; icon?: string };
@@ -257,5 +278,23 @@ export const financeApi = {
   },
   deleteInvestmentEntry: async (id: string): Promise<void> => {
     await apiClient.delete(`/finance/investments/entries/${id}`);
+  },
+
+  // Statements
+  getCurrentStatement: async (accountId: string): Promise<FinanceStatement> => {
+    const { data } = await apiClient.get(`/finance/accounts/${accountId}/statement/current`);
+    return data;
+  },
+  getStatements: async (accountId: string): Promise<FinanceStatement[]> => {
+    const { data } = await apiClient.get(`/finance/accounts/${accountId}/statements`);
+    return data;
+  },
+  closeStatement: async (accountId: string): Promise<FinanceStatement> => {
+    const { data } = await apiClient.post(`/finance/accounts/${accountId}/statement/close`);
+    return data;
+  },
+  payStatement: async (accountId: string, statementId: string, dto: { fromAccountId: string; amount: number }): Promise<{ id: string; status: string; paymentTransactionId: string }> => {
+    const { data } = await apiClient.post(`/finance/accounts/${accountId}/statements/${statementId}/pay`, dto);
+    return data;
   },
 };

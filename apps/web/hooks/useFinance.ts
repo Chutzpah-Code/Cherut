@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   financeApi,
-  CreateAccountDto,
+  CreateAccountDto, UpdateAccountDto,
   CreateCategoryDto, UpdateCategoryDto,
   CreateTransactionDto, UpdateTransactionDto,
   CreateRecurringDto, UpdateRecurringDto,
@@ -267,6 +267,51 @@ export function useDeleteInvestmentEntry() {
     onSuccess: (_data, { investmentId }) => {
       qc.invalidateQueries({ queryKey: ['finance', 'investment-entries', investmentId] });
       qc.invalidateQueries({ queryKey: ['finance', 'investments'] });
+    },
+  });
+}
+
+// ─── Statements ──────────────────────────────────────────────────────────────
+
+export function useCurrentStatement(accountId: string) {
+  return useQuery({
+    queryKey: ['finance', 'statement-current', accountId],
+    queryFn: () => financeApi.getCurrentStatement(accountId),
+    enabled: !!accountId,
+    staleTime: 30_000,
+  });
+}
+
+export function useStatements(accountId: string) {
+  return useQuery({
+    queryKey: ['finance', 'statements', accountId],
+    queryFn: () => financeApi.getStatements(accountId),
+    enabled: !!accountId,
+    staleTime: 60_000,
+  });
+}
+
+export function useCloseStatement() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (accountId: string) => financeApi.closeStatement(accountId),
+    onSuccess: (_data, accountId) => {
+      qc.invalidateQueries({ queryKey: ['finance', 'statement-current', accountId] });
+      qc.invalidateQueries({ queryKey: ['finance', 'statements', accountId] });
+    },
+  });
+}
+
+export function usePayStatement() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ accountId, statementId, dto }: { accountId: string; statementId: string; dto: { fromAccountId: string; amount: number } }) =>
+      financeApi.payStatement(accountId, statementId, dto),
+    onSuccess: (_data, { accountId }) => {
+      qc.invalidateQueries({ queryKey: ['finance', 'statements', accountId] });
+      qc.invalidateQueries({ queryKey: ['finance', 'statement-current', accountId] });
+      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
     },
   });
 }

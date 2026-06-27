@@ -31,16 +31,20 @@ import { CreateAccountDto, CreateTransactionDto, CreateCategoryDto, FinanceTrans
 import { RecurringView } from './components/RecurringView';
 import { BudgetsView } from './components/BudgetsView';
 import { InvestmentsView } from './components/InvestmentsView';
+import { CardsView } from './components/CardsView';
+import { UpcomingView } from './components/UpcomingView';
 
-type FinanceView = 'overview' | 'transactions' | 'accounts' | 'recurring' | 'budgets' | 'investments';
+type FinanceView = 'overview' | 'transactions' | 'accounts' | 'recurring' | 'budgets' | 'investments' | 'cards' | 'upcoming';
 
 const TABS: { id: FinanceView; label: string }[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'transactions', label: 'Transactions' },
   { id: 'accounts', label: 'Accounts' },
+  { id: 'cards', label: 'Cards' },
   { id: 'recurring', label: 'Recurring' },
   { id: 'budgets', label: 'Budgets' },
   { id: 'investments', label: 'Investments' },
+  { id: 'upcoming', label: 'Upcoming' },
 ];
 
 function fmt(value: number, currency?: string) {
@@ -927,6 +931,35 @@ function AccountsView() {
             leftSection={<Text size="xs" c="dimmed" fw={600}>{form.currency ?? 'USD'}</Text>}
             decimalScale={2}
           />
+          {form.type === 'credit' && (
+            <>
+              <NumberInput
+                label={`Credit Limit (${form.currency ?? 'USD'})`}
+                description="Maximum spending limit"
+                min={0}
+                decimalScale={2}
+                value={form.creditLimit ?? ''}
+                onChange={(v) => setForm((f) => ({ ...f, creditLimit: typeof v === 'number' ? v : undefined }))}
+                leftSection={<Text size="xs" c="dimmed" fw={600}>{form.currency ?? 'USD'}</Text>}
+              />
+              <NumberInput
+                label="Statement Closing Day"
+                description="Day of month when billing cycle closes (1–28)"
+                min={1}
+                max={28}
+                value={form.statementClosingDay ?? ''}
+                onChange={(v) => setForm((f) => ({ ...f, statementClosingDay: typeof v === 'number' ? v : undefined }))}
+              />
+              <NumberInput
+                label="Payment Due Day"
+                description="Day of month when payment is due (1–28)"
+                min={1}
+                max={28}
+                value={form.statementDueDay ?? ''}
+                onChange={(v) => setForm((f) => ({ ...f, statementDueDay: typeof v === 'number' ? v : undefined }))}
+              />
+            </>
+          )}
           <Button onClick={handleCreate} loading={createAccount.isPending} disabled={!form.name} style={{ backgroundColor: '#0052CC' }}>
             Create Account
           </Button>
@@ -982,6 +1015,8 @@ export default function FinancePage() {
         {view === 'recurring' && <RecurringView />}
         {view === 'budgets' && <BudgetsView />}
         {view === 'investments' && <InvestmentsView />}
+        {view === 'cards' && <CardsView />}
+        {view === 'upcoming' && <UpcomingView />}
       </Box>
     </Stack>
   );

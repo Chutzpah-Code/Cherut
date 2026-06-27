@@ -28,4 +28,19 @@ export class CreateAccountDto {
   @IsString()
   @IsOptional()
   color?: string;
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  creditLimit?: number;
+
+  @IsNumber()
+  @Min(1)
+  @IsOptional()
+  statementClosingDay?: number;
+
+  @IsNumber()
+  @Min(1)
+  @IsOptional()
+  statementDueDay?: number;
 }
