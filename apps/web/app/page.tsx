@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { CMark, SHELL_TOKENS } from '@/components/shell/Shell';
 
 const { BLUE, BLUE_SOFT, INK, PAPER, PAPER_2, MUTED, RULE, GRID } = SHELL_TOKENS;
+const SERIF = '"Fraunces", Georgia, serif';
 
 const content = {
   features: [
@@ -27,7 +28,6 @@ const content = {
     { quote: 'I have tried every productivity app. Cherut is the first one that connects what I do today to who I want to become.', name: 'Marina A.', role: 'Designer · São Paulo' },
     { quote: 'The OKR layer is what made it click. My habits stopped being random — they started serving an actual goal.', name: 'Daniel R.', role: 'Founder · Lisbon' },
     { quote: 'It quiets the noise. I open one app in the morning instead of seven, and I leave it knowing what matters today.', name: 'Sara K.', role: 'PM · Berlin' },
-    { quote: 'The dream board sounds soft until you build one. Mine has changed how I make decisions.', name: 'Lucas P.', role: 'Engineer · Porto Alegre' },
   ],
   pricing: [
     { name: 'Free', monthly: '$0', annual: '$0', cadenceMonthly: 'forever', cadenceAnnual: 'forever', blurb: 'Everything you need to start the practice.', features: ['Habits, tasks, journals', 'Up to 3 OKRs', 'Web + mobile', 'Community access'], cta: 'Get started', highlight: false, annualNote: null },
@@ -44,7 +44,6 @@ const content = {
   ],
 };
 
-
 const tabs = [
   { label: 'Today',       sub: 'Your day at a glance',    icon: '◐' },
   { label: 'Habits',      sub: 'Streaks that compound',   icon: '◇' },
@@ -59,11 +58,11 @@ const featureIcons = ['◆', '◐', '◯', '✦', '◇', '◈', '□', '◉'];
 export default function Home() {
   useAdminRedirect();
 
-  const [scrolled, setScrolled]         = useState(false);
-  const [activeTab, setActiveTab]       = useState(0);
-  const [openFaq, setOpenFaq]           = useState<number>(0);
-  const [billing, setBilling]           = useState<'monthly' | 'annual'>('annual');
-  const [menuOpen, setMenuOpen]         = useState(false);
+  const [scrolled, setScrolled]   = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [openFaq, setOpenFaq]     = useState<number>(0);
+  const [billing, setBilling]     = useState<'monthly' | 'annual'>('annual');
+  const [menuOpen, setMenuOpen]   = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -72,7 +71,6 @@ export default function Home() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close mobile menu on resize to desktop
   useEffect(() => {
     const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
     window.addEventListener('resize', onResize);
@@ -82,9 +80,9 @@ export default function Home() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <div style={{ background: PAPER, color: INK, fontFamily: '"Inter", -apple-system, system-ui, sans-serif', fontSize: 16, lineHeight: 1.5, minHeight: '100vh' }}>
+    <div style={{ background: PAPER, color: INK, fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif', fontSize: 16, lineHeight: 1.5, minHeight: '100vh' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
@@ -149,9 +147,10 @@ export default function Home() {
         }
         .lp-hero-text { text-align: center; padding-top: 24px; padding-bottom: 24px; }
         .lp-hero-h1 {
+          font-family: ${SERIF}; font-style: italic;
           font-size: clamp(40px, 5.6vw, 72px);
-          line-height: 1.05; letter-spacing: -.035em;
-          font-weight: 700; margin: 0 0 24px; color: ${INK};
+          line-height: 1.05; letter-spacing: -.025em;
+          font-weight: 600; margin: 0 0 24px; color: ${INK};
         }
         .lp-hero-sub {
           font-size: 18px; line-height: 1.55; color: ${MUTED};
@@ -161,13 +160,10 @@ export default function Home() {
           display: flex; gap: 14px; justify-content: center;
           align-items: center; flex-wrap: wrap;
         }
-        /* Mobile-only C mark decoration above headline */
         .lp-hero-cmark-mobile {
           display: none; justify-content: center; margin-bottom: 24px;
           filter: drop-shadow(0 12px 24px rgba(60,50,200,.25));
         }
-
-        /* Hero section padding (overrideable by media queries) */
         .lp-hero-section { padding: 80px 32px 100px; }
 
         /* ── Dashboard mockup ── */
@@ -186,7 +182,6 @@ export default function Home() {
           display: grid; grid-template-columns: 180px 1fr; overflow: hidden;
         }
         .lp-dash-sidebar { display: flex; }
-        /* Mobile: hide entire dashboard, show welcome-card only */
         .lp-dash-mobile-preview { display: none; justify-content: center; padding: 0 24px 80px; }
 
         /* ── Sections ── */
@@ -195,8 +190,10 @@ export default function Home() {
         .lp-section-head    { max-width: 760px; margin: 0 auto 64px; text-align: center; }
         .lp-features-grid   { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
         .lp-steps-grid      { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; }
-        .lp-testimonials-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .lp-pricing-grid    { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: stretch; }
+
+        /* ── Testimonials ── */
+        .lp-t-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
 
         /* ── About ── */
         .lp-about-grid { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
@@ -226,8 +223,9 @@ export default function Home() {
           padding: 5px 12px; border-radius: 999px; background: ${BLUE_SOFT};
         }
         .lp-h2 {
-          font-size: clamp(36px, 5vw, 60px); line-height: 1.05;
-          letter-spacing: -.03em; font-weight: 700; margin: 0;
+          font-family: ${SERIF}; font-style: italic;
+          font-size: clamp(34px, 4.8vw, 58px); line-height: 1.08;
+          letter-spacing: -.02em; font-weight: 600; margin: 0;
         }
         .lp-h2-sub {
           font-size: 18px; color: ${MUTED}; line-height: 1.5;
@@ -238,38 +236,29 @@ export default function Home() {
            RESPONSIVE BREAKPOINTS
         ════════════════════════════════ */
 
-        /* ── Laptop (< 1200px) ── */
         @media (max-width: 1199px) {
           .lp-hero-shape-wrap { width: 260px; height: 300px; }
         }
 
-        /* ── Tablet landscape (< 1024px) ── */
         @media (max-width: 1023px) {
           .lp-nav-inner   { padding: 16px 24px; gap: 20px; }
           .lp-nav-links   { gap: 20px; }
-          .lp-nav-tour    { display: none; }
           .lp-section     { padding: 80px 24px; }
           .lp-section-alt { padding: 80px 24px; }
           .lp-section-head { margin-bottom: 48px; }
           .lp-strip       { padding: 0 24px 80px; }
           .lp-dash-section { padding: 0 24px 80px; }
           .lp-about-grid  { gap: 40px; }
-          /* Tabs: 3+3 two-row visual or horizontal scroll */
           .lp-tab-bar     { grid-template-columns: repeat(3, 1fr); }
-          /* Sidebar hidden on tablet — dashboard goes full-width */
           .lp-dash-frame  { grid-template-columns: 1fr; }
           .lp-dash-sidebar { display: none; }
         }
 
-        /* ── Tablet portrait (< 768px) ── */
         @media (max-width: 767px) {
-          /* Nav: hamburger replaces links */
           .lp-nav-links  { display: none; }
           .lp-nav-ctas   { display: none; }
           .lp-hamburger  { display: flex; }
           .lp-nav-inner  { padding: 14px 20px; }
-
-          /* Hero: single column, C mark above headline */
           .lp-hero-section            { padding: 56px 20px 72px; }
           .lp-hero-inner              { grid-template-columns: 1fr; gap: 0; min-height: unset; }
           .lp-hero-shape-wrap         { display: none; }
@@ -279,12 +268,8 @@ export default function Home() {
           .lp-hero-sub                { font-size: 16px; margin-bottom: 28px; }
           .lp-hero-ctas               { flex-direction: column; align-items: stretch; gap: 10px; }
           .lp-hero-ctas a             { text-align: center; justify-content: center; }
-
-          /* Dashboard mockup: hide complex version, show welcome card preview */
           .lp-dash-outer     { display: none; }
           .lp-dash-mobile-preview { display: flex; }
-
-          /* Sections */
           .lp-section     { padding: 64px 20px; }
           .lp-section-alt { padding: 64px 20px; }
           .lp-section-head { margin-bottom: 40px; }
@@ -292,24 +277,17 @@ export default function Home() {
           .lp-dash-section { padding: 0 20px 64px; }
           .lp-features-grid { grid-template-columns: 1fr; }
           .lp-steps-grid    { grid-template-columns: 1fr 1fr; gap: 24px; }
-          .lp-testimonials-grid { grid-template-columns: 1fr; }
           .lp-pricing-grid  { grid-template-columns: 1fr; }
-
-          /* About */
           .lp-about-grid { grid-template-columns: 1fr; gap: 32px; }
-
-          /* Footer */
+          .lp-t-two-col  { grid-template-columns: 1fr; gap: 48px; }
           .lp-footer-inner {
             grid-template-columns: 1fr 1fr;
           }
           .lp-footer-brand { grid-column: span 2; }
           .lp-footer-bottom { flex-direction: column; gap: 8px; }
-
-          /* Final CTA padding */
           .lp-final-cta { padding: 80px 20px !important; }
         }
 
-        /* ── Mobile (< 480px) ── */
         @media (max-width: 479px) {
           .lp-steps-grid     { grid-template-columns: 1fr; }
           .lp-hero-section   { padding: 48px 16px 64px; }
@@ -342,15 +320,13 @@ export default function Home() {
             <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: '-0.02em' }}>Cherut</span>
           </a>
 
-          {/* Desktop nav links */}
           <div className="lp-nav-links">
             <a href="#features">Features <span style={{ fontSize: 9, opacity: 0.6 }}>▾</span></a>
             <a href="#how">Method</a>
             <a href="#pricing">Pricing</a>
-            <a href="#about">Resources <span style={{ fontSize: 9, opacity: 0.6 }}>▾</span></a>
+            <a href="#about">About</a>
           </div>
 
-          {/* Desktop CTAs */}
           <div className="lp-nav-ctas">
             <a href="/auth/login" style={{ fontSize: 14, color: 'rgba(15,15,30,0.7)', fontWeight: 500, padding: '8px 12px' }}>Login</a>
             <a href="/auth/register" className="lp-cta-dark" style={{ fontSize: 14, fontWeight: 600, padding: '10px 18px', background: INK, color: PAPER, borderRadius: 999 }}>
@@ -358,7 +334,6 @@ export default function Home() {
             </a>
           </div>
 
-          {/* Hamburger (mobile only) */}
           <button
             className="lp-hamburger"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
@@ -377,12 +352,11 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Mobile dropdown menu */}
         <div className={`lp-mobile-menu${menuOpen ? ' open' : ''}`}>
           <a href="#features" className="lp-mobile-link" onClick={closeMenu}>Features</a>
           <a href="#how"      className="lp-mobile-link" onClick={closeMenu}>Method</a>
           <a href="#pricing"  className="lp-mobile-link" onClick={closeMenu}>Pricing</a>
-          <a href="#about"    className="lp-mobile-link" onClick={closeMenu}>Resources</a>
+          <a href="#about"    className="lp-mobile-link" onClick={closeMenu}>About</a>
           <div className="lp-mobile-ctas">
             <a href="/auth/login"    className="lp-cta-outline" style={{ fontSize: 14, fontWeight: 600, padding: '11px 20px', border: `1px solid ${RULE}`, borderRadius: 999, flex: 1, textAlign: 'center' }}>Login</a>
             <a href="/auth/register" className="lp-cta-dark"    style={{ fontSize: 14, fontWeight: 600, padding: '11px 20px', background: INK, color: PAPER, borderRadius: 999, flex: 1, textAlign: 'center' }}>Try for free</a>
@@ -392,6 +366,7 @@ export default function Home() {
 
       {/* ── Hero ── */}
       <section className="lp-hero-section" style={{ position: 'relative', overflowX: 'clip' }}>
+        {/* Grid */}
         <div style={{
           position: 'absolute', inset: 0,
           backgroundImage: `linear-gradient(${GRID} 1px, transparent 1px), linear-gradient(90deg, ${GRID} 1px, transparent 1px)`,
@@ -400,14 +375,18 @@ export default function Home() {
           WebkitMaskImage: 'radial-gradient(ellipse at 50% 40%, #000 40%, transparent 80%)',
           pointerEvents: 'none',
         }} />
+        {/* Blue glow */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: `radial-gradient(ellipse 65% 55% at 72% 50%, ${BLUE_SOFT} 0%, transparent 70%)`,
+          pointerEvents: 'none',
+        }} />
         <div className="lp-hero-inner">
-          {/* Desktop: large floating shape on the left */}
           <div className="lp-shape lp-hero-shape-wrap">
             <CMark size={320} color={BLUE} />
           </div>
 
           <div className="lp-hero-text">
-            {/* Mobile: small C mark above headline */}
             <div className="lp-hero-cmark-mobile">
               <div style={{ filter: 'drop-shadow(0 8px 20px rgba(60,50,200,.3))' }}>
                 <CMark size={80} color={BLUE} />
@@ -426,7 +405,7 @@ export default function Home() {
                 Try for free <span>→</span>
               </a>
               <a href="#how" className="lp-cta-outline" style={{ fontSize: 15, fontWeight: 500, padding: '13px 26px', border: `1px solid ${RULE}`, borderRadius: 999, background: PAPER, color: INK }}>
-                Book a demo
+                See how it works
               </a>
             </div>
           </div>
@@ -436,7 +415,6 @@ export default function Home() {
       {/* ── Dashboard mockup (desktop / tablet) ── */}
       <section className="lp-dash-section">
         <div className="lp-dash-outer">
-          {/* Tab strip */}
           <div className="lp-tab-bar">
             {tabs.map((t, i) => (
               <button key={i} className="lp-tab" onClick={() => setActiveTab(i)} style={{
@@ -452,39 +430,110 @@ export default function Home() {
               </button>
             ))}
           </div>
-          {/* Dashboard frame */}
+
           <div className="lp-dash-frame">
-            <div className="lp-dash-sidebar" style={{ background: '#DEDDD8', padding: '20px 16px', flexDirection: 'column', gap: 14, borderRight: '1px solid rgba(15,15,30,0.06)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 4px', marginBottom: 4 }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: BLUE_SOFT, color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 12 }}>M</div>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: INK }}>Marina A.</div>
-                  <div style={{ fontSize: 10, color: 'rgba(15,15,30,0.55)' }}>Personal</div>
+            {/* Real sidebar */}
+            <div className="lp-dash-sidebar" style={{ background: '#141421', padding: '18px 10px', flexDirection: 'column', gap: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 8px 16px' }}>
+                <div style={{ width: 22, height: 22, borderRadius: '50%', background: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                  <CMark size={22} color={PAPER} />
                 </div>
-                <span style={{ fontSize: 9, opacity: 0.5, marginLeft: 'auto' }}>▾</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>Cherut</span>
               </div>
-              {['80%', '60%', '75%', '55%', '70%', '45%'].map((w, i) => (
-                <div key={i} style={{ height: 8, borderRadius: 4, background: 'rgba(15,15,30,0.08)', width: w }} />
+              {[
+                { icon: '◈', label: 'Dashboard', active: true },
+                { icon: '◇', label: 'Habits',    active: false },
+                { icon: '◆', label: 'Tasks',     active: false },
+                { icon: '◯', label: 'OKRs',      active: false },
+                { icon: '◐', label: 'Journal',   active: false },
+                { icon: '✦', label: 'Vision Board', active: false },
+                { icon: '□', label: 'Finance',   active: false },
+              ].map((item) => (
+                <div key={item.label} style={{
+                  padding: '7px 8px', borderRadius: 7,
+                  background: item.active ? 'rgba(255,255,255,0.09)' : 'transparent',
+                  display: 'flex', alignItems: 'center', gap: 9,
+                }}>
+                  <span style={{ fontSize: 11, color: item.active ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.55)' }}>{item.icon}</span>
+                  <span style={{ fontSize: 12, fontWeight: item.active ? 600 : 400, color: item.active ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)' }}>{item.label}</span>
+                </div>
               ))}
-            </div>
-            <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em' }}>Dashboard</div>
-                <div style={{ display: 'flex', gap: 6, background: INK, borderRadius: 8, padding: 4 }}>
-                  <button style={{ width: 24, height: 24, borderRadius: 5, color: PAPER, fontSize: 14, fontWeight: 500 }}>+</button>
-                  <button style={{ width: 24, height: 24, borderRadius: 5, color: PAPER, fontSize: 14, fontWeight: 500 }}>—</button>
+              <div style={{ marginTop: 'auto', padding: '8px 8px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 24, height: 24, borderRadius: '50%', background: BLUE_SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: BLUE, flexShrink: 0 }}>MA</div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>Marina A.</div>
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)' }}>Personal</div>
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
-                {[0, 1, 2, 3].map(i => (
-                  <div key={i} style={{ background: '#D4D3CE', borderRadius: 10, padding: '18px 20px', minHeight: 130, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    <div style={{ height: 8, borderRadius: 4, background: 'rgba(15,15,30,0.18)', width: '40%' }} />
-                    <div style={{ height: 8, borderRadius: 4, background: 'rgba(15,15,30,0.08)' }} />
-                    <div style={{ height: 8, borderRadius: 4, background: 'rgba(15,15,30,0.08)', width: '70%' }} />
+            </div>
+
+            {/* Real dashboard content */}
+            <div style={{ padding: '22px 26px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'hidden' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <div style={{ fontSize: 11, color: MUTED, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 3 }}>Friday · June 27</div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: INK, letterSpacing: '-0.02em' }}>Good morning, Marina ☀</div>
+                </div>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: INK, display: 'flex', alignItems: 'center', justifyContent: 'center', color: PAPER, fontSize: 18, flexShrink: 0 }}>+</div>
+              </div>
+
+              {/* Stats row */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                {[
+                  { label: 'Habit streak', value: '7 days',  color: '#16a34a' },
+                  { label: 'Due today',    value: '4 tasks', color: '#dc2626' },
+                  { label: 'OKR score',    value: '68%',     color: BLUE      },
+                  { label: 'Net balance',  value: '+$280',   color: '#16a34a' },
+                ].map((s) => (
+                  <div key={s.label} style={{ background: PAPER, borderRadius: 9, padding: '10px 13px', border: `1px solid ${RULE}` }}>
+                    <div style={{ fontSize: 9, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{s.label}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: s.color, letterSpacing: '-0.01em' }}>{s.value}</div>
                   </div>
                 ))}
               </div>
+
+              {/* Habits + OKR */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div style={{ background: PAPER, borderRadius: 11, padding: '14px 16px', border: `1px solid ${RULE}` }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Today's habits</div>
+                  {[
+                    { name: 'Morning run',    streak: 7,  color: '#0ea5e9', done: true  },
+                    { name: 'Meditate',       streak: 4,  color: '#8b5cf6', done: true  },
+                    { name: 'Read 30 pages',  streak: 5,  color: '#f59e0b', done: false },
+                    { name: 'Evening journal',streak: 12, color: '#10b981', done: false },
+                  ].map((h, i) => (
+                    <div key={h.name} style={{ display: 'flex', alignItems: 'center', gap: 9, paddingTop: i > 0 ? 9 : 0, borderTop: i > 0 ? `1px solid ${RULE}` : 'none' }}>
+                      <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: h.done ? h.color : 'transparent', border: `1.5px solid ${h.done ? h.color : RULE}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {h.done && <span style={{ color: 'white', fontSize: 8, fontWeight: 800 }}>✓</span>}
+                      </div>
+                      <span style={{ fontSize: 11, color: h.done ? MUTED : INK, textDecoration: h.done ? 'line-through' : 'none', flex: 1 }}>{h.name}</span>
+                      <span style={{ fontSize: 9, color: h.color, fontWeight: 700 }}>🔥{h.streak}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ background: PAPER, borderRadius: 11, padding: '14px 16px', border: `1px solid ${RULE}` }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Q2 OKR</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: INK, marginBottom: 14 }}>Build the foundation</div>
+                  {[
+                    { label: 'Establish daily habits',   pct: 80 },
+                    { label: 'Hit revenue targets',      pct: 45 },
+                    { label: 'Complete online course',   pct: 62 },
+                  ].map((kr, i) => (
+                    <div key={kr.label} style={{ marginBottom: i < 2 ? 12 : 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <span style={{ fontSize: 10, color: MUTED }}>{kr.label}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: BLUE }}>{kr.pct}%</span>
+                      </div>
+                      <div style={{ height: 4, background: BLUE_SOFT, borderRadius: 99 }}>
+                        <div style={{ height: '100%', width: `${kr.pct}%`, background: BLUE, borderRadius: 99 }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
+
             {/* Floating welcome card */}
             <WelcomeCard />
           </div>
@@ -526,7 +575,7 @@ export default function Home() {
                 <span style={{ fontSize: 18, color: BLUE }}>{featureIcons[i % 8]}</span>
               </div>
               <span style={{ fontSize: 11, color: BLUE, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>{f.tag}</span>
-              <h3 style={{ fontSize: 19, lineHeight: 1.25, fontWeight: 600, margin: 0, letterSpacing: '-0.015em' }}>{f.title}</h3>
+              <h3 style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 19, lineHeight: 1.25, fontWeight: 600, margin: 0, letterSpacing: '-0.01em' }}>{f.title}</h3>
               <p style={{ fontSize: 14, lineHeight: 1.6, color: MUTED, margin: 0 }}>{f.body}</p>
             </div>
           ))}
@@ -545,33 +594,63 @@ export default function Home() {
             <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ fontSize: 13, color: BLUE, fontWeight: 700, letterSpacing: '0.05em' }}>{s.n}</div>
               <div style={{ height: 2, background: BLUE, width: 32, borderRadius: 1, marginBottom: 6 }} />
-              <h3 style={{ fontSize: 22, lineHeight: 1.2, fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>{s.title}</h3>
+              <h3 style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 22, lineHeight: 1.2, fontWeight: 600, margin: 0, letterSpacing: '-0.01em' }}>{s.title}</h3>
               <p style={{ fontSize: 15, color: MUTED, lineHeight: 1.55, margin: 0 }}>{s.body}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── Testimonials ── */}
+      {/* ── Testimonials — editorial pull-quote layout ── */}
       <section className="lp-section">
         <div className="lp-section-head">
-          <span className="lp-kicker">Loved by builders of intentional lives</span>
-          <h2 className="lp-h2">What our community is saying.</h2>
+          <span className="lp-kicker">From the community</span>
+          <h2 className="lp-h2">Words from people<br/>building intentional lives.</h2>
         </div>
-        <div className="lp-testimonials-grid">
-          {content.testimonials.map((t, i) => (
-            <figure key={i} style={{ padding: '28px', background: PAPER, borderRadius: 16, border: `1px solid ${RULE}`, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ color: BLUE, fontSize: 14, letterSpacing: '0.1em' }}>★★★★★</div>
-              <blockquote style={{ fontSize: 16, lineHeight: 1.55, fontWeight: 500, margin: 0, color: 'rgba(15,15,30,0.85)' }}>"{t.quote}"</blockquote>
-              <figcaption style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 'auto' }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: BLUE_SOFT, color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 14, flexShrink: 0 }}>{t.name.charAt(0)}</div>
+
+        {/* Featured quote — full width */}
+        <div style={{ maxWidth: 1140, margin: '0 auto', paddingBottom: 64, marginBottom: 64, borderBottom: `1px solid ${RULE}`, textAlign: 'center' }}>
+          <blockquote style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(22px, 3vw, 36px)', lineHeight: 1.3, color: INK, margin: '0 auto 28px', maxWidth: 820 }}>
+            "{content.testimonials[0].quote}"
+          </blockquote>
+          <figcaption style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
+            <div style={{ width: 34, height: 34, borderRadius: '50%', background: BLUE_SOFT, color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{content.testimonials[0].name.charAt(0)}</div>
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: INK }}>{content.testimonials[0].name}</div>
+              <div style={{ fontSize: 12, color: MUTED }}>{content.testimonials[0].role}</div>
+            </div>
+          </figcaption>
+        </div>
+
+        {/* Two smaller quotes */}
+        <div className="lp-t-two-col" style={{ maxWidth: 1140, margin: '0 auto' }}>
+          {content.testimonials.slice(1).map((t, i) => (
+            <figure key={i} style={{ padding: i === 0 ? '0 56px 0 0' : '0 0 0 56px', borderRight: i === 0 ? `1px solid ${RULE}` : 'none', margin: 0 }}>
+              <blockquote style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(17px, 2vw, 22px)', lineHeight: 1.45, color: 'rgba(15,15,30,0.82)', margin: '0 0 22px' }}>
+                "{t.quote}"
+              </blockquote>
+              <figcaption style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: BLUE_SOFT, color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 11, flexShrink: 0 }}>
+                  {t.name.charAt(0)}
+                </div>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>{t.name}</div>
-                  <div style={{ fontSize: 12, color: MUTED }}>{t.role}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: INK }}>{t.name}</div>
+                  <div style={{ fontSize: 11, color: MUTED }}>{t.role}</div>
                 </div>
               </figcaption>
             </figure>
           ))}
+        </div>
+
+        {/* Community CTA */}
+        <div style={{ maxWidth: 1140, margin: '64px auto 0', padding: '28px 36px', background: PAPER_2, borderRadius: 14, border: `1px solid ${RULE}`, display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 20, fontWeight: 600, color: INK, marginBottom: 4 }}>Join our community</div>
+            <div style={{ fontSize: 14, color: MUTED }}>Connect with people building intentional lives. Share systems, get feedback, grow together.</div>
+          </div>
+          <a href="https://t.me/+MxfNsOTcN-Y5MmYx" className="lp-cta-dark" style={{ background: INK, color: PAPER, fontSize: 14, fontWeight: 600, padding: '12px 22px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            Join on Telegram →
+          </a>
         </div>
       </section>
 
@@ -598,7 +677,7 @@ export default function Home() {
                 {p.highlight && <div style={{ position: 'absolute', top: -12, right: 24, background: BLUE, color: PAPER, fontSize: 10, fontWeight: 700, padding: '5px 12px', borderRadius: 999, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Most popular</div>}
                 <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{p.name}</div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                  <span style={{ fontSize: 48, lineHeight: 1, fontWeight: 700, letterSpacing: '-0.03em' }}>{price}</span>
+                  <span style={{ fontFamily: SERIF, fontSize: 48, lineHeight: 1, fontWeight: 600, letterSpacing: '-0.03em' }}>{price}</span>
                   <span style={{ fontSize: 14, opacity: 0.6 }}>{cadenceLabel}</span>
                 </div>
                 {billing === 'annual' && p.annualNote && (
@@ -662,13 +741,13 @@ export default function Home() {
       <section className="lp-final-cta" style={{ position: 'relative', padding: '120px 32px', textAlign: 'center', overflow: 'hidden', background: PAPER }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(${GRID} 1px, transparent 1px), linear-gradient(90deg, ${GRID} 1px, transparent 1px)`, backgroundSize: '90px 90px', maskImage: 'radial-gradient(ellipse at 50% 50%, #000 30%, transparent 70%)', WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, #000 30%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', maxWidth: 720, margin: '0 auto', zIndex: 1 }}>
-          <h2 style={{ fontSize: 'clamp(36px, 6vw, 72px)', lineHeight: 1.05, letterSpacing: '-0.03em', fontWeight: 700, margin: '0 0 22px' }}>Your dreams are waiting.</h2>
+          <h2 style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(36px, 6vw, 72px)', lineHeight: 1.05, letterSpacing: '-0.025em', fontWeight: 600, margin: '0 0 22px' }}>Your dreams are waiting.</h2>
           <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.5, maxWidth: 520, margin: '0 auto 36px' }}>Start with the free plan. Bring your noise. We will help you turn it down.</p>
           <div className="lp-hero-ctas">
             <a href="/auth/register" className="lp-cta-dark" style={{ background: INK, color: PAPER, fontSize: 15, fontWeight: 600, padding: '14px 26px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 10 }}>
               Start free <span>→</span>
             </a>
-            <a href="#" className="lp-cta-outline" style={{ fontSize: 15, fontWeight: 500, padding: '13px 26px', border: `1px solid ${RULE}`, borderRadius: 999, background: PAPER, color: INK }}>
+            <a href="/contact" className="lp-cta-outline" style={{ fontSize: 15, fontWeight: 500, padding: '13px 26px', border: `1px solid ${RULE}`, borderRadius: 999, background: PAPER, color: INK }}>
               Talk to the team
             </a>
           </div>
