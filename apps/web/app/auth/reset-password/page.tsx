@@ -3,39 +3,36 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { confirmPasswordReset } from '@/lib/firebase/auth';
-import { getPasswordErrorMessage, createRateLimitError } from '@/lib/utils/auth-errors';
+import { getPasswordErrorMessage } from '@/lib/utils/auth-errors';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
-import {
-  Container,
-  Paper,
-  Title,
-  Text,
-  PasswordInput,
-  Button,
-  Stack,
-  Alert,
-  Box,
-  Group,
-} from '@mantine/core';
-import { AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
-import CherutLogo from '@/components/ui/CherutLogo';
 import Link from 'next/link';
 
+const BG      = '#07070D';
+const SURF    = '#0F0F1B';
+const SURF2   = '#161628';
+const TEXT    = '#EDEEF6';
+const MUTED   = 'rgba(237,238,246,0.46)';
+const ACCENT  = 'oklch(0.68 0.24 260)';
+const ACCENT_DIM = 'rgba(80,110,255,0.12)';
+const RULE    = 'rgba(255,255,255,0.08)';
+const GRID    = 'rgba(255,255,255,0.04)';
+
 function ResetPasswordPageContent() {
-  const [password, setPassword] = useState('');
+  const [password, setPassword]               = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [validatingCode, setValidatingCode] = useState(true);
-  const [isValidCode, setIsValidCode] = useState(false);
+  const [showPassword, setShowPassword]       = useState(false);
+  const [showConfirm, setShowConfirm]         = useState(false);
+  const [loading, setLoading]                 = useState(false);
+  const [error, setError]                     = useState('');
+  const [success, setSuccess]                 = useState(false);
+  const [validatingCode, setValidatingCode]   = useState(true);
+  const [isValidCode, setIsValidCode]         = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const oobCode = searchParams.get('oobCode');
 
-  // Rate limiting
   const passwordResetRateLimit = useRateLimit({ action: 'passwordReset' });
 
   useEffect(() => {
@@ -44,8 +41,6 @@ function ResetPasswordPageContent() {
       setValidatingCode(false);
       return;
     }
-
-    // Validate the reset code
     setValidatingCode(false);
     setIsValidCode(true);
   }, [oobCode]);
@@ -53,37 +48,16 @@ function ResetPasswordPageContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    // Check rate limit before proceeding
-    if (!passwordResetRateLimit.canSubmit) {
-      setError(passwordResetRateLimit.warningMessage);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (!oobCode) {
-      setError('Invalid reset code');
-      return;
-    }
-
+    if (!passwordResetRateLimit.canSubmit) { setError(passwordResetRateLimit.warningMessage); return; }
+    if (password.length < 6) { setError('Password must be at least 6 characters long'); return; }
+    if (password !== confirmPassword) { setError('Passwords do not match'); return; }
+    if (!oobCode) { setError('Invalid reset code'); return; }
     setLoading(true);
-
     try {
       await confirmPasswordReset(oobCode, password);
-      // Record successful password reset
       passwordResetRateLimit.recordSuccess();
       setSuccess(true);
     } catch (err: any) {
-      // Record failed password reset attempt
       passwordResetRateLimit.recordFailure();
       setError(getPasswordErrorMessage(err));
     } finally {
@@ -91,413 +65,134 @@ function ResetPasswordPageContent() {
     }
   };
 
+  const Shell = ({ children }: { children: React.ReactNode }) => (
+    <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', position: 'relative', fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+        *, *::before, *::after { box-sizing: border-box; }
+        .rp-input {
+          width: 100%; padding: 12px 14px; font-size: 15px; font-family: inherit;
+          background: ${SURF}; border: 1px solid ${RULE}; border-radius: 8px;
+          color: ${TEXT}; outline: none; transition: border-color .15s, box-shadow .15s; appearance: none;
+        }
+        .rp-input:focus { border-color: ${ACCENT}; box-shadow: 0 0 0 3px ${ACCENT_DIM}; }
+        .rp-input::placeholder { color: rgba(237,238,246,0.22); }
+        .rp-pw-wrap { position: relative; }
+        .rp-pw-wrap .rp-input { padding-right: 44px; }
+        .rp-pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: ${MUTED}; font-size: 13px; font-family: inherit; padding: 4px; }
+        .rp-btn { width: 100%; padding: 14px; background: ${TEXT}; color: ${BG}; font-size: 15px; font-weight: 700; font-family: inherit; border: none; border-radius: 999px; cursor: pointer; transition: opacity .15s; }
+        .rp-btn:hover:not(:disabled) { opacity: .85; }
+        .rp-btn:disabled { opacity: .5; cursor: not-allowed; }
+        .rp-btn-ghost { padding: 13px 24px; background: transparent; color: ${TEXT}; font-size: 15px; font-weight: 600; font-family: inherit; border: 1px solid ${RULE}; border-radius: 999px; cursor: pointer; text-decoration: none; transition: background .15s; display: inline-block; }
+        .rp-btn-ghost:hover { background: rgba(255,255,255,0.05); }
+        .rp-label { font-size: 13px; font-weight: 600; color: rgba(237,238,246,0.55); display: block; margin-bottom: 6px; }
+        .rp-error { background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.25); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: #f87171; }
+        .rp-success-box { background: rgba(22,163,74,0.1); border: 1px solid rgba(22,163,74,0.25); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: #4ade80; }
+      `}</style>
+      <div style={{
+        position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
+        backgroundImage: `linear-gradient(${GRID} 1px, transparent 1px), linear-gradient(90deg, ${GRID} 1px, transparent 1px)`,
+        backgroundSize: '90px 90px',
+        maskImage: 'radial-gradient(ellipse at 50% 30%, #000 40%, transparent 75%)',
+        WebkitMaskImage: 'radial-gradient(ellipse at 50% 30%, #000 40%, transparent 75%)',
+      }} />
+      <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
+        {children}
+      </div>
+    </div>
+  );
+
   if (validatingCode) {
     return (
-      <Box
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#ffffff',
-          padding: '20px',
-        }}
-      >
-        <Container size="xs" style={{ width: '100%' }}>
-          <Stack gap="xl" align="center">
-            <CherutLogo size={120} />
-            <Text size="lg" ta="center">
-              Validating reset code...
-            </Text>
-          </Stack>
-        </Container>
-      </Box>
+      <Shell>
+        <div style={{ textAlign: 'center', color: MUTED, fontSize: 16 }}>Validating reset code…</div>
+      </Shell>
     );
   }
 
   if (!isValidCode) {
     return (
-      <Box
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#ffffff',
-          padding: '20px',
-        }}
-      >
-        <Container size="xs" style={{ width: '100%' }}>
-          <Stack gap="xl">
-            <Stack gap="xs" align="center">
-              <CherutLogo size={120} />
-              <Title
-                order={1}
-                ta="center"
-                style={{
-                  fontSize: 'clamp(28px, 5vw, 40px)',
-                  fontWeight: 800,
-                  color: 'hsl(0 0% 0% / 0.87)',
-                  lineHeight: 1.2,
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                Invalid Link
-              </Title>
-            </Stack>
-
-            <Paper
-              radius={20}
-              p="xl"
-              style={{
-                background: 'white',
-                border: '1px solid hsl(0 0% 0% / 0.08)',
-                boxShadow: 'none',
-              }}
-            >
-              <Stack gap="lg" ta="center">
-                <Alert
-                  icon={<AlertCircle size={20} />}
-                  title="Invalid or Expired Link"
-                  color="red"
-                  radius={16}
-                  styles={{
-                    root: {
-                      backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                      border: '1px solid rgba(239, 68, 68, 0.2)',
-                    },
-                    title: { color: '#dc2626', fontWeight: 600 },
-                    message: { color: '#dc2626' },
-                  }}
-                >
-                  The password reset link is invalid or has expired. Please request a new one.
-                </Alert>
-
-                <Button
-                  component={Link}
-                  href="/auth/login"
-                  variant="outline"
-                  radius={48}
-                  rightSection={<ArrowRight size={20} />}
-                  style={{
-                    borderColor: '#3143B6',
-                    color: '#3143B6',
-                  }}
-                >
-                  Back to Login
-                </Button>
-              </Stack>
-            </Paper>
-          </Stack>
-        </Container>
-      </Box>
+      <Shell>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'center' }}>
+          <div>
+            <h1 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 36, fontWeight: 800, color: TEXT, margin: '0 0 8px', lineHeight: 1 }}>Invalid link</h1>
+            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>This reset link is invalid or has expired.</p>
+          </div>
+          <div style={{ background: SURF2, border: `1px solid ${RULE}`, borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="rp-error">The password reset link is invalid or has expired. Please request a new one.</div>
+            <Link href="/auth/login" className="rp-btn-ghost" style={{ textAlign: 'center' }}>← Back to login</Link>
+          </div>
+        </div>
+      </Shell>
     );
   }
 
   if (success) {
     return (
-      <Box
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#ffffff',
-          padding: '20px',
-        }}
-      >
-        <Container size="xs" style={{ width: '100%' }}>
-          <Stack gap="xl">
-            <Stack gap="xs" align="center">
-              <CherutLogo size={120} />
-              <Title
-                order={1}
-                ta="center"
-                style={{
-                  fontSize: 'clamp(28px, 5vw, 40px)',
-                  fontWeight: 800,
-                  color: 'hsl(0 0% 0% / 0.87)',
-                  lineHeight: 1.2,
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                Password Reset
-              </Title>
-            </Stack>
-
-            <Paper
-              radius={20}
-              p="xl"
-              style={{
-                background: 'white',
-                border: '1px solid hsl(0 0% 0% / 0.08)',
-                boxShadow: 'none',
-              }}
-            >
-              <Stack gap="lg" ta="center">
-                <Alert
-                  icon={<CheckCircle size={20} />}
-                  title="Password Updated Successfully!"
-                  color="green"
-                  radius={16}
-                  styles={{
-                    root: {
-                      backgroundColor: 'rgba(34, 197, 94, 0.08)',
-                      border: '1px solid rgba(34, 197, 94, 0.2)',
-                    },
-                    title: { color: '#16a34a', fontWeight: 600 },
-                    message: { color: '#16a34a' },
-                  }}
-                >
-                  Your password has been successfully updated. You can now sign in with your new password.
-                </Alert>
-
-                <Button
-                  component={Link}
-                  href="/auth/login"
-                  size="lg"
-                  radius={48}
-                  fullWidth
-                  rightSection={<ArrowRight size={20} />}
-                  style={{
-                    background: '#3143B6',
-                    border: 'none',
-                    height: '56px',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        background: '#2535a0',
-                      },
-                    },
-                  }}
-                >
-                  Sign In
-                </Button>
-              </Stack>
-            </Paper>
-          </Stack>
-        </Container>
-      </Box>
+      <Shell>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'center' }}>
+          <div>
+            <h1 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 36, fontWeight: 800, color: TEXT, margin: '0 0 8px', lineHeight: 1 }}>Password reset</h1>
+            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>You're good to go.</p>
+          </div>
+          <div style={{ background: SURF2, border: `1px solid ${RULE}`, borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="rp-success-box">✓ Your password has been updated. You can now sign in with your new password.</div>
+            <Link href="/auth/login" className="rp-btn" style={{ textAlign: 'center', display: 'block' }}>Sign in →</Link>
+          </div>
+        </div>
+      </Shell>
     );
   }
 
   return (
-    <Box
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#ffffff',
-        padding: '20px',
-      }}
-    >
-      <Container size="xs" style={{ width: '100%' }}>
-        <Stack gap="xl">
-          <Stack gap="xs" align="center">
-            <CherutLogo size={120} />
-            <Title
-              order={1}
-              ta="center"
-              style={{
-                fontSize: 'clamp(28px, 5vw, 40px)',
-                fontWeight: 800,
-                color: 'hsl(0 0% 0% / 0.87)',
-                lineHeight: 1.2,
-                letterSpacing: '-0.01em',
-              }}
-            >
-              Reset Password
-            </Title>
-            <Text
-              size="md"
-              ta="center"
-              fw={500}
-              style={{ color: 'hsl(0 0% 0% / 0.6)' }}
-            >
-              Enter your new password below
-            </Text>
-          </Stack>
+    <Shell>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '0 0 6px', color: TEXT }}>Reset your password</h1>
+          <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>Enter your new password below</p>
+        </div>
 
-          <Paper
-            radius={20}
-            p="xl"
-            style={{
-              background: 'white',
-              border: '1px solid hsl(0 0% 0% / 0.08)',
-              boxShadow: 'none',
-            }}
-          >
-            <form onSubmit={handleSubmit}>
-              <Stack gap="lg">
-                {/* Rate limit display */}
-                <RateLimitDisplay
-                  result={passwordResetRateLimit.result}
-                  message={passwordResetRateLimit.warningMessage}
-                  showProgress={true}
-                />
+        <div style={{ background: SURF2, border: `1px solid ${RULE}`, borderRadius: 16, padding: 28 }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <RateLimitDisplay result={passwordResetRateLimit.result} message={passwordResetRateLimit.warningMessage} showProgress />
+            {error && <div className="rp-error">{error}</div>}
 
-                {error && (
-                  <Alert
-                    icon={<AlertCircle size={20} />}
-                    title="Error"
-                    color="red"
-                    radius={16}
-                    styles={{
-                      root: {
-                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                        border: '1px solid rgba(239, 68, 68, 0.2)',
-                      },
-                      title: { color: '#dc2626', fontWeight: 600 },
-                      message: { color: '#dc2626' },
-                    }}
-                  >
-                    {error}
-                  </Alert>
-                )}
+            <div>
+              <label className="rp-label" htmlFor="rp-password">New password</label>
+              <div className="rp-pw-wrap">
+                <input id="rp-password" className="rp-input" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" />
+                <button type="button" className="rp-pw-toggle" onClick={() => setShowPassword(v => !v)}>{showPassword ? 'Hide' : 'Show'}</button>
+              </div>
+            </div>
 
-                <PasswordInput
-                  label="New Password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  size="md"
-                  radius={48}
-                  styles={{
-                    label: {
-                      color: 'hsl(0 0% 0% / 0.87)',
-                      fontWeight: 600,
-                      marginBottom: 8,
-                      fontSize: '14px',
-                    },
-                    input: {
-                      backgroundColor: 'white',
-                      border: '1px solid hsl(0 0% 0% / 0.15)',
-                      color: 'hsl(0 0% 0% / 0.87)',
-                      height: '48px',
-                      fontSize: '16px',
-                      '&::placeholder': {
-                        color: 'hsl(0 0% 0% / 0.38)',
-                      },
-                      '&:focus': {
-                        borderColor: '#3143B6',
-                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
-                      },
-                    },
-                    innerInput: {
-                      color: 'hsl(0 0% 0% / 0.87)',
-                    },
-                  }}
-                />
+            <div>
+              <label className="rp-label" htmlFor="rp-confirm">Confirm new password</label>
+              <div className="rp-pw-wrap">
+                <input id="rp-confirm" className="rp-input" type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required autoComplete="new-password" />
+                <button type="button" className="rp-pw-toggle" onClick={() => setShowConfirm(v => !v)}>{showConfirm ? 'Hide' : 'Show'}</button>
+              </div>
+            </div>
 
-                <PasswordInput
-                  label="Confirm New Password"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  size="md"
-                  radius={48}
-                  styles={{
-                    label: {
-                      color: 'hsl(0 0% 0% / 0.87)',
-                      fontWeight: 600,
-                      marginBottom: 8,
-                      fontSize: '14px',
-                    },
-                    input: {
-                      backgroundColor: 'white',
-                      border: '1px solid hsl(0 0% 0% / 0.15)',
-                      color: 'hsl(0 0% 0% / 0.87)',
-                      height: '48px',
-                      fontSize: '16px',
-                      '&::placeholder': {
-                        color: 'hsl(0 0% 0% / 0.38)',
-                      },
-                      '&:focus': {
-                        borderColor: '#3143B6',
-                        boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
-                      },
-                    },
-                    innerInput: {
-                      color: 'hsl(0 0% 0% / 0.87)',
-                    },
-                  }}
-                />
-
-                <Group justify="space-between" gap="sm">
-                  <Button
-                    component={Link}
-                    href="/auth/login"
-                    variant="outline"
-                    radius={48}
-                    style={{
-                      borderColor: '#3143B6',
-                      color: '#3143B6',
-                      flex: 1,
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    loading={loading}
-                    radius={48}
-                    rightSection={<ArrowRight size={20} />}
-                    style={{
-                      background: '#3143B6',
-                      border: 'none',
-                      flex: 2,
-                    }}
-                    styles={{
-                      root: {
-                        '&:hover': {
-                          background: '#2535a0',
-                        },
-                      },
-                    }}
-                  >
-                    Reset Password
-                  </Button>
-                </Group>
-              </Stack>
-            </form>
-          </Paper>
-        </Stack>
-      </Container>
-    </Box>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <Link href="/auth/login" className="rp-btn-ghost" style={{ flex: 1, textAlign: 'center' }}>Cancel</Link>
+              <button type="submit" className="rp-btn" disabled={loading} style={{ flex: 2 }}>
+                {loading ? 'Resetting…' : 'Reset password →'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Shell>
   );
 }
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense
-      fallback={
-        <Box
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#ffffff',
-            padding: '20px',
-          }}
-        >
-          <Container size="xs" style={{ width: '100%' }}>
-            <Stack gap="xl" align="center">
-              <CherutLogo size={120} />
-              <Text size="lg" ta="center">
-                Loading...
-              </Text>
-            </Stack>
-          </Container>
-        </Box>
-      }
-    >
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', background: '#07070D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui', color: 'rgba(237,238,246,0.46)', fontSize: 16 }}>
+        Loading…
+      </div>
+    }>
       <ResetPasswordPageContent />
     </Suspense>
   );

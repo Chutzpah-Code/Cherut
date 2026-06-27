@@ -31,6 +31,20 @@ interface PageShellProps {
   lead?: string;
 }
 
+// Dark theme tokens for public pages (separate from app dashboard tokens)
+const PS = {
+  BG:         '#07070D',
+  SURF:       '#0F0F1B',
+  SURF2:      '#161628',
+  TEXT:       '#EDEEF6',
+  MUTED_D:    'rgba(237,238,246,0.46)',
+  ACCENT:     'oklch(0.68 0.24 260)',
+  ACCENT_DIM: 'rgba(80,110,255,0.1)',
+  RULE_D:     'rgba(255,255,255,0.08)',
+  DISPLAY:    '"Barlow Condensed", "Arial Narrow", sans-serif',
+  BODY:       '"DM Sans", -apple-system, system-ui, sans-serif',
+} as const;
+
 export function PageShell({ children, kicker, title, lead }: PageShellProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -51,205 +65,146 @@ export function PageShell({ children, kicker, title, lead }: PageShellProps) {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <div style={{ background: PAPER, color: INK, fontFamily: '"Inter", -apple-system, system-ui, sans-serif', fontSize: 16, lineHeight: 1.5, minHeight: '100vh' }}>
+    <div style={{ background: PS.BG, color: PS.TEXT, fontFamily: PS.BODY, fontSize: 16, lineHeight: 1.5, minHeight: '100vh' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; overflow-x: hidden; }
+        body { margin: 0; overflow-x: hidden; background: ${PS.BG}; }
         a { text-decoration: none; color: inherit; }
         button { font-family: inherit; cursor: pointer; border: none; background: none; }
         ul, ol { margin: 0; padding: 0; list-style: none; }
 
-        .lp-cta-dark { transition: opacity .15s, transform .1s; }
-        .lp-cta-dark:hover { opacity: .85; transform: translateY(-1px); }
-        .lp-cta-outline { transition: background .15s, border-color .15s, color .15s; }
-        .lp-cta-outline:hover { background: ${INK}; color: ${PAPER}; border-color: ${INK}; }
-        .lp-mobile-link { transition: background .1s; }
-        .lp-mobile-link:hover { background: ${PAPER_2}; }
+        .ps-cta-primary { transition: opacity .12s, transform .1s; }
+        .ps-cta-primary:hover { opacity: .87; transform: translateY(-1px); }
+        .ps-cta-ghost { transition: background .15s, color .15s, border-color .15s; }
+        .ps-cta-ghost:hover { background: ${PS.TEXT}; color: ${PS.BG}; }
+        .ps-mobile-link:hover { background: ${PS.SURF}; }
+        .ps-hamburger:hover { background: ${PS.SURF}; }
+        .ps-nav-links a { transition: color .12s; color: ${PS.MUTED_D}; }
+        .ps-nav-links a:hover { color: ${PS.TEXT}; }
 
-        .lp-nav-inner   { max-width: 1280px; margin: 0 auto; padding: 18px 32px; display: flex; align-items: center; gap: 32px; }
-        .lp-nav-links   { display: flex; gap: 28px; margin-left: 24px; font-size: 14px; font-weight: 500; color: rgba(15,15,30,.78); }
-        .lp-nav-ctas    { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+        .ps-nav-inner  { max-width: 1280px; margin: 0 auto; padding: 18px 32px; display: flex; align-items: center; gap: 32px; }
+        .ps-nav-links  { display: flex; gap: 28px; margin-left: 24px; font-size: 14px; font-weight: 500; }
+        .ps-nav-ctas   { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+        .ps-hamburger  { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; margin-left: auto; color: ${PS.TEXT}; }
+        .ps-mobile-menu { display: none; flex-direction: column; background: ${PS.SURF}; border-top: 1px solid ${PS.RULE_D}; padding: 8px 0 16px; }
+        .ps-mobile-menu.open { display: flex; }
+        .ps-mobile-link { padding: 14px 24px; font-size: 16px; font-weight: 500; color: ${PS.TEXT}; display: block; }
+        .ps-mobile-ctas { display: flex; gap: 10px; padding: 12px 24px 4px; flex-wrap: wrap; }
 
-        .lp-hamburger   { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; margin-left: auto; }
-        .lp-hamburger:hover { background: ${PAPER_2}; }
-        .lp-mobile-menu {
-          display: none; flex-direction: column;
-          background: ${PAPER}; border-top: 1px solid ${RULE};
-          padding: 8px 0 16px;
+        .ps-kicker {
+          display: inline-block; font-size: 11px; color: ${PS.ACCENT};
+          letter-spacing: .14em; text-transform: uppercase; font-weight: 700;
+          margin-bottom: 20px; padding: 5px 13px; border-radius: 999px;
+          border: 1px solid rgba(80,110,255,0.4); background: ${PS.ACCENT_DIM};
         }
-        .lp-mobile-menu.open { display: flex; }
-        .lp-mobile-link {
-          padding: 14px 24px; font-size: 16px; font-weight: 500; color: ${INK};
-          border-radius: 0; display: block;
+        .sh-hero {
+          padding: 80px 32px 64px; background: ${PS.BG};
+          border-bottom: 1px solid ${PS.RULE_D}; text-align: center;
+          position: relative; overflow: hidden;
         }
-        .lp-mobile-ctas {
-          display: flex; gap: 10px; padding: 12px 24px 4px; flex-wrap: wrap;
+        .sh-hero-grid {
+          position: absolute; inset: 0;
+          background-image: linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+          background-size: 80px 80px;
+          mask-image: radial-gradient(ellipse at 50% 40%, #000 35%, transparent 75%);
+          -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 35%, transparent 75%);
+          pointer-events: none;
         }
+        .sh-hero-inner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
+        .sh-hero-title {
+          font-family: ${PS.DISPLAY}; text-transform: uppercase;
+          font-size: clamp(40px, 6vw, 72px); line-height: 0.96;
+          letter-spacing: 0.01em; font-weight: 800;
+          margin: 0 0 20px; color: ${PS.TEXT};
+        }
+        .sh-hero-lead { font-size: 18px; line-height: 1.55; color: ${PS.MUTED_D}; margin: 0; }
 
-        .lp-section         { padding: 120px 32px; }
-        .lp-section-alt     { padding: 120px 32px; background: ${PAPER_2}; }
-        .lp-section-head    { max-width: 760px; margin: 0 auto 64px; text-align: center; }
+        .ps-surf  { background: ${PS.SURF}; }
+        .ps-surf2 { background: ${PS.SURF2}; }
 
         .lp-footer-inner {
           max-width: 1280px; margin: 0 auto;
           display: grid; grid-template-columns: repeat(4, 1fr);
-          gap: 32px; padding-bottom: 48px; border-bottom: 1px solid ${RULE};
+          gap: 32px; padding-bottom: 48px; border-bottom: 1px solid ${PS.RULE_D};
         }
         .lp-footer-brand { grid-column: span 1; }
         .lp-footer-bottom {
           max-width: 1280px; margin: 0 auto; padding-top: 24px;
           display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
-          font-size: 13px; color: rgba(15,15,30,.5);
-        }
-
-        .lp-kicker {
-          display: inline-block; font-size: 12px; color: ${BLUE};
-          letter-spacing: .1em; text-transform: uppercase;
-          margin-bottom: 18px; font-weight: 600;
-          padding: 5px 12px; border-radius: 999px; background: ${BLUE_SOFT};
-        }
-        .lp-h2 {
-          font-size: clamp(36px, 5vw, 60px); line-height: 1.05;
-          letter-spacing: -.03em; font-weight: 700; margin: 0;
-        }
-        .lp-h2-sub {
-          font-size: 18px; color: ${MUTED}; line-height: 1.5;
-          margin: 20px auto 0; max-width: 580px;
-        }
-
-        .sh-hero {
-          padding: 80px 32px 64px;
-          background: ${PAPER};
-          border-bottom: 1px solid ${RULE};
-          text-align: center;
-          position: relative;
-          overflow: hidden;
-        }
-        .sh-hero-grid {
-          position: absolute; inset: 0;
-          background-image: linear-gradient(${GRID} 1px, transparent 1px), linear-gradient(90deg, ${GRID} 1px, transparent 1px);
-          background-size: 90px 90px;
-          mask-image: radial-gradient(ellipse at 50% 50%, #000 30%, transparent 70%);
-          -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000 30%, transparent 70%);
-          pointer-events: none;
-        }
-        .sh-hero-inner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
-        .sh-hero-title {
-          font-size: clamp(36px, 5vw, 60px); line-height: 1.05;
-          letter-spacing: -.03em; font-weight: 700; margin: 0 0 20px; color: ${INK};
-        }
-        .sh-hero-lead { font-size: 18px; line-height: 1.55; color: ${MUTED}; margin: 0; }
-
-        .sh-content { max-width: 1180px; margin: 0 auto; padding: 80px 32px; }
-
-        .sh-card {
-          background: ${PAPER}; border: 1px solid ${RULE};
-          border-radius: 16px; padding: 32px;
-          transition: transform .2s, border-color .2s;
-        }
-        .sh-card:hover { transform: translateY(-2px); border-color: ${BLUE}; }
-
-        .sh-principles-grid {
-          display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;
+          font-size: 13px; color: rgba(237,238,246,.28);
         }
 
         @media (max-width: 1023px) {
-          .lp-nav-inner   { padding: 16px 24px; gap: 20px; }
-          .lp-nav-links   { gap: 20px; }
-          .lp-nav-tour    { display: none; }
-          .lp-section     { padding: 80px 24px; }
-          .lp-section-alt { padding: 80px 24px; }
-          .sh-hero        { padding: 64px 24px 48px; }
-          .sh-content     { padding: 64px 24px; }
+          .ps-nav-inner  { padding: 16px 24px; gap: 20px; }
+          .ps-nav-links  { gap: 20px; }
+          .sh-hero       { padding: 64px 24px 48px; }
         }
-
         @media (max-width: 767px) {
-          .lp-nav-links  { display: none; }
-          .lp-nav-ctas   { display: none; }
-          .lp-hamburger  { display: flex; }
-          .lp-nav-inner  { padding: 14px 20px; }
-          .lp-section     { padding: 64px 20px; }
-          .lp-section-alt { padding: 64px 20px; }
-          .sh-hero        { padding: 56px 20px 40px; }
-          .sh-hero-title  { font-size: clamp(32px, 8vw, 48px); }
-          .sh-hero-lead   { font-size: 16px; }
-          .sh-content     { padding: 48px 20px; }
-          .sh-principles-grid { grid-template-columns: 1fr 1fr; }
+          .ps-nav-links  { display: none; }
+          .ps-nav-ctas   { display: none; }
+          .ps-hamburger  { display: flex; }
+          .ps-nav-inner  { padding: 14px 20px; }
+          .sh-hero       { padding: 56px 20px 40px; }
+          .sh-hero-title { font-size: clamp(32px, 8vw, 52px); }
+          .sh-hero-lead  { font-size: 16px; }
           .lp-footer-inner { grid-template-columns: 1fr 1fr; }
           .lp-footer-brand { grid-column: span 2; }
           .lp-footer-bottom { flex-direction: column; gap: 8px; }
         }
-
         @media (max-width: 479px) {
-          .sh-hero        { padding: 48px 16px 32px; }
-          .sh-content     { padding: 40px 16px; }
-          .sh-principles-grid { grid-template-columns: 1fr; }
+          .sh-hero       { padding: 48px 16px 32px; }
           .lp-footer-inner { grid-template-columns: 1fr; }
           .lp-footer-brand { grid-column: span 1; }
-          .lp-section     { padding: 56px 16px; }
-          .lp-section-alt { padding: 56px 16px; }
         }
       `}</style>
 
       {/* ── Nav ── */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: scrolled ? 'rgba(250,250,247,0.82)' : PAPER,
-        backdropFilter: scrolled ? 'saturate(180%) blur(14px)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'saturate(180%) blur(14px)' : 'none',
-        borderBottom: `1px solid ${scrolled ? RULE : 'transparent'}`,
-        boxShadow: scrolled ? '0 1px 0 rgba(15,15,14,0.02), 0 8px 24px -16px rgba(15,15,14,0.08)' : 'none',
-        transition: 'background .25s, border-color .25s, box-shadow .25s',
+        background: scrolled ? 'rgba(7,7,13,0.88)' : 'transparent',
+        backdropFilter: scrolled ? 'saturate(160%) blur(16px)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'saturate(160%) blur(16px)' : 'none',
+        borderBottom: `1px solid ${scrolled ? PS.RULE_D : 'transparent'}`,
+        transition: 'background .25s, border-color .25s',
       }}>
-        <div className="lp-nav-inner">
+        <div className="ps-nav-inner">
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-              <CMark size={28} color={PAPER} />
+            <div style={{ width: 28, height: 28, borderRadius: '50%', background: PS.ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <CMark size={28} color={PS.BG} />
             </div>
-            <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: '-0.02em', color: INK }}>Cherut</span>
+            <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: '-0.02em', color: PS.TEXT }}>Cherut</span>
           </Link>
 
-          <div className="lp-nav-links">
-            <Link href="/#features">Features <span style={{ fontSize: 9, opacity: 0.6 }}>▾</span></Link>
+          <div className="ps-nav-links">
+            <Link href="/#features">Features</Link>
             <Link href="/#how">Method</Link>
             <Link href="/#pricing">Pricing</Link>
             <Link href="/about">About</Link>
           </div>
 
-          <div className="lp-nav-ctas">
-            <Link href="/auth/login" style={{ fontSize: 14, color: 'rgba(15,15,30,0.7)', fontWeight: 500, padding: '8px 12px' }}>Login</Link>
-            <Link href="/auth/register" className="lp-cta-dark" style={{ fontSize: 14, fontWeight: 600, padding: '10px 18px', background: INK, color: PAPER, borderRadius: 999 }}>
-              Try for free
+          <div className="ps-nav-ctas">
+            <Link href="/auth/login" style={{ fontSize: 14, color: PS.MUTED_D, fontWeight: 500, padding: '8px 12px' }}>Login</Link>
+            <Link href="/auth/register" className="ps-cta-primary" style={{ fontSize: 14, fontWeight: 700, padding: '10px 20px', background: PS.TEXT, color: PS.BG, borderRadius: 999 }}>
+              Start building
             </Link>
           </div>
 
-          <button
-            className="lp-hamburger"
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            onClick={() => setMenuOpen(v => !v)}
-            style={{ color: INK }}
-          >
-            {menuOpen ? (
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            ) : (
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            )}
+          <button className="ps-hamburger" aria-label={menuOpen ? 'Close' : 'Menu'} onClick={() => setMenuOpen(v => !v)}>
+            {menuOpen
+              ? <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+              : <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+            }
           </button>
         </div>
 
-        <div className={`lp-mobile-menu${menuOpen ? ' open' : ''}`}>
-          <Link href="/#features" className="lp-mobile-link" onClick={closeMenu}>Features</Link>
-          <Link href="/#how"      className="lp-mobile-link" onClick={closeMenu}>Method</Link>
-          <Link href="/#pricing"  className="lp-mobile-link" onClick={closeMenu}>Pricing</Link>
-          <Link href="/about"     className="lp-mobile-link" onClick={closeMenu}>About</Link>
-          <div className="lp-mobile-ctas">
-            <Link href="/auth/login"    className="lp-cta-outline" style={{ fontSize: 14, fontWeight: 600, padding: '11px 20px', border: `1px solid ${RULE}`, borderRadius: 999, flex: 1, textAlign: 'center' }}>Login</Link>
-            <Link href="/auth/register" className="lp-cta-dark"    style={{ fontSize: 14, fontWeight: 600, padding: '11px 20px', background: INK, color: PAPER, borderRadius: 999, flex: 1, textAlign: 'center' }}>Try for free</Link>
+        <div className={`ps-mobile-menu${menuOpen ? ' open' : ''}`}>
+          {([['/#features','Features'],['/#how','Method'],['/#pricing','Pricing'],['/about','About']] as [string,string][]).map(([href, label]) => (
+            <Link key={label} href={href} className="ps-mobile-link" onClick={closeMenu}>{label}</Link>
+          ))}
+          <div className="ps-mobile-ctas">
+            <Link href="/auth/login"    className="ps-cta-ghost"   style={{ fontSize: 14, fontWeight: 600, padding: '11px 20px', border: `1px solid ${PS.RULE_D}`, borderRadius: 999, flex: 1, textAlign: 'center', color: PS.TEXT }}>Login</Link>
+            <Link href="/auth/register" className="ps-cta-primary" style={{ fontSize: 14, fontWeight: 700, padding: '11px 20px', background: PS.TEXT, color: PS.BG, borderRadius: 999, flex: 1, textAlign: 'center' }}>Start building</Link>
           </div>
         </div>
       </nav>
@@ -259,7 +214,7 @@ export function PageShell({ children, kicker, title, lead }: PageShellProps) {
         <div className="sh-hero">
           <div className="sh-hero-grid" />
           <div className="sh-hero-inner">
-            {kicker && <span className="lp-kicker">{kicker}</span>}
+            {kicker && <span className="ps-kicker">{kicker}</span>}
             <h1 className="sh-hero-title">{title}</h1>
             {lead && <p className="sh-hero-lead">{lead}</p>}
           </div>
@@ -272,16 +227,16 @@ export function PageShell({ children, kicker, title, lead }: PageShellProps) {
       </main>
 
       {/* ── Footer ── */}
-      <footer style={{ background: PAPER, color: 'rgba(15,15,30,0.7)', padding: '64px 32px 32px', borderTop: `1px solid ${RULE}` }}>
+      <footer style={{ background: PS.SURF, color: PS.MUTED_D, padding: '64px 32px 32px', borderTop: `1px solid ${PS.RULE_D}` }}>
         <div className="lp-footer-inner">
-          <div className="lp-footer-brand" style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
+          <div className="lp-footer-brand" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 28, height: 28, borderRadius: '50%', background: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <CMark size={28} color={PAPER} />
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: PS.ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <CMark size={28} color={PS.BG} />
               </div>
-              <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: '-0.02em', color: INK }}>Cherut</span>
+              <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: '-0.02em', color: PS.TEXT }}>Cherut</span>
             </div>
-            <p style={{ fontSize: 14, color: MUTED, margin: '8px 0 0', lineHeight: 1.5, maxWidth: 280 }}>Cherut (חירות) — freedom in Hebrew. Not freedom from responsibility, freedom through it.</p>
+            <p style={{ fontSize: 14, color: PS.MUTED_D, margin: '8px 0 0', lineHeight: 1.5, maxWidth: 280 }}>Cherut (חירות) — freedom in Hebrew. Not freedom from responsibility, freedom through it.</p>
           </div>
           {[
             { label: 'Product',   links: [['Features', '/#features'], ['Pricing', '/#pricing'], ['Changelog', '/changelog'], ['Roadmap', '/roadmap']] },
@@ -289,14 +244,18 @@ export function PageShell({ children, kicker, title, lead }: PageShellProps) {
             { label: 'Resources', links: [['Community', 'https://t.me/+MxfNsOTcN-Y5MmYx'], ['Help center', '/help-center'], ['Privacy', '/privacy-policy']] },
           ].map(col => (
             <div key={col.label} style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
-              <div style={{ fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(15,15,30,0.55)', marginBottom: 4, fontWeight: 600 }}>{col.label}</div>
-              {col.links.map(([text, href]) => <Link key={text} href={href}>{text}</Link>)}
+              <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(237,238,246,0.28)', marginBottom: 4, fontWeight: 700 }}>{col.label}</div>
+              {col.links.map(([text, href]) => (
+                <Link key={text} href={href} style={{ color: PS.MUTED_D, transition: 'color .12s' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = PS.TEXT)}
+                  onMouseLeave={e => (e.currentTarget.style.color = PS.MUTED_D)}>{text}</Link>
+              ))}
             </div>
           ))}
         </div>
         <div className="lp-footer-bottom">
-          <span>© 2026 Cherut. Built with intention.</span>
-          <span>Made for the dreamers who do.</span>
+          <span>© 2026 Cherut. Built with obsession.</span>
+          <span>For the ones who refused to wait.</span>
         </div>
       </footer>
     </div>

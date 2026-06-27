@@ -2,412 +2,122 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Container,
-  Title,
-  Text,
-  TextInput,
-  Textarea,
-  Button,
-  Stack,
-  Select,
-  Box,
-  Paper,
-} from '@mantine/core';
-import { Building2, ArrowLeft, CheckCircle } from 'lucide-react';
+import { PageShell } from '@/components/shell/Shell';
 import { enterpriseWaitlistApi } from '@/lib/api/services/enterprise-waitlist';
-import CherutLogo from '@/components/ui/CherutLogo';
+
+const BG      = '#07070D';
+const SURF    = '#0F0F1B';
+const SURF2   = '#161628';
+const TEXT    = '#EDEEF6';
+const MUTED   = 'rgba(237,238,246,0.46)';
+const ACCENT  = 'oklch(0.68 0.24 260)';
+const ACCENT_DIM = 'rgba(80,110,255,0.12)';
+const RULE    = 'rgba(255,255,255,0.08)';
+
+const employeesOptions = ['1-10', '11-50', '51-200', '201-500', '500+'];
+const revenueOptions   = [{ v: 'under-1m', l: 'Under $1M' }, { v: '1m-5m', l: '$1M – $5M' }, { v: '5m-10m', l: '$5M – $10M' }, { v: '10m-50m', l: '$10M – $50M' }, { v: '50m+', l: 'Over $50M' }];
 
 export default function EnterpriseWaitlistPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError]     = useState('');
+  const [form, setForm] = useState({ contactName: '', phoneNumber: '', companyName: '', numberOfEmployees: '', companyRevenue: '', intendedUse: '', desiredFeatures: '' });
 
-  const [formData, setFormData] = useState({
-    contactName: '',
-    phoneNumber: '',
-    companyName: '',
-    numberOfEmployees: '',
-    companyRevenue: '',
-    intendedUse: '',
-    desiredFeatures: '',
-  });
-
-  const handleChange = (field: string, value: string | number | null) => {
-    setFormData((prev) => ({ ...prev, [field]: value || '' }));
-  };
+  const set = (field: string, value: string) => setForm(p => ({ ...p, [field]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    if (!form.contactName || !form.phoneNumber || !form.companyName) { setError('Please fill in all required fields.'); return; }
     setLoading(true);
-
     try {
-      // Basic validation
-      if (!formData.contactName || !formData.phoneNumber || !formData.companyName) {
-        setError('Please fill in all required fields.');
-        setLoading(false);
-        return;
-      }
-
-      // Submit to backend (more secure)
-      await enterpriseWaitlistApi.create(formData);
-
+      await enterpriseWaitlistApi.create(form);
       setSuccess(true);
-      setTimeout(() => {
-        router.push('/');
-      }, 3000);
+      setTimeout(() => router.push('/'), 3000);
     } catch (err: any) {
-      console.error('Error submitting waitlist:', err);
       setError(err.response?.data?.message || 'Error submitting form. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (success) {
-    return (
-      <Box
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#ffffff',
-        }}
-      >
-        <Container size="sm">
-          <Paper
-            p="xl"
-            radius={20}
-            style={{
-              background: 'white',
-              border: '1px solid hsl(0 0% 0% / 0.08)',
-              textAlign: 'center',
-            }}
-          >
-            <CheckCircle size={64} color="#2FB264" style={{ margin: '0 auto 20px' }} />
-            <Title
-              order={2}
-              mb="md"
-              style={{
-                color: 'hsl(0 0% 0% / 0.87)',
-                fontWeight: 700,
-              }}
-            >
-              Thank you for your interest!
-            </Title>
-            <Text size="lg" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-              We have received your request and will contact you soon.
-            </Text>
-            <Text size="sm" mt="md" style={{ color: 'hsl(0 0% 0% / 0.38)' }}>
-              Redirecting to homepage...
-            </Text>
-          </Paper>
-        </Container>
-      </Box>
-    );
-  }
-
   return (
-    <Box
-      style={{
-        minHeight: '100vh',
-        background: '#ffffff',
-        paddingTop: '60px',
-        paddingBottom: '60px',
-      }}
-    >
-      <Container size="md">
-        <Button
-          variant="subtle"
-          leftSection={<ArrowLeft size={18} />}
-          onClick={() => router.push('/')}
-          mb="xl"
-          style={{
-            color: 'hsl(0 0% 0% / 0.6)',
-          }}
-        >
-          Back
-        </Button>
+    <PageShell kicker="Enterprise" title="Enterprise Waitlist" lead="Tell us about your team and we'll be in touch.">
+      <style>{`
+        .ew-wrap  { max-width: 680px; margin: 0 auto; padding: 48px 20px 80px; }
+        .ew-form  { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 16px; padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+        .ew-field { display: flex; flex-direction: column; gap: 6px; }
+        .ew-label { font-size: 13px; font-weight: 600; color: rgba(237,238,246,0.55); }
+        .ew-input { width: 100%; padding: 12px 14px; font-size: 15px; font-family: inherit; background: ${SURF}; border: 1px solid ${RULE}; border-radius: 8px; color: ${TEXT}; outline: none; transition: border-color .15s; box-sizing: border-box; }
+        .ew-input:focus { border-color: ${ACCENT}; }
+        .ew-input::placeholder { color: rgba(237,238,246,0.22); }
+        .ew-select { appearance: none; cursor: pointer; }
+        .ew-select option { background: ${SURF2}; }
+        .ew-textarea { min-height: 100px; resize: vertical; }
+        .ew-submit { padding: 14px 24px; background: ${TEXT}; color: ${BG}; font-size: 15px; font-weight: 700; font-family: inherit; border: none; border-radius: 999px; cursor: pointer; transition: opacity .15s; width: 100%; }
+        .ew-submit:hover:not(:disabled) { opacity: .87; }
+        .ew-submit:disabled { opacity: .5; cursor: not-allowed; }
+        .ew-success { text-align: center; padding: 48px 24px; }
+        .ew-row { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        @media (min-width: 640px)  { .ew-wrap { padding: 64px 32px 100px; } .ew-row { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1024px) { .ew-wrap { padding: 80px 32px 120px; } }
+      `}</style>
 
-        <Paper
-          p="xl"
-          radius={20}
-          style={{
-            background: 'white',
-            border: '1px solid hsl(0 0% 0% / 0.08)',
-          }}
-        >
-          <Stack gap="lg" mb="xl">
-            <CherutLogo size={100} />
-            <div>
-              <Title
-                order={2}
-                style={{
-                  color: 'hsl(0 0% 0% / 0.87)',
-                  fontWeight: 700,
-                  fontSize: '32px',
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                Enterprise Waitlist
-              </Title>
-              <Text size="md" mt="xs" style={{ color: 'hsl(0 0% 0% / 0.6)' }}>
-                Fill out the form to receive more information
-              </Text>
+      <div style={{ background: BG }}>
+        <div className="ew-wrap">
+          {success ? (
+            <div className="ew-form ew-success">
+              <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
+              <h2 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 36, fontWeight: 800, color: TEXT, margin: '0 0 12px', lineHeight: 0.96 }}>We're on it.</h2>
+              <p style={{ fontSize: 16, color: MUTED, margin: 0 }}>We'll reach out soon. Redirecting…</p>
             </div>
-          </Stack>
-
-          <form onSubmit={handleSubmit}>
-            <Stack gap="md">
-              <TextInput
-                label="Contact Name"
-                placeholder="John Smith"
-                required
-                value={formData.contactName}
-                onChange={(e) => handleChange('contactName', e.currentTarget.value)}
-                radius={48}
-                size="md"
-                styles={{
-                  label: {
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    background: 'white',
-                    border: '1px solid hsl(0 0% 0% / 0.15)',
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    height: '48px',
-                    fontSize: '16px',
-                    '&:focus': {
-                      borderColor: '#3143B6',
-                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
-                    },
-                  },
-                }}
-              />
-
-              <TextInput
-                label="Phone Number"
-                placeholder="+1 (555) 123-4567"
-                required
-                value={formData.phoneNumber}
-                onChange={(e) => handleChange('phoneNumber', e.currentTarget.value)}
-                radius={48}
-                size="md"
-                styles={{
-                  label: {
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    background: 'white',
-                    border: '1px solid hsl(0 0% 0% / 0.15)',
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    height: '48px',
-                    fontSize: '16px',
-                    '&:focus': {
-                      borderColor: '#3143B6',
-                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
-                    },
-                  },
-                }}
-              />
-
-              <TextInput
-                label="Company Name"
-                placeholder="My Company Inc."
-                required
-                value={formData.companyName}
-                onChange={(e) => handleChange('companyName', e.currentTarget.value)}
-                radius={48}
-                size="md"
-                styles={{
-                  label: {
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    background: 'white',
-                    border: '1px solid hsl(0 0% 0% / 0.15)',
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    height: '48px',
-                    fontSize: '16px',
-                    '&:focus': {
-                      borderColor: '#3143B6',
-                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
-                    },
-                  },
-                }}
-              />
-
-              <Select
-                label="Number of Employees"
-                placeholder="Select"
-                value={formData.numberOfEmployees}
-                onChange={(value) => handleChange('numberOfEmployees', value || '')}
-                data={[
-                  { value: '1-10', label: '1-10 employees' },
-                  { value: '11-50', label: '11-50 employees' },
-                  { value: '51-200', label: '51-200 employees' },
-                  { value: '201-500', label: '201-500 employees' },
-                  { value: '500+', label: '500+ employees' },
-                ]}
-                radius={48}
-                size="md"
-                styles={{
-                  label: {
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    background: 'white',
-                    border: '1px solid hsl(0 0% 0% / 0.15)',
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    height: '48px',
-                    fontSize: '16px',
-                    '&:focus': {
-                      borderColor: '#3143B6',
-                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
-                    },
-                  },
-                }}
-              />
-
-              <Select
-                label="Annual Company Revenue"
-                placeholder="Select"
-                value={formData.companyRevenue}
-                onChange={(value) => handleChange('companyRevenue', value || '')}
-                data={[
-                  { value: 'under-1m', label: 'Under $1M' },
-                  { value: '1m-5m', label: '$1M - $5M' },
-                  { value: '5m-10m', label: '$5M - $10M' },
-                  { value: '10m-50m', label: '$10M - $50M' },
-                  { value: '50m+', label: 'Over $50M' },
-                ]}
-                radius={48}
-                size="md"
-                styles={{
-                  label: {
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    background: 'white',
-                    border: '1px solid hsl(0 0% 0% / 0.15)',
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    height: '48px',
-                    fontSize: '16px',
-                    '&:focus': {
-                      borderColor: '#3143B6',
-                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
-                    },
-                  },
-                }}
-              />
-
-              <Textarea
-                label="What is your intended use?"
-                placeholder="How do you plan to use Cherut in your company?"
-                minRows={3}
-                value={formData.intendedUse}
-                onChange={(e) => handleChange('intendedUse', e.currentTarget.value)}
-                radius={20}
-                size="md"
-                styles={{
-                  label: {
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    background: 'white',
-                    border: '1px solid hsl(0 0% 0% / 0.15)',
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    fontSize: '16px',
-                    '&:focus': {
-                      borderColor: '#3143B6',
-                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
-                    },
-                  },
-                }}
-              />
-
-              <Textarea
-                label="What features do you think would be important?"
-                placeholder="Describe features you would like to see in the product..."
-                minRows={3}
-                value={formData.desiredFeatures}
-                onChange={(e) => handleChange('desiredFeatures', e.currentTarget.value)}
-                radius={20}
-                size="md"
-                styles={{
-                  label: {
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    background: 'white',
-                    border: '1px solid hsl(0 0% 0% / 0.15)',
-                    color: 'hsl(0 0% 0% / 0.87)',
-                    fontSize: '16px',
-                    '&:focus': {
-                      borderColor: '#3143B6',
-                      boxShadow: '0 0 0 4px rgba(49, 67, 182, 0.1)',
-                    },
-                  },
-                }}
-              />
-
-              {error && (
-                <Text size="sm" style={{ color: '#dc2626' }}>
-                  {error}
-                </Text>
-              )}
-
-              <Button
-                type="submit"
-                size="lg"
-                radius={48}
-                loading={loading}
-                style={{
-                  background: '#3143B6',
-                  border: 'none',
-                  marginTop: '16px',
-                  height: '56px',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      background: '#2535a0',
-                    },
-                  },
-                }}
-              >
-                Submit Request
-              </Button>
-            </Stack>
-          </form>
-        </Paper>
-      </Container>
-    </Box>
+          ) : (
+            <form className="ew-form" onSubmit={handleSubmit}>
+              <div className="ew-row">
+                <div className="ew-field">
+                  <label className="ew-label" htmlFor="ew-name">Contact name *</label>
+                  <input id="ew-name" className="ew-input" type="text" placeholder="John Smith" value={form.contactName} onChange={e => set('contactName', e.target.value)} required />
+                </div>
+                <div className="ew-field">
+                  <label className="ew-label" htmlFor="ew-phone">Phone number *</label>
+                  <input id="ew-phone" className="ew-input" type="tel" placeholder="+1 (555) 123-4567" value={form.phoneNumber} onChange={e => set('phoneNumber', e.target.value)} required />
+                </div>
+              </div>
+              <div className="ew-field">
+                <label className="ew-label" htmlFor="ew-company">Company name *</label>
+                <input id="ew-company" className="ew-input" type="text" placeholder="My Company Inc." value={form.companyName} onChange={e => set('companyName', e.target.value)} required />
+              </div>
+              <div className="ew-row">
+                <div className="ew-field">
+                  <label className="ew-label" htmlFor="ew-employees">Number of employees</label>
+                  <select id="ew-employees" className="ew-input ew-select" value={form.numberOfEmployees} onChange={e => set('numberOfEmployees', e.target.value)}>
+                    <option value="">Select…</option>
+                    {employeesOptions.map(o => <option key={o} value={o}>{o} employees</option>)}
+                  </select>
+                </div>
+                <div className="ew-field">
+                  <label className="ew-label" htmlFor="ew-revenue">Annual revenue</label>
+                  <select id="ew-revenue" className="ew-input ew-select" value={form.companyRevenue} onChange={e => set('companyRevenue', e.target.value)}>
+                    <option value="">Select…</option>
+                    {revenueOptions.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="ew-field">
+                <label className="ew-label" htmlFor="ew-use">Intended use</label>
+                <textarea id="ew-use" className="ew-input ew-textarea" placeholder="How do you plan to use Cherut in your company?" value={form.intendedUse} onChange={e => set('intendedUse', e.target.value)} />
+              </div>
+              <div className="ew-field">
+                <label className="ew-label" htmlFor="ew-features">Features you'd want</label>
+                <textarea id="ew-features" className="ew-input ew-textarea" placeholder="Describe features that would be important for your team…" value={form.desiredFeatures} onChange={e => set('desiredFeatures', e.target.value)} />
+              </div>
+              {error && <p style={{ fontSize: 14, color: '#f87171', margin: 0 }}>{error}</p>}
+              <button type="submit" className="ew-submit" disabled={loading}>{loading ? 'Sending…' : 'Submit request →'}</button>
+            </form>
+          )}
+        </div>
+      </div>
+    </PageShell>
   );
 }
