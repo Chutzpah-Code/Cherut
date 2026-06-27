@@ -6,7 +6,7 @@ import {
   Modal, Select, NumberInput, TextInput, ActionIcon, Card, Switch,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Plus, Trash2, Play, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, Play, RefreshCw, Pencil } from 'lucide-react';
 import {
   useFinanceRecurring, useFinanceAccounts, useFinanceCategories,
   useCreateRecurring, useDeleteRecurring, useApplyRecurring, useUpdateRecurring,
@@ -39,12 +39,14 @@ export function RecurringView() {
     (accounts as FinanceAccount[]).map((a) => [a.id, a]),
   );
 
+  // Create form
   const [form, setForm] = useState<Partial<CreateRecurringDto>>({
     type: 'expense',
     frequency: 'monthly',
     startDate: new Date().toISOString().slice(0, 10),
   });
   const [formCurrency, setFormCurrency] = useState('USD');
+  const [createAmount, setCreateAmount] = useState<number | string>('');
 
   const handleAccountChange = (accountId: string | null) => {
     const acc = (accounts as FinanceAccount[]).find((a) => a.id === accountId);
@@ -53,8 +55,51 @@ export function RecurringView() {
   };
 
   const handleCreate = () => {
-    if (!form.accountId || !form.categoryId || !form.amount || !form.type || !form.frequency || !form.startDate || !form.description) return;
-    createRecurring.mutate(form as CreateRecurringDto, { onSuccess: close });
+    const amount = typeof createAmount === 'number' ? createAmount : parseFloat(createAmount as string);
+    if (!form.accountId || !form.categoryId || isNaN(amount) || amount <= 0 || !form.type || !form.frequency || !form.startDate || !form.description) return;
+    createRecurring.mutate(
+      { ...form, amount } as CreateRecurringDto,
+      {
+        onSuccess: () => {
+          setForm({ type: 'expense', frequency: 'monthly', startDate: new Date().toISOString().slice(0, 10) });
+          setCreateAmount('');
+          close();
+        },
+      },
+    );
+  };
+
+  // Edit state
+  const [editTarget, setEditTarget] = useState<any | null>(null);
+  const [editAmount, setEditAmount] = useState<number | string>('');
+  const [editCurrency, setEditCurrency] = useState('USD');
+
+  const openEdit = (rule: any) => {
+    const acc = accountMap[rule.accountId];
+    setEditTarget({ ...rule });
+    setEditAmount(rule.amount);
+    setEditCurrency(acc?.currency ?? 'USD');
+  };
+
+  const handleUpdate = () => {
+    if (!editTarget) return;
+    const amount = typeof editAmount === 'number' ? editAmount : parseFloat(editAmount as string);
+    if (isNaN(amount) || amount <= 0) return;
+    updateRecurring.mutate(
+      {
+        id: editTarget.id,
+        dto: {
+          description: editTarget.description,
+          amount,
+          type: editTarget.type,
+          frequency: editTarget.frequency,
+          accountId: editTarget.accountId,
+          categoryId: editTarget.categoryId,
+          startDate: editTarget.startDate,
+        },
+      },
+      { onSuccess: () => setEditTarget(null) },
+    );
   };
 
   if (isLoading) return <Center py="xl"><Loader size="sm" color="#4686FE" /></Center>;
@@ -107,6 +152,9 @@ export function RecurringView() {
                       checked={rule.isActive}
                       onChange={(e) => updateRecurring.mutate({ id: rule.id, dto: { isActive: e.currentTarget.checked } })}
                     />
+                    <ActionIcon size="sm" variant="subtle" color="blue" title="Edit" onClick={() => openEdit(rule)}>
+                      <Pencil size={12} />
+                    </ActionIcon>
                     <ActionIcon
                       size="sm"
                       variant="light"
@@ -128,6 +176,7 @@ export function RecurringView() {
         </Stack>
       )}
 
+      {/* Create modal */}
       <Modal opened={opened} onClose={close} title="New Recurring Rule" centered>
         <Stack gap="sm">
           <TextInput
@@ -164,10 +213,10 @@ export function RecurringView() {
           />
           <NumberInput
             label={`Amount (${formCurrency})`}
-            min={0}
+            min={0.01}
             decimalScale={2}
-            value={form.amount}
-            onChange={(v) => setForm((f) => ({ ...f, amount: typeof v === 'number' ? v : undefined }))}
+            value={createAmount}
+            onChange={setCreateAmount}
             leftSection={<Text size="xs" c="dimmed" fw={600}>{formCurrency}</Text>}
           />
           <TextInput
@@ -179,12 +228,69 @@ export function RecurringView() {
           <Button
             onClick={handleCreate}
             loading={createRecurring.isPending}
-            disabled={!form.accountId || !form.categoryId || !form.amount || !form.description}
+            disabled={!form.accountId || !form.categoryId || !createAmount || !form.description}
             style={{ backgroundColor: '#0052CC' }}
           >
             Create Rule
           </Button>
         </Stack>
+      </Modal>
+
+      {/* Edit modal */}
+      <Modal opened={!!editTarget} onClose={() => setEditTarget(null)} title="Edit Recurring Rule" centered>
+        {editTarget && (
+          <Stack gap="sm">
+            <TextInput
+              label="Description"
+              value={editTarget.description ?? ''}
+              onChange={(e) => setEditTarget((t: any) => ({ ...t, description: e.target.value }))}
+            />
+            <Select
+              label="Type"
+              data={[{ value: 'income', label: 'Income' }, { value: 'expense', label: 'Expense' }]}
+              value={editTarget.type}
+              onChange={(v) => setEditTarget((t: any) => ({ ...t, type: v }))}
+            />
+            <Select
+              label="Frequency"
+              data={['daily', 'weekly', 'monthly', 'yearly'].map((v) => ({ value: v, label: FREQ_LABELS[v] }))}
+              value={editTarget.frequency}
+              onChange={(v) => setEditTarget((t: any) => ({ ...t, frequency: v }))}
+            />
+            <Select
+              label="Account"
+              data={(accounts as FinanceAccount[]).map((a) => ({ value: a.id, label: `${a.name} (${a.currency})` }))}
+              value={editTarget.accountId}
+              onChange={(v) => {
+                const acc = (accounts as FinanceAccount[]).find((a) => a.id === v);
+                setEditCurrency(acc?.currency ?? 'USD');
+                setEditTarget((t: any) => ({ ...t, accountId: v }));
+              }}
+            />
+            <Select
+              label="Category"
+              data={categories.map((c: any) => ({ value: c.id, label: c.name }))}
+              value={editTarget.categoryId}
+              onChange={(v) => setEditTarget((t: any) => ({ ...t, categoryId: v }))}
+            />
+            <NumberInput
+              label={`Amount (${editCurrency})`}
+              min={0.01}
+              decimalScale={2}
+              value={editAmount}
+              onChange={setEditAmount}
+              leftSection={<Text size="xs" c="dimmed" fw={600}>{editCurrency}</Text>}
+            />
+            <Button
+              onClick={handleUpdate}
+              loading={updateRecurring.isPending}
+              disabled={!editAmount || !editTarget.description}
+              style={{ backgroundColor: '#0052CC' }}
+            >
+              Save Changes
+            </Button>
+          </Stack>
+        )}
       </Modal>
     </>
   );

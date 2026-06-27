@@ -27,9 +27,12 @@ function fmtTimer(s: number): string {
 function fmtHuman(s: number): string {
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
-  if (h === 0) return `${m}m`;
-  if (m === 0) return `${h}h`;
-  return `${h}h ${m}m`;
+  const sec = s % 60;
+  if (s < 60) return `${sec}s`;
+  if (h === 0) return sec > 0 ? `${m}m ${sec}s` : `${m}m`;
+  if (sec === 0 && m === 0) return `${h}h`;
+  if (sec === 0) return `${h}h ${m}m`;
+  return `${h}h ${m}m ${sec}s`;
 }
 
 function toLocalTime(iso: string): string {
@@ -53,10 +56,10 @@ function todayStr(): string {
 function dayLabel(d: string): string {
   const today = todayStr();
   const yesterday = toLocalDate(new Date(Date.now() - 86400000).toISOString());
-  if (d === today) return 'Hoje';
-  if (d === yesterday) return 'Ontem';
+  if (d === today) return 'Today';
+  if (d === yesterday) return 'Yesterday';
   const [y, mo, da] = d.split('-');
-  return `${da}/${mo}/${y}`;
+  return `${mo}/${da}/${y}`;
 }
 
 // ── types ─────────────────────────────────────────────────────────────────────
@@ -123,7 +126,7 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
         <>
           <Group gap={8} style={{ flex: 1 }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', animation: 'ttPulse 1.5s ease-in-out infinite', flexShrink: 0 }} />
-            <Text size="sm" fw={600} c="green.7">Rodando</Text>
+            <Text size="sm" fw={600} c="green.7">Running</Text>
             <Text size="sm" c="dimmed">—</Text>
             <Text size="sm" fw={500} style={{ color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 260 }}>
               {activeTask?.title}
@@ -145,7 +148,7 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
       ) : (
         <>
           <Select
-            placeholder="Selecionar tarefa..."
+            placeholder="Select task..."
             data={tasks.map(t => ({ value: t.id, label: t.title }))}
             value={selectedTaskId}
             onChange={setSelectedTaskId}
@@ -211,8 +214,8 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
     <Box style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 10, padding: '14px 16px' }}>
       <Group gap={10} wrap="wrap" align="flex-end">
         <Select
-          label="Tarefa"
-          placeholder="Selecionar..."
+          label="Task"
+          placeholder="Select..."
           data={tasks.map(t => ({ value: t.id, label: t.title }))}
           value={taskId}
           onChange={setTaskId}
@@ -221,7 +224,7 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
           style={{ flex: 1, minWidth: 180 }}
         />
         <TextInput
-          label="Data"
+          label="Date"
           type="date"
           value={date}
           onChange={e => setDate(e.target.value)}
@@ -229,7 +232,7 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
           style={{ width: 140 }}
         />
         <TextInput
-          label="Início"
+          label="Start"
           type="time"
           value={startTime}
           onChange={e => setStartTime(e.target.value)}
@@ -237,7 +240,7 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
           style={{ width: 110 }}
         />
         <TextInput
-          label="Fim"
+          label="End"
           type="time"
           value={endTime}
           onChange={e => setEndTime(e.target.value)}
@@ -246,10 +249,10 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
         />
         <Group gap={6} style={{ paddingBottom: 2 }}>
           <Button size="sm" color="blue" onClick={handleSave} disabled={!isValid} loading={addMutation.isPending}>
-            Salvar
+            Save
           </Button>
           <Button size="sm" variant="subtle" color="gray" onClick={onClose}>
-            Cancelar
+            Cancel
           </Button>
         </Group>
       </Group>
@@ -350,6 +353,8 @@ interface BoardTimeLogViewProps {
 export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
   const { data: columns, isLoading } = useBoardKanban(boardId);
   const [showManual, setShowManual] = useState(false);
+  const [filterFrom, setFilterFrom] = useState('');
+  const [filterTo, setFilterTo] = useState('');
 
   const tasks: Task[] = useMemo(
     () => columns?.flatMap(c => c.tasks).filter(t => !t.archived) ?? [],
@@ -376,9 +381,19 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
     [tasks],
   );
 
+  const filteredEntries = useMemo(() => {
+    if (!filterFrom && !filterTo) return flatEntries;
+    return flatEntries.filter(fe => {
+      const day = toLocalDate(fe.entry.startTime);
+      if (filterFrom && day < filterFrom) return false;
+      if (filterTo && day > filterTo) return false;
+      return true;
+    });
+  }, [flatEntries, filterFrom, filterTo]);
+
   const grouped = useMemo(() => {
     const map = new Map<string, FlatEntry[]>();
-    for (const fe of flatEntries) {
+    for (const fe of filteredEntries) {
       const day = toLocalDate(fe.entry.startTime);
       if (!map.has(day)) map.set(day, []);
       map.get(day)!.push(fe);
@@ -390,7 +405,7 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
     return <Center h={400}><Loader size="sm" color="blue" /></Center>;
   }
 
-  const hasContent = flatEntries.length > 0 || !!activeEntry;
+  const hasContent = filteredEntries.length > 0 || !!activeEntry;
 
   return (
     <>
@@ -407,12 +422,36 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
           <ManualEntryForm tasks={tasks} onClose={() => setShowManual(false)} />
         )}
 
+        <Group gap="sm" align="flex-end">
+          <TextInput
+            type="date"
+            label="From"
+            size="xs"
+            value={filterFrom}
+            onChange={e => setFilterFrom(e.currentTarget.value)}
+            style={{ flex: 1 }}
+          />
+          <TextInput
+            type="date"
+            label="To"
+            size="xs"
+            value={filterTo}
+            onChange={e => setFilterTo(e.currentTarget.value)}
+            style={{ flex: 1 }}
+          />
+          {(filterFrom || filterTo) && (
+            <Button size="xs" variant="subtle" color="gray" onClick={() => { setFilterFrom(''); setFilterTo(''); }}>
+              Clear
+            </Button>
+          )}
+        </Group>
+
         {!hasContent ? (
           <Center h={300}>
             <Stack align="center" gap={8}>
               <Clock size={32} color="#94A3B8" />
-              <Text size="sm" c="dimmed">Nenhum tempo registrado neste board.</Text>
-              <Text size="xs" c="dimmed">Use o timer acima para começar.</Text>
+              <Text size="sm" c="dimmed">No time logged on this board.</Text>
+              <Text size="xs" c="dimmed">Use the timer above to get started.</Text>
             </Stack>
           </Center>
         ) : (
@@ -421,13 +460,13 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
               <>
                 <Box style={{ padding: '8px 20px', background: '#F0FDF4', borderBottom: '1px solid #BBF7D0' }}>
                   <Text size="xs" fw={700} c="green.7" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                    Rodando agora
+                    Running now
                   </Text>
                 </Box>
                 <Box style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', background: '#F0FDF4', borderBottom: '1px solid #E2E8F0' }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', animation: 'ttPulse 1.5s ease-in-out infinite', flexShrink: 0 }} />
                   <Text size="sm" fw={500} style={{ flex: 1, color: '#166534' }}>{activeTask.title}</Text>
-                  <Text size="sm" c="green.7">{toLocalTime(activeEntry.startTime)} – agora</Text>
+                  <Text size="sm" c="green.7">{toLocalTime(activeEntry.startTime)} – now</Text>
                 </Box>
               </>
             )}

@@ -29,8 +29,14 @@ export class FinanceController {
 
   // Overview
   @Get('overview')
-  getOverview(@Request() req, @Query('month') month?: string) {
-    return this.financeService.getOverview(req.user.uid, month);
+  getOverview(
+    @Request() req,
+    @Query('month') month?: string,
+    @Query('displayCurrency') displayCurrency?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.financeService.getOverview(req.user.uid, month, displayCurrency ?? 'USD', startDate, endDate);
   }
 
   // Accounts
