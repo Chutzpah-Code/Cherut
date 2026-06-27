@@ -4,6 +4,8 @@ import { profileApi, CreateProfileDto, UpdateProfileDto } from '@/lib/api/servic
 export const useProfile = () => {
   return useQuery({
     queryKey: ['profile'],
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       try {
         return await profileApi.get();

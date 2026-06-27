@@ -12,8 +12,8 @@ interface ViewSwitcherProps {
 
 const VIEWS = [
   { id: 'kanban' as TaskView, label: 'Board', icon: LayoutGrid, comingSoon: false },
-  { id: 'calendar' as TaskView, label: 'Calendar', icon: CalendarIcon, comingSoon: true },
-  { id: 'timetracker' as TaskView, label: 'Time', icon: Clock, comingSoon: true },
+  { id: 'calendar' as TaskView, label: 'Calendar', icon: CalendarIcon, comingSoon: false },
+  { id: 'timetracker' as TaskView, label: 'Time', icon: Clock, comingSoon: false },
 ];
 
 export function ViewSwitcher({ currentView, onViewChange }: ViewSwitcherProps) {

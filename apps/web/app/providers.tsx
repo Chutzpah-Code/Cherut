@@ -1,6 +1,8 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import { MantineProvider, createTheme, MantineColorsTuple } from '@mantine/core';
@@ -215,15 +217,17 @@ function MantineThemeProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+const CACHE_VERSION = 'v1';
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 30 * 1000,        // 30s — dado vai stale rápido
-        gcTime: 5 * 60 * 1000,       // 5 min em memória
-        refetchOnWindowFocus: true,  // refetch ao voltar para a aba/app
-        refetchOnMount: true,        // refetch ao navegar entre seções
-        refetchOnReconnect: true,    // refetch ao reconectar
+        staleTime: 30 * 1000,
+        gcTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+        refetchOnReconnect: true,
         refetchInterval: false,
         refetchIntervalInBackground: false,
         retry: 1,
@@ -238,16 +242,37 @@ export function Providers({ children }: { children: React.ReactNode }) {
     },
   }));
 
-  return (
-    <QueryClientProvider client={queryClient}>
+  const [persister] = useState(() =>
+    typeof window !== 'undefined'
+      ? createSyncStoragePersister({
+          storage: window.localStorage,
+          key: `cherut-query-cache-${CACHE_VERSION}`,
+        })
+      : undefined
+  );
+
+  if (!persister) {
+    return (
       <MantineThemeProvider>
         <ModalsProvider>
           <Notifications position="top-right" />
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </ModalsProvider>
       </MantineThemeProvider>
-    </QueryClientProvider>
+    );
+  }
+
+  return (
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister, maxAge: 24 * 60 * 60 * 1000 }}
+    >
+      <MantineThemeProvider>
+        <ModalsProvider>
+          <Notifications position="top-right" />
+          <AuthProvider>{children}</AuthProvider>
+        </ModalsProvider>
+      </MantineThemeProvider>
+    </PersistQueryClientProvider>
   );
 }

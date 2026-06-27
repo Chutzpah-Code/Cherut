@@ -5,6 +5,8 @@ import { Stack, Group, Title, ActionIcon, TextInput, Loader } from '@mantine/cor
 import { ArrowLeft, Check, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BoardKanbanView } from './components/BoardKanbanView';
+import { BoardCalendarView } from './components/BoardCalendarView';
+import { BoardTimeLogView } from './components/BoardTimeLogView';
 import { ViewSwitcher, TaskView } from '../components/ViewSwitcher';
 import { useBoard, useUpdateBoard } from '@/hooks/useBoards';
 
@@ -113,7 +115,9 @@ export default function BoardDetailPage({ params }: { params: Promise<{ boardId:
 
       <ViewSwitcher currentView={currentView} onViewChange={setCurrentView} />
 
-      <BoardKanbanView boardId={boardId} />
+      {currentView === 'kanban' && <BoardKanbanView boardId={boardId} />}
+      {currentView === 'calendar' && <BoardCalendarView boardId={boardId} />}
+      {currentView === 'timetracker' && <BoardTimeLogView boardId={boardId} />}
     </Stack>
   );
 }

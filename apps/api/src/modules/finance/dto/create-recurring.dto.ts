@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsBoolean, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsBoolean, Min, Matches } from 'class-validator';
 
 export enum RecurringFrequency {
   DAILY = 'daily',
@@ -33,6 +33,7 @@ export class CreateRecurringDto {
 
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'startDate must be YYYY-MM-DD' })
   startDate: string;
 
   @IsString()

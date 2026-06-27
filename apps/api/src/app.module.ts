@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ValidationExceptionFilter } from './common/filters/validation-exception.filter';
@@ -22,78 +23,32 @@ import { ValuesModule } from './modules/values/values.module';
 import { BoardsModule } from './modules/boards/boards.module';
 import { FinanceModule } from './modules/finance/finance.module';
 
-/**
- * 📚 EXPLICAÇÃO: App Module (Módulo Raiz)
- *
- * MÓDULOS IMPORTADOS:
- * 1. ConfigModule.forRoot() → Carrega variáveis de ambiente do .env
- * 2. FirebaseModule → Inicializa Firebase Admin SDK
- * 3. AuthModule → Sistema de autenticação (NEW!)
- *
- * ConfigModule.forRoot():
- * - isGlobal: true → Configurações ficam disponíveis em toda aplicação
- * - envFilePath: '.env' → Arquivo com variáveis de ambiente
- * - Lê automaticamente process.env e .env file
- *
- * FirebaseModule:
- * - Marcado como @Global() → Disponível em toda aplicação
- * - FirebaseService pode ser injetado em qualquer service
- * - Inicializa quando a aplicação inicia (onModuleInit)
- *
- * AuthModule:
- * - Expõe rotas: /auth/register, /auth/login, /auth/me
- * - Implementa JWT authentication
- * - Integra com Firebase Auth
- */
-
 @Module({
   imports: [
-    // Configura variáveis de ambiente globalmente
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
-      load: [cloudinaryConfig],
-    }),
-    // Inicializa Firebase Admin SDK
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env', load: [cloudinaryConfig] }),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     FirebaseModule,
-    // Sistema de autenticação
     AuthModule,
-    // User Profile (perfil do usuário)
     ProfileModule,
-    // Life Areas (áreas da vida)
     LifeAreasModule,
-    // Objectives (OKR methodology)
     ObjectivesModule,
-    // Key Results (measurable outcomes)
     KeyResultsModule,
-// Habits (rastreamento de hábitos)
     HabitsModule,
-    // Tracking (métricas e progresso)
     TrackingModule,
-    // Tasks (gerenciamento Kanban + Pomodoro)
     TasksModule,
-    // Enterprise Waitlist (formulário de interesse corporativo)
     EnterpriseWaitlistModule,
-    // Vision Board (quadro de visualização de objetivos com imagens)
     VisionBoardModule,
-    // Admin (dashboard administrativo)
     AdminModule,
-    // Journal (personal journaling for daily reflections)
     JournalModule,
-    // Values (core personal values definition and alignment)
     ValuesModule,
-    // Boards (Trello-like boards and columns for tasks)
     BoardsModule,
-    // Finance (personal finance tracking)
     FinanceModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_FILTER,
-      useClass: ValidationExceptionFilter,
-    },
+    { provide: APP_FILTER, useClass: ValidationExceptionFilter },
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}

@@ -1,43 +1,27 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { CacheControlInterceptor } from './common/interceptors/cache-control.interceptor';
 
-/**
- * 📚 EXPLICAÇÃO: Main.ts (Ponto de Entrada)
- *
- * MUDANÇAS:
- * - app.useGlobalPipes(new ValidationPipe()) → Valida DTOs automaticamente
- * - app.enableCors() → Permite requisições de outros domínios (web, mobile)
- *
- * ValidationPipe:
- * - Valida automaticamente todos os DTOs com decorators (class-validator)
- * - whitelist: true → Remove propriedades não definidas no DTO
- * - transform: true → Converte tipos automaticamente (string → number, etc.)
- *
- * CORS (Cross-Origin Resource Sharing):
- * - Permite que frontend (localhost:3002) faça requisições para API (localhost:3000)
- * - Sem CORS, navegador bloqueia requisições entre domínios diferentes
- */
+const DEFAULT_ORIGINS = ['http://localhost:3000', 'https://cherut-web.vercel.app'];
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Ativa validação global de DTOs
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true, // Remove propriedades não definidas no DTO
-      transform: true, // Converte tipos automaticamente
-    }),
-  );
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  app.useGlobalInterceptors(new CacheControlInterceptor());
 
-  // Habilita CORS para permitir requisições do frontend
+  const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
+    : DEFAULT_ORIGINS;
+
   app.enableCors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
+    origin: allowedOrigins,
     credentials: true,
   });
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
+  console.log(`Application running on port ${port}`);
 }
 bootstrap();

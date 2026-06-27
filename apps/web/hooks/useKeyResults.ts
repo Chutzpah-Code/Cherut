@@ -8,6 +8,8 @@ import { objectivesApi, KeyResult } from '@/lib/api/services/objectives';
 export const useKeyResults = (objectiveId?: string) => {
   return useQuery({
     queryKey: ['keyResults', objectiveId],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async (): Promise<KeyResult[]> => {
       // Fetch all objectives (which include their key results)
       const objectives = await objectivesApi.getAll(undefined);

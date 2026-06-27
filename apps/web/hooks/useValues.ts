@@ -5,6 +5,8 @@ export const useValues = () => {
   return useQuery({
     queryKey: ['values'],
     queryFn: valuesApi.getAll,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 };
 
@@ -13,6 +15,8 @@ export const useValue = (id: string) => {
     queryKey: ['values', id],
     queryFn: () => valuesApi.getOne(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 };
 

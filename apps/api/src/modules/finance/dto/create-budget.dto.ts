@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, Min, Matches } from 'class-validator';
 
 export class CreateBudgetDto {
   @IsString()
@@ -9,8 +9,8 @@ export class CreateBudgetDto {
   @Min(0)
   amount: number;
 
-  // YYYY-MM
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d{4}-\d{2}$/, { message: 'month must be YYYY-MM' })
   month: string;
 }

@@ -5,6 +5,8 @@ export const useLifeAreas = () => {
   return useQuery({
     queryKey: ['lifeAreas'],
     queryFn: lifeAreasApi.getAll,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 };
 
@@ -13,6 +15,8 @@ export const useLifeArea = (id: string) => {
     queryKey: ['lifeAreas', id],
     queryFn: () => lifeAreasApi.getOne(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 };
 
