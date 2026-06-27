@@ -182,7 +182,7 @@ function CardPanel({ account, accounts }: { account: FinanceAccount; accounts: F
             </Group>
           </>
         ) : (
-          <Text size="sm" c="dimmed">Sem movimentos neste período.</Text>
+          <Text size="sm" c="dimmed">No transactions this period.</Text>
         )}
       </Box>
 
