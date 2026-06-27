@@ -27,6 +27,7 @@ import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { useObjectives } from '@/hooks/useObjectives';
 import { useKeyResults } from '@/hooks/useKeyResults';
 import { useTask, useUpdateTask, useToggleRecurringDate } from '@/hooks/useTasks';
+import { notifications } from '@mantine/notifications';
 
 function getRecurringDates(config: RecurringConfig): string[] {
   const dates: string[] = [];
@@ -119,6 +120,13 @@ export function TaskModal({
 
   const handleSave = () => {
     onSave(currentTask.id, formData);
+    onClose();
+    notifications.show({
+      title: 'Task updated',
+      message: formData.title || currentTask.title,
+      color: 'green',
+      autoClose: 2500,
+    });
   };
 
   const handleAddChecklistItem = () => {
