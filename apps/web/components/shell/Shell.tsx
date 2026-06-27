@@ -69,7 +69,8 @@ export function PageShell({ children, kicker, title, lead }: PageShellProps) {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; overflow-x: hidden; background: ${PS.BG}; }
+        html { background: ${PS.BG} !important; color-scheme: dark !important; }
+        body { margin: 0; overflow-x: hidden; background: ${PS.BG} !important; color: ${PS.TEXT} !important; }
         a { text-decoration: none; color: inherit; }
         button { font-family: inherit; cursor: pointer; border: none; background: none; }
         ul, ol { margin: 0; padding: 0; list-style: none; }

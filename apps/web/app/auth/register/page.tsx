@@ -62,6 +62,8 @@ export default function RegisterPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
+        html { background: ${BG} !important; color-scheme: dark !important; }
+        body { background: ${BG} !important; }
         .auth-input {
           width: 100%; padding: 12px 14px; font-size: 15px; font-family: inherit;
           background: ${SURF}; border: 1px solid ${RULE}; border-radius: 8px;

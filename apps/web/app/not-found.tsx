@@ -27,6 +27,8 @@ export default function NotFound() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
+        html { background: ${BG} !important; color-scheme: dark !important; }
+        body { background: ${BG} !important; }
         .nf-btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 13px 28px; background: ${TEXT}; color: ${BG}; font-size: 15px; font-weight: 700; font-family: inherit; border: none; border-radius: 999px; cursor: pointer; text-decoration: none; transition: opacity .15s; }
         .nf-btn-primary:hover { opacity: .85; }
         .nf-btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 13px 28px; background: transparent; color: ${TEXT}; font-size: 15px; font-weight: 600; font-family: inherit; border: 1px solid ${RULE}; border-radius: 999px; cursor: pointer; text-decoration: none; transition: background .15s; }
