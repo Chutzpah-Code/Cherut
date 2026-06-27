@@ -334,6 +334,94 @@ export class TasksService {
     return this.findOne(userId, taskId);
   }
 
+  async addManualTimeEntry(userId: string, taskId: string, dto: { startTime: string; endTime: string }) {
+    const task: any = await this.findOne(userId, taskId);
+    const db = this.firebaseService.getFirestore();
+
+    const duration = Math.floor(
+      (new Date(dto.endTime).getTime() - new Date(dto.startTime).getTime()) / 1000,
+    );
+    if (duration <= 0) throw new BadRequestException('End time must be after start time');
+
+    const newEntry = {
+      id: db.collection('temp').doc().id,
+      startTime: dto.startTime,
+      endTime: dto.endTime,
+      duration,
+      status: 'completed',
+    };
+
+    const timeTracking = [...(task.timeTracking || []), newEntry];
+    const totalTimeTracked = (task.totalTimeTracked || 0) + duration;
+
+    await db.collection(this.collection).doc(taskId).update({
+      timeTracking,
+      totalTimeTracked,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Manual time entry added for task: ${taskId}`);
+    return this.findOne(userId, taskId);
+  }
+
+  async editTimeEntry(userId: string, taskId: string, trackingId: string, dto: { startTime?: string; endTime?: string }) {
+    const task: any = await this.findOne(userId, taskId);
+    const db = this.firebaseService.getFirestore();
+
+    const entry = task.timeTracking?.find((t: any) => t.id === trackingId);
+    if (!entry) throw new NotFoundException('Time tracking entry not found');
+    if (entry.status !== 'completed' && entry.status !== 'paused') {
+      throw new BadRequestException('Can only edit completed or paused entries');
+    }
+
+    const oldDuration = entry.duration ?? 0;
+    const newStart = dto.startTime ?? entry.startTime;
+    const newEnd = dto.endTime ?? entry.endTime;
+    const newDuration = Math.floor(
+      (new Date(newEnd).getTime() - new Date(newStart).getTime()) / 1000,
+    );
+    if (newDuration <= 0) throw new BadRequestException('End time must be after start time');
+
+    const updatedTracking = task.timeTracking.map((t: any) =>
+      t.id === trackingId
+        ? { ...t, startTime: newStart, endTime: newEnd, duration: newDuration }
+        : t,
+    );
+    const totalTimeTracked = Math.max(0, (task.totalTimeTracked || 0) - oldDuration + newDuration);
+
+    await db.collection(this.collection).doc(taskId).update({
+      timeTracking: updatedTracking,
+      totalTimeTracked,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Time entry ${trackingId} edited for task: ${taskId}`);
+    return this.findOne(userId, taskId);
+  }
+
+  async deleteTimeEntry(userId: string, taskId: string, trackingId: string) {
+    const task: any = await this.findOne(userId, taskId);
+    const db = this.firebaseService.getFirestore();
+
+    const entry = task.timeTracking?.find((t: any) => t.id === trackingId);
+    if (!entry) throw new NotFoundException('Time tracking entry not found');
+
+    const updatedTracking = task.timeTracking.filter((t: any) => t.id !== trackingId);
+    let totalTimeTracked = task.totalTimeTracked || 0;
+    if (entry.status === 'completed' || entry.status === 'paused') {
+      totalTimeTracked = Math.max(0, totalTimeTracked - (entry.duration ?? 0));
+    }
+
+    await db.collection(this.collection).doc(taskId).update({
+      timeTracking: updatedTracking,
+      totalTimeTracked,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Time entry ${trackingId} deleted from task: ${taskId}`);
+    return this.findOne(userId, taskId);
+  }
+
   /**
    * Toggle checklist item
    */

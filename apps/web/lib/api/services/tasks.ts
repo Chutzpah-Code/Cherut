@@ -199,6 +199,22 @@ export const tasksApi = {
     return data;
   },
 
+  // Time Tracking — extended
+  addManualTimeEntry: async (id: string, dto: { startTime: string; endTime: string }): Promise<Task> => {
+    const { data } = await apiClient.post(`/tasks/${id}/time-tracking/manual`, dto);
+    return data;
+  },
+
+  editTimeEntry: async (id: string, trackingId: string, dto: { startTime?: string; endTime?: string }): Promise<Task> => {
+    const { data } = await apiClient.patch(`/tasks/${id}/time-tracking/${trackingId}/edit`, dto);
+    return data;
+  },
+
+  deleteTimeEntry: async (id: string, trackingId: string): Promise<Task> => {
+    const { data } = await apiClient.delete(`/tasks/${id}/time-tracking/${trackingId}`);
+    return data;
+  },
+
   // Recurring
   toggleRecurringDate: async (id: string, date: string): Promise<Task> => {
     const { data } = await apiClient.patch(`/tasks/${id}/toggle-recurring-date`, { date });

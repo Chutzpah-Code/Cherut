@@ -152,6 +152,36 @@ export class TasksController {
     return this.tasksService.toggleArchive(req.user.uid, id);
   }
 
+  @Post(':id/time-tracking/manual')
+  addManualTimeEntry(
+    @Request() req,
+    @Param('id') id: string,
+    @Body('startTime') startTime: string,
+    @Body('endTime') endTime: string,
+  ) {
+    return this.tasksService.addManualTimeEntry(req.user.uid, id, { startTime, endTime });
+  }
+
+  @Patch(':id/time-tracking/:trackingId/edit')
+  editTimeEntry(
+    @Request() req,
+    @Param('id') id: string,
+    @Param('trackingId') trackingId: string,
+    @Body('startTime') startTime?: string,
+    @Body('endTime') endTime?: string,
+  ) {
+    return this.tasksService.editTimeEntry(req.user.uid, id, trackingId, { startTime, endTime });
+  }
+
+  @Delete(':id/time-tracking/:trackingId')
+  deleteTimeEntry(
+    @Request() req,
+    @Param('id') id: string,
+    @Param('trackingId') trackingId: string,
+  ) {
+    return this.tasksService.deleteTimeEntry(req.user.uid, id, trackingId);
+  }
+
   @Patch(':id/toggle-recurring-date')
   toggleRecurringDate(
     @Request() req,

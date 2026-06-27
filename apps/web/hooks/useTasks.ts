@@ -247,47 +247,83 @@ export const useDeleteTask = () => {
 // Time Tracking Hooks
 export const useStartTimeTracking = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (id: string) => tasksApi.startTimeTracking(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });
 };
 
 export const usePauseTimeTracking = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({ id, trackingId }: { id: string; trackingId: string }) =>
       tasksApi.pauseTimeTracking(id, trackingId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });
 };
 
 export const useStopTimeTracking = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({ id, trackingId }: { id: string; trackingId: string }) =>
       tasksApi.stopTimeTracking(id, trackingId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });
 };
 
 export const useCancelTimeTracking = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({ id, trackingId }: { id: string; trackingId: string }) =>
       tasksApi.cancelTimeTracking(id, trackingId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
+    },
+  });
+};
+
+export const useAddManualTimeEntry = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, dto }: { id: string; dto: { startTime: string; endTime: string } }) =>
+      tasksApi.addManualTimeEntry(id, dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
+    },
+  });
+};
+
+export const useEditTimeEntry = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, trackingId, dto }: { id: string; trackingId: string; dto: { startTime?: string; endTime?: string } }) =>
+      tasksApi.editTimeEntry(id, trackingId, dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
+    },
+  });
+};
+
+export const useDeleteTimeEntry = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, trackingId }: { id: string; trackingId: string }) =>
+      tasksApi.deleteTimeEntry(id, trackingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });
 };
