@@ -361,6 +361,52 @@ export class TasksService {
   }
 
   /**
+   * Toggle a specific date in completedDates for a recurring task.
+   * Auto-marks the task as 'done' when all occurrences are completed.
+   */
+  async toggleRecurringDate(userId: string, taskId: string, date: string) {
+    const task: any = await this.findOne(userId, taskId);
+    const db = this.firebaseService.getFirestore();
+
+    const current: string[] = task.completedDates ?? [];
+    const completedDates = current.includes(date)
+      ? current.filter((d: string) => d !== date)
+      : [...current, date].sort();
+
+    const updateData: any = { completedDates, updatedAt: new Date().toISOString() };
+
+    if (task.recurringConfig) {
+      const total = this.countOccurrences(
+        task.recurringConfig.startDate,
+        task.recurringConfig.endDate,
+        task.recurringConfig.frequency,
+      );
+      if (completedDates.length >= total) {
+        updateData.status = 'done';
+      } else if (task.status === 'done') {
+        updateData.status = 'in_progress';
+      }
+    }
+
+    await db.collection(this.collection).doc(taskId).update(updateData);
+    this.logger.log(`Recurring date toggled for task ${taskId}: ${date}`);
+    return this.findOne(userId, taskId);
+  }
+
+  private countOccurrences(startDate: string, endDate: string, frequency: string): number {
+    let count = 0;
+    const current = new Date(startDate);
+    const end = new Date(endDate);
+    while (current <= end) {
+      count++;
+      if (frequency === 'daily') current.setDate(current.getDate() + 1);
+      else if (frequency === 'weekly') current.setDate(current.getDate() + 7);
+      else current.setMonth(current.getMonth() + 1);
+    }
+    return count;
+  }
+
+  /**
    * Archive/Unarchive task
    */
   async toggleArchive(userId: string, taskId: string) {

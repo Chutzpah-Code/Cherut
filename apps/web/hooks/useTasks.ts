@@ -316,3 +316,50 @@ export const useToggleArchive = () => {
     },
   });
 };
+
+// Recurring date toggle — optimistic update on completedDates
+export const useToggleRecurringDate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, date }: { id: string; date: string }) =>
+      tasksApi.toggleRecurringDate(id, date),
+    onMutate: async ({ id, date }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks'] });
+
+      const updateTask = (task: any) => {
+        if (task?.id !== id) return task;
+        const current: string[] = task.completedDates ?? [];
+        const completedDates = current.includes(date)
+          ? current.filter((d: string) => d !== date)
+          : [...current, date].sort();
+        return { ...task, completedDates };
+      };
+
+      const previousData = queryClient.getQueriesData({ queryKey: ['tasks'] });
+
+      queryClient.setQueriesData<any>({ queryKey: ['tasks', 'kanban'] }, (old: any) => {
+        if (!old) return old;
+        const updated = { ...old };
+        for (const col of ['todo', 'in_progress', 'done'] as const) {
+          if (updated[col]) updated[col] = updated[col].map(updateTask);
+        }
+        return updated;
+      });
+
+      queryClient.setQueryData(['tasks', id], (old: any) => updateTask(old));
+
+      return { previousData };
+    },
+    onError: (_err, _vars, context: any) => {
+      if (context?.previousData) {
+        for (const [key, data] of context.previousData) {
+          queryClient.setQueryData(key, data);
+        }
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'], exact: false, refetchType: 'none' });
+    },
+  });
+};

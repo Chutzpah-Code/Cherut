@@ -17,14 +17,29 @@ import {
   Progress,
   Alert,
   Grid,
+  Switch,
+  Tooltip,
 } from '@mantine/core';
-import { Plus, X, Play, Pause, Square, Trash2, Archive, Clock } from 'lucide-react';
-import { Task, ChecklistItem, UpdateTaskDto } from '@/lib/api/services/tasks';
-import { useState, useEffect } from 'react';
+import { Plus, X, Play, Pause, Square, Trash2, Archive, Clock, RefreshCw } from 'lucide-react';
+import { Task, ChecklistItem, UpdateTaskDto, RecurringConfig } from '@/lib/api/services/tasks';
+import { useState, useEffect, useMemo } from 'react';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { useObjectives } from '@/hooks/useObjectives';
 import { useKeyResults } from '@/hooks/useKeyResults';
-import { useTask, useUpdateTask } from '@/hooks/useTasks';
+import { useTask, useUpdateTask, useToggleRecurringDate } from '@/hooks/useTasks';
+
+function getRecurringDates(config: RecurringConfig): string[] {
+  const dates: string[] = [];
+  const current = new Date(config.startDate + 'T00:00:00');
+  const end = new Date(config.endDate + 'T00:00:00');
+  while (current <= end) {
+    dates.push(current.toISOString().split('T')[0]);
+    if (config.frequency === 'daily') current.setDate(current.getDate() + 1);
+    else if (config.frequency === 'weekly') current.setDate(current.getDate() + 7);
+    else current.setMonth(current.getMonth() + 1);
+  }
+  return dates;
+}
 
 interface TaskModalProps {
   task: Task | null;
@@ -66,6 +81,7 @@ export function TaskModal({
 
   const [formData, setFormData] = useState<UpdateTaskDto>({});
   const [newChecklistItem, setNewChecklistItem] = useState('');
+  const toggleRecurringDate = useToggleRecurringDate();
 
   // Filter objectives by selected life area
   const filteredObjectives = allObjectives?.filter(
@@ -90,6 +106,9 @@ export function TaskModal({
         estimatedPomodoros: currentTask.estimatedPomodoros,
         checklist: currentTask.checklist,
         tags: currentTask.tags,
+        isRecurring: currentTask.isRecurring ?? false,
+        recurringConfig: currentTask.recurringConfig,
+        completedDates: currentTask.completedDates,
       });
     }
   }, [currentTask]);
@@ -289,6 +308,118 @@ export function TaskModal({
             />
           </Grid.Col>
         </Grid>
+
+        {/* Recurring */}
+        <Stack gap="sm">
+          <Group justify="space-between" align="center">
+            <Group gap={8}>
+              <RefreshCw size={15} color="#4686FE" />
+              <Text size="sm" fw={600}>Recurring task</Text>
+            </Group>
+            <Switch
+              checked={!!formData.isRecurring}
+              onChange={(e) => {
+                const on = e.currentTarget.checked;
+                setFormData({
+                  ...formData,
+                  isRecurring: on,
+                  recurringConfig: on
+                    ? (formData.recurringConfig ?? { startDate: '', endDate: '', frequency: 'daily' as const })
+                    : undefined,
+                  completedDates: on ? (formData.completedDates ?? []) : undefined,
+                });
+              }}
+              color="blue"
+            />
+          </Group>
+
+          {formData.isRecurring && (
+            <Stack gap="sm" style={{ padding: '16px', background: '#F8FAFC', borderRadius: 10, border: '1px solid #E2E8F0' }}>
+              <Select
+                label="Frequency"
+                size="sm"
+                value={formData.recurringConfig?.frequency ?? 'daily'}
+                onChange={(v) => setFormData({
+                  ...formData,
+                  recurringConfig: { ...(formData.recurringConfig ?? { startDate: '', endDate: '' }), frequency: v as RecurringConfig['frequency'] },
+                })}
+                data={[
+                  { value: 'daily', label: 'Daily' },
+                  { value: 'weekly', label: 'Weekly' },
+                  { value: 'monthly', label: 'Monthly' },
+                ]}
+              />
+              <Grid>
+                <Grid.Col span={6}>
+                  <TextInput
+                    label="Start date"
+                    type="date"
+                    size="sm"
+                    value={formData.recurringConfig?.startDate ?? ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      recurringConfig: { ...(formData.recurringConfig ?? { endDate: '', frequency: 'daily' }), startDate: e.target.value },
+                    })}
+                  />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput
+                    label="End date"
+                    type="date"
+                    size="sm"
+                    value={formData.recurringConfig?.endDate ?? ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      recurringConfig: { ...(formData.recurringConfig ?? { startDate: '', frequency: 'daily' }), endDate: e.target.value },
+                    })}
+                  />
+                </Grid.Col>
+              </Grid>
+
+              {/* Day-check grid — only for saved recurring tasks */}
+              {currentTask.isRecurring && currentTask.recurringConfig?.startDate && currentTask.recurringConfig?.endDate && (() => {
+                const allDates = getRecurringDates(currentTask.recurringConfig!);
+                const completed = new Set(currentTask.completedDates ?? []);
+                const total = allDates.length;
+                const done = completed.size;
+                const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+                return (
+                  <Stack gap="xs">
+                    <Group justify="space-between">
+                      <Text size="xs" fw={600} c="dimmed">{done}/{total} days complete</Text>
+                      <Text size="xs" c="dimmed">{pct}%</Text>
+                    </Group>
+                    <Progress value={pct} size="sm" radius={4} color={pct === 100 ? 'green' : 'blue'} />
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxHeight: 140, overflowY: 'auto' }}>
+                      {allDates.map((d) => {
+                        const isDone = completed.has(d);
+                        const label = d.slice(5); // MM-DD
+                        return (
+                          <Tooltip key={d} label={d} withArrow position="top">
+                            <button
+                              type="button"
+                              onClick={() => toggleRecurringDate.mutate({ id: currentTask.id, date: d })}
+                              style={{
+                                width: 36, height: 36, borderRadius: 6, border: 'none',
+                                background: isDone ? '#22C55E' : '#E2E8F0',
+                                color: isDone ? '#fff' : '#64748B',
+                                fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                transition: 'background 0.15s',
+                              }}
+                            >
+                              {label}
+                            </button>
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
+                  </Stack>
+                );
+              })()}
+            </Stack>
+          )}
+        </Stack>
 
         {/* Estimated Pomodoros */}
         <TextInput

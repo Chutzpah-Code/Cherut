@@ -15,6 +15,12 @@ export interface TimeTrackingEntry {
   status: 'running' | 'paused' | 'completed' | 'cancelled';
 }
 
+export interface RecurringConfig {
+  startDate: string;
+  endDate: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
+}
+
 export interface Task {
   id: string;
   userId: string;
@@ -38,6 +44,10 @@ export interface Task {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  // Recurring task fields
+  isRecurring?: boolean;
+  recurringConfig?: RecurringConfig;
+  completedDates?: string[];
 }
 
 export interface CreateTaskDto {
@@ -54,6 +64,9 @@ export interface CreateTaskDto {
   estimatedPomodoros?: number;
   checklist?: ChecklistItem[];
   tags?: string[];
+  isRecurring?: boolean;
+  recurringConfig?: RecurringConfig;
+  completedDates?: string[];
 }
 
 export interface UpdateTaskDto {
@@ -70,6 +83,9 @@ export interface UpdateTaskDto {
   estimatedPomodoros?: number;
   checklist?: ChecklistItem[];
   tags?: string[];
+  isRecurring?: boolean;
+  recurringConfig?: RecurringConfig;
+  completedDates?: string[];
 }
 
 export interface UpdateTaskOrderDto {
@@ -180,6 +196,12 @@ export const tasksApi = {
   // Archive
   toggleArchive: async (id: string): Promise<Task> => {
     const { data } = await apiClient.patch(`/tasks/${id}/archive`);
+    return data;
+  },
+
+  // Recurring
+  toggleRecurringDate: async (id: string, date: string): Promise<Task> => {
+    const { data } = await apiClient.patch(`/tasks/${id}/toggle-recurring-date`, { date });
     return data;
   },
 };

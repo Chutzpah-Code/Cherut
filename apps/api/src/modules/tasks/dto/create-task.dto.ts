@@ -10,8 +10,22 @@ import {
   IsArray,
   ValidateNested,
   IsBoolean,
+  Matches,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+
+export class RecurringConfigDto {
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'startDate must be YYYY-MM-DD' })
+  startDate: string;
+
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'endDate must be YYYY-MM-DD' })
+  endDate: string;
+
+  @IsEnum(['daily', 'weekly', 'monthly'])
+  frequency: 'daily' | 'weekly' | 'monthly';
+}
 
 export enum TaskStatus {
   TODO = 'todo',
@@ -164,4 +178,20 @@ export class CreateTaskDto {
   @IsString()
   @IsOptional()
   columnId?: string;
+
+  // Recurring task fields
+  @IsBoolean()
+  @IsOptional()
+  isRecurring?: boolean;
+
+  @ValidateNested()
+  @Type(() => RecurringConfigDto)
+  @IsOptional()
+  recurringConfig?: RecurringConfigDto;
+
+  @IsArray()
+  @IsString({ each: true })
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { each: true, message: 'each date must be YYYY-MM-DD' })
+  @IsOptional()
+  completedDates?: string[];
 }

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Card, Text, Group, Stack, Badge, Tooltip, ActionIcon } from '@mantine/core';
-import { Clock, Archive, Edit2 } from 'lucide-react';
+import { Clock, Archive, Edit2, RefreshCw } from 'lucide-react';
 import { Task } from '@/lib/api/services/tasks';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -63,6 +63,22 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
     task.timeTracking?.some((t) => t.status === 'running'),
     [task.timeTracking]
   );
+
+  const recurringProgress = useMemo(() => {
+    if (!task.isRecurring || !task.recurringConfig?.startDate || !task.recurringConfig?.endDate) return null;
+    const { startDate, endDate, frequency } = task.recurringConfig;
+    let total = 0;
+    const cur = new Date(startDate + 'T00:00:00');
+    const end = new Date(endDate + 'T00:00:00');
+    while (cur <= end) {
+      total++;
+      if (frequency === 'daily') cur.setDate(cur.getDate() + 1);
+      else if (frequency === 'weekly') cur.setDate(cur.getDate() + 7);
+      else cur.setMonth(cur.getMonth() + 1);
+    }
+    const done = task.completedDates?.length ?? 0;
+    return { done, total };
+  }, [task.isRecurring, task.recurringConfig, task.completedDates]);
 
   return (
     <React.Fragment>
@@ -196,6 +212,24 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
             </ActionIcon>
           )}
         </Group>
+        {/* Recurring progress */}
+        {recurringProgress && (
+          <Group gap={6} mt={2}>
+            <RefreshCw size={11} color="#4686FE" />
+            <Text size="xs" c="dimmed" fw={500}>
+              {recurringProgress.done}/{recurringProgress.total}
+            </Text>
+            <div style={{ flex: 1, height: 3, background: '#E2E8F0', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{
+                height: '100%',
+                width: `${recurringProgress.total > 0 ? (recurringProgress.done / recurringProgress.total) * 100 : 0}%`,
+                background: recurringProgress.done === recurringProgress.total ? '#22C55E' : '#4686FE',
+                borderRadius: 2,
+                transition: 'width 0.3s ease',
+              }} />
+            </div>
+          </Group>
+        )}
       </Stack>
 
         {/* Global styles for pulse animation */}

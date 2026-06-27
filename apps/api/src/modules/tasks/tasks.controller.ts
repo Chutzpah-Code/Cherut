@@ -151,4 +151,13 @@ export class TasksController {
   toggleArchive(@Request() req, @Param('id') id: string) {
     return this.tasksService.toggleArchive(req.user.uid, id);
   }
+
+  @Patch(':id/toggle-recurring-date')
+  toggleRecurringDate(
+    @Request() req,
+    @Param('id') id: string,
+    @Body('date') date: string,
+  ) {
+    return this.tasksService.toggleRecurringDate(req.user.uid, id, date);
+  }
 }
