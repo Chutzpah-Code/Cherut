@@ -479,15 +479,17 @@ export function TaskModal({
         {/* Time Tracking */}
         {activeTracking ? (
           <Stack gap="sm">
-            <Group gap={10} align="center"
+            <Group justify="space-between" align="center"
               style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10, padding: '12px 16px' }}
             >
-              <div style={{
-                width: 10, height: 10, borderRadius: '50%', background: '#22C55E',
-                animation: 'ttPulse 1.5s ease-in-out infinite', flexShrink: 0,
-              }} />
-              <Text size="sm" fw={600} c="green.7" style={{ flex: 0 }}>Recording</Text>
-              <Text fw={700} style={{ fontFamily: 'monospace', fontSize: 22, letterSpacing: 2, color: '#166534', flex: 1 }}>
+              <Group gap={8}>
+                <div style={{
+                  width: 10, height: 10, borderRadius: '50%', background: '#22C55E',
+                  animation: 'ttPulse 1.5s ease-in-out infinite', flexShrink: 0,
+                }} />
+                <Text size="sm" fw={600} c="green.7">Recording</Text>
+              </Group>
+              <Text fw={700} style={{ fontFamily: 'monospace', fontSize: 22, letterSpacing: 2, color: '#166534' }}>
                 {formatTime(liveElapsed)}
               </Text>
             </Group>
