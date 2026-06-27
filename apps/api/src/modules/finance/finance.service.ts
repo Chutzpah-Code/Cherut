@@ -238,15 +238,14 @@ export class FinanceService {
     const txSnap = await this.db
       .collection(this.TRANSACTIONS)
       .where('userId', '==', userId)
-      .where('type', '==', 'expense')
-      .where('date', '>=', startDate)
-      .where('date', '<=', endStr)
       .get();
 
     const spent: Record<string, number> = {};
     txSnap.docs.forEach((d: any) => {
-      const { categoryId, amount } = d.data();
-      spent[categoryId] = (spent[categoryId] ?? 0) + amount;
+      const { categoryId, amount, type, date } = d.data();
+      if (type === 'expense' && date >= startDate && date <= endStr) {
+        spent[categoryId] = (spent[categoryId] ?? 0) + amount;
+      }
     });
 
     return budgets.map((b) => ({ ...b, spent: spent[b.categoryId] ?? 0 }));
@@ -351,11 +350,12 @@ export class FinanceService {
 
     const [accountsSnap, txSnap] = await Promise.all([
       this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
-      this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).where('date', '>=', start).where('date', '<=', end).get(),
+      this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
     ]);
 
     const accounts = accountsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
-    const transactions = txSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+    const transactions = (txSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[])
+      .filter((t) => t.date >= start && t.date <= end);
 
     const totalBalance = accounts.reduce((sum, a) => sum + (a.balance ?? 0), 0);
     const income = transactions.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
