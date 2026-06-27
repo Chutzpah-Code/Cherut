@@ -20,7 +20,7 @@ import {
   Switch,
   Tooltip,
 } from '@mantine/core';
-import { Plus, X, Play, Pause, Square, Trash2, Archive, Clock, RefreshCw } from 'lucide-react';
+import { Plus, X, Play, Square, Trash2, Archive, Clock, RefreshCw } from 'lucide-react';
 import { Task, ChecklistItem, UpdateTaskDto, RecurringConfig } from '@/lib/api/services/tasks';
 import { useState, useEffect, useMemo } from 'react';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
@@ -83,6 +83,20 @@ export function TaskModal({
   const [formData, setFormData] = useState<UpdateTaskDto>({});
   const [newChecklistItem, setNewChecklistItem] = useState('');
   const toggleRecurringDate = useToggleRecurringDate();
+
+  const [liveElapsed, setLiveElapsed] = useState(0);
+  useEffect(() => {
+    const running = currentTask?.timeTracking?.find((t) => t.status === 'running');
+    if (!running) {
+      setLiveElapsed(0);
+      return;
+    }
+    const start = new Date(running.startTime).getTime();
+    const tick = () => setLiveElapsed(Math.floor((Date.now() - start) / 1000));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [currentTask?.timeTracking]);
 
   // Filter objectives by selected life area
   const filteredObjectives = allObjectives?.filter(
@@ -463,77 +477,60 @@ export function TaskModal({
         />
 
         {/* Time Tracking */}
-        {currentTask.totalTimeTracked && currentTask.totalTimeTracked > 0 && (
-          <Alert
-            icon={<Clock size={16} />}
-            variant="light"
-            radius={8}
-            styles={{
-              root: {
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0',
-              },
-              icon: {
-                color: '#4686FE',
-              },
-              message: {
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
-                fontWeight: 500,
-                color: '#334155',
-              },
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
-                fontWeight: 500,
-                color: '#334155',
-              }}
+        {activeTracking ? (
+          <Stack gap="sm">
+            <Group gap={10} align="center"
+              style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10, padding: '12px 16px' }}
             >
-              Total time tracked: {formatTime(currentTask.totalTimeTracked)}
-            </Text>
-          </Alert>
-        )}
-
-        <Grid>
-          {!activeTracking ? (
-            <Grid.Col span={{ base: 12, xs: 'content' }}>
-              <Button
-                leftSection={<Play size={16} />}
-                color="green"
-                onClick={() => onStartTimeTracking(currentTask.id)}
-                fullWidth
+              <div style={{
+                width: 10, height: 10, borderRadius: '50%', background: '#22C55E',
+                animation: 'ttPulse 1.5s ease-in-out infinite', flexShrink: 0,
+              }} />
+              <Text size="sm" fw={600} c="green.7" style={{ flex: 0 }}>Recording</Text>
+              <Text fw={700} style={{ fontFamily: 'monospace', fontSize: 22, letterSpacing: 2, color: '#166534', flex: 1 }}>
+                {formatTime(liveElapsed)}
+              </Text>
+            </Group>
+            {(currentTask.totalTimeTracked ?? 0) > 0 && (
+              <Text size="xs" c="dimmed" style={{ paddingLeft: 2 }}>
+                + {formatTime(currentTask.totalTimeTracked!)} previously tracked
+              </Text>
+            )}
+            <Button
+              leftSection={<Square size={16} />}
+              color="red"
+              onClick={() => onStopTimeTracking(currentTask.id, activeTracking.id)}
+            >
+              Stop Tracking
+            </Button>
+          </Stack>
+        ) : (
+          <Stack gap="sm">
+            {(currentTask.totalTimeTracked ?? 0) > 0 && (
+              <Alert
+                icon={<Clock size={16} />}
+                variant="light"
+                radius={8}
+                styles={{
+                  root: { backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' },
+                  icon: { color: '#4686FE' },
+                }}
               >
-                Start Tracking
-              </Button>
-            </Grid.Col>
-          ) : (
-            <React.Fragment>
-              <Grid.Col span={{ base: 6, xs: 'content' }}>
-                <Button
-                  leftSection={<Pause size={16} />}
-                  color="yellow"
-                  onClick={() => onPauseTimeTracking(currentTask.id, activeTracking.id)}
-                  fullWidth
-                >
-                  Pause
-                </Button>
-              </Grid.Col>
-              <Grid.Col span={{ base: 6, xs: 'content' }}>
-                <Button
-                  leftSection={<Square size={16} />}
-                  color="red"
-                  onClick={() => onStopTimeTracking(currentTask.id, activeTracking.id)}
-                  fullWidth
-                >
-                  Stop
-                </Button>
-              </Grid.Col>
-            </React.Fragment>
-          )}
-        </Grid>
+                <Text size="sm" fw={500} c="dark.4">
+                  Total time tracked: {formatTime(currentTask.totalTimeTracked!)}
+                </Text>
+              </Alert>
+            )}
+            <Button
+              leftSection={<Play size={16} />}
+              color="green"
+              onClick={() => onStartTimeTracking(currentTask.id)}
+            >
+              Start Tracking
+            </Button>
+          </Stack>
+        )}
+        <style>{`@keyframes ttPulse { 0%,100%{opacity:1} 50%{opacity:.35} }`}</style>
 
         <Divider label="Checklist" labelPosition="center" />
 
