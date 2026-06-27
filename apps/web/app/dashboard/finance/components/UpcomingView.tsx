@@ -65,9 +65,9 @@ function urgencyColor(days: number): string {
   return 'green';
 }
 
-// ─── Vencimentos ─────────────────────────────────────────────────────────────
+// ─── Upcoming Bills ──────────────────────────────────────────────────────────
 
-function VencimentosTab() {
+function UpcomingBillsTab() {
   const [horizon, setHorizon] = useState(30);
   const { data: recurring = [], isLoading } = useFinanceRecurring(true);
   const applyRecurring = useApplyRecurring();
@@ -102,14 +102,14 @@ function VencimentosTab() {
             color={horizon === d ? '#0052CC' : 'gray'}
             onClick={() => setHorizon(d)}
           >
-            {d} dias
+            {d} days
           </Button>
         ))}
       </Group>
 
       {upcoming.length === 0 ? (
         <Center py="xl">
-          <Text c="dimmed" size="sm">Nenhum vencimento nos próximos {horizon} dias.</Text>
+          <Text c="dimmed" size="sm">No bills due in the next {horizon} days.</Text>
         </Center>
       ) : (
         <Stack gap={6}>
@@ -125,7 +125,7 @@ function VencimentosTab() {
                     <Text size="sm" fw={600}>{rule.description}</Text>
                     <Group gap={6} mt={2}>
                       <Badge size="xs" color={urgencyColor(days)} variant="light">
-                        {days < 0 ? `${Math.abs(days)}d atrasado` : days === 0 ? 'Hoje' : `em ${days}d`}
+                        {days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Today' : `in ${days}d`}
                       </Badge>
                       <Text size="xs" c="dimmed">{fmtDate(dueDate)}</Text>
                     </Group>
@@ -143,7 +143,7 @@ function VencimentosTab() {
                         loading={applyRecurring.isPending}
                         onClick={() => applyRecurring.mutate(rule.id)}
                       >
-                        Aplicar
+                        Apply
                       </Button>
                     )}
                   </Group>
@@ -157,9 +157,9 @@ function VencimentosTab() {
   );
 }
 
-// ─── Projeção ─────────────────────────────────────────────────────────────────
+// ─── Projection ───────────────────────────────────────────────────────────────
 
-function ProjecaoTab() {
+function ProjectionTab() {
   const { data: recurring = [], isLoading: rLoading } = useFinanceRecurring(true);
   const { data: accounts = [], isLoading: aLoading } = useFinanceAccounts();
 
@@ -205,14 +205,14 @@ function ProjecaoTab() {
   if (!accountNames.length) {
     return (
       <Center py="xl">
-        <Text c="dimmed" size="sm">Nenhuma conta disponível para projeção.</Text>
+        <Text c="dimmed" size="sm">No accounts available for projection.</Text>
       </Center>
     );
   }
 
   return (
     <Stack gap="md">
-      <Text size="xs" c="dimmed">Projeção de saldo para os próximos 60 dias com base nas regras recorrentes ativas.</Text>
+      <Text size="xs" c="dimmed">Balance projection for the next 60 days based on active recurring rules.</Text>
       <ResponsiveContainer width="100%" height={280}>
         <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
@@ -236,9 +236,9 @@ function ProjecaoTab() {
   );
 }
 
-// ─── Subscrições ─────────────────────────────────────────────────────────────
+// ─── Subscriptions ───────────────────────────────────────────────────────────
 
-function SubscricoesTab() {
+function SubscriptionsTab() {
   const { data: recurring = [], isLoading } = useFinanceRecurring(true);
 
   const subscriptions = useMemo(() => {
@@ -261,7 +261,7 @@ function SubscricoesTab() {
   if (subscriptions.length === 0) {
     return (
       <Center py="xl">
-        <Text c="dimmed" size="sm">Nenhuma subscrição recorrente cadastrada.</Text>
+        <Text c="dimmed" size="sm">No recurring subscriptions added yet.</Text>
       </Center>
     );
   }
@@ -270,11 +270,11 @@ function SubscricoesTab() {
     <Stack gap="md">
       <Group gap="md">
         <Box style={{ flex: 1, background: '#EFF6FF', borderRadius: 10, padding: '12px 16px' }}>
-          <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Total mensal</Text>
+          <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Monthly total</Text>
           <Text size="xl" fw={700} c="#0052CC">{fmt(monthlyTotal)}</Text>
         </Box>
         <Box style={{ flex: 1, background: '#F0FDF4', borderRadius: 10, padding: '12px 16px' }}>
-          <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Total anual</Text>
+          <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Yearly total</Text>
           <Text size="xl" fw={700} c="green.7">{fmt(yearlyTotal)}</Text>
         </Box>
       </Group>
@@ -292,13 +292,13 @@ function SubscricoesTab() {
                 <Box>
                   <Text size="sm" fw={600}>{rule.description}</Text>
                   <Badge size="xs" variant="light" color="blue" mt={2}>
-                    {rule.frequency === 'monthly' ? 'Mensal' : 'Anual'}
+                    {rule.frequency === 'monthly' ? 'Monthly' : 'Yearly'}
                   </Badge>
                 </Box>
                 <Box style={{ textAlign: 'right' }}>
                   <Text size="sm" fw={600} c="red.7">{fmt(rule.amount)}</Text>
                   {rule.frequency === 'yearly' && (
-                    <Text size="xs" c="dimmed">{fmt(monthly)}/mês</Text>
+                    <Text size="xs" c="dimmed">{fmt(monthly)}/mo</Text>
                   )}
                 </Box>
               </Group>
@@ -315,16 +315,16 @@ function SubscricoesTab() {
 
 export function UpcomingView() {
   return (
-    <Tabs defaultValue="vencimentos" color="#0052CC">
+    <Tabs defaultValue="upcoming" color="#0052CC">
       <Tabs.List mb="md">
-        <Tabs.Tab value="vencimentos" leftSection={<Calendar size={14} />}>Vencimentos</Tabs.Tab>
-        <Tabs.Tab value="projecao" leftSection={<TrendingUp size={14} />}>Projeção</Tabs.Tab>
-        <Tabs.Tab value="subscricoes" leftSection={<RotateCcw size={14} />}>Subscrições</Tabs.Tab>
+        <Tabs.Tab value="upcoming" leftSection={<Calendar size={14} />}>Upcoming bills</Tabs.Tab>
+        <Tabs.Tab value="projection" leftSection={<TrendingUp size={14} />}>Projection</Tabs.Tab>
+        <Tabs.Tab value="subscriptions" leftSection={<RotateCcw size={14} />}>Subscriptions</Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Panel value="vencimentos"><VencimentosTab /></Tabs.Panel>
-      <Tabs.Panel value="projecao"><ProjecaoTab /></Tabs.Panel>
-      <Tabs.Panel value="subscricoes"><SubscricoesTab /></Tabs.Panel>
+      <Tabs.Panel value="upcoming"><UpcomingBillsTab /></Tabs.Panel>
+      <Tabs.Panel value="projection"><ProjectionTab /></Tabs.Panel>
+      <Tabs.Panel value="subscriptions"><SubscriptionsTab /></Tabs.Panel>
     </Tabs>
   );
 }

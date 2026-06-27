@@ -32,9 +32,9 @@ function fmtDate(iso: string) {
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { color: string; label: string }> = {
-    open: { color: 'blue', label: 'Em aberto' },
-    closed: { color: 'orange', label: 'Aguardando pagamento' },
-    paid: { color: 'green', label: 'Paga' },
+    open: { color: 'blue', label: 'Open' },
+    closed: { color: 'orange', label: 'Pending payment' },
+    paid: { color: 'green', label: 'Paid' },
   };
   const { color, label } = map[status] ?? { color: 'gray', label: status };
   return <Badge size="xs" color={color} variant="light">{label}</Badge>;
@@ -64,16 +64,16 @@ function PayModal({
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Pagar fatura" centered>
+    <Modal opened={opened} onClose={onClose} title="Pay statement" centered>
       <Stack gap="sm">
         <Box style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
-          <Text size="xs" c="dimmed">Total da fatura</Text>
+          <Text size="xs" c="dimmed">Statement total</Text>
           <Text size="xl" fw={700} c="green.7">{fmt(statement.total, cardAccount.currency)}</Text>
-          <Text size="xs" c="dimmed">Vencimento: {fmtDate(statement.dueDate)}</Text>
+          <Text size="xs" c="dimmed">Due: {fmtDate(statement.dueDate)}</Text>
         </Box>
         <Select
-          label="Pagar com"
-          placeholder="Selecione a conta"
+          label="Pay from"
+          placeholder="Select account"
           required
           data={checkingAccounts.map((a) => ({
             value: a.id,
@@ -83,7 +83,7 @@ function PayModal({
           onChange={setFromAccountId}
         />
         <NumberInput
-          label="Valor"
+          label="Amount"
           min={0.01}
           decimalScale={2}
           value={amount}
@@ -96,7 +96,7 @@ function PayModal({
           disabled={!fromAccountId || isNaN(parsedAmount) || parsedAmount <= 0}
           color="green"
         >
-          Confirmar pagamento
+          Confirm payment
         </Button>
       </Stack>
     </Modal>
@@ -137,7 +137,7 @@ function CardPanel({ account, accounts }: { account: FinanceAccount; accounts: F
           </Box>
         </Group>
         {account.statementClosingDay && (
-          <Text size="xs" c="dimmed">Fecha dia {account.statementClosingDay} · Vence dia {account.statementDueDay}</Text>
+          <Text size="xs" c="dimmed">Closes day {account.statementClosingDay} · Due day {account.statementDueDay}</Text>
         )}
       </Group>
 
@@ -145,12 +145,12 @@ function CardPanel({ account, accounts }: { account: FinanceAccount; accounts: F
       {limit > 0 && (
         <Box mb="md">
           <Group justify="space-between" mb={4}>
-            <Text size="xs" c="dimmed">Utilizado</Text>
+            <Text size="xs" c="dimmed">Used</Text>
             <Text size="xs" fw={600}>{fmt(used, account.currency)} / {fmt(limit, account.currency)}</Text>
           </Group>
           <Progress value={utilization!} color={utilizationColor} radius="xl" size="sm" />
           {available !== null && (
-            <Text size="xs" c="dimmed" mt={4}>Disponível: <Text span fw={600} c="green.7">{fmt(available, account.currency)}</Text></Text>
+            <Text size="xs" c="dimmed" mt={4}>Available: <Text span fw={600} c="green.7">{fmt(available, account.currency)}</Text></Text>
           )}
         </Box>
       )}
@@ -158,7 +158,7 @@ function CardPanel({ account, accounts }: { account: FinanceAccount; accounts: F
       {/* Current statement */}
       <Box style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 8, padding: '12px 16px' }} mb="md">
         <Group justify="space-between" mb={4}>
-          <Text size="xs" fw={600} c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fatura atual</Text>
+          <Text size="xs" fw={600} c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Current statement</Text>
           <StatusBadge status="open" />
         </Group>
 
@@ -168,7 +168,7 @@ function CardPanel({ account, accounts }: { account: FinanceAccount; accounts: F
           <>
             <Text size="xl" fw={700} c="#0F172A">{fmt(current.total, account.currency)}</Text>
             <Text size="xs" c="dimmed" mt={2}>
-              {fmtDate(current.periodStart)} → {fmtDate(current.periodEnd)} · Vence {fmtDate(current.dueDate)}
+              {fmtDate(current.periodStart)} → {fmtDate(current.periodEnd)} · Due {fmtDate(current.dueDate)}
             </Text>
             <Group mt="sm" gap="xs">
               <Button
@@ -177,7 +177,7 @@ function CardPanel({ account, accounts }: { account: FinanceAccount; accounts: F
                 onClick={() => closeStatement.mutate(account.id)}
                 loading={closeStatement.isPending}
               >
-                Fechar fatura
+                Close statement
               </Button>
             </Group>
           </>
@@ -195,14 +195,14 @@ function CardPanel({ account, accounts }: { account: FinanceAccount; accounts: F
         onClick={() => setHistoryOpen((v) => !v)}
         mb={historyOpen ? 'xs' : 0}
       >
-        Histórico de faturas
+        Statement history
       </Button>
 
       <Collapse in={historyOpen}>
         {stmtsLoading ? (
           <Center py="sm"><Loader size="xs" /></Center>
         ) : statements.length === 0 ? (
-          <Text size="xs" c="dimmed" px="xs">Nenhuma fatura fechada ainda.</Text>
+          <Text size="xs" c="dimmed" px="xs">No closed statements yet.</Text>
         ) : (
           <Stack gap={6}>
             {(statements as FinanceStatement[]).map((stmt) => (
@@ -217,11 +217,11 @@ function CardPanel({ account, accounts }: { account: FinanceAccount; accounts: F
                       <StatusBadge status={stmt.status} />
                     </Group>
                     <Text size="sm" fw={600}>{fmt(stmt.total, account.currency)}</Text>
-                    <Text size="xs" c="dimmed">Vence {fmtDate(stmt.dueDate)}</Text>
+                    <Text size="xs" c="dimmed">Due {fmtDate(stmt.dueDate)}</Text>
                   </Box>
                   {stmt.status === 'closed' && (
                     <Button size="xs" color="green" variant="light" onClick={() => handleOpenPay(stmt)}>
-                      Pagar
+                      Pay
                     </Button>
                   )}
                 </Group>
@@ -256,8 +256,8 @@ export function CardsView() {
       <Center py="xl">
         <Stack align="center" gap="xs">
           <AlertCircle size={32} color="#94A3B8" />
-          <Text c="dimmed" size="sm">Nenhum cartão de crédito cadastrado.</Text>
-          <Text c="dimmed" size="xs">Crie uma conta do tipo "Crédito" na aba Accounts.</Text>
+          <Text c="dimmed" size="sm">No credit cards added yet.</Text>
+          <Text c="dimmed" size="xs">Create an account of type "Credit" in the Accounts tab.</Text>
         </Stack>
       </Center>
     );
