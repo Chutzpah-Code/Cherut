@@ -1,0 +1,399 @@
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { FirebaseService } from '../../config/firebase.service';
+import {
+  CreateAccountDto,
+  UpdateAccountDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+  CreateTransactionDto,
+  UpdateTransactionDto,
+  CreateRecurringDto,
+  UpdateRecurringDto,
+  CreateBudgetDto,
+  UpdateBudgetDto,
+  CreateInvestmentDto,
+  UpdateInvestmentDto,
+  CreateInvestmentEntryDto,
+} from './dto';
+
+@Injectable()
+export class FinanceService {
+  private readonly logger = new Logger(FinanceService.name);
+  private readonly ACCOUNTS = 'finance_accounts';
+  private readonly CATEGORIES = 'finance_categories';
+  private readonly TRANSACTIONS = 'finance_transactions';
+  private readonly RECURRING = 'finance_recurring';
+  private readonly BUDGETS = 'finance_budgets';
+  private readonly INVESTMENTS = 'finance_investments';
+  private readonly INVESTMENT_ENTRIES = 'finance_investment_entries';
+
+  constructor(private readonly firebaseService: FirebaseService) {}
+
+  private get db() {
+    return this.firebaseService.getFirestore();
+  }
+
+  private clean(obj: Record<string, any>) {
+    return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
+  }
+
+  private now() {
+    return new Date().toISOString();
+  }
+
+  private async assertOwner(collection: string, id: string, userId: string) {
+    const doc = await this.db.collection(collection).doc(id).get();
+    if (!doc.exists || doc.data()!.userId !== userId) {
+      throw new NotFoundException(`${collection}/${id} not found`);
+    }
+    return { id: doc.id, ...doc.data()! };
+  }
+
+  // ─── Accounts ──────────────────────────────────────────────────────────────
+
+  async createAccount(userId: string, dto: CreateAccountDto) {
+    const data = {
+      ...this.clean(dto as any),
+      userId,
+      balance: dto.balance ?? 0,
+      currency: dto.currency ?? 'USD',
+      createdAt: this.now(),
+      updatedAt: this.now(),
+    };
+    const ref = await this.db.collection(this.ACCOUNTS).add(data);
+    return { id: ref.id, ...data };
+  }
+
+  async findAccounts(userId: string) {
+    const snap = await this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get();
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  async updateAccount(userId: string, id: string, dto: UpdateAccountDto) {
+    await this.assertOwner(this.ACCOUNTS, id, userId);
+    await this.db.collection(this.ACCOUNTS).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
+    return this.assertOwner(this.ACCOUNTS, id, userId);
+  }
+
+  async deleteAccount(userId: string, id: string) {
+    await this.assertOwner(this.ACCOUNTS, id, userId);
+    await this.db.collection(this.ACCOUNTS).doc(id).delete();
+    return { message: 'Account deleted' };
+  }
+
+  // ─── Categories ─────────────────────────────────────────────────────────────
+
+  async createCategory(userId: string, dto: CreateCategoryDto) {
+    const data = { ...this.clean(dto as any), userId, createdAt: this.now(), updatedAt: this.now() };
+    const ref = await this.db.collection(this.CATEGORIES).add(data);
+    return { id: ref.id, ...data };
+  }
+
+  async findCategories(userId: string, type?: string) {
+    let query: any = this.db.collection(this.CATEGORIES).where('userId', '==', userId);
+    if (type) query = query.where('type', '==', type);
+    const snap = await query.get();
+    return snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+  }
+
+  async updateCategory(userId: string, id: string, dto: UpdateCategoryDto) {
+    await this.assertOwner(this.CATEGORIES, id, userId);
+    await this.db.collection(this.CATEGORIES).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
+    return this.assertOwner(this.CATEGORIES, id, userId);
+  }
+
+  async deleteCategory(userId: string, id: string) {
+    await this.assertOwner(this.CATEGORIES, id, userId);
+    await this.db.collection(this.CATEGORIES).doc(id).delete();
+    return { message: 'Category deleted' };
+  }
+
+  // ─── Transactions ───────────────────────────────────────────────────────────
+
+  async createTransaction(userId: string, dto: CreateTransactionDto) {
+    const data = { ...this.clean(dto as any), userId, createdAt: this.now(), updatedAt: this.now() };
+    const ref = await this.db.collection(this.TRANSACTIONS).add(data);
+    await this.adjustBalance(userId, dto.accountId, dto.amount, dto.type);
+    return { id: ref.id, ...data };
+  }
+
+  async findTransactions(
+    userId: string,
+    opts: { accountId?: string; startDate?: string; endDate?: string; type?: string } = {},
+  ) {
+    let query: any = this.db.collection(this.TRANSACTIONS).where('userId', '==', userId);
+    if (opts.accountId) query = query.where('accountId', '==', opts.accountId);
+    if (opts.type) query = query.where('type', '==', opts.type);
+    if (opts.startDate) query = query.where('date', '>=', opts.startDate);
+    if (opts.endDate) query = query.where('date', '<=', opts.endDate);
+
+    try {
+      const snap = await query.orderBy('date', 'desc').get();
+      return snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+    } catch {
+      const snap = await query.get();
+      const docs = snap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as any[];
+      return docs.sort((a, b) => (a.date < b.date ? 1 : -1));
+    }
+  }
+
+  async updateTransaction(userId: string, id: string, dto: UpdateTransactionDto) {
+    await this.assertOwner(this.TRANSACTIONS, id, userId);
+    await this.db.collection(this.TRANSACTIONS).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
+    return this.assertOwner(this.TRANSACTIONS, id, userId);
+  }
+
+  async deleteTransaction(userId: string, id: string) {
+    const tx: any = await this.assertOwner(this.TRANSACTIONS, id, userId);
+    const reverseType = tx.type === 'income' ? 'expense' : 'income';
+    await this.adjustBalance(userId, tx.accountId, tx.amount, reverseType);
+    await this.db.collection(this.TRANSACTIONS).doc(id).delete();
+    return { message: 'Transaction deleted' };
+  }
+
+  // ─── Recurring ──────────────────────────────────────────────────────────────
+
+  async createRecurring(userId: string, dto: CreateRecurringDto) {
+    const data = {
+      ...this.clean(dto as any),
+      userId,
+      isActive: dto.isActive ?? true,
+      nextDueDate: dto.startDate,
+      createdAt: this.now(),
+      updatedAt: this.now(),
+    };
+    const ref = await this.db.collection(this.RECURRING).add(data);
+    return { id: ref.id, ...data };
+  }
+
+  async findRecurring(userId: string, isActive?: boolean) {
+    let query: any = this.db.collection(this.RECURRING).where('userId', '==', userId);
+    if (isActive !== undefined) query = query.where('isActive', '==', isActive);
+    const snap = await query.get();
+    return snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+  }
+
+  async updateRecurring(userId: string, id: string, dto: UpdateRecurringDto) {
+    await this.assertOwner(this.RECURRING, id, userId);
+    await this.db.collection(this.RECURRING).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
+    return this.assertOwner(this.RECURRING, id, userId);
+  }
+
+  async deleteRecurring(userId: string, id: string) {
+    await this.assertOwner(this.RECURRING, id, userId);
+    await this.db.collection(this.RECURRING).doc(id).delete();
+    return { message: 'Recurring deleted' };
+  }
+
+  async applyRecurring(userId: string, id: string) {
+    const rule: any = await this.assertOwner(this.RECURRING, id, userId);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const txData = {
+      userId,
+      accountId: rule.accountId,
+      categoryId: rule.categoryId,
+      amount: rule.amount,
+      type: rule.type,
+      date: today,
+      description: rule.description,
+      recurringId: id,
+      createdAt: this.now(),
+      updatedAt: this.now(),
+    };
+    const txRef = await this.db.collection(this.TRANSACTIONS).add(txData);
+    await this.adjustBalance(userId, rule.accountId, rule.amount, rule.type);
+
+    const nextDueDate = this.calcNextDueDate(rule.nextDueDate ?? today, rule.frequency);
+    await this.db.collection(this.RECURRING).doc(id).update({ nextDueDate, updatedAt: this.now() });
+
+    this.logger.log(`Recurring ${id} applied → tx ${txRef.id}, next: ${nextDueDate}`);
+    return { transaction: { id: txRef.id, ...txData }, nextDueDate };
+  }
+
+  // ─── Budgets ────────────────────────────────────────────────────────────────
+
+  async createBudget(userId: string, dto: CreateBudgetDto) {
+    const data = { ...dto, userId, createdAt: this.now(), updatedAt: this.now() };
+    const ref = await this.db.collection(this.BUDGETS).add(data);
+    return { id: ref.id, ...data };
+  }
+
+  async findBudgets(userId: string, month?: string) {
+    let query: any = this.db.collection(this.BUDGETS).where('userId', '==', userId);
+    if (month) query = query.where('month', '==', month);
+    const snap = await query.get();
+    const budgets = snap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as any[];
+
+    if (!budgets.length) return [];
+
+    // Fetch spending per category for the month
+    const targetMonth = month ?? new Date().toISOString().slice(0, 7);
+    const startDate = `${targetMonth}-01`;
+    const endDate = new Date(`${targetMonth}-01`);
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(0);
+    const endStr = endDate.toISOString().slice(0, 10);
+
+    const txSnap = await this.db
+      .collection(this.TRANSACTIONS)
+      .where('userId', '==', userId)
+      .where('type', '==', 'expense')
+      .where('date', '>=', startDate)
+      .where('date', '<=', endStr)
+      .get();
+
+    const spent: Record<string, number> = {};
+    txSnap.docs.forEach((d: any) => {
+      const { categoryId, amount } = d.data();
+      spent[categoryId] = (spent[categoryId] ?? 0) + amount;
+    });
+
+    return budgets.map((b) => ({ ...b, spent: spent[b.categoryId] ?? 0 }));
+  }
+
+  async updateBudget(userId: string, id: string, dto: UpdateBudgetDto) {
+    await this.assertOwner(this.BUDGETS, id, userId);
+    await this.db.collection(this.BUDGETS).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
+    return this.assertOwner(this.BUDGETS, id, userId);
+  }
+
+  async deleteBudget(userId: string, id: string) {
+    await this.assertOwner(this.BUDGETS, id, userId);
+    await this.db.collection(this.BUDGETS).doc(id).delete();
+    return { message: 'Budget deleted' };
+  }
+
+  // ─── Investments ─────────────────────────────────────────────────────────────
+
+  async createInvestment(userId: string, dto: CreateInvestmentDto) {
+    const data = {
+      ...this.clean(dto as any),
+      userId,
+      currency: dto.currency ?? 'USD',
+      totalContributed: 0,
+      createdAt: this.now(),
+      updatedAt: this.now(),
+    };
+    const ref = await this.db.collection(this.INVESTMENTS).add(data);
+    return { id: ref.id, ...data };
+  }
+
+  async findInvestments(userId: string) {
+    const snap = await this.db.collection(this.INVESTMENTS).where('userId', '==', userId).get();
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  async updateInvestment(userId: string, id: string, dto: UpdateInvestmentDto) {
+    await this.assertOwner(this.INVESTMENTS, id, userId);
+    await this.db.collection(this.INVESTMENTS).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
+    return this.assertOwner(this.INVESTMENTS, id, userId);
+  }
+
+  async deleteInvestment(userId: string, id: string) {
+    await this.assertOwner(this.INVESTMENTS, id, userId);
+    await this.db.collection(this.INVESTMENTS).doc(id).delete();
+    return { message: 'Investment deleted' };
+  }
+
+  async createInvestmentEntry(userId: string, dto: CreateInvestmentEntryDto) {
+    await this.assertOwner(this.INVESTMENTS, dto.investmentId, userId);
+    const data = { ...dto, userId, createdAt: this.now(), updatedAt: this.now() };
+    const ref = await this.db.collection(this.INVESTMENT_ENTRIES).add(data);
+
+    // Update totalContributed on the investment
+    const inv: any = await this.assertOwner(this.INVESTMENTS, dto.investmentId, userId);
+    await this.db.collection(this.INVESTMENTS).doc(dto.investmentId).update({
+      totalContributed: (inv.totalContributed ?? 0) + dto.amount,
+      updatedAt: this.now(),
+    });
+
+    return { id: ref.id, ...data };
+  }
+
+  async findInvestmentEntries(userId: string, investmentId: string) {
+    const snap = await this.db
+      .collection(this.INVESTMENT_ENTRIES)
+      .where('userId', '==', userId)
+      .where('investmentId', '==', investmentId)
+      .get();
+    const docs = snap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as any[];
+    return docs.sort((a, b) => (a.date < b.date ? 1 : -1));
+  }
+
+  async deleteInvestmentEntry(userId: string, id: string) {
+    const entry: any = await this.assertOwner(this.INVESTMENT_ENTRIES, id, userId);
+    await this.db.collection(this.INVESTMENT_ENTRIES).doc(id).delete();
+
+    // Reverse totalContributed
+    try {
+      const inv: any = await this.assertOwner(this.INVESTMENTS, entry.investmentId, userId);
+      await this.db.collection(this.INVESTMENTS).doc(entry.investmentId).update({
+        totalContributed: Math.max(0, (inv.totalContributed ?? 0) - entry.amount),
+        updatedAt: this.now(),
+      });
+    } catch { /* investment may have been deleted */ }
+
+    return { message: 'Entry deleted' };
+  }
+
+  // ─── Overview ───────────────────────────────────────────────────────────────
+
+  async getOverview(userId: string, month?: string) {
+    const now = new Date();
+    const start = month
+      ? `${month}-01`
+      : `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+    const endDate = new Date(start);
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(0);
+    const end = endDate.toISOString().slice(0, 10);
+
+    const [accountsSnap, txSnap] = await Promise.all([
+      this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
+      this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).where('date', '>=', start).where('date', '<=', end).get(),
+    ]);
+
+    const accounts = accountsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+    const transactions = txSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+
+    const totalBalance = accounts.reduce((sum, a) => sum + (a.balance ?? 0), 0);
+    const income = transactions.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    const expenses = transactions.filter((t) => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+
+    return {
+      totalBalance,
+      income,
+      expenses,
+      net: income - expenses,
+      month: start.slice(0, 7),
+      recentTransactions: transactions.sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 5),
+    };
+  }
+
+  // ─── Private helpers ────────────────────────────────────────────────────────
+
+  private async adjustBalance(userId: string, accountId: string, amount: number, type: string) {
+    try {
+      const account: any = await this.assertOwner(this.ACCOUNTS, accountId, userId);
+      const delta = type === 'income' ? amount : type === 'expense' ? -amount : 0;
+      await this.db.collection(this.ACCOUNTS).doc(accountId).update({
+        balance: (account.balance ?? 0) + delta,
+        updatedAt: this.now(),
+      });
+    } catch {
+      this.logger.warn(`Could not adjust balance for account ${accountId}`);
+    }
+  }
+
+  private calcNextDueDate(current: string, frequency: string): string {
+    const d = new Date(current);
+    switch (frequency) {
+      case 'daily': d.setDate(d.getDate() + 1); break;
+      case 'weekly': d.setDate(d.getDate() + 7); break;
+      case 'monthly': d.setMonth(d.getMonth() + 1); break;
+      case 'yearly': d.setFullYear(d.getFullYear() + 1); break;
+    }
+    return d.toISOString().slice(0, 10);
+  }
+}

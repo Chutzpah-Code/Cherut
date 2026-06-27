@@ -34,14 +34,14 @@ export default function BoardDetailPage({ params }: { params: Promise<{ boardId:
 
   return (
     <Stack
-      gap="lg"
+      gap={0}
       style={{ fontFamily: 'Inter, sans-serif', height: '100%' }}
     >
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
 
-      <Group gap="md" align="center">
+      <Group gap="md" align="center" mb="sm">
         <ActionIcon
           variant="subtle"
           color="gray"
@@ -111,9 +111,9 @@ export default function BoardDetailPage({ params }: { params: Promise<{ boardId:
         )}
       </Group>
 
-      <BoardKanbanView boardId={boardId} />
-
       <ViewSwitcher currentView={currentView} onViewChange={setCurrentView} />
+
+      <BoardKanbanView boardId={boardId} />
     </Stack>
   );
 }

@@ -16,6 +16,7 @@ import {
   BookOpen,
   Heart,
   Bot,
+  Wallet,
 } from 'lucide-react';
 import { Stack, NavLink, ScrollArea, Box, Divider, Button, Group, Badge, Text, Tooltip, ActionIcon } from '@mantine/core';
 import { logoutUser } from '@/lib/firebase/auth';
@@ -25,6 +26,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Finance', href: '/dashboard/finance', icon: Wallet },
   { name: 'Vision Board', href: '/dashboard/vision-board', icon: Sparkles },
   { name: 'Life Areas', href: '/dashboard/life-areas', icon: TrendingUp },
   { name: 'Values', href: '/dashboard/values', icon: Heart },

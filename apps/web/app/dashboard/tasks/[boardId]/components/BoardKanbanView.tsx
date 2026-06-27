@@ -313,8 +313,8 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         style={{
           overflowX: 'auto',
           overflowY: 'hidden',
-          height: isMobile ? 'calc(100dvh - 140px)' : 'calc(100dvh - 170px)',
-          paddingBottom: 80,
+          height: isMobile ? 'calc(100dvh - 175px)' : 'calc(100dvh - 200px)',
+          paddingBottom: 16,
           marginLeft: isMobile ? -4 : 0,
           marginRight: isMobile ? -4 : 0,
         }}

@@ -1,9 +1,7 @@
 'use client';
 
-import { Group, Text, UnstyledButton, Tooltip } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
+import { Box, Group, Text, UnstyledButton, Tooltip } from '@mantine/core';
 import { LayoutGrid, Calendar as CalendarIcon, Clock } from 'lucide-react';
-import { useSidebar } from '@/contexts/SidebarContext';
 
 export type TaskView = 'kanban' | 'calendar' | 'timetracker';
 
@@ -19,73 +17,65 @@ const VIEWS = [
 ];
 
 export function ViewSwitcher({ currentView, onViewChange }: ViewSwitcherProps) {
-  const { mobileOpened, screenSize, isCompact } = useSidebar();
-  const isMobile = useMediaQuery('(max-width: 767px)');
-
-  if (isMobile && mobileOpened) return null;
-
-  // Center relative to the content area, not the full viewport
-  // Sidebar: mobile=0, tablet/compact=80px, desktop=260px
-  const sidebarWidth = screenSize === 'mobile' ? 0 : isCompact ? 80 : 260;
-  const leftOffset = `calc(50% + ${sidebarWidth / 2}px)`;
-
   return (
-    <Group
-      gap={2}
+    <Box
       style={{
-        position: 'fixed',
-        bottom: 28,
-        left: leftOffset,
-        transform: 'translateX(-50%)',
+        marginLeft: 'calc(-1 * var(--mantine-spacing-md))',
+        marginRight: 'calc(-1 * var(--mantine-spacing-md))',
+        paddingLeft: 'var(--mantine-spacing-md)',
+        borderBottom: '1px solid #E2E8F0',
+        marginBottom: 16,
         backgroundColor: '#ffffff',
-        padding: '5px 6px',
-        borderRadius: 12,
-        boxShadow: '0 2px 12px rgba(9,30,66,0.15), 0 0 0 1px rgba(9,30,66,0.08)',
-        zIndex: 1000,
-        transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      {VIEWS.map(({ id, label, icon: Icon, comingSoon }) => {
-        const isActive = currentView === id;
+      <Group gap={0}>
+        {VIEWS.map(({ id, label, icon: Icon, comingSoon }) => {
+          const isActive = currentView === id;
 
-        const btn = (
-          <UnstyledButton
-            key={id}
-            onClick={() => !comingSoon && onViewChange(id)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '6px 12px',
-              borderRadius: 8,
-              cursor: comingSoon ? 'default' : 'pointer',
-              backgroundColor: isActive ? '#0052CC' : 'transparent',
-              opacity: comingSoon ? 0.45 : 1,
-              transition: 'background-color 0.15s ease',
-              userSelect: 'none',
-            }}
-          >
-            <Icon size={15} style={{ color: isActive ? '#ffffff' : '#42526E', flexShrink: 0 }} />
-            <Text
-              size="xs"
-              fw={600}
+          const btn = (
+            <UnstyledButton
+              key={id}
+              onClick={() => !comingSoon && onViewChange(id)}
               style={{
-                color: isActive ? '#ffffff' : '#42526E',
-                letterSpacing: '-0.01em',
-                lineHeight: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '10px 16px',
+                marginBottom: -1,
+                borderBottom: isActive ? '2px solid #0052CC' : '2px solid transparent',
+                cursor: comingSoon ? 'default' : 'pointer',
+                opacity: comingSoon ? 0.45 : 1,
+                transition: 'border-color 0.15s ease, color 0.15s ease',
+                userSelect: 'none',
               }}
             >
-              {label}
-            </Text>
-          </UnstyledButton>
-        );
+              <Icon
+                size={15}
+                style={{ color: isActive ? '#0052CC' : '#42526E', flexShrink: 0 }}
+              />
+              <Text
+                size="sm"
+                fw={isActive ? 600 : 500}
+                style={{
+                  color: isActive ? '#0052CC' : '#42526E',
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1,
+                }}
+              >
+                {label}
+              </Text>
+            </UnstyledButton>
+          );
 
-        return comingSoon ? (
-          <Tooltip key={id} label="Coming soon" position="top" withArrow>
-            <span>{btn}</span>
-          </Tooltip>
-        ) : btn;
-      })}
-    </Group>
+          return comingSoon ? (
+            <Tooltip key={id} label="Coming soon" position="top" withArrow>
+              <span>{btn}</span>
+            </Tooltip>
+          ) : (
+            btn
+          );
+        })}
+      </Group>
+    </Box>
   );
 }

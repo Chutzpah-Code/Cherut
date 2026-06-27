@@ -20,6 +20,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { JournalModule } from './modules/journal/journal.module';
 import { ValuesModule } from './modules/values/values.module';
 import { BoardsModule } from './modules/boards/boards.module';
+import { FinanceModule } from './modules/finance/finance.module';
 
 /**
  * 📚 EXPLICAÇÃO: App Module (Módulo Raiz)
@@ -83,6 +84,8 @@ import { BoardsModule } from './modules/boards/boards.module';
     ValuesModule,
     // Boards (Trello-like boards and columns for tasks)
     BoardsModule,
+    // Finance (personal finance tracking)
+    FinanceModule,
   ],
   controllers: [AppController],
   providers: [
