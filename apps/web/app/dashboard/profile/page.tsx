@@ -160,7 +160,7 @@ export default function ProfilePage() {
   };
 
   const handleThemeChange = async (newTheme: 'light' | 'dark') => {
-    const forcedTheme = 'light';
+    const forcedTheme = 'light' as const;
     setColorScheme(forcedTheme);
     localStorage.setItem('mantine-color-scheme-cherut', forcedTheme);
     const updated = {
