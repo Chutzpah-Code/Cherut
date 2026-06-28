@@ -51,7 +51,7 @@ export class ProfileController {
       cb(null, true);
     },
   }))
-  uploadAvatar(@Request() req, @UploadedFile() file: Express.Multer.File) {
+  uploadAvatar(@Request() req, @UploadedFile() file: { buffer: Buffer; mimetype: string; originalname: string; size: number }) {
     if (!file) throw new BadRequestException('No file uploaded');
     return this.profileService.updateAvatar(req.user.uid, file);
   }

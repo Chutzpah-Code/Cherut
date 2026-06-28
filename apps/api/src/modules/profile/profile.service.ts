@@ -8,6 +8,13 @@ import { FirebaseService } from '../../config/firebase.service';
 import { CloudinaryService } from '../../config/cloudinary.service';
 import { CreateProfileDto, UpdateProfileDto } from './dto';
 
+interface UploadedFile {
+  buffer: Buffer;
+  mimetype: string;
+  originalname: string;
+  size: number;
+}
+
 @Injectable()
 export class ProfileService {
   private readonly logger = new Logger(ProfileService.name);
@@ -18,7 +25,7 @@ export class ProfileService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async updateAvatar(userId: string, file: Express.Multer.File): Promise<{ avatarUrl: string }> {
+  async updateAvatar(userId: string, file: UploadedFile): Promise<{ avatarUrl: string }> {
     const avatarUrl = await this.cloudinaryService.uploadAvatar(file.buffer, userId);
     await this.update(userId, { avatarUrl });
     return { avatarUrl };
