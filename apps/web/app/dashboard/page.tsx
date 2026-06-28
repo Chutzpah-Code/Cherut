@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Grid, Progress, Box, Group, Stack, Text, Title, Loader } from '@mantine/core';
-import { CheckCircle2, Circle, ArrowUpCircle, ArrowDownCircle, PenLine } from 'lucide-react';
+import { CheckCircle2, Circle, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { useObjectives } from '@/hooks/useObjectives';
 import { useTasks } from '@/hooks/useTasks';
 import { useHabits, useLogHabit } from '@/hooks/useHabits';
@@ -439,71 +439,45 @@ function JournalPanel() {
       {isLoading ? (
         <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
       ) : !latest ? (
-        <Stack gap={10}>
-          <Text size="sm" c="dimmed">No entries yet. Start reflecting today.</Text>
-          <button
-            onClick={() => router.push('/dashboard/journal')}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              background: '#4686FE', color: 'white', border: 'none',
-              borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 600,
-              cursor: 'pointer', width: 'fit-content',
-            }}
+        <Text size="sm" c="dimmed">No entries yet. Start reflecting today.</Text>
+      ) : wroteToday ? (
+        <Box style={{ padding: '12px 14px', background: '#F0FDF4', borderRadius: 8, border: '1px solid #bbf7d0' }}>
+          <Group gap={6} mb={4}>
+            <CheckCircle2 size={14} color="#2e7d32" />
+            <Text size="xs" fw={600} style={{ color: '#2e7d32' }}>Written today</Text>
+          </Group>
+          <Text
+            size="sm"
+            fw={500}
+            style={{ color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
           >
-            <PenLine size={14} /> Write first entry
-          </button>
-        </Stack>
-      ) : (
-        <Stack gap={10}>
-          {wroteToday ? (
-            <Box style={{ padding: '12px 14px', background: '#F0FDF4', borderRadius: 8, border: '1px solid #bbf7d0' }}>
-              <Group gap={6} mb={4}>
-                <CheckCircle2 size={14} color="#2e7d32" />
-                <Text size="xs" fw={600} style={{ color: '#2e7d32' }}>Written today</Text>
-              </Group>
-              <Text
-                size="sm"
-                fw={500}
-                style={{ color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-              >
-                {latest.title}
-              </Text>
-              {latest.content && (
-                <Text size="xs" c="dimmed" lineClamp={2} mt={2}>
-                  {latest.content.replace(/<[^>]+>/g, '')}
-                </Text>
-              )}
-            </Box>
-          ) : (
-            <Box>
-              <Text size="xs" c="dimmed" mb={6}>
-                Last entry: {daysSince === 1 ? 'yesterday' : daysSince === 0 ? 'today' : `${daysSince} days ago`}
-              </Text>
-              <Text
-                size="sm"
-                fw={500}
-                style={{ color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 10 }}
-              >
-                {latest.title}
-              </Text>
-              <button
-                onClick={() => router.push('/dashboard/journal')}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  background: '#4686FE', color: 'white', border: 'none',
-                  borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                <PenLine size={14} /> Write today
-              </button>
-            </Box>
+            {latest.title}
+          </Text>
+          {latest.content && (
+            <Text size="xs" c="dimmed" lineClamp={2} mt={2}>
+              {latest.content.replace(/<[^>]+>/g, '')}
+            </Text>
           )}
-        </Stack>
+        </Box>
+      ) : (
+        <Box>
+          <Text size="xs" c="dimmed" mb={4}>
+            Last entry: {daysSince === 1 ? 'yesterday' : `${daysSince} days ago`}
+          </Text>
+          <Text
+            size="sm"
+            fw={500}
+            style={{ color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
+            {latest.title}
+          </Text>
+        </Box>
       )}
 
       <Box mt="auto" pt={14}>
-        <NavLink onClick={() => router.push('/dashboard/journal')}>View all entries</NavLink>
+        <NavLink onClick={() => router.push('/dashboard/journal')}>
+          {!latest ? 'Write first entry' : !wroteToday ? 'Write today' : 'View all entries'}
+        </NavLink>
       </Box>
     </Panel>
   );
