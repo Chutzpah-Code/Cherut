@@ -10,6 +10,7 @@ import { useHabits, useLogHabit } from '@/hooks/useHabits';
 import { useFinanceOverview } from '@/hooks/useFinance';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/hooks/useProfile';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -352,6 +353,7 @@ function ObjectivesProgress() {
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { data: profile } = useProfile();
   const { data: habits = [] } = useHabits(undefined, false);
   const { data: tasks = [] } = useTasks();
   const today = localDateStr();
@@ -364,7 +366,7 @@ export default function DashboardPage() {
     t => t.dueDate && t.dueDate <= today && t.status !== 'done' && !t.archived
   ).length;
 
-  const firstName = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? '';
+  const firstName = profile?.displayName?.split(' ')[0] ?? user?.displayName?.split(' ')[0] ?? '';
 
   const subtitle = [
     habitsToLogCount > 0 && `${habitsToLogCount} habit${habitsToLogCount !== 1 ? 's' : ''} to log`,

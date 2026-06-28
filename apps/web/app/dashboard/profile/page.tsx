@@ -231,6 +231,12 @@ export default function ProfilePage() {
           </Text>
         </div>
 
+        {profile && !profile.displayName && (
+          <Alert color="blue" radius="md" variant="light">
+            Add your name so it appears in your greeting and header.
+          </Alert>
+        )}
+
       <Grid gutter="md">
         {/* Profile Card */}
         <Grid.Col span={{ base: 12, lg: 4 }}>
@@ -252,7 +258,7 @@ export default function ProfilePage() {
                 radius="xl"
                 color="red"
               >
-                {user?.email?.[0].toUpperCase() || 'U'}
+                {(formData.displayName?.[0] ?? user?.email?.[0] ?? 'U').toUpperCase()}
               </Avatar>
 
               <div style={{ textAlign: 'center' }}>

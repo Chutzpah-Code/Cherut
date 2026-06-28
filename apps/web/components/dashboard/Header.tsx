@@ -57,6 +57,7 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
   // Will be available soon!
 
   const getFirstName = () => {
+    if (profile?.displayName) return profile.displayName.split(' ')[0];
     if (!user?.email) return 'there';
     const name = user.email.split('@')[0];
     return name.charAt(0).toUpperCase() + name.slice(1);
@@ -173,7 +174,7 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
               }
             }}
           >
-            {user?.email?.[0].toUpperCase() || 'U'}
+            {(profile?.displayName?.[0] ?? user?.email?.[0] ?? 'U').toUpperCase()}
           </Avatar>
           
           <Box visibleFrom="sm">
