@@ -57,6 +57,10 @@ function Panel({ children, accent = false, style }: {
       borderLeft: accent ? '3px solid #0052CC' : '1px solid #E2E8F0',
       borderRadius: 12,
       padding: '20px 22px',
+      height: '100%',
+      boxSizing: 'border-box',
+      display: 'flex',
+      flexDirection: 'column',
       ...style,
     }}>
       {children}
@@ -162,7 +166,7 @@ function HabitsToday() {
         </Stack>
       )}
 
-      <Box mt={14}>
+      <Box mt="auto" pt={14}>
         {unloggedCount > 0 && (
           <Text size="xs" c="dimmed" mb={6}>{unloggedCount} to log today</Text>
         )}
@@ -235,7 +239,7 @@ function TasksDue() {
         </Stack>
       )}
 
-      <Box mt={14}>
+      <Box mt="auto" pt={14}>
         {totalDue > 5 && (
           <Text size="xs" c="dimmed" mb={6}>+{totalDue - 5} more</Text>
         )}
@@ -290,7 +294,7 @@ function FinanceSnapshot() {
         </Stack>
       )}
 
-      <Box mt={14}>
+      <Box mt="auto" pt={14}>
         <NavLink onClick={() => router.push('/dashboard/finance')}>View Finance</NavLink>
       </Box>
     </Panel>
@@ -343,7 +347,7 @@ function ObjectivesProgress() {
         </Stack>
       )}
 
-      <Box mt={14}>
+      <Box mt="auto" pt={14}>
         <NavLink onClick={() => router.push('/dashboard/objectives')}>View all objectives</NavLink>
       </Box>
     </Panel>
@@ -407,7 +411,7 @@ function KeyResultsPanel() {
         </Stack>
       )}
 
-      <Box mt={14}>
+      <Box mt="auto" pt={14}>
         <NavLink onClick={() => router.push('/dashboard/objectives')}>View objectives</NavLink>
       </Box>
     </Panel>
@@ -498,7 +502,7 @@ function JournalPanel() {
         </Stack>
       )}
 
-      <Box mt={14}>
+      <Box mt="auto" pt={14}>
         <NavLink onClick={() => router.push('/dashboard/journal')}>View all entries</NavLink>
       </Box>
     </Panel>
@@ -543,7 +547,7 @@ function LifeAreasPanel() {
         </Box>
       )}
 
-      <Box mt={14}>
+      <Box mt="auto" pt={14}>
         <NavLink onClick={() => router.push('/dashboard/life-areas')}>Manage life areas</NavLink>
       </Box>
     </Panel>
@@ -595,16 +599,16 @@ export default function DashboardPage() {
       </Panel>
 
       {/* Row 1 — Today + Goals */}
-      <Grid gutter="lg">
-        <Grid.Col span={{ base: 12, md: 7 }}>
-          <Stack gap="lg">
+      <Grid gutter="lg" align="stretch">
+        <Grid.Col span={{ base: 12, md: 7 }} style={{ display: 'flex', flexDirection: 'column' }}>
+          <Stack gap="lg" style={{ flex: 1 }}>
             <HabitsToday />
             <TasksDue />
           </Stack>
         </Grid.Col>
 
-        <Grid.Col span={{ base: 12, md: 5 }}>
-          <Stack gap="lg">
+        <Grid.Col span={{ base: 12, md: 5 }} style={{ display: 'flex', flexDirection: 'column' }}>
+          <Stack gap="lg" style={{ flex: 1 }}>
             <FinanceSnapshot />
             <ObjectivesProgress />
           </Stack>
@@ -612,14 +616,14 @@ export default function DashboardPage() {
       </Grid>
 
       {/* Row 2 — Key Results · Journal · Life Areas */}
-      <Grid gutter="lg">
-        <Grid.Col span={{ base: 12, md: 4 }}>
+      <Grid gutter="lg" align="stretch">
+        <Grid.Col span={{ base: 12, sm: 6, md: 4 }} style={{ display: 'flex', flexDirection: 'column' }}>
           <KeyResultsPanel />
         </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 4 }}>
+        <Grid.Col span={{ base: 12, sm: 6, md: 4 }} style={{ display: 'flex', flexDirection: 'column' }}>
           <JournalPanel />
         </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 4 }}>
+        <Grid.Col span={{ base: 12, sm: 12, md: 4 }} style={{ display: 'flex', flexDirection: 'column' }}>
           <LifeAreasPanel />
         </Grid.Col>
       </Grid>
