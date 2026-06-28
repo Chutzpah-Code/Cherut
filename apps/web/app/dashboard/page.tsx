@@ -607,17 +607,19 @@ export default function DashboardPage() {
           <Stack gap="lg">
             <FinanceSnapshot />
             <ObjectivesProgress />
-            <KeyResultsPanel />
           </Stack>
         </Grid.Col>
       </Grid>
 
-      {/* Row 2 — Journal + Life Areas */}
+      {/* Row 2 — Key Results · Journal · Life Areas */}
       <Grid gutter="lg">
-        <Grid.Col span={{ base: 12, md: 6 }}>
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <KeyResultsPanel />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 4 }}>
           <JournalPanel />
         </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6 }}>
+        <Grid.Col span={{ base: 12, md: 4 }}>
           <LifeAreasPanel />
         </Grid.Col>
       </Grid>
