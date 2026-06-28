@@ -58,4 +58,13 @@ export const profileApi = {
     const { data } = await apiClient.patch('/profile', dto);
     return data;
   },
+
+  uploadAvatar: async (file: File): Promise<{ avatarUrl: string }> => {
+    const form = new FormData();
+    form.append('avatar', file);
+    const { data } = await apiClient.post('/profile/avatar', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data;
+  },
 };

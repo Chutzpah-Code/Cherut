@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Save, Lock, Shield } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Save, Lock, Shield, Camera } from 'lucide-react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import {
   Button,
@@ -28,7 +28,7 @@ import {
   useComputedColorScheme,
 } from '@mantine/core';
 import { useAuth } from '@/contexts/AuthContext';
-import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
+import { useProfile, useUpdateProfile, useUploadAvatar } from '@/hooks/useProfile';
 import { UpdateProfileDto } from '@/lib/api/services/profile';
 import { changePassword } from '@/lib/firebase/auth';
 import { getPasswordErrorMessage } from '@/lib/utils/auth-errors';
@@ -62,6 +62,9 @@ export default function ProfilePage() {
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile();
   const updateMutation = useUpdateProfile();
+  const uploadAvatarMutation = useUploadAvatar();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [avatarHovered, setAvatarHovered] = useState(false);
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light');
 
@@ -199,6 +202,19 @@ export default function ProfilePage() {
           marginBottom: 24,
         }}
       >
+        <input
+          ref={avatarInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            uploadAvatarMutation.mutate(file);
+            e.target.value = '';
+          }}
+        />
+
         <Box
           style={{
             width: 104,
@@ -208,11 +224,43 @@ export default function ProfilePage() {
             background: 'white',
             boxShadow: '0 4px 20px rgba(70,134,254,0.2)',
             margin: '0 auto 16px',
+            position: 'relative',
+            cursor: 'pointer',
           }}
+          onClick={() => avatarInputRef.current?.click()}
+          onMouseEnter={() => setAvatarHovered(true)}
+          onMouseLeave={() => setAvatarHovered(false)}
         >
-          <Avatar size={96} radius={999} color="blue" style={{ width: '100%', height: '100%' }}>
+          <Avatar
+            src={profile?.avatarUrl ?? undefined}
+            size={96}
+            radius={999}
+            color="blue"
+            style={{ width: '100%', height: '100%' }}
+          >
             {displayInitial}
           </Avatar>
+
+          {/* camera overlay */}
+          <Box
+            style={{
+              position: 'absolute',
+              inset: 4,
+              borderRadius: '50%',
+              background: 'rgba(0,0,0,0.45)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: avatarHovered || uploadAvatarMutation.isPending ? 1 : 0,
+              transition: 'opacity 0.18s ease',
+              pointerEvents: 'none',
+            }}
+          >
+            {uploadAvatarMutation.isPending
+              ? <Loader size="xs" color="white" />
+              : <Camera size={22} color="white" />
+            }
+          </Box>
         </Box>
 
         <Text

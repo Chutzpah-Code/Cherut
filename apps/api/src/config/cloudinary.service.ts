@@ -121,6 +121,27 @@ export class CloudinaryService {
     }
   }
 
+  async uploadAvatar(fileBuffer: Buffer, userId: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: `cherut/avatars/${userId}`,
+          resource_type: 'image',
+          transformation: [
+            { width: 300, height: 300, crop: 'fill', gravity: 'face', quality: 'auto:good', fetch_format: 'auto' },
+          ],
+        },
+        (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
+          if (error) return reject(error);
+          if (!result) return reject(new Error('Upload failed: no result'));
+          this.logger.log(`Avatar uploaded: ${result.public_id}`);
+          resolve(result.secure_url);
+        },
+      );
+      uploadStream.end(fileBuffer);
+    });
+  }
+
   /**
    * Extrai o public_id de uma URL do Cloudinary
    */

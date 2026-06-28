@@ -5,6 +5,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { FirebaseService } from '../../config/firebase.service';
+import { CloudinaryService } from '../../config/cloudinary.service';
 import { CreateProfileDto, UpdateProfileDto } from './dto';
 
 @Injectable()
@@ -12,7 +13,16 @@ export class ProfileService {
   private readonly logger = new Logger(ProfileService.name);
   private readonly collection = 'profiles';
 
-  constructor(private readonly firebaseService: FirebaseService) {}
+  constructor(
+    private readonly firebaseService: FirebaseService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
+
+  async updateAvatar(userId: string, file: Express.Multer.File): Promise<{ avatarUrl: string }> {
+    const avatarUrl = await this.cloudinaryService.uploadAvatar(file.buffer, userId);
+    await this.update(userId, { avatarUrl });
+    return { avatarUrl };
+  }
 
   async create(userId: string, createDto: CreateProfileDto) {
     const db = this.firebaseService.getFirestore();

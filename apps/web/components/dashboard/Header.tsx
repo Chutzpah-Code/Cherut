@@ -171,6 +171,7 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
 
         <Group gap="xs" ml="xs">
           <Avatar
+            src={profile?.avatarUrl ?? undefined}
             color="blue"
             radius="xl"
             size="md"
