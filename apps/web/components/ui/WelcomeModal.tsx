@@ -234,11 +234,7 @@ function StepGettingStarted() {
               key={mod.label}
               size="sm"
               variant="light"
-              style={{
-                background: `${mod.color}12`,
-                color: mod.color,
-                border: `1px solid ${mod.color}25`,
-              }}
+              color="blue"
               leftSection={<mod.icon size={10} />}
             >
               {mod.label}
