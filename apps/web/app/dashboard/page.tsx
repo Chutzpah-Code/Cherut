@@ -7,7 +7,7 @@ import { CheckCircle2, Circle, ArrowUpCircle, ArrowDownCircle } from 'lucide-rea
 import { useObjectives } from '@/hooks/useObjectives';
 import { useTasks } from '@/hooks/useTasks';
 import { useHabits, useLogHabit } from '@/hooks/useHabits';
-import { useFinanceOverview } from '@/hooks/useFinance';
+import { useFinanceOverview, useFinanceAccounts } from '@/hooks/useFinance';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -34,11 +34,9 @@ function fmtDate() {
 
 function fmtCurrency(value: number, currency = 'USD') {
   try {
-    return new Intl.NumberFormat(undefined, {
-      style: 'currency', currency, maximumFractionDigits: 0,
-    }).format(value);
+    return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(value);
   } catch {
-    return `${currency} ${value.toFixed(0)}`;
+    return `${currency} ${value.toFixed(2)}`;
   }
 }
 
@@ -252,10 +250,25 @@ function FinanceSnapshot() {
   const [currency] = useState<string>(() => {
     try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
   });
-  const { data, isLoading } = useFinanceOverview(undefined, currency);
+  const { data: accounts = [], isLoading } = useFinanceAccounts();
+  const { data: overview } = useFinanceOverview(undefined, currency);
 
-  const net = (data?.totalIncomeConverted ?? 0) - (data?.totalExpensesConverted ?? 0);
-  const hasData = !!data && (data.totalBalanceConverted !== undefined);
+  // Compute true balance directly from accounts — same source as Finance > Accounts tab
+  const balanceByCurrency = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const acc of accounts as any[]) {
+      const cur = acc.currency ?? 'USD';
+      map[cur] = (map[cur] ?? 0) + (acc.balance ?? 0);
+    }
+    return map;
+  }, [accounts]);
+
+  const currencies = Object.keys(balanceByCurrency);
+  const hasData = (accounts as any[]).length > 0;
+
+  // Net this month from overview (income − expenses)
+  const net = (overview?.totalIncomeConverted ?? 0) - (overview?.totalExpensesConverted ?? 0);
+  const netCurrency = currencies.length === 1 ? currencies[0] : currency;
 
   return (
     <Panel accent>
@@ -267,25 +280,29 @@ function FinanceSnapshot() {
         <Text size="sm" c="dimmed">Set up Finance to start tracking your money.</Text>
       ) : (
         <Stack gap={8}>
-          <Box>
-            <Text style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 2 }}>
-              Total balance
-            </Text>
-            <Text style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', color: '#0052CC', lineHeight: 1 }}>
-              {fmtCurrency(data.totalBalanceConverted, currency)}
-            </Text>
-          </Box>
+          {currencies.map((cur) => (
+            <Box key={cur}>
+              <Text style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 2 }}>
+                {currencies.length > 1 ? cur : 'Total balance'}
+              </Text>
+              <Text style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', color: '#0052CC', lineHeight: 1 }}>
+                {fmtCurrency(balanceByCurrency[cur], cur)}
+              </Text>
+            </Box>
+          ))}
 
-          <Group gap={6} align="center">
-            {net >= 0
-              ? <ArrowUpCircle size={14} color="#2e7d32" />
-              : <ArrowDownCircle size={14} color="#c62828" />
-            }
-            <Text style={{ fontSize: 13, fontWeight: 600, color: net >= 0 ? '#2e7d32' : '#c62828' }}>
-              {net >= 0 ? '+' : ''}{fmtCurrency(net, currency)}
-            </Text>
-            <Text size="xs" c="dimmed">this month</Text>
-          </Group>
+          {overview && (
+            <Group gap={6} align="center">
+              {net >= 0
+                ? <ArrowUpCircle size={14} color="#2e7d32" />
+                : <ArrowDownCircle size={14} color="#c62828" />
+              }
+              <Text style={{ fontSize: 13, fontWeight: 600, color: net >= 0 ? '#2e7d32' : '#c62828' }}>
+                {net >= 0 ? '+' : ''}{fmtCurrency(net, netCurrency)}
+              </Text>
+              <Text size="xs" c="dimmed">this month</Text>
+            </Group>
+          )}
         </Stack>
       )}
 
