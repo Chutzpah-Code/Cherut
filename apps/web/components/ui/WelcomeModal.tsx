@@ -166,6 +166,13 @@ const gettingStartedSteps = [
   },
 ];
 
+const exploreModules = [
+  { icon: Wallet,    label: 'Finance',      color: '#0052CC' },
+  { icon: BookOpen,  label: 'Journal',      color: '#8b5cf6' },
+  { icon: ImageIcon, label: 'Vision Board', color: '#a855f7' },
+  { icon: Heart,     label: 'Values',       color: '#e11d48' },
+];
+
 function StepGettingStarted() {
   return (
     <Stack gap="sm">
@@ -208,6 +215,37 @@ function StepGettingStarted() {
           </Group>
         </Paper>
       ))}
+
+      {/* Explore more */}
+      <Box
+        style={{
+          background: 'rgba(70,134,254,0.04)',
+          border: '1px solid rgba(70,134,254,0.12)',
+          borderRadius: 10,
+          padding: '12px 14px',
+        }}
+      >
+        <Text size="xs" fw={600} style={{ color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: 10, marginBottom: 8 }}>
+          Then explore at your own pace
+        </Text>
+        <Group gap="xs">
+          {exploreModules.map((mod) => (
+            <Badge
+              key={mod.label}
+              size="sm"
+              variant="light"
+              style={{
+                background: `${mod.color}12`,
+                color: mod.color,
+                border: `1px solid ${mod.color}25`,
+              }}
+              leftSection={<mod.icon size={10} />}
+            >
+              {mod.label}
+            </Badge>
+          ))}
+        </Group>
+      </Box>
     </Stack>
   );
 }
