@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Globe, Clock, Save, Lock, Shield } from 'lucide-react';
+import { Save, Lock, Shield } from 'lucide-react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 import {
-  Title,
-  Text,
   Button,
   Card,
   Group,
@@ -21,6 +20,10 @@ import {
   PasswordInput,
   Alert,
   Modal,
+  Badge,
+  Tooltip,
+  Box,
+  Text,
   useMantineColorScheme,
   useComputedColorScheme,
 } from '@mantine/core';
@@ -28,17 +31,37 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
 import { UpdateProfileDto } from '@/lib/api/services/profile';
 import { changePassword } from '@/lib/firebase/auth';
-import { AlertCircle, CheckCircle } from 'lucide-react';
-import { getPasswordErrorMessage, createRateLimitError } from '@/lib/utils/auth-errors';
+import { getPasswordErrorMessage } from '@/lib/utils/auth-errors';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
+
+// ── Shared style constants ─────────────────────────────────────────────────────
+
+const SECTION_LABEL: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 600,
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+  color: '#64748B',
+  marginBottom: 16,
+};
+
+const INPUT_STYLES = {
+  input: { height: 48, fontSize: 14, border: '1px solid #E2E8F0' },
+  label: { fontSize: 14, fontWeight: 500 as const, color: '#333333', marginBottom: 4 },
+};
+
+const TEXTAREA_STYLES = {
+  input: { fontSize: 14, border: '1px solid #E2E8F0' },
+  label: { fontSize: 14, fontWeight: 500 as const, color: '#333333', marginBottom: 4 },
+};
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile();
   const updateMutation = useUpdateProfile();
-
-  // Theme integration hooks
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light');
 
@@ -54,7 +77,6 @@ export default function ProfilePage() {
     },
   });
 
-  // Password change state
   const [passwordModalOpened, setPasswordModalOpened] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -64,8 +86,6 @@ export default function ProfilePage() {
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState(false);
-
-  // Rate limiting for password changes
   const passwordChangeRateLimit = useRateLimit({ action: 'passwordChange' });
 
   useEffect(() => {
@@ -76,7 +96,6 @@ export default function ProfilePage() {
         timezone: profile.timezone || '',
         language: profile.language || 'en',
         preferences: {
-          // Use current Mantine theme instead of profile theme to ensure sync
           theme: computedColorScheme as 'light' | 'dark',
           notifications: profile.preferences?.notifications ?? true,
           weekStartsOn: profile.preferences?.weekStartsOn ?? 0,
@@ -87,7 +106,6 @@ export default function ProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       await updateMutation.mutateAsync(formData);
     } catch (error) {
@@ -99,40 +117,30 @@ export default function ProfilePage() {
     e.preventDefault();
     setPasswordError('');
 
-    // Check rate limit before proceeding
     if (!passwordChangeRateLimit.canSubmit) {
       setPasswordError(passwordChangeRateLimit.warningMessage);
       return;
     }
-
     if (passwordData.newPassword.length < 6) {
       setPasswordError('Password must be at least 6 characters long');
       return;
     }
-
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setPasswordError('New passwords do not match');
       return;
     }
 
     setPasswordLoading(true);
-
     try {
       await changePassword(passwordData.currentPassword, passwordData.newPassword);
-      // Record successful password change
       passwordChangeRateLimit.recordSuccess();
       setPasswordSuccess(true);
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      });
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setTimeout(() => {
         setPasswordSuccess(false);
         setPasswordModalOpened(false);
       }, 2000);
     } catch (error: any) {
-      // Record failed password change attempt
       passwordChangeRateLimit.recordFailure();
       setPasswordError(getPasswordErrorMessage(error));
     } finally {
@@ -142,47 +150,27 @@ export default function ProfilePage() {
 
   const handlePasswordModalClose = () => {
     setPasswordModalOpened(false);
-    setPasswordData({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    });
+    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     setPasswordError('');
     setPasswordSuccess(false);
     setPasswordLoading(false);
   };
 
-  // Handle theme change with bidirectional sync - Force light mode only for now
   const handleThemeChange = async (newTheme: 'light' | 'dark') => {
-    // Force light mode only - dark mode coming soon
     const forcedTheme = 'light';
-    // 1. Update Mantine theme immediately for instant visual feedback
     setColorScheme(forcedTheme);
     localStorage.setItem('mantine-color-scheme-cherut', forcedTheme);
-
-    // 2. Update form data
-    setFormData({
+    const updated = {
       ...formData,
-      preferences: {
-        ...formData.preferences,
-        theme: forcedTheme,
-      },
-    });
-
-    // 3. Save to backend profile
+      preferences: { ...formData.preferences, theme: forcedTheme },
+    };
+    setFormData(updated);
     try {
-      await updateMutation.mutateAsync({
-        ...formData,
-        preferences: {
-          ...formData.preferences,
-          theme: forcedTheme,
-        },
-      });
+      await updateMutation.mutateAsync(updated);
     } catch (error) {
       console.error('Error updating theme preference:', error);
     }
   };
-
 
   if (isLoading) {
     return (
@@ -192,635 +180,299 @@ export default function ProfilePage() {
     );
   }
 
+  const displayInitial = (formData.displayName?.[0] ?? user?.email?.[0] ?? 'U').toUpperCase();
+
   return (
     <>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
-      <Stack
-        gap="xl"
+
+      {/* ── Hero strip ────────────────────────────────────────────────────── */}
+      <Box
         style={{
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          background: 'linear-gradient(135deg, rgba(70,134,254,0.08) 0%, rgba(0,82,204,0.04) 100%)',
+          border: '1px solid #E2E8F0',
+          borderRadius: 12,
+          padding: '36px 24px 28px',
+          textAlign: 'center',
+          marginBottom: 24,
         }}
       >
-        <div>
-          <Title
-            order={1}
-            size="h2"
-            mb="xs"
-            style={{
-              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: 'clamp(22px, 5vw, 32px)',
-              fontWeight: 700,
-              color: '#000000',
-            }}
-          >
-            Profile
-          </Title>
-          <Text
-            c="dimmed"
-            size="sm"
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '16px',
-              fontWeight: 400,
-              color: '#666666',
-            }}
-          >
-            Manage your account settings and preferences
-          </Text>
-        </div>
+        <Box
+          style={{
+            width: 104,
+            height: 104,
+            borderRadius: '50%',
+            padding: 4,
+            background: 'white',
+            boxShadow: '0 4px 20px rgba(70,134,254,0.2)',
+            margin: '0 auto 16px',
+          }}
+        >
+          <Avatar size={96} radius={999} color="blue" style={{ width: '100%', height: '100%' }}>
+            {displayInitial}
+          </Avatar>
+        </Box>
+
+        <Text
+          style={{
+            fontFamily: 'Inter Display, -apple-system, sans-serif',
+            fontSize: 22,
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+            color: formData.displayName ? '#0F172A' : '#94A3B8',
+            lineHeight: 1.2,
+            marginBottom: 4,
+          }}
+        >
+          {formData.displayName || 'Your Name'}
+        </Text>
+
+        <Text style={{ fontSize: 14, color: '#64748B' }}>{user?.email}</Text>
 
         {profile && !profile.displayName && (
-          <Alert color="blue" radius="md" variant="light">
-            Add your name so it appears in your greeting and header.
-          </Alert>
+          <Badge variant="light" color="blue" size="sm" mt={12} style={{ cursor: 'default' }}>
+            Add your name below
+          </Badge>
         )}
+      </Box>
 
-      <Grid gutter="md">
-        {/* Profile Card */}
-        <Grid.Col span={{ base: 12, lg: 4 }}>
-          <Card
-            shadow="sm"
-            padding="lg"
-            withBorder
-            radius={16}
-            styles={{
-              root: {
-                border: '1px solid #E5E7EB',
-                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              },
-            }}
-          >
-            <Stack align="center" gap="md">
-              <Avatar
-                size={96}
-                radius="xl"
-                color="red"
-              >
-                {(formData.displayName?.[0] ?? user?.email?.[0] ?? 'U').toUpperCase()}
-              </Avatar>
+      {/* ── Cards zone ────────────────────────────────────────────────────── */}
+      <Stack gap="lg" style={{ maxWidth: 680, margin: '0 auto' }}>
+        <form onSubmit={handleSubmit}>
+          <Stack gap="lg">
 
-              <div style={{ textAlign: 'center' }}>
-                <Text
-                  fw={600}
-                  size="lg"
-                  style={{
-                    fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                    fontSize: '20px',
-                    fontWeight: 600,
-                    color: '#000000',
-                  }}
-                >
-                  {formData.displayName || 'User'}
-                </Text>
-                <Text
-                  size="sm"
-                  c="dimmed"
-                  style={{
-                    wordBreak: 'break-all',
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 400,
-                    color: '#666666',
-                  }}
-                >
-                  {user?.email}
-                </Text>
-              </div>
+            {/* Personal Information */}
+            <Card
+              padding="xl"
+              radius={12}
+              withBorder={false}
+              shadow="none"
+              style={{ border: '1px solid #E2E8F0', borderLeft: '3px solid #4686FE' }}
+            >
+              <div style={SECTION_LABEL}>Personal Information</div>
+              <Stack gap="md">
+                <TextInput
+                  label="Display Name"
+                  placeholder="Your full name"
+                  value={formData.displayName}
+                  onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+                  radius={8}
+                  styles={INPUT_STYLES}
+                />
+                <Textarea
+                  label="Bio"
+                  placeholder="Tell us about yourself..."
+                  value={formData.bio}
+                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                  rows={3}
+                  radius={8}
+                  styles={TEXTAREA_STYLES}
+                />
+              </Stack>
+            </Card>
 
-              <Divider w="100%" />
+            {/* Regional Settings */}
+            <Card
+              padding="xl"
+              radius={12}
+              withBorder={false}
+              shadow="none"
+              style={{ border: '1px solid #E2E8F0' }}
+            >
+              <div style={SECTION_LABEL}>Regional Settings</div>
+              <Grid gutter="md">
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Select
+                    label="Timezone"
+                    placeholder="Select timezone"
+                    value={formData.timezone || null}
+                    onChange={(value) => setFormData({ ...formData, timezone: value || '' })}
+                    radius={8}
+                    styles={INPUT_STYLES}
+                    data={[
+                      { value: 'America/New_York', label: 'Eastern Time (ET)' },
+                      { value: 'America/Chicago', label: 'Central Time (CT)' },
+                      { value: 'America/Denver', label: 'Mountain Time (MT)' },
+                      { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
+                      { value: 'America/Sao_Paulo', label: 'Brasília Time (BRT)' },
+                      { value: 'Europe/London', label: 'London (GMT)' },
+                      { value: 'Europe/Paris', label: 'Paris (CET)' },
+                      { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
+                      { value: 'Asia/Shanghai', label: 'Shanghai (CST)' },
+                      { value: 'Australia/Sydney', label: 'Sydney (AEST)' },
+                    ]}
+                  />
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Select
+                    label="Language"
+                    value={formData.language}
+                    onChange={(value) => setFormData({ ...formData, language: value || 'en' })}
+                    radius={8}
+                    styles={INPUT_STYLES}
+                    data={[{ value: 'en', label: 'English' }]}
+                  />
+                </Grid.Col>
+              </Grid>
+            </Card>
 
-              <Stack gap="sm" w="100%">
-                <Group gap="xs" wrap="nowrap">
-                  <Mail size={16} style={{ flexShrink: 0, opacity: 0.6 }} />
-                  <Text
-                    size="sm"
-                    truncate
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '14px',
-                      fontWeight: 400,
-                      color: '#333333',
-                    }}
-                  >
-                    {user?.email}
-                  </Text>
+            {/* Preferences */}
+            <Card
+              padding="xl"
+              radius={12}
+              withBorder={false}
+              shadow="none"
+              style={{ border: '1px solid #E2E8F0' }}
+            >
+              <div style={SECTION_LABEL}>Preferences</div>
+              <Stack gap="md">
+                <Tooltip label="Dark mode coming soon" position="top-start" withArrow>
+                  <Select
+                    label="Theme"
+                    value={formData.preferences?.theme}
+                    onChange={(value) => handleThemeChange(value as 'light' | 'dark')}
+                    radius={8}
+                    styles={INPUT_STYLES}
+                    disabled
+                    data={[
+                      { value: 'light', label: 'Light' },
+                      { value: 'dark', label: 'Dark' },
+                    ]}
+                  />
+                </Tooltip>
+
+                <Select
+                  label="Week Starts On"
+                  value={String(formData.preferences?.weekStartsOn ?? 0)}
+                  onChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      preferences: {
+                        ...formData.preferences,
+                        weekStartsOn: parseInt(value || '0'),
+                      },
+                    })
+                  }
+                  radius={8}
+                  styles={INPUT_STYLES}
+                  data={[
+                    { value: '0', label: 'Sunday' },
+                    { value: '1', label: 'Monday' },
+                  ]}
+                />
+
+                <Group justify="space-between" align="center" py={4}>
+                  <Box>
+                    <Text size="sm" fw={500} c="#333333">Notifications</Text>
+                    <Text size="xs" c="dimmed">Enable or disable all notifications</Text>
+                  </Box>
+                  <Switch
+                    checked={formData.preferences?.notifications === true}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        preferences: {
+                          ...formData.preferences,
+                          notifications: e.currentTarget.checked,
+                        },
+                      })
+                    }
+                    color="blue"
+                  />
                 </Group>
 
-                {formData.timezone && (
-                  <Group gap="xs" wrap="nowrap">
-                    <Clock size={16} style={{ flexShrink: 0, opacity: 0.6 }} />
-                    <Text
-                      size="sm"
-                      truncate
-                      style={{
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '14px',
-                        fontWeight: 400,
-                        color: '#333333',
-                      }}
-                    >
-                      {formData.timezone}
-                    </Text>
-                  </Group>
-                )}
-
-                {formData.language && (
-                  <Group gap="xs" wrap="nowrap">
-                    <Globe size={16} style={{ flexShrink: 0, opacity: 0.6 }} />
-                    <Text
-                      size="sm"
-                      style={{
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '14px',
-                        fontWeight: 400,
-                        color: '#333333',
-                      }}
-                    >
-                      {formData.language.toUpperCase()}
-                    </Text>
-                  </Group>
-                )}
-              </Stack>
-            </Stack>
-          </Card>
-        </Grid.Col>
-
-        {/* Settings Form */}
-        <Grid.Col span={{ base: 12, lg: 8 }}>
-          <Card
-            shadow="sm"
-            padding="lg"
-            withBorder
-            radius={16}
-            styles={{
-              root: {
-                border: '1px solid #E5E7EB',
-                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              },
-            }}
-          >
-            <Title
-              order={3}
-              size="h4"
-              mb="lg"
-              style={{
-                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: '24px',
-                fontWeight: 600,
-                color: '#000000',
-              }}
-            >
-              Profile Settings
-            </Title>
-
-            <form onSubmit={handleSubmit}>
-              <Stack gap="lg">
-                {/* Personal Information */}
-                <div>
-                  <Title
-                    order={4}
-                    size="h5"
-                    mb="md"
-                    style={{
-                      fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                      fontSize: '18px',
-                      fontWeight: 600,
-                      color: '#000000',
-                    }}
-                  >
-                    Personal Information
-                  </Title>
-                  <Stack gap="md">
-                    <TextInput
-                      label="Display Name"
-                      placeholder="Your name"
-                      value={formData.displayName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, displayName: e.target.value })
-                      }
-                      radius={8}
-                      styles={{
-                        input: {
-                          height: '48px',
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          border: '1px solid #CCCCCC',
-                          '&:focus': {
-                            borderColor: '#4686FE',
-                          },
-                        },
-                        label: {
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 500,
-                          color: '#333333',
-                        },
-                      }}
-                    />
-
-                    <Textarea
-                      label="Bio"
-                      placeholder="Tell us about yourself..."
-                      value={formData.bio}
-                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                      rows={3}
-                      radius={8}
-                      styles={{
-                        input: {
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          border: '1px solid #CCCCCC',
-                          '&:focus': {
-                            borderColor: '#4686FE',
-                          },
-                        },
-                        label: {
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 500,
-                          color: '#333333',
-                        },
-                      }}
-                    />
-                  </Stack>
-                </div>
-
                 <Divider />
 
-                {/* Regional Settings */}
-                <div>
-                  <Title
-                    order={4}
-                    size="h5"
-                    mb="md"
-                    style={{
-                      fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                      fontSize: '18px',
-                      fontWeight: 600,
-                      color: '#000000',
-                    }}
-                  >
-                    Regional Settings
-                  </Title>
-                  <Grid gutter="md">
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Select
-                        label="Timezone"
-                        placeholder="Select timezone"
-                        value={formData.timezone}
-                        onChange={(value) => setFormData({ ...formData, timezone: value || '' })}
-                        radius={8}
-                        styles={{
-                          input: {
-                            height: '48px',
-                            fontFamily: 'Inter, sans-serif',
-                            fontSize: '14px',
-                            border: '1px solid #CCCCCC',
-                            '&:focus': {
-                              borderColor: '#4686FE',
-                            },
-                          },
-                          label: {
-                            fontFamily: 'Inter, sans-serif',
-                            fontSize: '14px',
-                            fontWeight: 500,
-                            color: '#333333',
-                          },
-                        }}
-                        data={[
-                          { value: '', label: 'Select timezone' },
-                          { value: 'America/New_York', label: 'Eastern Time (ET)' },
-                          { value: 'America/Chicago', label: 'Central Time (CT)' },
-                          { value: 'America/Denver', label: 'Mountain Time (MT)' },
-                          { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
-                          { value: 'America/Sao_Paulo', label: 'Brasília Time (BRT)' },
-                          { value: 'Europe/London', label: 'London (GMT)' },
-                          { value: 'Europe/Paris', label: 'Paris (CET)' },
-                          { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
-                          { value: 'Asia/Shanghai', label: 'Shanghai (CST)' },
-                          { value: 'Australia/Sydney', label: 'Sydney (AEST)' },
-                        ]}
-                      />
-                    </Grid.Col>
-
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Select
-                        label="Language"
-                        value={formData.language}
-                        onChange={(value) => setFormData({ ...formData, language: value || 'en' })}
-                        radius={8}
-                        styles={{
-                          input: {
-                            height: '48px',
-                            fontFamily: 'Inter, sans-serif',
-                            fontSize: '14px',
-                            border: '1px solid #CCCCCC',
-                            '&:focus': {
-                              borderColor: '#4686FE',
-                            },
-                          },
-                          label: {
-                            fontFamily: 'Inter, sans-serif',
-                            fontSize: '14px',
-                            fontWeight: 500,
-                            color: '#333333',
-                          },
-                        }}
-                        data={[
-                          { value: 'en', label: 'English' },
-                        ]}
-                      />
-                    </Grid.Col>
-                  </Grid>
-                </div>
-
-                <Divider />
-
-                {/* Preferences */}
-                <div>
-                  <Title
-                    order={4}
-                    size="h5"
-                    mb="md"
-                    style={{
-                      fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                      fontSize: '18px',
-                      fontWeight: 600,
-                      color: '#000000',
-                    }}
-                  >
-                    Preferences
-                  </Title>
-                  <Stack gap="md">
-                    <Select
-                      label="Theme"
-                      value={formData.preferences?.theme}
-                      onChange={(value) => handleThemeChange(value as 'light' | 'dark')}
-                      radius={8}
-                      styles={{
-                        input: {
-                          height: '48px',
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          border: '1px solid #CCCCCC',
-                          '&:focus': {
-                            borderColor: '#4686FE',
-                          },
-                        },
-                        label: {
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 500,
-                          color: '#333333',
-                        },
-                      }}
-                      data={[
-                        { value: 'dark', label: 'Dark' },
-                        { value: 'light', label: 'Light' },
-                      ]}
-                    />
-
-                    <Select
-                      label="Week Starts On"
-                      value={String(formData.preferences?.weekStartsOn)}
-                      onChange={(value) =>
-                        setFormData({
-                          ...formData,
-                          preferences: {
-                            ...formData.preferences,
-                            weekStartsOn: parseInt(value || '0'),
-                          },
-                        })
-                      }
-                      radius={8}
-                      styles={{
-                        input: {
-                          height: '48px',
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          border: '1px solid #CCCCCC',
-                          '&:focus': {
-                            borderColor: '#4686FE',
-                          },
-                        },
-                        label: {
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 500,
-                          color: '#333333',
-                        },
-                      }}
-                      data={[
-                        { value: '0', label: 'Sunday' },
-                        { value: '1', label: 'Monday' },
-                      ]}
-                    />
-
-                    <Group justify="space-between">
-                      <div>
-                        <Text
-                          size="sm"
-                          fw={500}
-                          style={{
-                            fontFamily: 'Inter, sans-serif',
-                            fontSize: '14px',
-                            fontWeight: 500,
-                            color: '#333333',
-                          }}
-                        >
-                          Notifications
-                        </Text>
-                        <Text
-                          size="xs"
-                          c="dimmed"
-                          style={{
-                            fontFamily: 'Inter, sans-serif',
-                            fontSize: '12px',
-                            fontWeight: 400,
-                            color: '#666666',
-                          }}
-                        >
-                          Enable or disable all notifications
-                        </Text>
-                      </div>
-                      <Switch
-                        checked={formData.preferences?.notifications === true}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            preferences: {
-                              ...formData.preferences,
-                              notifications: e.currentTarget.checked,
-                            },
-                          })
-                        }
-                      />
-                    </Group>
-                  </Stack>
-                </div>
-
-                <Divider />
-
-                {/* Security Section */}
-                <div>
-                  <Title
-                    order={4}
-                    size="h5"
-                    mb="md"
-                    style={{
-                      fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                      fontSize: '18px',
-                      fontWeight: 600,
-                      color: '#000000',
-                    }}
-                  >
-                    Security
-                  </Title>
-                  <Stack gap="md">
-                    <div>
-                      <Text
-                        size="sm"
-                        c="dimmed"
-                        mb="xs"
-                        style={{
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 400,
-                          color: '#666666',
-                        }}
-                      >
-                        Keep your account secure by updating your password regularly
-                      </Text>
-                      <Button
-                        variant="outline"
-                        leftSection={<Lock size={16} />}
-                        onClick={() => setPasswordModalOpened(true)}
-                        radius={8}
-                        style={{
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: 600,
-                          height: '48px',
-                          borderColor: '#CCCCCC',
-                          color: '#333333',
-                          background: 'white',
-                        }}
-                        styles={{
-                          root: {
-                            '&:hover': {
-                              borderColor: '#4686FE',
-                              color: '#4686FE',
-                            },
-                          },
-                        }}
-                      >
-                        Change Password
-                      </Button>
-                    </div>
-                  </Stack>
-                </div>
-
-                <Divider />
-
-                {/* Submit Button */}
-                <Group justify="flex-start">
+                <Group align="center" gap="md">
                   <Button
                     type="submit"
-                    leftSection={<Save size={20} />}
+                    leftSection={<Save size={16} />}
                     loading={updateMutation.isPending}
                     radius={8}
                     style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      height: '48px',
+                      height: 48,
                       backgroundColor: '#4686FE',
                       border: 'none',
-                      color: 'white',
-                    }}
-                    styles={{
-                      root: {
-                        '&:hover': {
-                          backgroundColor: '#3366E5',
-                        },
-                        '&:disabled': {
-                          backgroundColor: '#CCCCCC',
-                        },
-                      },
+                      fontSize: 14,
+                      fontWeight: 600,
                     }}
                   >
                     {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                   </Button>
 
                   {updateMutation.isSuccess && (
-                    <Text
-                      size="sm"
-                      c="green"
-                      style={{
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '14px',
-                        fontWeight: 500,
-                        color: '#22C55E',
-                      }}
-                    >
-                      Profile updated successfully!
+                    <Text size="sm" fw={500} style={{ color: '#16A34A' }}>
+                      Saved
                     </Text>
                   )}
                 </Group>
               </Stack>
-            </form>
-          </Card>
-        </Grid.Col>
-      </Grid>
+            </Card>
 
-      {/* Change Password Modal */}
+          </Stack>
+        </form>
+
+        {/* Security */}
+        <Card
+          padding="xl"
+          radius={12}
+          withBorder={false}
+          shadow="none"
+          style={{ border: '1px solid #E2E8F0' }}
+        >
+          <div style={SECTION_LABEL}>Security</div>
+          <Text size="sm" c="dimmed" mb="md">
+            Keep your account secure by updating your password regularly.
+          </Text>
+          <Button
+            variant="outline"
+            leftSection={<Lock size={16} />}
+            onClick={() => setPasswordModalOpened(true)}
+            radius={8}
+            style={{
+              height: 44,
+              borderColor: '#E2E8F0',
+              color: '#333333',
+              fontSize: 14,
+              fontWeight: 500,
+            }}
+          >
+            Change Password
+          </Button>
+        </Card>
+      </Stack>
+
+      {/* ── Password Modal ─────────────────────────────────────────────────── */}
       <Modal
         opened={passwordModalOpened}
         onClose={handlePasswordModalClose}
         title={
           <Group gap="xs">
             <Shield size={20} />
-            <Text
-              fw={600}
-              style={{
-                fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: '18px',
-                fontWeight: 600,
-                color: '#000000',
-              }}
-            >
-              Change Password
-            </Text>
+            <Text fw={600} size="lg">Change Password</Text>
           </Group>
         }
         centered
         radius={16}
         styles={{
-          header: {
-            padding: '24px 24px 0 24px',
-          },
-          body: {
-            padding: '24px',
-          },
+          header: { padding: '24px 24px 0 24px' },
+          body: { padding: '24px' },
         }}
       >
         {passwordSuccess ? (
-          <Stack gap="lg" ta="center">
-            <Alert
-              icon={<CheckCircle size={20} />}
-              title="Password Changed Successfully!"
-              color="green"
-              radius="md"
-            >
-              Your password has been updated successfully.
-            </Alert>
-          </Stack>
+          <Alert
+            icon={<CheckCircle size={20} />}
+            title="Password Changed Successfully!"
+            color="green"
+            radius="md"
+          >
+            Your password has been updated successfully.
+          </Alert>
         ) : (
           <form onSubmit={handlePasswordChange}>
             <Stack gap="lg">
-              {/* Rate limit display */}
               <RateLimitDisplay
                 result={passwordChangeRateLimit.result}
                 message={passwordChangeRateLimit.warningMessage}
@@ -828,27 +480,13 @@ export default function ProfilePage() {
               />
 
               {passwordError && (
-                <Alert
-                  icon={<AlertCircle size={20} />}
-                  title="Error"
-                  color="red"
-                  radius="md"
-                >
+                <Alert icon={<AlertCircle size={20} />} title="Error" color="red" radius="md">
                   {passwordError}
                 </Alert>
               )}
 
-              <Text
-                size="sm"
-                c="dimmed"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '14px',
-                  fontWeight: 400,
-                  color: '#666666',
-                }}
-              >
-                Enter your current password and choose a new password to secure your account.
+              <Text size="sm" c="dimmed">
+                Enter your current password and choose a new one to secure your account.
               </Text>
 
               <PasswordInput
@@ -861,23 +499,7 @@ export default function ProfilePage() {
                 required
                 autoFocus
                 radius={8}
-                styles={{
-                  input: {
-                    height: '48px',
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    border: '1px solid #CCCCCC',
-                    '&:focus': {
-                      borderColor: '#4686FE',
-                    },
-                  },
-                  label: {
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    color: '#333333',
-                  },
-                }}
+                styles={INPUT_STYLES}
               />
 
               <PasswordInput
@@ -890,28 +512,7 @@ export default function ProfilePage() {
                 required
                 description="Must be at least 6 characters long"
                 radius={8}
-                styles={{
-                  input: {
-                    height: '48px',
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    border: '1px solid #CCCCCC',
-                    '&:focus': {
-                      borderColor: '#4686FE',
-                    },
-                  },
-                  label: {
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    color: '#333333',
-                  },
-                  description: {
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '12px',
-                    color: '#666666',
-                  },
-                }}
+                styles={INPUT_STYLES}
               />
 
               <PasswordInput
@@ -923,23 +524,7 @@ export default function ProfilePage() {
                 }
                 required
                 radius={8}
-                styles={{
-                  input: {
-                    height: '48px',
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    border: '1px solid #CCCCCC',
-                    '&:focus': {
-                      borderColor: '#4686FE',
-                    },
-                  },
-                  label: {
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    color: '#333333',
-                  },
-                }}
+                styles={INPUT_STYLES}
               />
 
               <Group justify="flex-end" gap="sm" wrap="wrap">
@@ -949,27 +534,11 @@ export default function ProfilePage() {
                   disabled={passwordLoading}
                   radius={8}
                   style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    height: '48px',
-                    borderColor: '#CCCCCC',
+                    height: 44,
+                    borderColor: '#E2E8F0',
                     color: '#333333',
-                    background: 'white',
                     flex: '1 1 auto',
-                    minWidth: '110px',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        borderColor: '#4686FE',
-                        color: '#4686FE',
-                      },
-                      '&:disabled': {
-                        borderColor: '#CCCCCC',
-                        color: '#999999',
-                      },
-                    },
+                    minWidth: 110,
                   }}
                 >
                   Cancel
@@ -980,25 +549,11 @@ export default function ProfilePage() {
                   leftSection={<Lock size={16} />}
                   radius={8}
                   style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    height: '48px',
+                    height: 44,
                     backgroundColor: '#4686FE',
                     border: 'none',
-                    color: 'white',
                     flex: '1 1 auto',
-                    minWidth: '110px',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        backgroundColor: '#3366E5',
-                      },
-                      '&:disabled': {
-                        backgroundColor: '#CCCCCC',
-                      },
-                    },
+                    minWidth: 110,
                   }}
                 >
                   {passwordLoading ? 'Changing...' : 'Change Password'}
@@ -1008,7 +563,6 @@ export default function ProfilePage() {
           </form>
         )}
       </Modal>
-      </Stack>
     </>
   );
 }
