@@ -21,10 +21,11 @@ import {
   Shield,
   ImageIcon,
   ArrowRight,
-  Sparkles,
-  X,
   Heart,
   BookOpen,
+  Wallet,
+  Clock,
+  X,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -33,230 +34,188 @@ interface WelcomeModalProps {
   onClose: () => void;
 }
 
-const features = [
-  {
-    icon: Shield,
-    title: 'Life Areas',
-    description: 'Set up foundational life categories. All other features depend on this setup.',
-    color: '#FAAD18',
-  },
-  {
-    icon: Target,
-    title: 'OKR Framework',
-    description: 'Set objectives and key results like world-class performers using proven methodology.',
-    color: '#3143B6',
-  },
-  {
-    icon: CheckCircle2,
-    title: 'Task Management',
-    description: 'Organize work with intuitive boards, track progress, and manage priorities effectively.',
-    color: '#06b6d4',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Habit Tracking',
-    description: 'Build daily routines that compound into extraordinary results over time.',
-    color: '#2FB264',
-  },
-  {
-    icon: ImageIcon,
-    title: 'Vision Board',
-    description: 'Visualize your dreams and maintain motivation through inspiring imagery.',
-    color: '#a855f7',
-  },
-  {
-    icon: Heart,
-    title: 'Personal Values',
-    description: 'Define and align with your core values. Track behaviors that reinforce your principles.',
-    color: '#e11d48',
-  },
-  {
-    icon: BookOpen,
-    title: 'Journal',
-    description: 'Daily reflections and thoughts. Search entries by date or content for insights.',
-    color: '#8b5cf6',
-  },
+const modules = [
+  { icon: Shield,       title: 'Life Areas',    color: '#FAAD18', description: 'The foundation — all features connect here', startHere: true },
+  { icon: Target,       title: 'Objectives',    color: '#4686FE', description: 'OKRs: goals with measurable key results' },
+  { icon: CheckCircle2, title: 'Tasks',         color: '#06b6d4', description: 'Kanban boards with time tracking' },
+  { icon: TrendingUp,   title: 'Habits',        color: '#2FB264', description: 'Daily streaks and frequency tracking' },
+  { icon: Wallet,       title: 'Finance',       color: '#0052CC', description: 'Accounts, budgets, investments' },
+  { icon: BookOpen,     title: 'Journal',       color: '#8b5cf6', description: 'Daily entries with search' },
+  { icon: ImageIcon,    title: 'Vision Board',  color: '#a855f7', description: 'Inspiring images for your goals' },
+  { icon: Heart,        title: 'Values',        color: '#e11d48', description: 'Core principles and behaviors' },
 ];
 
-const steps = [
-  {
-    title: 'Welcome to Cherut! 🎉',
-    subtitle: 'Your premium personal excellence platform',
-    content: (
-      <Stack gap="lg">
-        <Box>
-          <Text size="lg" c="dimmed" ta="center" mb="md">
-            Transform your ambition into reality with a complete system designed for elite performance.
-          </Text>
-          <Badge
-            size="lg"
-            radius="xl"
-            style={{
-              background: 'rgba(49, 67, 182, 0.1)',
-              color: '#3143B6',
-              border: '1px solid rgba(49, 67, 182, 0.2)',
-              margin: 'auto',
-              display: 'block',
-              width: 'fit-content',
-            }}
-            leftSection={<Sparkles size={14} />}
-          >
-            FREE DURING BETA
-          </Badge>
-        </Box>
+const HEADER_GRADIENT = 'linear-gradient(135deg, rgba(70,134,254,0.08) 0%, rgba(0,82,204,0.04) 100%)';
+const PRIMARY = '#4686FE';
+const ACCENT = '#0052CC';
+const BORDER = '1px solid #E2E8F0';
 
-        <Paper p="xl" radius="md" style={{ background: 'rgba(49, 67, 182, 0.05)', border: '1px solid rgba(49, 67, 182, 0.1)' }}>
-          <Text size="sm" fw={600} mb="xs" style={{ color: '#3143B6' }}>
-            💡 Quick Tip
-          </Text>
-          <Text size="sm" c="dimmed">
-            You can access this help anytime by clicking the help icon (?) in the header.
-          </Text>
-        </Paper>
+function StepWelcome() {
+  return (
+    <Stack gap="lg">
+      <Stack gap="xs" align="center">
+        <Text size="md" c="dimmed" ta="center" maw={420}>
+          Your personal productivity system — habits, goals, tasks, finance and more.
+        </Text>
+        <Badge
+          size="md"
+          radius="xl"
+          variant="light"
+          color="blue"
+          style={{ width: 'fit-content' }}
+        >
+          Free during Beta
+        </Badge>
       </Stack>
-    ),
-  },
-  {
-    title: 'Core Features',
-    subtitle: 'Everything you need to perform at your peak',
-    content: (
-      <SimpleGrid cols={1} spacing="md">
-        {features.map((feature, index) => (
-          <Paper key={index} p="md" radius="md" style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
-            <Group gap="md">
+
+      <Paper
+        p="md"
+        radius="md"
+        style={{ background: 'rgba(70,134,254,0.05)', border: '1px solid rgba(70,134,254,0.12)' }}
+      >
+        <Text size="sm" fw={600} mb={4} style={{ color: PRIMARY }}>
+          Quick tip
+        </Text>
+        <Text size="sm" c="dimmed">
+          You can access this guide anytime by clicking the help icon (?) in the header.
+        </Text>
+      </Paper>
+    </Stack>
+  );
+}
+
+function StepModules() {
+  return (
+    <Stack gap="md">
+      <SimpleGrid cols={2} spacing="sm">
+        {modules.map((mod) => (
+          <Paper
+            key={mod.title}
+            p="sm"
+            radius="md"
+            style={{ border: BORDER, position: 'relative' }}
+          >
+            <Group gap="sm" wrap="nowrap" align="flex-start">
               <ThemeIcon
-                size={40}
+                size={36}
                 radius="md"
-                style={{ background: `${feature.color}20`, color: feature.color }}
+                style={{ background: `${mod.color}18`, color: mod.color, flexShrink: 0 }}
               >
-                <feature.icon size={20} />
+                <mod.icon size={18} />
               </ThemeIcon>
-              <Box style={{ flex: 1 }}>
-                <Text fw={600} size="sm" mb={4}>
-                  {feature.title}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  {feature.description}
+              <Box style={{ flex: 1, minWidth: 0 }}>
+                <Group gap={6} mb={2} wrap="nowrap">
+                  <Text fw={600} size="sm" style={{ lineHeight: 1.2 }}>
+                    {mod.title}
+                  </Text>
+                  {mod.startHere && (
+                    <Badge size="xs" variant="light" color="yellow" style={{ flexShrink: 0 }}>
+                      Start here
+                    </Badge>
+                  )}
+                </Group>
+                <Text size="xs" c="dimmed" style={{ lineHeight: 1.4 }}>
+                  {mod.description}
                 </Text>
               </Box>
             </Group>
           </Paper>
         ))}
       </SimpleGrid>
-    ),
+
+      <Box>
+        <Divider mb="sm" />
+        <Group gap="xs" align="center">
+          <Text size="xs" c="dimmed" fw={500} style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: 10 }}>
+            Coming Soon
+          </Text>
+          {['Reports', 'Cherut OS'].map((name) => (
+            <Badge
+              key={name}
+              size="sm"
+              variant="light"
+              color="gray"
+              leftSection={<Clock size={10} />}
+            >
+              {name}
+            </Badge>
+          ))}
+        </Group>
+      </Box>
+    </Stack>
+  );
+}
+
+const gettingStartedSteps = [
+  {
+    title: 'Create Life Areas first',
+    body: 'Add categories like Health, Career, Finance. Everything links here. Rename instead of deleting.',
+    accent: true,
   },
   {
-    title: 'Getting Started Guide',
-    subtitle: 'Your roadmap to elite performance',
-    content: (
-      <Stack gap="md">
-        <Paper p="md" radius="md" style={{ border: '1px solid #FAAD1820', background: '#FAAD1810' }}>
-          <Group gap="sm" align="flex-start">
-            <ThemeIcon size={24} radius="xl" style={{ background: '#FAAD18', color: 'white', flexShrink: 0 }}>
-              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>1</span>
-            </ThemeIcon>
-            <Box>
-              <Text fw={600} size="sm">⚠️ Setup Life Areas FIRST</Text>
-              <Text size="xs" c="dimmed">
-                Life Areas are the foundation - all other features depend on them. Create categories like &quot;Health&quot;, &quot;Career&quot;, &quot;Relationships&quot;.
-                <strong> Rename instead of deleting</strong> to avoid breaking existing objectives and tasks linked to them.
-              </Text>
-            </Box>
-          </Group>
-        </Paper>
-
-        <Paper p="md" radius="md" style={{ border: '1px solid #3143B620', background: '#3143B610' }}>
-          <Group gap="sm" align="flex-start">
-            <ThemeIcon size={24} radius="xl" style={{ background: '#3143B6', color: 'white', flexShrink: 0 }}>
-              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>2</span>
-            </ThemeIcon>
-            <Box>
-              <Text fw={600} size="sm">Create Objectives (OKRs)</Text>
-              <Text size="xs" c="dimmed">
-                Set quarterly/yearly goals with measurable Key Results. Each objective must be linked to a Life Area.
-                This methodology is used by Google, Intel, and other top-performing organizations.
-              </Text>
-            </Box>
-          </Group>
-        </Paper>
-
-        <Paper p="md" radius="md" style={{ border: '1px solid #06b6d420', background: '#06b6d410' }}>
-          <Group gap="sm" align="flex-start">
-            <ThemeIcon size={24} radius="xl" style={{ background: '#06b6d4', color: 'white', flexShrink: 0 }}>
-              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>3</span>
-            </ThemeIcon>
-            <Box>
-              <Text fw={600} size="sm">Manage Tasks & Execution</Text>
-              <Text size="xs" c="dimmed">
-                Break down objectives into actionable tasks. Use Kanban boards to track progress through stages:
-                To Do → In Progress → Review → Done. Tasks can be linked to objectives for better tracking.
-              </Text>
-            </Box>
-          </Group>
-        </Paper>
-
-        <Paper p="md" radius="md" style={{ border: '1px solid #2FB26420', background: '#2FB26410' }}>
-          <Group gap="sm" align="flex-start">
-            <ThemeIcon size={24} radius="xl" style={{ background: '#2FB264', color: 'white', flexShrink: 0 }}>
-              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>4</span>
-            </ThemeIcon>
-            <Box>
-              <Text fw={600} size="sm">Build Consistent Habits</Text>
-              <Text size="xs" c="dimmed">
-                Track daily/weekly habits that support your objectives. Set frequency, monitor streaks,
-                and build the systems that create lasting change. Small consistent actions compound into massive results.
-              </Text>
-            </Box>
-          </Group>
-        </Paper>
-
-        <Paper p="md" radius="md" style={{ border: '1px solid #a855f720', background: '#a855f710' }}>
-          <Group gap="sm" align="flex-start">
-            <ThemeIcon size={24} radius="xl" style={{ background: '#a855f7', color: 'white', flexShrink: 0 }}>
-              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>5</span>
-            </ThemeIcon>
-            <Box>
-              <Text fw={600} size="sm">Visualize with Vision Board</Text>
-              <Text size="xs" c="dimmed">
-                Upload inspiring images that represent your goals and dreams. Visual motivation helps maintain
-                focus and emotional connection to your objectives during challenging times.
-              </Text>
-            </Box>
-          </Group>
-        </Paper>
-
-        <Paper p="md" radius="md" style={{ border: '1px solid #e11d4820', background: '#e11d4810' }}>
-          <Group gap="sm" align="flex-start">
-            <ThemeIcon size={24} radius="xl" style={{ background: '#e11d48', color: 'white', flexShrink: 0 }}>
-              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>6</span>
-            </ThemeIcon>
-            <Box>
-              <Text fw={600} size="sm">Define Your Personal Values</Text>
-              <Text size="xs" c="dimmed">
-                Identify your core principles and define behaviors that reinforce them. Values serve as your
-                moral compass and decision-making framework for consistent character development.
-              </Text>
-            </Box>
-          </Group>
-        </Paper>
-
-        <Paper p="md" radius="md" style={{ border: '1px solid #8b5cf620', background: '#8b5cf610' }}>
-          <Group gap="sm" align="flex-start">
-            <ThemeIcon size={24} radius="xl" style={{ background: '#8b5cf6', color: 'white', flexShrink: 0 }}>
-              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>7</span>
-            </ThemeIcon>
-            <Box>
-              <Text fw={600} size="sm">Daily Journaling & Reflection</Text>
-              <Text size="xs" c="dimmed">
-                Capture daily thoughts, insights, and reflections. Use search functionality to find patterns
-                and track your mental and emotional growth over time.
-              </Text>
-            </Box>
-          </Group>
-        </Paper>
-      </Stack>
-    ),
+    title: 'Set Objectives (OKRs)',
+    body: 'Link each goal to a Life Area. Add measurable Key Results to track progress.',
   },
+  {
+    title: 'Break goals into Tasks',
+    body: 'Use Kanban boards. Connect tasks to objectives for better tracking.',
+  },
+  {
+    title: 'Build daily Habits',
+    body: 'Small consistent actions. Track streaks to build lasting routines.',
+  },
+];
+
+function StepGettingStarted() {
+  return (
+    <Stack gap="sm">
+      {gettingStartedSteps.map((step, i) => (
+        <Paper
+          key={i}
+          p="md"
+          radius="md"
+          style={{
+            border: BORDER,
+            borderLeft: step.accent ? `3px solid ${PRIMARY}` : BORDER,
+          }}
+        >
+          <Group gap="sm" align="flex-start" wrap="nowrap">
+            <Box
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                background: PRIMARY,
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 12,
+                fontWeight: 700,
+                flexShrink: 0,
+              }}
+            >
+              {i + 1}
+            </Box>
+            <Box>
+              <Text fw={600} size="sm" mb={2}>
+                {step.title}
+              </Text>
+              <Text size="xs" c="dimmed" style={{ lineHeight: 1.5 }}>
+                {step.body}
+              </Text>
+            </Box>
+          </Group>
+        </Paper>
+      ))}
+    </Stack>
+  );
+}
+
+const steps = [
+  { title: 'Welcome to Cherut',   subtitle: 'Get to know your workspace',          content: <StepWelcome /> },
+  { title: 'Your Modules',        subtitle: 'Everything in one place',              content: <StepModules /> },
+  { title: 'Getting Started',     subtitle: 'Four steps to set everything up',      content: <StepGettingStarted /> },
 ];
 
 export default function WelcomeModal({ opened, onClose }: WelcomeModalProps) {
@@ -271,9 +230,7 @@ export default function WelcomeModal({ opened, onClose }: WelcomeModalProps) {
   };
 
   const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+    if (currentStep > 0) setCurrentStep(currentStep - 1);
   };
 
   const handleFinish = () => {
@@ -281,137 +238,98 @@ export default function WelcomeModal({ opened, onClose }: WelcomeModalProps) {
     onClose();
   };
 
-  const handleSkip = () => {
-    localStorage.setItem('cherut-welcome-modal-seen', 'true');
-    onClose();
-  };
-
-  const currentStepData = steps[currentStep];
+  const isLast = currentStep === steps.length - 1;
+  const { title, subtitle, content } = steps[currentStep];
 
   return (
     <Modal
       opened={opened}
-      onClose={handleSkip}
+      onClose={handleFinish}
       size="lg"
       centered
       withCloseButton={false}
       styles={{
-        content: {
-          borderRadius: '16px',
-          padding: 0,
-        },
-        body: {
-          padding: 0,
-        },
+        content: { borderRadius: 16, padding: 0 },
+        body: { padding: 0 },
       }}
-      overlayProps={{
-        backgroundOpacity: 0.55,
-        blur: 3,
-      }}
+      overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
     >
       <Box pos="relative">
+        {/* Skip */}
         <Button
           variant="subtle"
           size="xs"
           pos="absolute"
-          top={16}
-          right={16}
-          style={{ zIndex: 1000 }}
-          onClick={handleSkip}
-          leftSection={<X size={16} />}
-          c="dimmed"
+          top={14}
+          right={14}
+          style={{ zIndex: 10, color: '#64748B' }}
+          onClick={handleFinish}
+          leftSection={<X size={14} />}
         >
           Skip
         </Button>
 
         <Stack gap={0}>
-          {/* Header com progresso */}
-          <Box p="xl" pb="md" style={{ background: 'linear-gradient(135deg, rgba(49, 67, 182, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%)' }}>
+          {/* Header */}
+          <Box p="xl" pb="md" style={{ background: HEADER_GRADIENT }}>
             <Group justify="space-between" mb="md">
-              <Badge size="sm" radius="xl" variant="light" color="blue">
+              <Text style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#64748B' }}>
                 {currentStep + 1} of {steps.length}
-              </Badge>
-              <Group gap={4}>
-                {steps.map((_, index) => (
+              </Text>
+              <Group gap={6}>
+                {steps.map((_, i) => (
                   <Box
-                    key={index}
+                    key={i}
                     style={{
-                      width: 8,
+                      width: i === currentStep ? 20 : 8,
                       height: 8,
-                      borderRadius: '50%',
-                      background: index <= currentStep ? '#3143B6' : '#e9ecef',
-                      transition: 'all 0.3s ease',
+                      borderRadius: 4,
+                      background: i <= currentStep ? PRIMARY : '#E2E8F0',
+                      transition: 'all 0.25s ease',
                     }}
                   />
                 ))}
               </Group>
             </Group>
 
-            <Title order={2} size="h2" mb={4} style={{ fontSize: '24px', fontWeight: 700 }}>
-              {currentStepData.title}
+            <Title
+              order={2}
+              style={{ fontFamily: 'Inter Display, -apple-system, sans-serif', fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', color: '#0F172A', marginBottom: 4 }}
+            >
+              {title}
             </Title>
-            <Text c="dimmed" size="md" style={{ fontSize: '16px' }}>
-              {currentStepData.subtitle}
-            </Text>
+            <Text size="sm" c="dimmed">{subtitle}</Text>
           </Box>
 
           <Divider />
 
           {/* Content */}
-          <Box p="xl" style={{ minHeight: 400, fontSize: '16px' }}>
-            {currentStepData.content}
+          <Box p="xl" style={{ minHeight: 320 }}>
+            {content}
           </Box>
 
           <Divider />
 
-          {/* Footer with navigation */}
-          <Stack p="xl" pt="md" gap="md">
-            <Group justify="space-between" w="100%" gap="md">
-              <Button
-                variant="subtle"
-                onClick={handlePrevious}
-                disabled={currentStep === 0}
-                c="dimmed"
-                style={{
-                  flex: 1,
-                  minWidth: '100px',
-                  maxWidth: '150px',
-                  whiteSpace: 'nowrap'
-                }}
-                size="md"
-              >
-                Previous
-              </Button>
-              <Button
-                onClick={handleNext}
-                rightSection={currentStep === steps.length - 1 ? <CheckCircle2 size={16} /> : <ArrowRight size={16} />}
-                style={{
-                  background: '#3143B6',
-                  flex: 1,
-                  minWidth: '120px',
-                  maxWidth: '150px',
-                  whiteSpace: 'nowrap'
-                }}
-                size="md"
-              >
-                {currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
-              </Button>
-            </Group>
-
+          {/* Footer */}
+          <Group p="lg" justify="space-between">
             <Button
-              variant="outline"
-              onClick={handleSkip}
-              c="dimmed"
-              style={{
-                borderColor: 'var(--mantine-color-gray-3)',
-                alignSelf: 'center',
-                width: 'fit-content'
-              }}
-              size="sm"
+              variant="subtle"
+              onClick={handlePrevious}
+              disabled={currentStep === 0}
+              style={{ color: '#64748B' }}
+              size="md"
             >
-              Skip tutorial
+              Previous
             </Button>
-          </Stack>
+            <Button
+              onClick={handleNext}
+              rightSection={isLast ? <CheckCircle2 size={16} /> : <ArrowRight size={16} />}
+              style={{ background: isLast ? ACCENT : PRIMARY, height: 44, borderRadius: 8, paddingInline: 24 }}
+              size="md"
+            >
+              {isLast ? "Let's go" : 'Next'}
+            </Button>
+          </Group>
         </Stack>
       </Box>
     </Modal>
