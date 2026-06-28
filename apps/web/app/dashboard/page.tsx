@@ -3,11 +3,13 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Grid, Progress, Box, Group, Stack, Text, Title, Loader } from '@mantine/core';
-import { CheckCircle2, Circle, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { CheckCircle2, Circle, ArrowUpCircle, ArrowDownCircle, PenLine } from 'lucide-react';
 import { useObjectives } from '@/hooks/useObjectives';
 import { useTasks } from '@/hooks/useTasks';
 import { useHabits, useLogHabit } from '@/hooks/useHabits';
 import { useFinanceOverview } from '@/hooks/useFinance';
+import { useJournalEntries } from '@/hooks/useJournal';
+import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -348,6 +350,206 @@ function ObjectivesProgress() {
   );
 }
 
+// ─── Section: Key Results ─────────────────────────────────────────────────────
+
+function KeyResultsPanel() {
+  const router = useRouter();
+  const { data: objectives = [], isLoading } = useObjectives();
+
+  const keyResults = useMemo(() => {
+    return (objectives as any[])
+      .filter(o => o.status === 'active')
+      .flatMap(o => (o.keyResults ?? []).map((kr: any) => ({ ...kr, objectiveTitle: o.title })));
+  }, [objectives]);
+
+  return (
+    <Panel>
+      <div style={LABEL}>Key Results</div>
+
+      {isLoading ? (
+        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+      ) : keyResults.length === 0 ? (
+        <Text size="sm" c="dimmed">No key results yet.</Text>
+      ) : (
+        <Stack gap={14}>
+          {keyResults.map((kr: any) => {
+            const pct = kr.targetValue > 0
+              ? Math.min(100, Math.round((kr.currentValue / kr.targetValue) * 100))
+              : 0;
+            const done = kr.completedAt != null;
+            return (
+              <Box key={kr.id}>
+                <Group justify="space-between" mb={4} wrap="nowrap">
+                  <Box style={{ flex: 1, minWidth: 0 }}>
+                    <Text
+                      size="sm"
+                      fw={500}
+                      style={{
+                        color: done ? '#94A3B8' : '#0F172A',
+                        textDecoration: done ? 'line-through' : 'none',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {kr.title}
+                    </Text>
+                    <Text size="xs" c="dimmed" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {kr.objectiveTitle}
+                    </Text>
+                  </Box>
+                  <Text style={{ fontSize: 12, fontWeight: 600, color: done ? '#2e7d32' : '#64748B', flexShrink: 0, marginLeft: 8 }}>
+                    {kr.currentValue}/{kr.targetValue}
+                  </Text>
+                </Group>
+                <Progress value={pct} size={5} color={done ? 'green' : '#4686FE'} radius={3} />
+              </Box>
+            );
+          })}
+        </Stack>
+      )}
+
+      <Box mt={14}>
+        <NavLink onClick={() => router.push('/dashboard/objectives')}>View objectives</NavLink>
+      </Box>
+    </Panel>
+  );
+}
+
+// ─── Section: Journal ─────────────────────────────────────────────────────────
+
+function JournalPanel() {
+  const router = useRouter();
+  const today = localDateStr();
+  const { data: entries = [], isLoading } = useJournalEntries();
+
+  const latest = (entries as any[])[0];
+  const wroteToday = latest?.createdAt?.slice(0, 10) === today;
+
+  const daysSince = latest && !wroteToday
+    ? Math.round((Date.now() - new Date(latest.createdAt).getTime()) / 86_400_000)
+    : null;
+
+  return (
+    <Panel>
+      <div style={LABEL}>Journal</div>
+
+      {isLoading ? (
+        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+      ) : !latest ? (
+        <Stack gap={10}>
+          <Text size="sm" c="dimmed">No entries yet. Start reflecting today.</Text>
+          <button
+            onClick={() => router.push('/dashboard/journal')}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: '#4686FE', color: 'white', border: 'none',
+              borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 600,
+              cursor: 'pointer', width: 'fit-content',
+            }}
+          >
+            <PenLine size={14} /> Write first entry
+          </button>
+        </Stack>
+      ) : (
+        <Stack gap={10}>
+          {wroteToday ? (
+            <Box style={{ padding: '12px 14px', background: '#F0FDF4', borderRadius: 8, border: '1px solid #bbf7d0' }}>
+              <Group gap={6} mb={4}>
+                <CheckCircle2 size={14} color="#2e7d32" />
+                <Text size="xs" fw={600} style={{ color: '#2e7d32' }}>Written today</Text>
+              </Group>
+              <Text
+                size="sm"
+                fw={500}
+                style={{ color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+              >
+                {latest.title}
+              </Text>
+              {latest.content && (
+                <Text size="xs" c="dimmed" lineClamp={2} mt={2}>
+                  {latest.content.replace(/<[^>]+>/g, '')}
+                </Text>
+              )}
+            </Box>
+          ) : (
+            <Box>
+              <Text size="xs" c="dimmed" mb={6}>
+                Last entry: {daysSince === 1 ? 'yesterday' : daysSince === 0 ? 'today' : `${daysSince} days ago`}
+              </Text>
+              <Text
+                size="sm"
+                fw={500}
+                style={{ color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 10 }}
+              >
+                {latest.title}
+              </Text>
+              <button
+                onClick={() => router.push('/dashboard/journal')}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  background: '#4686FE', color: 'white', border: 'none',
+                  borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                <PenLine size={14} /> Write today
+              </button>
+            </Box>
+          )}
+        </Stack>
+      )}
+
+      <Box mt={14}>
+        <NavLink onClick={() => router.push('/dashboard/journal')}>View all entries</NavLink>
+      </Box>
+    </Panel>
+  );
+}
+
+// ─── Section: Life Areas ──────────────────────────────────────────────────────
+
+function LifeAreasPanel() {
+  const router = useRouter();
+  const { data: areas = [], isLoading } = useLifeAreas();
+
+  return (
+    <Panel>
+      <div style={LABEL}>Life Areas</div>
+
+      {isLoading ? (
+        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+      ) : (areas as any[]).length === 0 ? (
+        <Text size="sm" c="dimmed">No life areas defined yet.</Text>
+      ) : (
+        <Box>
+          <Text size="xs" c="dimmed" mb={12}>{(areas as any[]).length} area{(areas as any[]).length !== 1 ? 's' : ''} defined</Text>
+          <Group gap={8} wrap="wrap">
+            {(areas as any[]).map((area: any) => (
+              <span
+                key={area.id}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '5px 12px', borderRadius: 20,
+                  fontSize: 13, fontWeight: 500,
+                  background: area.color ? `${area.color}18` : '#F1F5F9',
+                  color: area.color ?? '#64748B',
+                  border: `1px solid ${area.color ? `${area.color}30` : '#E2E8F0'}`,
+                }}
+              >
+                {area.icon && <span style={{ fontSize: 14 }}>{area.icon}</span>}
+                {area.name}
+              </span>
+            ))}
+          </Group>
+        </Box>
+      )}
+
+      <Box mt={14}>
+        <NavLink onClick={() => router.push('/dashboard/life-areas')}>Manage life areas</NavLink>
+      </Box>
+    </Panel>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -392,9 +594,8 @@ export default function DashboardPage() {
         </Group>
       </Panel>
 
-      {/* Two-column grid */}
+      {/* Row 1 — Today + Goals */}
       <Grid gutter="lg">
-        {/* Left — Today */}
         <Grid.Col span={{ base: 12, md: 7 }}>
           <Stack gap="lg">
             <HabitsToday />
@@ -402,12 +603,22 @@ export default function DashboardPage() {
           </Stack>
         </Grid.Col>
 
-        {/* Right — Overview */}
         <Grid.Col span={{ base: 12, md: 5 }}>
           <Stack gap="lg">
             <FinanceSnapshot />
             <ObjectivesProgress />
+            <KeyResultsPanel />
           </Stack>
+        </Grid.Col>
+      </Grid>
+
+      {/* Row 2 — Journal + Life Areas */}
+      <Grid gutter="lg">
+        <Grid.Col span={{ base: 12, md: 6 }}>
+          <JournalPanel />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 6 }}>
+          <LifeAreasPanel />
         </Grid.Col>
       </Grid>
     </Stack>
