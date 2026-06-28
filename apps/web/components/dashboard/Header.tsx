@@ -56,11 +56,19 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
   // Dark mode functionality temporarily disabled
   // Will be available soon!
 
-  const getFirstName = () => {
-    if (profile?.displayName) return profile.displayName.split(' ')[0];
-    if (!user?.email) return 'there';
-    const name = user.email.split('@')[0];
-    return name.charAt(0).toUpperCase() + name.slice(1);
+  const getDisplayName = () => {
+    const MAX = 14;
+    let name: string;
+    if (profile?.displayName) {
+      name = profile.displayName;
+    } else if (user?.email) {
+      const raw = user.email.split('@')[0];
+      name = raw.charAt(0).toUpperCase() + raw.slice(1);
+    } else {
+      return 'there';
+    }
+    if (name.length <= MAX) return name;
+    return name.slice(0, MAX).trimEnd() + '.';
   };
 
   const navigateToProfile = () => {
@@ -180,7 +188,7 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
           <Box visibleFrom="sm">
             <Stack gap={0}>
               <Text size="sm" fw={600} lineClamp={1}>
-                {getFirstName()}
+                {getDisplayName()}
               </Text>
               <Badge size="xs" variant="light" color="green">
                 Active
