@@ -53,8 +53,65 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: (dto: CreateTaskDto) => tasksApi.create(dto),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    onMutate: async (dto) => {
+      const tempId = `temp-${Date.now()}`;
+      const tempTask = {
+        id: tempId,
+        title: dto.title,
+        status: dto.status || 'todo',
+        priority: dto.priority || 'medium',
+        order: 9999,
+        lifeAreaId: dto.lifeAreaId,
+        boardId: dto.boardId,
+        columnId: dto.columnId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        timeTracking: [],
+        checklist: [],
+        pomodoroCount: 0,
+        archived: false,
+      };
+
+      // Optimistic update: tasks kanban ({ todo, in_progress, done } structure)
+      await queryClient.cancelQueries({ queryKey: ['tasks', 'kanban'] });
+      const previousKanbanEntries = queryClient.getQueriesData<any>({ queryKey: ['tasks', 'kanban'] });
+      queryClient.setQueriesData<any>({ queryKey: ['tasks', 'kanban'] }, (old: any) => {
+        if (!old || typeof old !== 'object' || Array.isArray(old)) return old;
+        const col = (dto.status as string) || 'todo';
+        if (!(col in old)) return old;
+        return { ...old, [col]: [...(old[col] || []), tempTask] };
+      });
+
+      // Optimistic update: board kanban (array of columns structure)
+      let previousBoardEntry: any;
+      if (dto.boardId && dto.columnId) {
+        await queryClient.cancelQueries({ queryKey: ['boards', dto.boardId, 'kanban'] });
+        previousBoardEntry = queryClient.getQueryData(['boards', dto.boardId, 'kanban']);
+        queryClient.setQueryData(['boards', dto.boardId, 'kanban'], (old: any) => {
+          if (!old || !Array.isArray(old)) return old;
+          return old.map((col: any) =>
+            col.id === dto.columnId ? { ...col, tasks: [...(col.tasks || []), tempTask] } : col
+          );
+        });
+      }
+
+      return { previousKanbanEntries, previousBoardEntry };
+    },
+    onError: (_err, dto, context: any) => {
+      if (context?.previousKanbanEntries) {
+        for (const [key, data] of context.previousKanbanEntries) {
+          queryClient.setQueryData(key, data);
+        }
+      }
+      if (context?.previousBoardEntry && dto.boardId) {
+        queryClient.setQueryData(['boards', dto.boardId, 'kanban'], context.previousBoardEntry);
+      }
+    },
+    onSettled: (_data, _err, dto) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'], exact: false });
+      if (dto?.boardId) {
+        queryClient.invalidateQueries({ queryKey: ['boards', dto.boardId, 'kanban'] });
+      }
     },
   });
 };

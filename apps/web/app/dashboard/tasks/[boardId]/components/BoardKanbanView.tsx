@@ -244,16 +244,9 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
 
   const handleAddTask = useCallback(
     (columnId: string, title: string) => {
-      createTask.mutate(
-        { title, boardId, columnId, status: 'todo', priority: 'medium' },
-        {
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'kanban'] });
-          },
-        }
-      );
+      createTask.mutate({ title, boardId, columnId, status: 'todo', priority: 'medium' });
     },
-    [boardId, createTask, queryClient]
+    [boardId, createTask]
   );
 
   const handleAddColumn = () => {
