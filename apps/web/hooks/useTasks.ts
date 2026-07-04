@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { notifications } from '@mantine/notifications';
 import { tasksApi, CreateTaskDto, UpdateTaskDto, UpdateTaskOrderDto } from '@/lib/api/services/tasks';
 
 export const useTasks = (lifeAreaId?: string) => {
@@ -224,22 +225,56 @@ export const useDeleteTask = () => {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ['tasks'] });
       const previousTasks = queryClient.getQueryData(['tasks', undefined]);
+      const previousKanbanEntries = queryClient.getQueriesData<any>({ queryKey: ['tasks', 'kanban'] });
+      const previousBoardEntries = queryClient.getQueriesData<any>({ queryKey: ['boards'] });
 
-      // Remove imediatamente da UI
       queryClient.setQueryData(['tasks', undefined], (old: any) => {
         if (!old || !Array.isArray(old)) return old;
         return old.filter((task: any) => task.id !== id);
       });
 
-      return { previousTasks };
+      const removeFromKanban = (old: any) => {
+        if (!old || typeof old !== 'object' || Array.isArray(old)) return old;
+        if (!('todo' in old) && !('in_progress' in old) && !('done' in old)) return old;
+        return {
+          ...old,
+          todo: (old.todo || []).filter((t: any) => t.id !== id),
+          in_progress: (old.in_progress || []).filter((t: any) => t.id !== id),
+          done: (old.done || []).filter((t: any) => t.id !== id),
+        };
+      };
+
+      queryClient.setQueriesData<any>({ queryKey: ['tasks', 'kanban'] }, removeFromKanban);
+      queryClient.setQueriesData<any>({ queryKey: ['boards'] }, removeFromKanban);
+
+      return { previousTasks, previousKanbanEntries, previousBoardEntries };
     },
     onError: (_err, _id, context: any) => {
       if (context?.previousTasks) {
         queryClient.setQueryData(['tasks', undefined], context.previousTasks);
       }
+      if (context?.previousKanbanEntries) {
+        for (const [key, data] of context.previousKanbanEntries) {
+          queryClient.setQueryData(key, data);
+        }
+      }
+      if (context?.previousBoardEntries) {
+        for (const [key, data] of context.previousBoardEntries) {
+          queryClient.setQueryData(key, data);
+        }
+      }
+    },
+    onSuccess: () => {
+      notifications.show({
+        title: 'Task deleted',
+        message: 'The task has been removed.',
+        color: 'red',
+        autoClose: 3000,
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['boards'], exact: false });
     },
   });
 };
