@@ -115,8 +115,21 @@ export const useDeleteColumn = () => {
   return useMutation({
     mutationFn: ({ boardId, columnId }: { boardId: string; columnId: string }) =>
       boardsApi.deleteColumn(boardId, columnId),
-    onSuccess: (_data, { boardId }) => {
-      queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'columns'] });
+    onMutate: async ({ boardId, columnId }) => {
+      await queryClient.cancelQueries({ queryKey: ['boards', boardId, 'kanban'] });
+      const previous = queryClient.getQueryData(['boards', boardId, 'kanban']);
+      queryClient.setQueryData(['boards', boardId, 'kanban'], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.filter((col: any) => col.id !== columnId);
+      });
+      return { previous };
+    },
+    onError: (_err, { boardId }, context: any) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['boards', boardId, 'kanban'], context.previous);
+      }
+    },
+    onSettled: (_data, _err, { boardId }) => {
       queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'kanban'] });
     },
   });
