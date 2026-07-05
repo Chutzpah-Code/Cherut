@@ -125,10 +125,12 @@ export const useUpdateTask = () => {
       tasksApi.update(id, dto),
     onMutate: async ({ id, dto }) => {
       await queryClient.cancelQueries({ queryKey: ['tasks'] });
+      await queryClient.cancelQueries({ queryKey: ['boards'] });
 
       const previousTasks = queryClient.getQueryData(['tasks', undefined]);
       const previousTask = queryClient.getQueryData(['tasks', id]);
       const previousKanbanEntries = queryClient.getQueriesData<any>({ queryKey: ['tasks', 'kanban'] });
+      const previousBoardEntries = queryClient.getQueriesData<any>({ queryKey: ['boards'] });
 
       queryClient.setQueryData(['tasks', undefined], (old: any) => {
         if (!old || !Array.isArray(old)) return old;
@@ -140,9 +142,9 @@ export const useUpdateTask = () => {
         return { ...old, ...dto };
       });
 
-      // Update ALL kanban cache entries regardless of params
+      // Update tasks kanban ({ todo, in_progress, done } structure)
       queryClient.setQueriesData<any>({ queryKey: ['tasks', 'kanban'] }, (old: any) => {
-        if (!old) return old;
+        if (!old || typeof old !== 'object' || Array.isArray(old)) return old;
         const newBoard = { ...old };
         for (const col of ['todo', 'in_progress', 'done'] as const) {
           if (newBoard[col]) {
@@ -154,7 +156,20 @@ export const useUpdateTask = () => {
         return newBoard;
       });
 
-      return { previousTasks, previousTask, previousKanbanEntries };
+      // Update board kanban (array of columns structure)
+      queryClient.setQueriesData<any>({ queryKey: ['boards'] }, (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        // Only process column arrays (each column has { id, tasks[] })
+        if (!old[0]?.tasks) return old;
+        return old.map((col: any) => ({
+          ...col,
+          tasks: (col.tasks || []).map((task: any) =>
+            task.id === id ? { ...task, ...dto } : task
+          ),
+        }));
+      });
+
+      return { previousTasks, previousTask, previousKanbanEntries, previousBoardEntries };
     },
     onError: (_err, _vars, context: any) => {
       if (context?.previousTasks) {
@@ -168,9 +183,15 @@ export const useUpdateTask = () => {
           queryClient.setQueryData(key, data);
         }
       }
+      if (context?.previousBoardEntries) {
+        for (const [key, data] of context.previousBoardEntries) {
+          queryClient.setQueryData(key, data);
+        }
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'], exact: false, refetchType: 'none' });
+      queryClient.invalidateQueries({ queryKey: ['boards'], exact: false, refetchType: 'none' });
     },
   });
 };
