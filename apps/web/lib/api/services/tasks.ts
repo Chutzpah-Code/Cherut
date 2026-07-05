@@ -60,6 +60,7 @@ export interface CreateTaskDto {
   description?: string;
   status?: 'todo' | 'in_progress' | 'done';
   priority?: 'low' | 'medium' | 'high' | 'urgent';
+  order?: number;
   dueDate?: string;
   estimatedPomodoros?: number;
   checklist?: ChecklistItem[];

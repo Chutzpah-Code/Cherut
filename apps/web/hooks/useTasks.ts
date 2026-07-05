@@ -60,7 +60,7 @@ export const useCreateTask = () => {
         title: dto.title,
         status: dto.status || 'todo',
         priority: dto.priority || 'medium',
-        order: 9999,
+        order: dto.order ?? 9999,
         lifeAreaId: dto.lifeAreaId,
         boardId: dto.boardId,
         columnId: dto.columnId,

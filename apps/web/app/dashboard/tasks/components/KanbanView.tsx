@@ -149,18 +149,14 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
       let newOrder: number;
 
       if (overTask) {
-        // Dropped on a specific task - insert before it
         const overTaskIndex = targetColumnTasks.findIndex(t => t.id === overId);
         if (overTaskIndex === 0) {
-          // Insert at the beginning
-          newOrder = Math.max(0, overTask.order - 1);
+          newOrder = overTask.order - 1;
         } else {
-          // Insert between tasks
           const beforeTask = targetColumnTasks[overTaskIndex - 1];
           newOrder = (beforeTask.order + overTask.order) / 2;
         }
       } else {
-        // Dropped on column - add to the end
         newOrder = targetColumnTasks.length > 0 ? Math.max(...targetColumnTasks.map(t => t.order)) + 1 : 0;
       }
 
@@ -184,8 +180,7 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
         let newOrder: number;
 
         if (newIndex === 0) {
-          // Moving to the top
-          newOrder = Math.max(0, overTask.order - 1);
+          newOrder = overTask.order - 1;
         } else if (newIndex === currentColumnTasks.length - 1) {
           // Moving to the bottom
           newOrder = overTask.order + 1;
@@ -254,21 +249,12 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
   const handleCreateTask = () => {
     if (!newTaskData.title || !newTaskData.lifeAreaId) return;
 
-    // Create task and then update its status if needed
-    createMutation.mutate(newTaskData, {
-      onSuccess: (task) => {
-        // If the status is not 'todo', update it
-        if (newTaskStatus !== 'todo') {
-          updateOrderMutation.mutate({
-            id: task.id,
-            dto: {
-              newStatus: newTaskStatus as 'todo' | 'in_progress' | 'done',
-              newOrder: 0,
-            },
-          });
-        }
-      },
-    });
+    const targetCol = kanban?.[newTaskStatus as keyof typeof kanban] as any[] | undefined;
+    const maxOrder = targetCol?.length
+      ? Math.max(...targetCol.map((t: any) => t.order ?? 0)) + 1
+      : 0;
+
+    createMutation.mutate({ ...newTaskData, status: newTaskStatus as any, order: maxOrder });
 
     setNewTaskData({ title: '', lifeAreaId: '', priority: 'medium' });
     setCreateModalOpened(false);

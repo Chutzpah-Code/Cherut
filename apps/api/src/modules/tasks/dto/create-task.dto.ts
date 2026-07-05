@@ -166,7 +166,6 @@ export class CreateTaskDto {
 
   // Kanban board column order
   @IsNumber()
-  @Min(0)
   @IsOptional()
   order?: number;
 

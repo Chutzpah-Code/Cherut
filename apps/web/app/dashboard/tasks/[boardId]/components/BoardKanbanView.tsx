@@ -226,7 +226,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         const idx = targetTasks.findIndex((t) => t.id === overIdStr);
         newOrder =
           idx === 0
-            ? Math.max(0, overTask.order - 1)
+            ? overTask.order - 1
             : (targetTasks[idx - 1].order + overTask.order) / 2;
       } else {
         newOrder =
@@ -244,9 +244,13 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
 
   const handleAddTask = useCallback(
     (columnId: string, title: string) => {
-      createTask.mutate({ title, boardId, columnId, status: 'todo', priority: 'medium' });
+      const col = kanbanColumns?.find((c) => c.id === columnId);
+      const maxOrder = col?.tasks?.length
+        ? Math.max(...col.tasks.map((t) => t.order ?? 0)) + 1
+        : 0;
+      createTask.mutate({ title, boardId, columnId, status: 'todo', priority: 'medium', order: maxOrder });
     },
-    [boardId, createTask]
+    [boardId, createTask, kanbanColumns]
   );
 
   const handleAddColumn = () => {
