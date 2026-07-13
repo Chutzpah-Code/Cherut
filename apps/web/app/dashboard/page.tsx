@@ -508,9 +508,9 @@ function LifeAreasPanel() {
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                   padding: '5px 12px', borderRadius: 20,
                   fontSize: 13, fontWeight: 500,
-                  background: area.color ? `${area.color}18` : '#F1F5F9',
-                  color: area.color ?? '#64748B',
-                  border: `1px solid ${area.color ? `${area.color}30` : '#E2E8F0'}`,
+                  background: '#F1F5F9',
+                  color: '#64748B',
+                  border: '1px solid #E2E8F0',
                 }}
               >
                 {area.name}
