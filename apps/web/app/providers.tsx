@@ -1,6 +1,6 @@
 'use client';
 
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
@@ -274,15 +274,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   if (!persister) {
     return (
-      <MantineThemeProvider>
-        <ModalsProvider>
-          <Notifications position="top-right" />
-          <AuthProvider>
-            <CacheSync />
-            {children}
-          </AuthProvider>
-        </ModalsProvider>
-      </MantineThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <MantineThemeProvider>
+          <ModalsProvider>
+            <Notifications position="top-right" />
+            <AuthProvider>
+              <CacheSync />
+              {children}
+            </AuthProvider>
+          </ModalsProvider>
+        </MantineThemeProvider>
+      </QueryClientProvider>
     );
   }
 
