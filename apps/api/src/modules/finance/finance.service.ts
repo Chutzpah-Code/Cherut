@@ -255,13 +255,11 @@ export class FinanceService {
 
     if (!budgets.length) return [];
 
-    // Fetch spending per category for the month
+    // Fetch spending per category for the month — use UTC to avoid timezone-dependent last-day calc
     const targetMonth = month ?? new Date().toISOString().slice(0, 7);
     const startDate = `${targetMonth}-01`;
-    const endDate = new Date(`${targetMonth}-01`);
-    endDate.setMonth(endDate.getMonth() + 1);
-    endDate.setDate(0);
-    const endStr = endDate.toISOString().slice(0, 10);
+    const [y, m] = targetMonth.split('-').map(Number);
+    const endStr = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
 
     const txSnap = await this.db
       .collection(this.TRANSACTIONS)
