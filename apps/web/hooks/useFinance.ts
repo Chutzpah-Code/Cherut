@@ -37,11 +37,33 @@ export function useCreateAccount() {
 }
 
 
+export function useUpdateAccount() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, dto }: { id: string; dto: UpdateAccountDto }) => financeApi.updateAccount(id, dto),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+    },
+  });
+}
+
 export function useDeleteAccount() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => financeApi.deleteAccount(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'accounts'] }),
+  });
+}
+
+export function useRecalculateBalance() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => financeApi.recalculateBalance(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+    },
   });
 }
 

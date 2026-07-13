@@ -180,6 +180,11 @@ export const financeApi = {
     await apiClient.delete(`/finance/accounts/${id}`);
   },
 
+  recalculateBalance: async (id: string): Promise<{ balance: number }> => {
+    const { data } = await apiClient.post(`/finance/accounts/${id}/recalculate-balance`);
+    return data;
+  },
+
   // Categories
   getCategories: async (type?: CategoryType): Promise<FinanceCategory[]> => {
     const { data } = await apiClient.get('/finance/categories', { params: type ? { type } : {} });

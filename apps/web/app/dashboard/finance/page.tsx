@@ -10,7 +10,7 @@ import { PieChart, Pie, Cell } from 'recharts';
 import { useDisclosure } from '@mantine/hooks';
 import {
   TrendingUp, Wallet, Plus, Trash2, Pencil, Check, X,
-  ArrowUpCircle, ArrowDownCircle,
+  ArrowUpCircle, ArrowDownCircle, RefreshCw,
 } from 'lucide-react';
 import {
   useFinanceOverview,
@@ -19,6 +19,8 @@ import {
   useFinanceCategories,
   useCreateAccount,
   useDeleteAccount,
+  useUpdateAccount,
+  useRecalculateBalance,
   useCreateTransaction,
   useUpdateTransaction,
   useDeleteTransaction,
@@ -799,7 +801,12 @@ function AccountsView() {
   const { data: categories = [] } = useFinanceCategories();
   const createAccount = useCreateAccount();
   const deleteAccount = useDeleteAccount();
+  const recalculateBalance = useRecalculateBalance();
+  const { mutate: updateAccount } = useUpdateAccount();
   const createCategory = useCreateCategory();
+
+  const [editingBalanceId, setEditingBalanceId] = useState<string | null>(null);
+  const [editingBalanceVal, setEditingBalanceVal] = useState<number>(0);
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
 
@@ -852,9 +859,60 @@ function AccountsView() {
                   <Badge size="xs" variant="light" mt={4}>{acc.type}</Badge>
                 </Box>
                 <Group gap="xs">
-                  <Text fw={700} size="lg" style={{ color: acc.balance >= 0 ? '#0052CC' : '#c62828' }}>
-                    {fmt(acc.balance ?? 0, acc.currency)}
-                  </Text>
+                  {editingBalanceId === acc.id ? (
+                    <Group gap={4}>
+                      <NumberInput
+                        value={editingBalanceVal}
+                        onChange={(v) => setEditingBalanceVal(Number(v))}
+                        size="xs"
+                        style={{ width: 110 }}
+                        hideControls
+                        decimalScale={2}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            updateAccount(
+                              { id: acc.id, dto: { balance: editingBalanceVal } },
+                              { onSuccess: () => setEditingBalanceId(null) },
+                            );
+                          }
+                          if (e.key === 'Escape') setEditingBalanceId(null);
+                        }}
+                        autoFocus
+                      />
+                      <ActionIcon size="sm" color="green" variant="subtle"
+                        onClick={() => updateAccount(
+                          { id: acc.id, dto: { balance: editingBalanceVal } },
+                          { onSuccess: () => setEditingBalanceId(null) },
+                        )}
+                      >
+                        <Check size={13} />
+                      </ActionIcon>
+                      <ActionIcon size="sm" color="gray" variant="subtle" onClick={() => setEditingBalanceId(null)}>
+                        <X size={13} />
+                      </ActionIcon>
+                    </Group>
+                  ) : (
+                    <Group gap={4}>
+                      <Text fw={700} size="lg" style={{ color: acc.balance >= 0 ? '#0052CC' : '#c62828' }}>
+                        {fmt(acc.balance ?? 0, acc.currency)}
+                      </Text>
+                      <ActionIcon
+                        size="sm" variant="subtle" color="gray"
+                        title="Edit balance directly"
+                        onClick={() => { setEditingBalanceId(acc.id); setEditingBalanceVal(acc.balance ?? 0); }}
+                      >
+                        <Pencil size={13} />
+                      </ActionIcon>
+                    </Group>
+                  )}
+                  <ActionIcon
+                    size="sm" variant="subtle" color="blue"
+                    loading={recalculateBalance.isPending && recalculateBalance.variables === acc.id}
+                    title="Recalculate balance from initialBalance + transactions"
+                    onClick={() => recalculateBalance.mutate(acc.id)}
+                  >
+                    <RefreshCw size={14} />
+                  </ActionIcon>
                   <ActionIcon size="sm" variant="subtle" color="red" onClick={() => deleteAccount.mutate(acc.id)}>
                     <Trash2 size={14} />
                   </ActionIcon>

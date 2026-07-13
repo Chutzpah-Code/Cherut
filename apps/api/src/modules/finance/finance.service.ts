@@ -80,10 +80,12 @@ export class FinanceService {
   // ─── Accounts ──────────────────────────────────────────────────────────────
 
   async createAccount(userId: string, dto: CreateAccountDto) {
+    const initialBalance = dto.balance ?? 0;
     const data = {
       ...this.clean(dto as any),
       userId,
-      balance: dto.balance ?? 0,
+      balance: initialBalance,
+      initialBalance,
       currency: dto.currency ?? 'USD',
       createdAt: this.now(),
       updatedAt: this.now(),
@@ -461,6 +463,31 @@ export class FinanceService {
       month: start.slice(0, 7),
       recentTransactions,
     };
+  }
+
+  // ─── Recalculate balance ────────────────────────────────────────────────────
+
+  async recalculateBalance(userId: string, accountId: string) {
+    const account: any = await this.assertOwner(this.ACCOUNTS, accountId, userId);
+    const snap = await this.db
+      .collection(this.TRANSACTIONS)
+      .where('userId', '==', userId)
+      .where('accountId', '==', accountId)
+      .get();
+
+    const initialBalance: number = account.initialBalance ?? 0;
+    let balance = initialBalance;
+    for (const doc of snap.docs) {
+      const tx = doc.data() as any;
+      if (tx.type === 'income') balance += tx.amount;
+      else if (tx.type === 'expense') balance -= tx.amount;
+    }
+
+    await this.db.collection(this.ACCOUNTS).doc(accountId).update({
+      balance,
+      updatedAt: this.now(),
+    });
+    return { balance };
   }
 
   // ─── Private helpers ────────────────────────────────────────────────────────

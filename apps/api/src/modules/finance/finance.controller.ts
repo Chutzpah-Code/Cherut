@@ -61,6 +61,11 @@ export class FinanceController {
     return this.financeService.deleteAccount(req.user.uid, id);
   }
 
+  @Post('accounts/:id/recalculate-balance')
+  recalculateBalance(@Request() req, @Param('id') id: string) {
+    return this.financeService.recalculateBalance(req.user.uid, id);
+  }
+
   // Categories
   @Post('categories')
   createCategory(@Request() req, @Body() dto: CreateCategoryDto) {
