@@ -6,7 +6,7 @@ import {
   Button, Loader, Center, UnstyledButton, Modal,
   TextInput, Select, NumberInput, ActionIcon,
 } from '@mantine/core';
-import { PieChart, Pie, Cell } from 'recharts';
+import { PieChart, Pie, Cell, Sector } from 'recharts';
 import { useDisclosure } from '@mantine/hooks';
 import {
   TrendingUp, Wallet, Plus, Trash2, Pencil, Check, X,
@@ -191,120 +191,213 @@ function HeroBalanceCard({
   );
 }
 
-type DonutPeriod = 'today' | 'week' | 'month' | 'recent';
+type DonutPeriod = 'today' | 'week' | 'month' | 'all';
 
-const PERIOD_LABELS: Record<DonutPeriod, string> = {
-  today: 'Today',
-  week: 'This Week',
-  month: 'This Month',
-  recent: 'Recent',
+const PERIOD_BTN_LABELS: Record<DonutPeriod, string> = {
+  today: 'Today', week: 'Week', month: 'Month', all: 'All',
+};
+const PERIOD_HEADER_LABELS: Record<DonutPeriod, string> = {
+  today: 'Today', week: 'This Week', month: 'This Month', all: 'All Time',
 };
 
-function getPeriodDates(period: DonutPeriod): { startDate?: string; endDate?: string } {
-  const now = new Date();
-  const today = now.toISOString().slice(0, 10);
-  if (period === 'today') return { startDate: today, endDate: today };
-  if (period === 'week') {
-    const mon = new Date(now);
-    mon.setDate(now.getDate() - ((now.getDay() + 6) % 7)); // Monday
-    return { startDate: mon.toISOString().slice(0, 10), endDate: today };
-  }
-  return {};
+// Client-local date helpers — avoids UTC/timezone mismatch
+function localToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
+function localMonday() {
+  const d = new Date();
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function localMonthStart() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
+const INCOME_COLOR = '#16a34a';
+const EXPENSE_COLOR = '#dc2626';
+const EMPTY_COLOR = '#E2E8F0';
+
+const SLICE_META = [
+  { key: 'income', label: 'Income',   color: INCOME_COLOR,  sign: '+' },
+  { key: 'expense', label: 'Expenses', color: EXPENSE_COLOR, sign: '-' },
+] as const;
 
 function DonutCard({ displayCurrency }: { displayCurrency: string }) {
   const [period, setPeriod] = useState<DonutPeriod>('month');
-  const isRecent = period === 'recent';
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const { data: allTx = [], isFetching } = useFinanceTransactions();
 
-  const { startDate, endDate } = getPeriodDates(period);
-  const { data, isFetching: overviewFetching } = useFinanceOverview(
-    undefined, displayCurrency, startDate, endDate,
-  );
-  const { data: allTx = [], isFetching: txFetching } = useFinanceTransactions();
+  const filtered = useMemo(() => {
+    const txs = allTx as FinanceTransaction[];
+    const today = localToday();
+    if (period === 'today')  return txs.filter(t => t.date === today);
+    if (period === 'week')   return txs.filter(t => t.date >= localMonday() && t.date <= today);
+    if (period === 'month')  return txs.filter(t => t.date >= localMonthStart() && t.date <= today);
+    return txs;
+  }, [allTx, period]);
 
-  const isFetching = isRecent ? txFetching : overviewFetching;
-
-  const totalIncome = isRecent
-    ? (allTx as FinanceTransaction[]).filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
-    : (data?.totalIncomeConverted ?? 0);
-  const totalExpenses = isRecent
-    ? (allTx as FinanceTransaction[]).filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
-    : (data?.totalExpensesConverted ?? 0);
+  const totalIncome   = filtered.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const totalExpenses = filtered.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
   const net = totalIncome - totalExpenses;
-  const hasData = totalIncome > 0 || totalExpenses > 0;
+  const total = totalIncome + totalExpenses;
+  const hasData = total > 0;
 
   const slices = hasData
-    ? ([
-        totalIncome > 0 ? { name: 'Income', value: totalIncome } : null,
-        totalExpenses > 0 ? { name: 'Expenses', value: totalExpenses } : null,
-      ].filter(Boolean) as { name: string; value: number }[])
-    : [{ name: 'Empty', value: 1 }];
+    ? SLICE_META
+        .map(m => ({ ...m, value: m.key === 'income' ? totalIncome : totalExpenses }))
+        .filter(s => s.value > 0)
+    : [{ key: 'empty', label: 'No data', color: EMPTY_COLOR, sign: '', value: 1 }];
 
-  const SLICE_COLORS = hasData ? ['#2e7d32', '#c62828'] : ['#E2E8F0'];
+  const hoveredSlice = activeIdx !== null ? slices[activeIdx] : null;
+  const centerLabel  = hoveredSlice
+    ? (hoveredSlice.key === 'empty' ? null : { label: hoveredSlice.label, value: hoveredSlice.value, color: hoveredSlice.color, sign: hoveredSlice.sign })
+    : hasData
+      ? { label: 'NET', value: Math.abs(net), color: net >= 0 ? INCOME_COLOR : EXPENSE_COLOR, sign: net >= 0 ? '+' : '-' }
+      : null;
+
+  const renderActiveShape = (props: any) => {
+    const { cx, cy, innerRadius, outerRadius, startAngle: sa, endAngle: ea, fill } = props;
+    return (
+      <g>
+        <Sector cx={cx} cy={cy} innerRadius={innerRadius - 2} outerRadius={outerRadius + 5}
+          startAngle={sa} endAngle={ea} fill={fill} />
+      </g>
+    );
+  };
 
   return (
     <Box style={{
-      border: '1px solid #E2E8F0', borderRadius: 12,
-      padding: '24px 28px', background: '#fff', height: '100%',
+      borderRadius: 14, padding: '20px 22px', background: '#fff', height: '100%',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+      border: '1px solid #F1F5F9',
     }}>
-      <Group justify="space-between" mb={16}>
-        <Text style={CARD_LABEL}>{PERIOD_LABELS[period]} · {displayCurrency}</Text>
-        <Group gap={2}>
-          {(['today', 'week', 'month', 'recent'] as DonutPeriod[]).map((p) => (
+      {/* Header */}
+      <Group justify="space-between" align="center" mb={18}>
+        <Box>
+          <Text style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            Cash Flow
+          </Text>
+          <Text style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', lineHeight: 1.3 }}>
+            {PERIOD_HEADER_LABELS[period]} · {displayCurrency}
+          </Text>
+        </Box>
+
+        {/* Period pill switcher */}
+        <Box style={{
+          display: 'flex', gap: 2, background: '#F1F5F9', borderRadius: 8, padding: 3,
+        }}>
+          {(['today', 'week', 'month', 'all'] as DonutPeriod[]).map((p) => (
             <UnstyledButton
               key={p}
               onClick={() => setPeriod(p)}
               style={{
-                fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 4,
-                color: period === p ? '#0052CC' : '#94A3B8',
-                background: period === p ? '#EFF6FF' : 'transparent',
-                transition: 'all 0.15s',
+                fontSize: 11, fontWeight: 600, padding: '4px 9px', borderRadius: 6,
+                color: period === p ? '#1E293B' : '#64748B',
+                background: period === p ? '#ffffff' : 'transparent',
+                boxShadow: period === p ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
+                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap',
               }}
             >
-              {PERIOD_LABELS[p]}
+              {PERIOD_BTN_LABELS[p]}
             </UnstyledButton>
           ))}
-        </Group>
+        </Box>
       </Group>
 
-      <Box style={{ display: 'flex', justifyContent: 'center', position: 'relative', marginBottom: 16, opacity: isFetching ? 0.5 : 1, transition: 'opacity 0.2s' }}>
-        <PieChart width={156} height={156}>
-          <Pie data={slices} cx={74} cy={74} innerRadius={50} outerRadius={74}
-            dataKey="value" strokeWidth={0} startAngle={90} endAngle={-270}>
-            {slices.map((_, i) => <Cell key={i} fill={SLICE_COLORS[i % SLICE_COLORS.length]} />)}
-          </Pie>
-        </PieChart>
-        <Box style={{
-          position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none',
-        }}>
-          <Text style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em', textTransform: 'uppercase' }}>net</Text>
-          <Text style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.2, color: !hasData ? '#94A3B8' : net >= 0 ? '#2e7d32' : '#c62828' }}>
-            {hasData ? `${net >= 0 ? '+' : ''}${fmt(net, displayCurrency)}` : '—'}
-          </Text>
+      {/* Chart + center label */}
+      <Box style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+        <Box style={{ position: 'relative', flexShrink: 0, opacity: isFetching ? 0.5 : 1, transition: 'opacity 0.2s' }}>
+          <PieChart width={148} height={148}>
+            <Pie
+              data={slices}
+              cx={70} cy={70}
+              innerRadius={46} outerRadius={68}
+              dataKey="value"
+              strokeWidth={0}
+              startAngle={90} endAngle={-270}
+              activeIndex={activeIdx ?? undefined}
+              activeShape={renderActiveShape}
+              onMouseEnter={(_, i) => setActiveIdx(i)}
+              onMouseLeave={() => setActiveIdx(null)}
+              style={{ cursor: hasData ? 'pointer' : 'default', outline: 'none' }}
+            >
+              {slices.map((s, i) => (
+                <Cell key={i} fill={s.color} opacity={activeIdx !== null && activeIdx !== i ? 0.35 : 1} />
+              ))}
+            </Pie>
+          </PieChart>
+
+          {/* Center overlay */}
+          <Box style={{
+            position: 'absolute', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)', textAlign: 'center',
+            pointerEvents: 'none', width: 80,
+          }}>
+            {centerLabel ? (
+              <>
+                <Text style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.07em', textTransform: 'uppercase', lineHeight: 1 }}>
+                  {centerLabel.label}
+                </Text>
+                <Text style={{ fontSize: 12, fontWeight: 800, color: centerLabel.color, lineHeight: 1.3, marginTop: 2 }}>
+                  {centerLabel.sign}{fmt(centerLabel.value, displayCurrency)}
+                </Text>
+              </>
+            ) : (
+              <Text style={{ fontSize: 11, color: '#CBD5E1' }}>—</Text>
+            )}
+          </Box>
+        </Box>
+
+        {/* Legend — right side */}
+        <Box style={{ flex: 1, minWidth: 0 }}>
+          {hasData ? (
+            <Stack gap={10}>
+              {SLICE_META.map((meta, i) => {
+                const val = meta.key === 'income' ? totalIncome : totalExpenses;
+                if (val === 0) return null;
+                const pct = Math.round((val / total) * 100);
+                const isHovered = activeIdx === slices.findIndex(s => s.key === meta.key);
+                return (
+                  <Box
+                    key={meta.key}
+                    style={{ cursor: 'pointer', transition: 'opacity 0.15s', opacity: activeIdx !== null && !isHovered ? 0.4 : 1 }}
+                    onMouseEnter={() => setActiveIdx(slices.findIndex(s => s.key === meta.key))}
+                    onMouseLeave={() => setActiveIdx(null)}
+                  >
+                    <Group justify="space-between" mb={4}>
+                      <Group gap={6}>
+                        <Box style={{ width: 8, height: 8, borderRadius: '50%', background: meta.color, flexShrink: 0, marginTop: 1 }} />
+                        <Text style={{ fontSize: 11, fontWeight: 600, color: '#475569' }}>{meta.label}</Text>
+                      </Group>
+                      <Group gap={6} align="baseline">
+                        <Text style={{ fontSize: 11, color: '#94A3B8' }}>{pct}%</Text>
+                        <Text style={{ fontSize: 12, fontWeight: 700, color: meta.color }}>
+                          {meta.sign}{fmt(val, displayCurrency)}
+                        </Text>
+                      </Group>
+                    </Group>
+                    {/* Proportion bar */}
+                    <Box style={{ height: 3, borderRadius: 2, background: '#F1F5F9', overflow: 'hidden' }}>
+                      <Box style={{
+                        height: '100%', width: `${pct}%`, borderRadius: 2,
+                        background: meta.color, transition: 'width 0.4s ease',
+                      }} />
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Stack>
+          ) : (
+            <Box style={{ textAlign: 'center', paddingTop: 20 }}>
+              <Text style={{ fontSize: 11, color: '#94A3B8' }}>No transactions</Text>
+              <Text style={{ fontSize: 10, color: '#CBD5E1', marginTop: 2 }}>for this period</Text>
+            </Box>
+          )}
         </Box>
       </Box>
-
-      {hasData ? (
-        <Stack gap={8}>
-          {[
-            { label: 'Income', value: totalIncome, color: '#2e7d32', sign: '+' },
-            { label: 'Expenses', value: totalExpenses, color: '#c62828', sign: '-' },
-          ].filter(r => r.value > 0).map(row => (
-            <Group key={row.label} justify="space-between">
-              <Group gap={6}>
-                <Box style={{ width: 8, height: 8, borderRadius: 2, background: row.color, flexShrink: 0 }} />
-                <Text style={{ fontSize: 12, color: '#64748B' }}>{row.label}</Text>
-              </Group>
-              <Text style={{ fontSize: 13, fontWeight: 600, color: row.color }}>
-                {row.sign}{fmt(row.value, displayCurrency)}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
-      ) : (
-        <Text style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center' }}>No transactions</Text>
-      )}
     </Box>
   );
 }
