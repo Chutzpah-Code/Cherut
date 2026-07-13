@@ -418,17 +418,39 @@ export class FinanceService {
     ]);
 
     const accounts = accountsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
-    const transactions = (txSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[])
-      .filter((t) => t.date >= start && t.date <= end);
+    const allTransactions = txSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+    const transactions = allTransactions.filter((t) => t.date >= start && t.date <= end);
 
     const accountMap: Record<string, any> = {};
     const accountCurrency: Record<string, string> = {};
-    const balanceByCurrency: Record<string, number> = {};
+    const computedBalance: Record<string, number> = {};
+    const hasInitialBalance: Set<string> = new Set();
     for (const a of accounts) {
       const cur = a.currency ?? 'USD';
       accountMap[a.id] = a;
       accountCurrency[a.id] = cur;
-      balanceByCurrency[cur] = (balanceByCurrency[cur] ?? 0) + (a.balance ?? 0);
+      if (a.initialBalance !== undefined) {
+        // New accounts: seed from initialBalance, transactions will be applied below
+        computedBalance[a.id] = a.initialBalance;
+        hasInitialBalance.add(a.id);
+      } else {
+        // Legacy accounts: use stored running balance (already reflects past transactions)
+        computedBalance[a.id] = a.balance ?? 0;
+      }
+    }
+
+    // Apply ALL transactions only for accounts with initialBalance — avoids double-counting
+    // for legacy accounts whose stored balance already includes past transactions
+    for (const t of allTransactions) {
+      if (!hasInitialBalance.has(t.accountId)) continue;
+      if (t.type === 'income') computedBalance[t.accountId] += t.amount;
+      else if (t.type === 'expense') computedBalance[t.accountId] -= t.amount;
+    }
+
+    const balanceByCurrency: Record<string, number> = {};
+    for (const a of accounts) {
+      const cur = accountCurrency[a.id];
+      balanceByCurrency[cur] = (balanceByCurrency[cur] ?? 0) + computedBalance[a.id];
     }
 
     const incomeByCurrency: Record<string, number> = {};
