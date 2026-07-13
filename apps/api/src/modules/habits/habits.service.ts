@@ -140,7 +140,7 @@ export class HabitsService {
     const db = this.firebaseService.getFirestore();
 
     // Verify habit exists and belongs to user
-    const habit = await this.findOne(userId, logDto.habitId);
+    const habit: any = await this.findOne(userId, logDto.habitId);
 
     // Validate log data based on habit type
     this.validateLogData(habit, logDto);
@@ -164,7 +164,6 @@ export class HabitsService {
     };
 
     if (existingLog) {
-      // Update existing log
       await db.collection(this.logsCollection).doc(existingLog.id).update({
         ...logData,
         updatedAt: new Date().toISOString(),
@@ -174,22 +173,29 @@ export class HabitsService {
         `Habit log updated for habit ${logDto.habitId} on ${logDto.date}`,
       );
 
-      return {
-        id: existingLog.id,
-        ...logData,
-      };
+      if (logDto.completed && logDto.date >= (habit.lastCompletedAt || '')) {
+        await db.collection(this.habitsCollection).doc(logDto.habitId).update({
+          lastCompletedAt: logDto.date,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
+      return { id: existingLog.id, ...logData };
     } else {
-      // Create new log
       const docRef = await db.collection(this.logsCollection).add(logData);
 
       this.logger.log(
         `Habit logged: ${docRef.id} for habit ${logDto.habitId} on ${logDto.date}`,
       );
 
-      return {
-        id: docRef.id,
-        ...logData,
-      };
+      if (logDto.completed && logDto.date >= (habit.lastCompletedAt || '')) {
+        await db.collection(this.habitsCollection).doc(logDto.habitId).update({
+          lastCompletedAt: logDto.date,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
+      return { id: docRef.id, ...logData };
     }
   }
 

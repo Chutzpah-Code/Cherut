@@ -108,9 +108,12 @@ export const useLogHabit = () => {
 
   return useMutation({
     mutationFn: (dto: LogHabitDto) => habitsApi.logHabit(dto),
-    onSuccess: () => {
+    onSuccess: (_data, dto) => {
       queryClient.invalidateQueries({ queryKey: ['habitLogs'] });
-      // Habit logs don't change habit metadata — no habit list invalidation needed
+      // Refresh habit list so lastCompletedAt reflects immediately after page reload
+      if (dto.completed) {
+        queryClient.invalidateQueries({ queryKey: ['habits'] });
+      }
     },
   });
 };
