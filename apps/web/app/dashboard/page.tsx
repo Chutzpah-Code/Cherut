@@ -513,7 +513,6 @@ function LifeAreasPanel() {
                   border: `1px solid ${area.color ? `${area.color}30` : '#E2E8F0'}`,
                 }}
               >
-                {area.icon && <span style={{ fontSize: 14 }}>{area.icon}</span>}
                 {area.name}
               </span>
             ))}
