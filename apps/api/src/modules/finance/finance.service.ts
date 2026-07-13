@@ -466,16 +466,12 @@ export class FinanceService {
   // ─── Private helpers ────────────────────────────────────────────────────────
 
   private async adjustBalance(userId: string, accountId: string, amount: number, type: string) {
-    try {
-      const account: any = await this.assertOwner(this.ACCOUNTS, accountId, userId);
-      const delta = type === 'income' ? amount : type === 'expense' ? -amount : 0;
-      await this.db.collection(this.ACCOUNTS).doc(accountId).update({
-        balance: (account.balance ?? 0) + delta,
-        updatedAt: this.now(),
-      });
-    } catch {
-      this.logger.warn(`Could not adjust balance for account ${accountId}`);
-    }
+    const account: any = await this.assertOwner(this.ACCOUNTS, accountId, userId);
+    const delta = type === 'income' ? amount : type === 'expense' ? -amount : 0;
+    await this.db.collection(this.ACCOUNTS).doc(accountId).update({
+      balance: (account.balance ?? 0) + delta,
+      updatedAt: this.now(),
+    });
   }
 
   // ─── Credit card statements ─────────────────────────────────────────────────
