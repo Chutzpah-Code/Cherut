@@ -1,10 +1,10 @@
-import { IsString, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
 export class CreateJournalEntryDto {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(200, { message: 'Title cannot exceed 200 characters' })
-  title: string;
+  title?: string;
 
   @IsString()
   @IsNotEmpty()

@@ -74,9 +74,7 @@ describe('JournalService', () => {
     });
 
     it('should create entry without title', async () => {
-      const createEntryDto = {
-        content: 'Content without title.',
-      };
+      const createEntryDto = { content: 'Content without title.' } as any;
 
       const mockDocRef = { id: 'no-title-entry' };
       mockFirestore.add.mockResolvedValue(mockDocRef);
@@ -226,14 +224,14 @@ describe('JournalService', () => {
       };
 
       jest.spyOn(service, 'findOne')
-        .mockResolvedValueOnce(mockJournalEntry)
+        .mockResolvedValueOnce(mockJournalEntry as any)
         .mockResolvedValueOnce({
           ...mockJournalEntry,
           title: 'Updated Title',
           content: 'Updated content',
-        });
+        } as any);
 
-      const result = await service.update('user-123', 'entry-1', updateDto);
+      const result = await service.update('user-123', 'entry-1', updateDto) as any;
 
       expect(mockFirestore.update).toHaveBeenCalledWith({
         title: 'Updated Title',
@@ -250,7 +248,7 @@ describe('JournalService', () => {
         content: undefined,
       };
 
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockJournalEntry);
+      jest.spyOn(service, 'findOne').mockResolvedValue(mockJournalEntry as any);
 
       await service.update('user-123', 'entry-1', updateDto);
 
@@ -263,7 +261,7 @@ describe('JournalService', () => {
 
   describe('remove', () => {
     it('should delete a journal entry successfully', async () => {
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockJournalEntry);
+      jest.spyOn(service, 'findOne').mockResolvedValue(mockJournalEntry as any);
 
       const result = await service.remove('user-123', 'entry-1');
 

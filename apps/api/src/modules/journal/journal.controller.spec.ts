@@ -65,9 +65,7 @@ describe('JournalController', () => {
     });
 
     it('should create entry without title', async () => {
-      const createEntryDto = {
-        content: 'Content only',
-      };
+      const createEntryDto = { content: 'Content only' } as any;
 
       const entryWithoutTitle = { ...mockJournalEntry, title: undefined };
       mockJournalService.create.mockResolvedValue(entryWithoutTitle);
@@ -89,7 +87,7 @@ describe('JournalController', () => {
 
       const result = await controller.findAll(mockRequest, undefined);
 
-      expect(service.findAll).toHaveBeenCalledWith('user-123', undefined);
+      expect(service.findAll).toHaveBeenCalledWith('user-123', undefined, false);
       expect(result).toEqual(mockEntries);
     });
 
@@ -99,7 +97,7 @@ describe('JournalController', () => {
 
       const result = await controller.findAll(mockRequest, 'test query');
 
-      expect(service.findAll).toHaveBeenCalledWith('user-123', 'test query');
+      expect(service.findAll).toHaveBeenCalledWith('user-123', 'test query', false);
       expect(result).toEqual(mockEntries);
     });
 
@@ -214,7 +212,7 @@ describe('JournalController', () => {
 
       const result = await controller.findAll(mockRequest, '');
 
-      expect(service.findAll).toHaveBeenCalledWith('user-123', '');
+      expect(service.findAll).toHaveBeenCalledWith('user-123', '', false);
       expect(result).toEqual(mockEntries);
     });
 
@@ -224,7 +222,7 @@ describe('JournalController', () => {
 
       const result = await controller.findAll(mockRequest, 'test @#$%');
 
-      expect(service.findAll).toHaveBeenCalledWith('user-123', 'test @#$%');
+      expect(service.findAll).toHaveBeenCalledWith('user-123', 'test @#$%', false);
       expect(result).toEqual(mockEntries);
     });
 
@@ -232,9 +230,9 @@ describe('JournalController', () => {
       const mockEntries = [mockJournalEntry];
       mockJournalService.findAll.mockResolvedValue(mockEntries);
 
-      const result = await controller.findAll(mockRequest, '  test query  ');
+      await controller.findAll(mockRequest, '  test query  ');
 
-      expect(service.findAll).toHaveBeenCalledWith('user-123', '  test query  ');
+      expect(service.findAll).toHaveBeenCalledWith('user-123', '  test query  ', false);
     });
   });
 
@@ -257,7 +255,7 @@ describe('JournalController', () => {
       const timeoutError = new Error('TIMEOUT');
       mockJournalService.findAll.mockRejectedValue(timeoutError);
 
-      await expect(controller.findAll(mockRequest, {})).rejects.toThrow(timeoutError);
+      await expect(controller.findAll(mockRequest, undefined)).rejects.toThrow(timeoutError);
     });
   });
 });
