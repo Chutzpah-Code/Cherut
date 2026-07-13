@@ -888,25 +888,28 @@ function TransactionRow({ tx, currency, categoryName, onDelete, onEdit }: { tx: 
 // ─── Accounts ─────────────────────────────────────────────────────────────────
 
 function AccountsView() {
+  // — state —
   const [opened, { open, close }] = useDisclosure();
   const [catOpened, { open: openCat, close: closeCat }] = useDisclosure();
-  const { data: accounts = [], isLoading } = useFinanceAccounts();
-  const { data: categories = [] } = useFinanceCategories();
-  const createAccount = useCreateAccount();
-  const deleteAccount = useDeleteAccount();
-  const recalculateBalance = useRecalculateBalance();
-  const { mutate: updateAccount } = useUpdateAccount();
-  const createCategory = useCreateCategory();
-
-  const [editingBalanceId, setEditingBalanceId] = useState<string | null>(null);
-  const [editingBalanceVal, setEditingBalanceVal] = useState<number>(0);
-  const updateCategory = useUpdateCategory();
-  const deleteCategory = useDeleteCategory();
-
   const [form, setForm] = useState<Partial<CreateAccountDto>>({ type: 'checking', currency: 'USD', balance: 0 });
   const [catForm, setCatForm] = useState<Partial<CreateCategoryDto>>({ type: 'expense' });
   const [editingCatId, setEditingCatId] = useState<string | null>(null);
-  const [editingCatName, setEditingCatName] = useState('');
+  const [editingBalanceId, setEditingBalanceId] = useState<string | null>(null);
+  const [editingBalanceVal, setEditingBalanceVal] = useState<number>(0);
+  const [editingCatName, setEditingCatName] = useState<string>('');
+
+  // — queries —
+  const { data: accounts = [], isLoading } = useFinanceAccounts();
+  const { data: categories = [] } = useFinanceCategories();
+
+  // — mutations —
+  const createAccount = useCreateAccount();
+  const { mutate: updateAccount } = useUpdateAccount();
+  const deleteAccount = useDeleteAccount();
+  const recalculateBalance = useRecalculateBalance();
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
+  const deleteCategory = useDeleteCategory();
 
   const handleCreate = () => {
     if (!form.name || !form.type) return;
