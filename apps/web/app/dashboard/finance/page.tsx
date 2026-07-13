@@ -435,6 +435,7 @@ function OverviewView({ onNavigate }: { onNavigate: (v: FinanceView) => void }) 
   const { data, isLoading } = useFinanceOverview(undefined, displayCurrency);
   const { data: accounts = [] } = useFinanceAccounts();
   const { data: categories = [] } = useFinanceCategories();
+  const { data: allTransactions = [] } = useFinanceTransactions();
 
   const accountMap = useMemo(
     () => Object.fromEntries((accounts as FinanceAccount[]).map((a) => [a.id, a])),
@@ -443,6 +444,14 @@ function OverviewView({ onNavigate }: { onNavigate: (v: FinanceView) => void }) 
   const categoryMap = useMemo(
     () => Object.fromEntries(categories.map((c: any) => [c.id, c])),
     [categories],
+  );
+
+  const recentTransactions = useMemo(
+    () => [...(allTransactions as FinanceTransaction[])]
+      .sort((a, b) => (a.date < b.date ? 1 : -1))
+      .slice(0, 5)
+      .map((t) => ({ ...t, accountName: (accountMap[t.accountId] as FinanceAccount)?.name ?? '' })),
+    [allTransactions, accountMap],
   );
 
   const availableCurrencies = data ? Object.keys(data.balanceByCurrency) : [];
@@ -475,7 +484,7 @@ function OverviewView({ onNavigate }: { onNavigate: (v: FinanceView) => void }) 
       <Grid gutter="md">
         <Grid.Col span={{ base: 12, sm: 7 }}>
           <RecentTxList
-            transactions={data.recentTransactions}
+            transactions={recentTransactions}
             accountMap={accountMap}
             categoryMap={categoryMap}
             onViewAll={() => onNavigate('transactions')}
