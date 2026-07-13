@@ -1,10 +1,10 @@
 'use client';
 
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { useState } from 'react';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { useState, useLayoutEffect, useRef } from 'react';
 import { MantineProvider, createTheme, MantineColorsTuple } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
@@ -218,6 +218,27 @@ function MantineThemeProvider({ children }: { children: React.ReactNode }) {
 }
 
 const CACHE_VERSION = 'v1';
+const PERSIST_KEY = `cherut-query-cache-${CACHE_VERSION}`;
+
+// Sits inside AuthProvider + PersistQueryClientProvider.
+// useLayoutEffect runs before the browser paints, so the cache is cleared
+// in the same render cycle that the new user's state propagates — no stale-data flash.
+function CacheSync() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const prevUid = useRef<string | null | undefined>(undefined);
+
+  useLayoutEffect(() => {
+    const uid = user?.uid ?? null;
+    if (prevUid.current !== undefined && uid !== prevUid.current) {
+      queryClient.clear();
+      localStorage.removeItem(PERSIST_KEY);
+    }
+    prevUid.current = uid;
+  }, [user?.uid, queryClient]);
+
+  return null;
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -256,7 +277,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <MantineThemeProvider>
         <ModalsProvider>
           <Notifications position="top-right" />
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <CacheSync />
+            {children}
+          </AuthProvider>
         </ModalsProvider>
       </MantineThemeProvider>
     );
@@ -270,7 +294,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <MantineThemeProvider>
         <ModalsProvider>
           <Notifications position="top-right" />
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <CacheSync />
+            {children}
+          </AuthProvider>
         </ModalsProvider>
       </MantineThemeProvider>
     </PersistQueryClientProvider>
