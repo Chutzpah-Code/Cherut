@@ -189,12 +189,13 @@ function HeroBalanceCard({
   );
 }
 
-type DonutPeriod = 'today' | 'week' | 'month';
+type DonutPeriod = 'today' | 'week' | 'month' | 'recent';
 
 const PERIOD_LABELS: Record<DonutPeriod, string> = {
   today: 'Today',
   week: 'This Week',
   month: 'This Month',
+  recent: 'Recent',
 };
 
 function getPeriodDates(period: DonutPeriod): { startDate?: string; endDate?: string } {
@@ -211,11 +212,22 @@ function getPeriodDates(period: DonutPeriod): { startDate?: string; endDate?: st
 
 function DonutCard({ displayCurrency }: { displayCurrency: string }) {
   const [period, setPeriod] = useState<DonutPeriod>('month');
-  const { startDate, endDate } = getPeriodDates(period);
-  const { data, isFetching } = useFinanceOverview(undefined, displayCurrency, startDate, endDate);
+  const isRecent = period === 'recent';
 
-  const totalIncome = data?.totalIncomeConverted ?? 0;
-  const totalExpenses = data?.totalExpensesConverted ?? 0;
+  const { startDate, endDate } = getPeriodDates(period);
+  const { data, isFetching: overviewFetching } = useFinanceOverview(
+    undefined, displayCurrency, startDate, endDate,
+  );
+  const { data: allTx = [], isFetching: txFetching } = useFinanceTransactions();
+
+  const isFetching = isRecent ? txFetching : overviewFetching;
+
+  const totalIncome = isRecent
+    ? (allTx as FinanceTransaction[]).filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+    : (data?.totalIncomeConverted ?? 0);
+  const totalExpenses = isRecent
+    ? (allTx as FinanceTransaction[]).filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+    : (data?.totalExpensesConverted ?? 0);
   const net = totalIncome - totalExpenses;
   const hasData = totalIncome > 0 || totalExpenses > 0;
 
@@ -236,7 +248,7 @@ function DonutCard({ displayCurrency }: { displayCurrency: string }) {
       <Group justify="space-between" mb={16}>
         <Text style={CARD_LABEL}>{PERIOD_LABELS[period]} · {displayCurrency}</Text>
         <Group gap={2}>
-          {(['today', 'week', 'month'] as DonutPeriod[]).map((p) => (
+          {(['today', 'week', 'month', 'recent'] as DonutPeriod[]).map((p) => (
             <UnstyledButton
               key={p}
               onClick={() => setPeriod(p)}
@@ -247,7 +259,7 @@ function DonutCard({ displayCurrency }: { displayCurrency: string }) {
                 transition: 'all 0.15s',
               }}
             >
-              {p === 'today' ? 'Today' : p === 'week' ? 'Week' : 'Month'}
+              {PERIOD_LABELS[p]}
             </UnstyledButton>
           ))}
         </Group>
