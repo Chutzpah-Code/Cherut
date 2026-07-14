@@ -135,10 +135,10 @@ function PayModal({
         <Group justify="flex-end" mt="sm">
           <Button variant="light" onClick={onClose}>Cancel</Button>
           <Button
-            color="#0052CC"
             onClick={handlePay}
             loading={payMutation.isPending}
             disabled={!accountId || amount <= 0}
+            style={{ backgroundColor: '#0052CC' }}
           >
             Confirm Payment
           </Button>
@@ -309,10 +309,10 @@ function BillFormModal({
         <Group justify="flex-end" mt="sm">
           <Button variant="light" onClick={onClose}>Cancel</Button>
           <Button
-            color="#0052CC"
             onClick={handleSubmit}
             loading={isBusy}
             disabled={!isValid}
+            style={{ backgroundColor: '#0052CC' }}
           >
             {editing ? 'Save Changes' : 'Create Bill'}
           </Button>
@@ -373,7 +373,7 @@ export function BillsView() {
             <ChevronRight size={16} />
           </ActionIcon>
         </Group>
-        <Button size="xs" variant="light" leftSection={<Plus size={13} />} onClick={openNewBill}>
+        <Button size="xs" leftSection={<Plus size={14} />} onClick={openNewBill} style={{ backgroundColor: '#0052CC' }}>
           Add Bill
         </Button>
       </Group>
@@ -442,7 +442,7 @@ export function BillsView() {
                     {occ.bill?.type === 'expense' ? '−' : '+'}{fmt(occ.amount)}
                   </Text>
                   {(occ.status === 'pending' || occ.status === 'overdue') && (
-                    <Button size="xs" color="#0052CC" variant="light" onClick={() => openPayModal(occ)}>
+                    <Button size="xs" onClick={() => openPayModal(occ)} style={{ backgroundColor: '#0052CC' }}>
                       Pay
                     </Button>
                   )}
@@ -501,11 +501,11 @@ export function BillsView() {
                       </Text>
                     </Box>
                     <Group gap={4}>
-                      <ActionIcon size="sm" variant="subtle" onClick={() => openEditBill(bill)}>
-                        <Pencil size={13} />
+                      <ActionIcon size="xs" variant="subtle" onClick={() => openEditBill(bill)}>
+                        <Pencil size={12} />
                       </ActionIcon>
                       <ActionIcon
-                        size="sm"
+                        size="xs"
                         variant="subtle"
                         color="red"
                         loading={deleteBill.isPending}
