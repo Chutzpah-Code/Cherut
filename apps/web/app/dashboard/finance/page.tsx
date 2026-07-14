@@ -122,13 +122,14 @@ function IconBox({ bg, children }: { bg: string; children: React.ReactNode }) {
 
 
 function HeroBalanceCard({
-  totalConverted, displayCurrency, balanceByCurrency, availableCurrencies, onCurrencyChange,
+  totalConverted, displayCurrency, balanceByCurrency, availableCurrencies, onCurrencyChange, isUpdating,
 }: {
   totalConverted: number;
   displayCurrency: string;
   balanceByCurrency: Record<string, number>;
   availableCurrencies: string[];
   onCurrencyChange: (c: string) => void;
+  isUpdating?: boolean;
 }) {
   const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   const breakdown = Object.entries(balanceByCurrency);
@@ -143,7 +144,10 @@ function HeroBalanceCard({
         <Group gap={10}>
           <IconBox bg="#DBEAFE"><Wallet size={16} color="#0052CC" /></IconBox>
           <Box>
-            <Text style={CARD_LABEL}>Consolidated Total</Text>
+            <Group gap={6}>
+              <Text style={CARD_LABEL}>Consolidated Total</Text>
+              {isUpdating && <Loader size={10} color="#0052CC" />}
+            </Group>
             <Text style={{ fontSize: 10, color: '#94A3B8' }}>All accounts converted to</Text>
           </Box>
         </Group>
@@ -538,7 +542,7 @@ function OverviewView({ onNavigate }: { onNavigate: (v: FinanceView) => void }) 
     try { localStorage.setItem('finance_display_currency', cur); } catch {}
   };
 
-  const { data, isLoading } = useFinanceOverview(undefined, displayCurrency);
+  const { data, isLoading, isFetching } = useFinanceOverview(undefined, displayCurrency);
   const { data: accounts = [] } = useFinanceAccounts();
   const { data: categories = [] } = useFinanceCategories();
   const { data: allTransactions = [] } = useFinanceTransactions();
@@ -587,6 +591,7 @@ function OverviewView({ onNavigate }: { onNavigate: (v: FinanceView) => void }) 
             balanceByCurrency={data.balanceByCurrency}
             availableCurrencies={availableCurrencies}
             onCurrencyChange={handleCurrencyChange}
+            isUpdating={isFetching}
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, sm: 5 }}>

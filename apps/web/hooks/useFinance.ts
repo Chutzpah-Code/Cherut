@@ -14,7 +14,7 @@ export function useFinanceOverview(month?: string, displayCurrency?: string, sta
   return useQuery({
     queryKey: ['finance', 'overview', month, displayCurrency, startDate, endDate],
     queryFn: () => financeApi.getOverview(month, displayCurrency, startDate, endDate),
-    staleTime: 60_000,
+    staleTime: 15_000,
   });
 }
 
@@ -32,7 +32,10 @@ export function useCreateAccount() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: CreateAccountDto) => financeApi.createAccount(dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'accounts'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+    },
   });
 }
 
