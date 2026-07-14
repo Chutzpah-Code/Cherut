@@ -10,7 +10,7 @@ import { PieChart, Pie, Cell, Sector } from 'recharts';
 import { useDisclosure } from '@mantine/hooks';
 import {
   TrendingUp, Wallet, Plus, Trash2, Pencil, Check, X,
-  ArrowUpCircle, ArrowDownCircle,
+  ArrowUpCircle, ArrowDownCircle, AlertTriangle,
 } from 'lucide-react';
 import {
   useFinanceOverview,
@@ -802,16 +802,26 @@ function TransactionsView() {
         )}
       </Group>
 
+      {(transactions as FinanceTransaction[]).some((tx) => tx.accountId && !accountMap[tx.accountId]) && (
+        <Group p="sm" mb="sm" gap="sm" style={{ background: '#fff8f0', borderRadius: 8, border: '1px solid #fed7aa' }}>
+          <AlertTriangle size={15} color="#c2410c" style={{ flexShrink: 0 }} />
+          <Text size="xs" style={{ color: '#9a3412' }}>
+            Algumas transactions estão vinculadas a contas que foram removidas. Delete-as para limpar.
+          </Text>
+        </Group>
+      )}
+
       {transactions.length === 0 ? (
         <Center py="xl"><Text c="dimmed" size="sm">No transactions found.</Text></Center>
       ) : (
         <Stack gap="xs">
-          {transactions.map((tx) => (
+          {(transactions as FinanceTransaction[]).map((tx) => (
             <TransactionRow
               key={tx.id}
               tx={tx}
               currency={accountMap[tx.accountId]?.currency}
               categoryName={categoryMap[tx.categoryId]?.name}
+              accountName={accountMap[tx.accountId]?.name}
               onEdit={() => openEdit(tx)}
               onDelete={() => deleteTx.mutate(tx.id)}
             />
@@ -852,17 +862,25 @@ function TransactionsView() {
   );
 }
 
-function TransactionRow({ tx, currency, categoryName, onDelete, onEdit }: { tx: FinanceTransaction; currency?: string; categoryName?: string; onDelete?: () => void; onEdit?: () => void }) {
+function TransactionRow({ tx, currency, categoryName, accountName, onDelete, onEdit }: { tx: FinanceTransaction; currency?: string; categoryName?: string; accountName?: string; onDelete?: () => void; onEdit?: () => void }) {
   const isIncome = tx.type === 'income';
+  const isOrphaned = !!tx.accountId && !accountName;
   return (
-    <Group justify="space-between" p="sm" style={{ borderRadius: 8, background: '#f8fafc', border: '1px solid #E2E8F0' }}>
+    <Group justify="space-between" p="sm" style={{ borderRadius: 8, background: isOrphaned ? '#fff8f0' : '#f8fafc', border: `1px solid ${isOrphaned ? '#fed7aa' : '#E2E8F0'}` }}>
       <Group gap="sm">
         {isIncome
           ? <ArrowUpCircle size={18} style={{ color: '#2e7d32' }} />
           : <ArrowDownCircle size={18} style={{ color: '#c62828' }} />}
         <Box>
           <Text size="sm" fw={500}>{tx.description || categoryName || tx.type}</Text>
-          <Text size="xs" c="dimmed">{categoryName && tx.description ? `${categoryName} · ` : ''}{tx.date}</Text>
+          <Group gap={4}>
+            {isOrphaned && (
+              <Badge size="xs" variant="light" color="orange" style={{ textTransform: 'none' }}>
+                Conta removida
+              </Badge>
+            )}
+            <Text size="xs" c="dimmed">{categoryName && tx.description ? `${categoryName} · ` : ''}{tx.date}</Text>
+          </Group>
         </Box>
       </Group>
       <Group gap="xs">
