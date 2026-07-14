@@ -631,10 +631,10 @@ function TransactionForm({
         <Group gap="sm" p="sm" style={{ background: '#fff8f0', borderRadius: 8, border: '1px solid #fed7aa' }}>
           <AlertTriangle size={15} color="#c2410c" style={{ flexShrink: 0 }} />
           <Text size="sm" style={{ color: '#9a3412' }}>
-            Você precisa criar uma <strong>conta</strong> antes de adicionar transações.
+            You need to create an <strong>account</strong> before adding transactions.
           </Text>
         </Group>
-        <Text size="xs" c="dimmed">Vá para a aba <strong>Accounts</strong> e crie sua primeira conta.</Text>
+        <Text size="xs" c="dimmed">Go to the <strong>Accounts</strong> tab and create your first account.</Text>
       </Stack>
     );
   }
@@ -821,7 +821,7 @@ function TransactionsView() {
         <Group p="sm" mb="sm" gap="sm" style={{ background: '#fff8f0', borderRadius: 8, border: '1px solid #fed7aa' }}>
           <AlertTriangle size={15} color="#c2410c" style={{ flexShrink: 0 }} />
           <Text size="xs" style={{ color: '#9a3412' }}>
-            Algumas transactions estão vinculadas a contas que foram removidas. Delete-as para limpar.
+            Some transactions are linked to accounts that have been deleted. Remove them to clean up.
           </Text>
         </Group>
       )}
@@ -891,7 +891,7 @@ function TransactionRow({ tx, currency, categoryName, accountName, onDelete, onE
           <Group gap={4}>
             {isOrphaned && (
               <Badge size="xs" variant="light" color="orange" style={{ textTransform: 'none' }}>
-                Conta removida
+                Deleted account
               </Badge>
             )}
             <Text size="xs" c="dimmed">{categoryName && tx.description ? `${categoryName} · ` : ''}{tx.date}</Text>
