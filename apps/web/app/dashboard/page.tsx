@@ -36,7 +36,7 @@ function fmtDate() {
 
 function fmtCurrency(value: number, currency = 'USD') {
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(value);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value);
   } catch {
     return `${currency} ${value.toFixed(2)}`;
   }

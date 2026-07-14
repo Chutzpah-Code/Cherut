@@ -15,7 +15,7 @@ import { CreateBudgetDto } from '@/lib/api/services/finance';
 
 function fmt(value: number) {
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(value);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
   } catch {
     return value.toFixed(2);
   }

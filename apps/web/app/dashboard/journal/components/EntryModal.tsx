@@ -207,7 +207,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
 
             <Group justify="space-between" align="center">
               <Text size="sm" c={characterCountColor}>
-                {characterCount.toLocaleString()} / 20,000 characters
+                {characterCount.toLocaleString('en-US')} / 20,000 characters
               </Text>
 
               <Group>
@@ -243,7 +243,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
         {!isEditing && (
           <Group justify="space-between" align="center" pt="xs" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
             <Text size="xs" c="dimmed">
-              {entry.content.length.toLocaleString()} characters
+              {entry.content.length.toLocaleString('en-US')} characters
             </Text>
             <Button variant="light" onClick={onClose}>
               Close

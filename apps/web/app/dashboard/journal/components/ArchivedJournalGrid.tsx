@@ -17,7 +17,7 @@ export function ArchivedJournalGrid({ entries, onUnarchive, onDelete, onView }: 
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', {
+    return date.toLocaleDateString('en-US', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

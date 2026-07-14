@@ -17,14 +17,14 @@ import { FinanceBill, FinanceBillOccurrence, CreateBillDto } from '@/lib/api/ser
 
 function fmt(value: number, currency = 'USD') {
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(value);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value);
   } catch {
     return `${currency} ${value.toFixed(2)}`;
   }
 }
 
 function fmtDate(iso: string) {
-  return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, {
+  return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -45,7 +45,7 @@ function nextMonth(yyyyMM: string): string {
 
 function formatMonthLabel(yyyyMM: string): string {
   const [y, m] = yyyyMM.split('-').map(Number);
-  return new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  return new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
 const FREQ_LABELS: Record<string, string> = {

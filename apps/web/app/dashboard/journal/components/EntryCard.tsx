@@ -236,7 +236,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
             color: '#666666',
           }}
         >
-          {entry.content.length.toLocaleString()} characters
+          {entry.content.length.toLocaleString('en-US')} characters
         </Text>
         <Text
           size="xs"

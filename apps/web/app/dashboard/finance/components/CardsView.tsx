@@ -20,14 +20,14 @@ import { FinanceAccount, FinanceStatement } from '@/lib/api/services/finance';
 
 function fmt(value: number, currency = 'USD') {
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(value);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value);
   } catch {
     return `${currency} ${value.toFixed(2)}`;
   }
 }
 
 function fmtDate(iso: string) {
-  return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
+  return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function StatusBadge({ status }: { status: string }) {

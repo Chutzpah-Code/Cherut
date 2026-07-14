@@ -167,7 +167,7 @@ export default function AdminUsersPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao criar admin');
+        throw new Error(errorData.message || 'Error creating admin');
       }
 
       // Reset form
@@ -181,7 +181,7 @@ export default function AdminUsersPage() {
 
     } catch (err) {
       console.error('Error creating admin:', err);
-      setError(`Erro ao criar admin: ${err instanceof Error ? err.message : 'Erro desconhecido'}`);
+      setError(`Error creating admin: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   }
 
@@ -216,7 +216,7 @@ export default function AdminUsersPage() {
 
     } catch (err) {
       console.error('Error promoting user:', err);
-      setError(`Erro ao promover usuário: ${err instanceof Error ? err.message : 'Erro desconhecido'}`);
+      setError(`Error promoting user: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   }
 
@@ -477,7 +477,7 @@ export default function AdminUsersPage() {
 
         {users.length === 0 && !loading && (
           <Text ta="center" c="dimmed" py="xl">
-            Nenhum usuário encontrado
+            No users found
           </Text>
         )}
       </Card>
@@ -486,7 +486,7 @@ export default function AdminUsersPage() {
       <Modal
         opened={createModalOpened}
         onClose={closeCreateModal}
-        title="Criar Novo Administrador"
+        title="Create New Administrator"
       >
         <Stack>
           <TextInput

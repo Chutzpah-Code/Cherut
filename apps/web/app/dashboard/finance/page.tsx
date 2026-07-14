@@ -50,7 +50,7 @@ const TABS: { id: FinanceView; label: string }[] = [
 
 function fmt(value: number, currency?: string) {
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency: currency ?? 'USD' }).format(value);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency ?? 'USD' }).format(value);
   } catch {
     return `${currency ?? ''} ${value.toFixed(2)}`;
   }

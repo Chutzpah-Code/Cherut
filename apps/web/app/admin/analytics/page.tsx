@@ -167,7 +167,7 @@ export default function AdminAnalyticsPage() {
             <IconUsers size={20} color="var(--mantine-color-blue-6)" />
           </Group>
           <Text size="xl" fw={700} c="blue">
-            {analyticsData?.engagement?.dailyActiveUsers?.toLocaleString() || '0'}
+            {analyticsData?.engagement?.dailyActiveUsers?.toLocaleString('en-US') || '0'}
           </Text>
           <Text size="xs" c="dimmed" mt="xs">
             Active users today
@@ -182,7 +182,7 @@ export default function AdminAnalyticsPage() {
             <IconCurrencyDollar size={20} color="var(--mantine-color-green-6)" />
           </Group>
           <Text size="xl" fw={700} c="green">
-            ${revenueData.reduce((sum, month) => sum + month.amount, 0).toLocaleString()}
+            ${revenueData.reduce((sum, month) => sum + month.amount, 0).toLocaleString('en-US')}
           </Text>
           <Text size="xs" c="dimmed" mt="xs">
             Total from last 6 months
@@ -260,7 +260,7 @@ export default function AdminAnalyticsPage() {
                   <div key={item.month}>
                     <Group justify="space-between" mb="xs">
                       <Text size="sm">{item.month}</Text>
-                      <Text size="sm" fw={500}>${item.amount.toLocaleString()}</Text>
+                      <Text size="sm" fw={500}>${item.amount.toLocaleString('en-US')}</Text>
                     </Group>
                     <Progress
                       value={(item.amount / maxRevenue) * 100}
@@ -310,7 +310,7 @@ export default function AdminAnalyticsPage() {
               <div>
                 <Text size="sm" c="dimmed">Weekly Active Users</Text>
                 <Group justify="space-between">
-                  <Text size="lg" fw={700}>{analyticsData?.engagement?.weeklyActiveUsers?.toLocaleString() || '0'}</Text>
+                  <Text size="lg" fw={700}>{analyticsData?.engagement?.weeklyActiveUsers?.toLocaleString('en-US') || '0'}</Text>
                   <Badge color="green" variant="light">Active</Badge>
                 </Group>
               </div>
@@ -318,7 +318,7 @@ export default function AdminAnalyticsPage() {
               <div>
                 <Text size="sm" c="dimmed">Monthly Active Users</Text>
                 <Group justify="space-between" mb="xs">
-                  <Text size="lg" fw={700}>{analyticsData?.engagement?.monthlyActiveUsers?.toLocaleString() || '0'}</Text>
+                  <Text size="lg" fw={700}>{analyticsData?.engagement?.monthlyActiveUsers?.toLocaleString('en-US') || '0'}</Text>
                   <Badge color="blue" variant="light">MAU</Badge>
                 </Group>
                 <Progress

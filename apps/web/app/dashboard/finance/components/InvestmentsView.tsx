@@ -16,7 +16,7 @@ import { CreateInvestmentDto, CreateInvestmentEntryDto, FinanceAccount, FinanceI
 
 function fmt(value: number, currency?: string) {
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency: currency ?? 'USD' }).format(value);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency ?? 'USD' }).format(value);
   } catch {
     return `${currency ?? ''} ${value.toFixed(2)}`;
   }

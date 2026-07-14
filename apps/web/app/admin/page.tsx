@@ -151,21 +151,21 @@ export default function AdminDashboard() {
   const metrics = [
     {
       title: 'Total Users',
-      value: overview.totalUsers.toLocaleString(),
+      value: overview.totalUsers.toLocaleString('en-US'),
       icon: IconUsers,
       color: 'blue',
       description: `${overview.newUsersLast30Days} new in last 30 days`,
     },
     {
       title: 'Active Users',
-      value: overview.activeSubscriptions.toLocaleString(),
+      value: overview.activeSubscriptions.toLocaleString('en-US'),
       icon: IconUserCheck,
       color: 'green',
       description: `${Math.round((overview.activeSubscriptions / overview.totalUsers) * 100)}% activation rate`,
     },
     {
       title: 'Monthly Revenue',
-      value: `$${salesData.monthlyRevenue.toLocaleString()}`,
+      value: `$${salesData.monthlyRevenue.toLocaleString('en-US')}`,
       icon: IconCurrencyDollar,
       color: 'yellow',
       description: `$${salesData.averageRevenuePerUser.toFixed(2)} ARPU`,

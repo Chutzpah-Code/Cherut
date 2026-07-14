@@ -96,7 +96,7 @@ export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntr
 
           <Stack gap="sm">
             <Text size="sm" c={characterCountColor} ta="center">
-              {characterCount.toLocaleString()} / 20,000 characters
+              {characterCount.toLocaleString('en-US')} / 20,000 characters
             </Text>
 
             <Group gap="sm" grow justify="flex-end">
