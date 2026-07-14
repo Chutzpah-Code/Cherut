@@ -405,10 +405,8 @@ function DonutCard({ displayCurrency }: { displayCurrency: string }) {
   );
 }
 
-function RecentTxList({ transactions, accountMap, categoryMap, onViewAll }: {
-  transactions: (FinanceTransaction & { accountName: string })[];
-  accountMap: Record<string, FinanceAccount>;
-  categoryMap: Record<string, any>;
+function RecentTxList({ transactions, onViewAll }: {
+  transactions: (FinanceTransaction & { accountName: string; accountCurrency: string; categoryName: string })[];
   onViewAll: () => void;
 }) {
   return (
@@ -425,8 +423,8 @@ function RecentTxList({ transactions, accountMap, categoryMap, onViewAll }: {
       ) : (
         transactions.map((tx, i) => {
           const isIncome = tx.type === 'income';
-          const currency = accountMap[tx.accountId]?.currency;
-          const categoryName = categoryMap[tx.categoryId]?.name;
+          const currency = tx.accountCurrency;
+          const categoryName = tx.categoryName;
           return (
             <Group key={tx.id} justify="space-between" style={{
               padding: '11px 20px',
@@ -543,26 +541,7 @@ function OverviewView({ onNavigate }: { onNavigate: (v: FinanceView) => void }) 
   };
 
   const { data, isLoading, isFetching } = useFinanceOverview(undefined, displayCurrency);
-  const { data: accounts = [] } = useFinanceAccounts();
-  const { data: categories = [] } = useFinanceCategories();
-  const { data: allTransactions = [] } = useFinanceTransactions();
-
-  const accountMap = useMemo(
-    () => Object.fromEntries((accounts as FinanceAccount[]).map((a) => [a.id, a])),
-    [accounts],
-  );
-  const categoryMap = useMemo(
-    () => Object.fromEntries(categories.map((c: any) => [c.id, c])),
-    [categories],
-  );
-
-  const recentTransactions = useMemo(
-    () => [...(allTransactions as FinanceTransaction[])]
-      .sort((a, b) => (a.date < b.date ? 1 : -1))
-      .slice(0, 5)
-      .map((t) => ({ ...t, accountName: (accountMap[t.accountId] as FinanceAccount)?.name ?? '' })),
-    [allTransactions, accountMap],
-  );
+  const recentTransactions = (data?.recentTransactions ?? []) as (FinanceTransaction & { accountName: string; accountCurrency: string; categoryName: string })[];
 
   const availableCurrencies = data ? Object.keys(data.balanceByCurrency) : [];
 
@@ -603,8 +582,6 @@ function OverviewView({ onNavigate }: { onNavigate: (v: FinanceView) => void }) 
         <Grid.Col span={{ base: 12, sm: 7 }}>
           <RecentTxList
             transactions={recentTransactions}
-            accountMap={accountMap}
-            categoryMap={categoryMap}
             onViewAll={() => onNavigate('transactions')}
           />
         </Grid.Col>

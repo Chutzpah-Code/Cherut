@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import * as admin from 'firebase-admin';
 import { FirebaseService } from '../../config/firebase.service';
 import {
   CreateAccountDto,
@@ -100,9 +101,10 @@ export class FinanceService {
   }
 
   async updateAccount(userId: string, id: string, dto: UpdateAccountDto) {
-    await this.assertOwner(this.ACCOUNTS, id, userId);
-    await this.db.collection(this.ACCOUNTS).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
-    return this.assertOwner(this.ACCOUNTS, id, userId);
+    const existing = await this.assertOwner(this.ACCOUNTS, id, userId);
+    const updates = { ...this.clean(dto as any), updatedAt: this.now() };
+    await this.db.collection(this.ACCOUNTS).doc(id).update(updates);
+    return { ...existing, ...updates };
   }
 
   async deleteAccount(userId: string, id: string) {
@@ -138,9 +140,10 @@ export class FinanceService {
   }
 
   async updateCategory(userId: string, id: string, dto: UpdateCategoryDto) {
-    await this.assertOwner(this.CATEGORIES, id, userId);
-    await this.db.collection(this.CATEGORIES).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
-    return this.assertOwner(this.CATEGORIES, id, userId);
+    const existing = await this.assertOwner(this.CATEGORIES, id, userId);
+    const updates = { ...this.clean(dto as any), updatedAt: this.now() };
+    await this.db.collection(this.CATEGORIES).doc(id).update(updates);
+    return { ...existing, ...updates };
   }
 
   async deleteCategory(userId: string, id: string) {
@@ -155,7 +158,7 @@ export class FinanceService {
     await this.assertOwner(this.ACCOUNTS, dto.accountId, userId);
     const data = { ...this.clean(dto as any), userId, createdAt: this.now(), updatedAt: this.now() };
     const ref = await this.db.collection(this.TRANSACTIONS).add(data);
-    await this.adjustBalance(userId, dto.accountId, dto.amount, dto.type);
+    await this.adjustBalance(dto.accountId, dto.amount, dto.type);
     return { id: ref.id, ...data };
   }
 
@@ -180,16 +183,17 @@ export class FinanceService {
   }
 
   async updateTransaction(userId: string, id: string, dto: UpdateTransactionDto) {
-    await this.assertOwner(this.TRANSACTIONS, id, userId);
-    await this.db.collection(this.TRANSACTIONS).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
-    return this.assertOwner(this.TRANSACTIONS, id, userId);
+    const existing = await this.assertOwner(this.TRANSACTIONS, id, userId);
+    const updates = { ...this.clean(dto as any), updatedAt: this.now() };
+    await this.db.collection(this.TRANSACTIONS).doc(id).update(updates);
+    return { ...existing, ...updates };
   }
 
   async deleteTransaction(userId: string, id: string) {
     const tx: any = await this.assertOwner(this.TRANSACTIONS, id, userId);
     const reverseType = tx.type === 'income' ? 'expense' : 'income';
     try {
-      await this.adjustBalance(userId, tx.accountId, tx.amount, reverseType);
+      await this.adjustBalance(tx.accountId, tx.amount, reverseType);
     } catch {
       // Account was already deleted; skip balance reversal
     }
@@ -220,9 +224,10 @@ export class FinanceService {
   }
 
   async updateRecurring(userId: string, id: string, dto: UpdateRecurringDto) {
-    await this.assertOwner(this.RECURRING, id, userId);
-    await this.db.collection(this.RECURRING).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
-    return this.assertOwner(this.RECURRING, id, userId);
+    const existing = await this.assertOwner(this.RECURRING, id, userId);
+    const updates = { ...this.clean(dto as any), updatedAt: this.now() };
+    await this.db.collection(this.RECURRING).doc(id).update(updates);
+    return { ...existing, ...updates };
   }
 
   async deleteRecurring(userId: string, id: string) {
@@ -248,7 +253,7 @@ export class FinanceService {
       updatedAt: this.now(),
     };
     const txRef = await this.db.collection(this.TRANSACTIONS).add(txData);
-    await this.adjustBalance(userId, rule.accountId, rule.amount, rule.type);
+    await this.adjustBalance(rule.accountId, rule.amount, rule.type);
 
     const nextDueDate = this.calcNextDueDate(rule.nextDueDate ?? today, rule.frequency);
     await this.db.collection(this.RECURRING).doc(id).update({ nextDueDate, updatedAt: this.now() });
@@ -296,9 +301,10 @@ export class FinanceService {
   }
 
   async updateBudget(userId: string, id: string, dto: UpdateBudgetDto) {
-    await this.assertOwner(this.BUDGETS, id, userId);
-    await this.db.collection(this.BUDGETS).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
-    return this.assertOwner(this.BUDGETS, id, userId);
+    const existing = await this.assertOwner(this.BUDGETS, id, userId);
+    const updates = { ...this.clean(dto as any), updatedAt: this.now() };
+    await this.db.collection(this.BUDGETS).doc(id).update(updates);
+    return { ...existing, ...updates };
   }
 
   async deleteBudget(userId: string, id: string) {
@@ -328,9 +334,10 @@ export class FinanceService {
   }
 
   async updateInvestment(userId: string, id: string, dto: UpdateInvestmentDto) {
-    await this.assertOwner(this.INVESTMENTS, id, userId);
-    await this.db.collection(this.INVESTMENTS).doc(id).update({ ...this.clean(dto as any), updatedAt: this.now() });
-    return this.assertOwner(this.INVESTMENTS, id, userId);
+    const existing = await this.assertOwner(this.INVESTMENTS, id, userId);
+    const updates = { ...this.clean(dto as any), updatedAt: this.now() };
+    await this.db.collection(this.INVESTMENTS).doc(id).update(updates);
+    return { ...existing, ...updates };
   }
 
   async deleteInvestment(userId: string, id: string) {
@@ -340,7 +347,7 @@ export class FinanceService {
   }
 
   async createInvestmentEntry(userId: string, dto: CreateInvestmentEntryDto) {
-    await this.assertOwner(this.INVESTMENTS, dto.investmentId, userId);
+    const inv: any = await this.assertOwner(this.INVESTMENTS, dto.investmentId, userId);
 
     const amount = Number(dto.amount);
     if (!isFinite(amount) || amount <= 0) {
@@ -360,15 +367,13 @@ export class FinanceService {
     try {
       const ref = await this.db.collection(this.INVESTMENT_ENTRIES).add(data);
 
-      const inv: any = await this.assertOwner(this.INVESTMENTS, dto.investmentId, userId);
       await this.db.collection(this.INVESTMENTS).doc(dto.investmentId).update({
-        totalContributed: (inv.totalContributed ?? 0) + amount,
+        totalContributed: admin.firestore.FieldValue.increment(amount),
         updatedAt: this.now(),
       });
 
-      // Deduct from linked account balance
       if (inv.accountId) {
-        await this.adjustBalance(userId, inv.accountId, amount, 'expense');
+        await this.adjustBalance(inv.accountId, amount, 'expense');
       }
 
       return { id: ref.id, ...data };
@@ -396,11 +401,11 @@ export class FinanceService {
     try {
       const inv: any = await this.assertOwner(this.INVESTMENTS, entry.investmentId, userId);
       await this.db.collection(this.INVESTMENTS).doc(entry.investmentId).update({
-        totalContributed: Math.max(0, (inv.totalContributed ?? 0) - entry.amount),
+        totalContributed: admin.firestore.FieldValue.increment(-entry.amount),
         updatedAt: this.now(),
       });
       if (inv.accountId) {
-        await this.adjustBalance(userId, inv.accountId, entry.amount, 'income');
+        await this.adjustBalance(inv.accountId, entry.amount, 'income');
       }
     } catch { /* investment may have been deleted */ }
 
@@ -427,9 +432,10 @@ export class FinanceService {
       end = endObj.toISOString().slice(0, 10);
     }
 
-    const [accountsSnap, allTxSnap, rates] = await Promise.all([
+    const [accountsSnap, allTxSnap, categoriesSnap, rates] = await Promise.all([
       this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
       this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
+      this.db.collection(this.CATEGORIES).where('userId', '==', userId).get(),
       this.getExchangeRates(),
     ]);
 
@@ -450,6 +456,9 @@ export class FinanceService {
       // and only reflect transactions added after account creation.
       computedBalance[a.id] = a.balance ?? 0;
     }
+
+    const categoryMap: Record<string, string> = {};
+    for (const c of categoriesSnap.docs) categoryMap[c.id] = (c.data() as any).name ?? '';
 
     const balanceByCurrency: Record<string, number> = {};
     for (const a of accounts) {
@@ -476,7 +485,12 @@ export class FinanceService {
     const recentTransactions = transactions
       .sort((a, b) => (a.date < b.date ? 1 : -1))
       .slice(0, 5)
-      .map((t) => ({ ...t, accountName: accountMap[t.accountId]?.name ?? '' }));
+      .map((t) => ({
+        ...t,
+        accountName: accountMap[t.accountId]?.name ?? '',
+        accountCurrency: accountCurrency[t.accountId] ?? 'USD',
+        categoryName: categoryMap[t.categoryId] ?? '',
+      }));
 
     return {
       displayCurrency,
@@ -518,11 +532,11 @@ export class FinanceService {
 
   // ─── Private helpers ────────────────────────────────────────────────────────
 
-  private async adjustBalance(userId: string, accountId: string, amount: number, type: string) {
-    const account: any = await this.assertOwner(this.ACCOUNTS, accountId, userId);
+  private async adjustBalance(accountId: string, amount: number, type: string) {
     const delta = type === 'income' ? amount : type === 'expense' ? -amount : 0;
+    if (delta === 0) return;
     await this.db.collection(this.ACCOUNTS).doc(accountId).update({
-      balance: (account.balance ?? 0) + delta,
+      balance: admin.firestore.FieldValue.increment(delta),
       updatedAt: this.now(),
     });
   }
@@ -623,6 +637,7 @@ export class FinanceService {
   async payStatement(userId: string, accountId: string, statementId: string, dto: { fromAccountId: string; amount: number }) {
     const statement: any = await this.assertOwner(this.STATEMENTS, statementId, userId);
     if (statement.status === 'paid') throw new Error('Statement already paid');
+    await this.assertOwner(this.ACCOUNTS, dto.fromAccountId, userId);
 
     const amount = Number(dto.amount);
 
@@ -656,8 +671,8 @@ export class FinanceService {
     };
     const txRef = await this.db.collection(this.TRANSACTIONS).add(txData);
 
-    await this.adjustBalance(userId, dto.fromAccountId, amount, 'expense');
-    await this.adjustBalance(userId, accountId, amount, 'income');
+    await this.adjustBalance(dto.fromAccountId, amount, 'expense');
+    await this.adjustBalance(accountId, amount, 'income');
 
     await this.db.collection(this.STATEMENTS).doc(statementId).update({
       status: 'paid',
