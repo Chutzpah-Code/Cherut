@@ -411,40 +411,31 @@ export class FinanceService {
       end = endObj.toISOString().slice(0, 10);
     }
 
+    let txQuery: any = this.db.collection(this.TRANSACTIONS)
+      .where('userId', '==', userId)
+      .where('date', '>=', start)
+      .where('date', '<=', end);
+
     const [accountsSnap, txSnap, rates] = await Promise.all([
       this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
-      this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
+      txQuery.get(),
       this.getExchangeRates(),
     ]);
 
     const accounts = accountsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
-    const allTransactions = txSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
-    const transactions = allTransactions.filter((t) => t.date >= start && t.date <= end);
+    const transactions = txSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
 
     const accountMap: Record<string, any> = {};
     const accountCurrency: Record<string, string> = {};
     const computedBalance: Record<string, number> = {};
-    const hasInitialBalance: Set<string> = new Set();
     for (const a of accounts) {
       const cur = a.currency ?? 'USD';
       accountMap[a.id] = a;
       accountCurrency[a.id] = cur;
-      if (a.initialBalance !== undefined) {
-        // New accounts: seed from initialBalance, transactions will be applied below
-        computedBalance[a.id] = a.initialBalance;
-        hasInitialBalance.add(a.id);
-      } else {
-        // Legacy accounts: use stored running balance (already reflects past transactions)
-        computedBalance[a.id] = a.balance ?? 0;
-      }
-    }
-
-    // Apply ALL transactions only for accounts with initialBalance — avoids double-counting
-    // for legacy accounts whose stored balance already includes past transactions
-    for (const t of allTransactions) {
-      if (!hasInitialBalance.has(t.accountId)) continue;
-      if (t.type === 'income') computedBalance[t.accountId] += t.amount;
-      else if (t.type === 'expense') computedBalance[t.accountId] -= t.amount;
+      // account.balance is the canonical stored balance, maintained by adjustBalance.
+      // Do not recompute from transactions here — that would ignore the stored balance
+      // and only reflect transactions added after account creation.
+      computedBalance[a.id] = a.balance ?? 0;
     }
 
     const balanceByCurrency: Record<string, number> = {};
