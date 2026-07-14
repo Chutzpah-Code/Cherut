@@ -1,35 +1,44 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsBoolean, Min, Matches } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsBoolean, IsInt, Min, Max, Matches } from 'class-validator';
 
-export enum RecurringFrequency {
+export enum BillFrequency {
   DAILY = 'daily',
   WEEKLY = 'weekly',
   MONTHLY = 'monthly',
   YEARLY = 'yearly',
 }
 
-export enum RecurringType {
+export enum BillType {
   INCOME = 'income',
   EXPENSE = 'expense',
 }
 
-export class CreateRecurringDto {
+export class CreateBillDto {
   @IsString()
   @IsNotEmpty()
-  accountId: string;
+  name: string;
 
   @IsString()
   @IsNotEmpty()
   categoryId: string;
 
+  @IsString()
+  @IsNotEmpty()
+  accountId: string;
+
   @IsNumber()
-  @Min(0)
+  @Min(0.01)
   amount: number;
 
-  @IsEnum(RecurringType)
-  type: RecurringType;
+  @IsEnum(BillType)
+  type: BillType;
 
-  @IsEnum(RecurringFrequency)
-  frequency: RecurringFrequency;
+  @IsEnum(BillFrequency)
+  frequency: BillFrequency;
+
+  @IsInt()
+  @Min(1)
+  @Max(28)
+  dueDay: number;
 
   @IsString()
   @IsNotEmpty()
@@ -37,12 +46,8 @@ export class CreateRecurringDto {
   startDate: string;
 
   @IsString()
-  @IsNotEmpty()
-  description: string;
-
-  @IsString()
   @IsOptional()
-  notes?: string;
+  description?: string;
 
   @IsBoolean()
   @IsOptional()

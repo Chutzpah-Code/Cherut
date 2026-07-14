@@ -15,7 +15,6 @@ import {
   CreateAccountDto, UpdateAccountDto,
   CreateCategoryDto, UpdateCategoryDto,
   CreateTransactionDto, UpdateTransactionDto,
-  CreateRecurringDto, UpdateRecurringDto,
   CreateBudgetDto, UpdateBudgetDto,
   CreateInvestmentDto, UpdateInvestmentDto,
   CreateInvestmentEntryDto,
@@ -112,33 +111,6 @@ export class FinanceController {
   @Delete('transactions/:id')
   deleteTransaction(@Request() req, @Param('id') id: string) {
     return this.financeService.deleteTransaction(req.user.uid, id);
-  }
-
-  // Recurring
-  @Post('recurring')
-  createRecurring(@Request() req, @Body() dto: CreateRecurringDto) {
-    return this.financeService.createRecurring(req.user.uid, dto);
-  }
-
-  @Get('recurring')
-  findRecurring(@Request() req, @Query('isActive') isActive?: string) {
-    const active = isActive === undefined ? undefined : isActive === 'true';
-    return this.financeService.findRecurring(req.user.uid, active);
-  }
-
-  @Patch('recurring/:id')
-  updateRecurring(@Request() req, @Param('id') id: string, @Body() dto: UpdateRecurringDto) {
-    return this.financeService.updateRecurring(req.user.uid, id, dto);
-  }
-
-  @Delete('recurring/:id')
-  deleteRecurring(@Request() req, @Param('id') id: string) {
-    return this.financeService.deleteRecurring(req.user.uid, id);
-  }
-
-  @Post('recurring/:id/apply')
-  applyRecurring(@Request() req, @Param('id') id: string) {
-    return this.financeService.applyRecurring(req.user.uid, id);
   }
 
   // Budgets

@@ -29,20 +29,20 @@ import {
   useFinanceInvestments,
 } from '@/hooks/useFinance';
 import { CreateAccountDto, CreateTransactionDto, CreateCategoryDto, FinanceTransaction, FinanceAccount } from '@/lib/api/services/finance';
-import { RecurringView } from './components/RecurringView';
+import { BillsView } from './components/BillsView';
 import { BudgetsView } from './components/BudgetsView';
 import { InvestmentsView } from './components/InvestmentsView';
 import { CardsView } from './components/CardsView';
 import { UpcomingView } from './components/UpcomingView';
 
-type FinanceView = 'overview' | 'transactions' | 'accounts' | 'recurring' | 'budgets' | 'investments' | 'cards' | 'upcoming';
+type FinanceView = 'overview' | 'transactions' | 'accounts' | 'bills' | 'budgets' | 'investments' | 'cards' | 'upcoming';
 
 const TABS: { id: FinanceView; label: string }[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'transactions', label: 'Transactions' },
   { id: 'accounts', label: 'Accounts' },
   { id: 'cards', label: 'Cards' },
-  { id: 'recurring', label: 'Recurring' },
+  { id: 'bills', label: 'Bills' },
   { id: 'budgets', label: 'Budgets' },
   { id: 'investments', label: 'Investments' },
   { id: 'upcoming', label: 'Upcoming' },
@@ -1232,7 +1232,7 @@ export default function FinancePage() {
         {view === 'overview' && <OverviewView onNavigate={setView} />}
         {view === 'transactions' && <TransactionsView />}
         {view === 'accounts' && <AccountsView />}
-        {view === 'recurring' && <RecurringView />}
+        {view === 'bills' && <BillsView />}
         {view === 'budgets' && <BudgetsView />}
         {view === 'investments' && <InvestmentsView />}
         {view === 'cards' && <CardsView />}

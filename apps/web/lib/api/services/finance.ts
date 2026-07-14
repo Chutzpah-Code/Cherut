@@ -3,8 +3,6 @@ import { apiClient } from '../client';
 export type AccountType = 'checking' | 'savings' | 'credit' | 'wallet' | 'other';
 export type CategoryType = 'income' | 'expense';
 export type TransactionType = 'income' | 'expense' | 'transfer';
-export type RecurringType = 'income' | 'expense';
-export type RecurringFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 export type InvestmentType = 'stock' | 'crypto' | 'fund' | 'real_estate' | 'other';
 
 export interface FinanceAccount {
@@ -62,24 +60,6 @@ export interface FinanceTransaction {
   description?: string;
   notes?: string;
   toAccountId?: string;
-  recurringId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface FinanceRecurring {
-  id: string;
-  userId: string;
-  accountId: string;
-  categoryId: string;
-  amount: number;
-  type: RecurringType;
-  frequency: RecurringFrequency;
-  startDate: string;
-  nextDueDate: string;
-  description: string;
-  notes?: string;
-  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -138,11 +118,8 @@ export type UpdateAccountDto = Partial<CreateAccountDto>;
 export type CreateCategoryDto = Pick<FinanceCategory, 'name' | 'type'> & { color?: string; icon?: string };
 export type UpdateCategoryDto = Partial<CreateCategoryDto>;
 
-export type CreateTransactionDto = Pick<FinanceTransaction, 'accountId' | 'categoryId' | 'amount' | 'type' | 'date'> & { description?: string; notes?: string; toAccountId?: string; recurringId?: string };
+export type CreateTransactionDto = Pick<FinanceTransaction, 'accountId' | 'categoryId' | 'amount' | 'type' | 'date'> & { description?: string; notes?: string; toAccountId?: string };
 export type UpdateTransactionDto = Partial<CreateTransactionDto>;
-
-export type CreateRecurringDto = Pick<FinanceRecurring, 'accountId' | 'categoryId' | 'amount' | 'type' | 'frequency' | 'startDate' | 'description'> & { notes?: string; isActive?: boolean };
-export type UpdateRecurringDto = Partial<CreateRecurringDto> & { isActive?: boolean };
 
 export type CreateBudgetDto = Pick<FinanceBudget, 'categoryId' | 'amount' | 'month'>;
 export type UpdateBudgetDto = Partial<CreateBudgetDto>;
@@ -217,27 +194,6 @@ export const financeApi = {
   },
   deleteTransaction: async (id: string): Promise<void> => {
     await apiClient.delete(`/finance/transactions/${id}`);
-  },
-
-  // Recurring
-  getRecurring: async (isActive?: boolean): Promise<FinanceRecurring[]> => {
-    const { data } = await apiClient.get('/finance/recurring', { params: isActive !== undefined ? { isActive } : {} });
-    return data;
-  },
-  createRecurring: async (dto: CreateRecurringDto): Promise<FinanceRecurring> => {
-    const { data } = await apiClient.post('/finance/recurring', dto);
-    return data;
-  },
-  updateRecurring: async (id: string, dto: UpdateRecurringDto): Promise<FinanceRecurring> => {
-    const { data } = await apiClient.patch(`/finance/recurring/${id}`, dto);
-    return data;
-  },
-  deleteRecurring: async (id: string): Promise<void> => {
-    await apiClient.delete(`/finance/recurring/${id}`);
-  },
-  applyRecurring: async (id: string): Promise<{ transaction: FinanceTransaction; nextDueDate: string }> => {
-    const { data } = await apiClient.post(`/finance/recurring/${id}/apply`);
-    return data;
   },
 
   // Budgets

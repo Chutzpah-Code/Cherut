@@ -4,7 +4,6 @@ import {
   CreateAccountDto, UpdateAccountDto,
   CreateCategoryDto, UpdateCategoryDto,
   CreateTransactionDto, UpdateTransactionDto,
-  CreateRecurringDto, UpdateRecurringDto,
   CreateBudgetDto, UpdateBudgetDto,
   CreateInvestmentDto, UpdateInvestmentDto,
   CreateInvestmentEntryDto,
@@ -146,53 +145,6 @@ export function useDeleteTransaction() {
   return useMutation({
     mutationFn: (id: string) => financeApi.deleteTransaction(id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
-    },
-  });
-}
-
-// ─── Recurring ───────────────────────────────────────────────────────────────
-
-export function useFinanceRecurring(isActive?: boolean) {
-  return useQuery({
-    queryKey: ['finance', 'recurring', isActive],
-    queryFn: () => financeApi.getRecurring(isActive),
-    staleTime: 60_000,
-  });
-}
-
-export function useCreateRecurring() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (dto: CreateRecurringDto) => financeApi.createRecurring(dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'recurring'] }),
-  });
-}
-
-export function useUpdateRecurring() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, dto }: { id: string; dto: UpdateRecurringDto }) => financeApi.updateRecurring(id, dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'recurring'] }),
-  });
-}
-
-export function useDeleteRecurring() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => financeApi.deleteRecurring(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'recurring'] }),
-  });
-}
-
-export function useApplyRecurring() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => financeApi.applyRecurring(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['finance', 'recurring'] });
       qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
       qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
       qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });

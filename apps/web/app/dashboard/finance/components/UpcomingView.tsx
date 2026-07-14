@@ -9,36 +9,10 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import { Calendar, TrendingUp, RotateCcw } from 'lucide-react';
-import { useFinanceRecurring, useFinanceAccounts, useApplyRecurring } from '@/hooks/useFinance';
-import { FinanceRecurring, FinanceAccount } from '@/lib/api/services/finance';
-
-function addDays(dateStr: string, days: number): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
-}
-
-function addMonths(dateStr: string, months: number): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setMonth(d.getMonth() + months);
-  return d.toISOString().slice(0, 10);
-}
-
-function addYears(dateStr: string, years: number): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setFullYear(d.getFullYear() + years);
-  return d.toISOString().slice(0, 10);
-}
-
-function nextDueDate(current: string, frequency: string): string {
-  switch (frequency) {
-    case 'daily': return addDays(current, 1);
-    case 'weekly': return addDays(current, 7);
-    case 'monthly': return addMonths(current, 1);
-    case 'yearly': return addYears(current, 1);
-    default: return current;
-  }
-}
+import { useBillOccurrences, useBills } from '@/hooks/useBills';
+import { useFinanceAccounts } from '@/hooks/useFinance';
+import { FinanceBillOccurrence, FinanceBill } from '@/lib/api/services/bills';
+import { FinanceAccount } from '@/lib/api/services/finance';
 
 function fmt(value: number, currency = 'USD') {
   try {
@@ -65,29 +39,35 @@ function urgencyColor(days: number): string {
   return 'green';
 }
 
+function currentYYYYMM(): string {
+  return new Date().toISOString().slice(0, 7);
+}
+
+function addOneMonth(yyyyMM: string): string {
+  const [y, m] = yyyyMM.split('-').map(Number);
+  const d = new Date(y, m, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
 // ─── Upcoming Bills ──────────────────────────────────────────────────────────
 
 function UpcomingBillsTab() {
   const [horizon, setHorizon] = useState(30);
-  const { data: recurring = [], isLoading } = useFinanceRecurring(true);
-  const applyRecurring = useApplyRecurring();
+  const thisMonth = currentYYYYMM();
+  const nxtMonth = addOneMonth(thisMonth);
+
+  const { data: thisOcc = [], isLoading: l1 } = useBillOccurrences(thisMonth);
+  const { data: nextOcc = [], isLoading: l2 } = useBillOccurrences(nxtMonth);
+  const isLoading = l1 || l2;
 
   const upcoming = useMemo(() => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const cutoff = new Date(today); cutoff.setDate(cutoff.getDate() + horizon);
-    const items: { rule: FinanceRecurring; dueDate: string }[] = [];
-
-    (recurring as FinanceRecurring[]).forEach((rule) => {
-      let due = rule.nextDueDate;
-      while (new Date(due + 'T00:00:00') <= cutoff) {
-        const d = new Date(due + 'T00:00:00');
-        if (d >= today) items.push({ rule, dueDate: due });
-        due = nextDueDate(due, rule.frequency);
-      }
-    });
-
-    return items.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
-  }, [recurring, horizon]);
+    const all = [...(thisOcc as FinanceBillOccurrence[]), ...(nextOcc as FinanceBillOccurrence[])];
+    return all
+      .filter((o) => (o.status === 'pending' || o.status === 'overdue') && new Date(o.dueDate + 'T00:00:00') <= cutoff)
+      .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+  }, [thisOcc, nextOcc, horizon]);
 
   if (isLoading) return <Center py="xl"><Loader size="sm" color="#4686FE" /></Center>;
 
@@ -113,40 +93,26 @@ function UpcomingBillsTab() {
         </Center>
       ) : (
         <Stack gap={6}>
-          {upcoming.map(({ rule, dueDate }, i) => {
-            const days = daysFromNow(dueDate);
+          {upcoming.map((occ) => {
+            const days = daysFromNow(occ.dueDate);
             return (
               <Box
-                key={`${rule.id}-${dueDate}-${i}`}
+                key={occ.id}
                 style={{ border: '1px solid #E2E8F0', borderRadius: 8, padding: '10px 14px', background: '#fff' }}
               >
                 <Group justify="space-between">
                   <Box>
-                    <Text size="sm" fw={600}>{rule.description}</Text>
+                    <Text size="sm" fw={600}>{occ.bill?.name ?? '—'}</Text>
                     <Group gap={6} mt={2}>
                       <Badge size="xs" color={urgencyColor(days)} variant="light">
                         {days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Today' : `in ${days}d`}
                       </Badge>
-                      <Text size="xs" c="dimmed">{fmtDate(dueDate)}</Text>
+                      <Text size="xs" c="dimmed">{fmtDate(occ.dueDate)}</Text>
                     </Group>
                   </Box>
-                  <Group gap="xs">
-                    <Text size="sm" fw={600} c={rule.type === 'income' ? 'green.7' : 'red.7'}>
-                      {rule.type === 'expense' ? '−' : '+'}{fmt(rule.amount)}
-                    </Text>
-                    {dueDate === rule.nextDueDate && (
-                      <Button
-                        size="xs"
-                        variant="light"
-                        color="blue"
-                        leftSection={<RotateCcw size={11} />}
-                        loading={applyRecurring.isPending}
-                        onClick={() => applyRecurring.mutate(rule.id)}
-                      >
-                        Apply
-                      </Button>
-                    )}
-                  </Group>
+                  <Text size="sm" fw={600} c={occ.bill?.type === 'income' ? 'green.7' : 'red.7'}>
+                    {occ.bill?.type === 'expense' ? '−' : '+'}{fmt(occ.amount)}
+                  </Text>
                 </Group>
               </Box>
             );
@@ -160,7 +126,10 @@ function UpcomingBillsTab() {
 // ─── Projection ───────────────────────────────────────────────────────────────
 
 function ProjectionTab() {
-  const { data: recurring = [], isLoading: rLoading } = useFinanceRecurring(true);
+  const thisMonth = currentYYYYMM();
+  const nxtMonth = addOneMonth(thisMonth);
+  const { data: thisOcc = [], isLoading: l1 } = useBillOccurrences(thisMonth);
+  const { data: nextOcc = [], isLoading: l2 } = useBillOccurrences(nxtMonth);
   const { data: accounts = [], isLoading: aLoading } = useFinanceAccounts();
 
   const chartData = useMemo(() => {
@@ -169,21 +138,24 @@ function ProjectionTab() {
 
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const days = 60;
-    const balances: Record<string, number> = {};
-    nonCredit.forEach((a) => { balances[a.id] = a.balance ?? 0; });
+
+    const pending = [...(thisOcc as FinanceBillOccurrence[]), ...(nextOcc as FinanceBillOccurrence[])]
+      .filter((o) => o.status === 'pending' || o.status === 'overdue');
+
+    const current: Record<string, number> = {};
+    nonCredit.forEach((a) => { current[a.id] = a.balance ?? 0; });
 
     const points: Record<string, number | string>[] = [];
-    let current = { ...balances };
 
     for (let i = 0; i <= days; i++) {
       const d = new Date(today); d.setDate(d.getDate() + i);
       const dateStr = d.toISOString().slice(0, 10);
-      const point: Record<string, number | string> = { date: dateStr.slice(5) }; // MM-DD
+      const point: Record<string, number | string> = { date: dateStr.slice(5) };
 
-      (recurring as FinanceRecurring[]).forEach((rule) => {
-        if (rule.nextDueDate === dateStr && current[rule.accountId] !== undefined) {
-          const delta = rule.type === 'income' ? rule.amount : -rule.amount;
-          current[rule.accountId] = (current[rule.accountId] ?? 0) + delta;
+      pending.forEach((occ) => {
+        if (occ.dueDate === dateStr && occ.bill && current[occ.bill.accountId] !== undefined) {
+          const delta = occ.bill.type === 'income' ? occ.amount : -occ.amount;
+          current[occ.bill.accountId] = (current[occ.bill.accountId] ?? 0) + delta;
         }
       });
 
@@ -192,7 +164,7 @@ function ProjectionTab() {
     }
 
     return points;
-  }, [recurring, accounts]);
+  }, [thisOcc, nextOcc, accounts]);
 
   const accountNames = (accounts as FinanceAccount[])
     .filter((a) => a.type !== 'credit')
@@ -200,7 +172,7 @@ function ProjectionTab() {
 
   const COLORS = ['#0052CC', '#38A169', '#DD6B20', '#805AD5', '#E53E3E'];
 
-  if (rLoading || aLoading) return <Center py="xl"><Loader size="sm" color="#4686FE" /></Center>;
+  if (l1 || l2 || aLoading) return <Center py="xl"><Loader size="sm" color="#4686FE" /></Center>;
 
   if (!accountNames.length) {
     return (
@@ -212,7 +184,7 @@ function ProjectionTab() {
 
   return (
     <Stack gap="md">
-      <Text size="xs" c="dimmed">Balance projection for the next 60 days based on active recurring rules.</Text>
+      <Text size="xs" c="dimmed">Balance projection for the next 60 days based on pending bills.</Text>
       <ResponsiveContainer width="100%" height={280}>
         <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
@@ -239,18 +211,17 @@ function ProjectionTab() {
 // ─── Subscriptions ───────────────────────────────────────────────────────────
 
 function SubscriptionsTab() {
-  const { data: recurring = [], isLoading } = useFinanceRecurring(true);
+  const { data: bills = [], isLoading } = useBills();
 
   const subscriptions = useMemo(() => {
-    return (recurring as FinanceRecurring[]).filter(
-      (r) => r.type === 'expense' && (r.frequency === 'monthly' || r.frequency === 'yearly'),
+    return (bills as FinanceBill[]).filter(
+      (b) => b.isActive && b.type === 'expense' && (b.frequency === 'monthly' || b.frequency === 'yearly'),
     );
-  }, [recurring]);
+  }, [bills]);
 
   const monthlyTotal = useMemo(() => {
-    return subscriptions.reduce((sum, r) => {
-      const monthly = r.frequency === 'yearly' ? r.amount / 12 : r.amount;
-      return sum + monthly;
+    return subscriptions.reduce((sum, b) => {
+      return sum + (b.frequency === 'yearly' ? b.amount / 12 : b.amount);
     }, 0);
   }, [subscriptions]);
 
@@ -280,24 +251,24 @@ function SubscriptionsTab() {
       </Group>
 
       <Stack gap={6}>
-        {subscriptions.map((rule) => {
-          const monthly = rule.frequency === 'yearly' ? rule.amount / 12 : rule.amount;
+        {subscriptions.map((bill) => {
+          const monthly = bill.frequency === 'yearly' ? bill.amount / 12 : bill.amount;
           const pct = monthlyTotal > 0 ? (monthly / monthlyTotal) * 100 : 0;
           return (
             <Box
-              key={rule.id}
+              key={bill.id}
               style={{ border: '1px solid #E2E8F0', borderRadius: 8, padding: '10px 14px', background: '#fff' }}
             >
               <Group justify="space-between" mb={4}>
                 <Box>
-                  <Text size="sm" fw={600}>{rule.description}</Text>
+                  <Text size="sm" fw={600}>{bill.name}</Text>
                   <Badge size="xs" variant="light" color="blue" mt={2}>
-                    {rule.frequency === 'monthly' ? 'Monthly' : 'Yearly'}
+                    {bill.frequency === 'monthly' ? 'Monthly' : 'Yearly'}
                   </Badge>
                 </Box>
                 <Box style={{ textAlign: 'right' }}>
-                  <Text size="sm" fw={600} c="red.7">{fmt(rule.amount)}</Text>
-                  {rule.frequency === 'yearly' && (
+                  <Text size="sm" fw={600} c="red.7">{fmt(bill.amount)}</Text>
+                  {bill.frequency === 'yearly' && (
                     <Text size="xs" c="dimmed">{fmt(monthly)}/mo</Text>
                   )}
                 </Box>

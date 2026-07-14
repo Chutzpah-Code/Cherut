@@ -4,8 +4,6 @@ export * from './create-category.dto';
 export * from './update-category.dto';
 export * from './create-transaction.dto';
 export * from './update-transaction.dto';
-export * from './create-recurring.dto';
-export * from './update-recurring.dto';
 export * from './create-budget.dto';
 export * from './update-budget.dto';
 export * from './create-investment.dto';

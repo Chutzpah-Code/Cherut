@@ -21,6 +21,7 @@ import { JournalModule } from './modules/journal/journal.module';
 import { ValuesModule } from './modules/values/values.module';
 import { BoardsModule } from './modules/boards/boards.module';
 import { FinanceModule } from './modules/finance/finance.module';
+import { BillsModule } from './modules/bills/bills.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { FinanceModule } from './modules/finance/finance.module';
     ValuesModule,
     BoardsModule,
     FinanceModule,
+    BillsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -8,8 +8,6 @@ import {
   UpdateCategoryDto,
   CreateTransactionDto,
   UpdateTransactionDto,
-  CreateRecurringDto,
-  UpdateRecurringDto,
   CreateBudgetDto,
   UpdateBudgetDto,
   CreateInvestmentDto,
@@ -50,7 +48,6 @@ export class FinanceService {
   }
   private readonly CATEGORIES = 'finance_categories';
   private readonly TRANSACTIONS = 'finance_transactions';
-  private readonly RECURRING = 'finance_recurring';
   private readonly BUDGETS = 'finance_budgets';
   private readonly INVESTMENTS = 'finance_investments';
   private readonly INVESTMENT_ENTRIES = 'finance_investment_entries';
@@ -110,14 +107,13 @@ export class FinanceService {
   async deleteAccount(userId: string, id: string) {
     await this.assertOwner(this.ACCOUNTS, id, userId);
 
-    const [txSnap, recurSnap, stmtSnap] = await Promise.all([
+    const [txSnap, stmtSnap] = await Promise.all([
       this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).where('accountId', '==', id).get(),
-      this.db.collection(this.RECURRING).where('userId', '==', userId).where('accountId', '==', id).get(),
       this.db.collection(this.STATEMENTS).where('userId', '==', userId).where('accountId', '==', id).get(),
     ]);
 
     const batch = this.db.batch();
-    for (const doc of [...txSnap.docs, ...recurSnap.docs, ...stmtSnap.docs]) batch.delete(doc.ref);
+    for (const doc of [...txSnap.docs, ...stmtSnap.docs]) batch.delete(doc.ref);
     batch.delete(this.db.collection(this.ACCOUNTS).doc(id));
     await batch.commit();
 
@@ -199,67 +195,6 @@ export class FinanceService {
     }
     await this.db.collection(this.TRANSACTIONS).doc(id).delete();
     return { message: 'Transaction deleted' };
-  }
-
-  // ─── Recurring ──────────────────────────────────────────────────────────────
-
-  async createRecurring(userId: string, dto: CreateRecurringDto) {
-    const data = {
-      ...this.clean(dto as any),
-      userId,
-      isActive: dto.isActive ?? true,
-      nextDueDate: dto.startDate,
-      createdAt: this.now(),
-      updatedAt: this.now(),
-    };
-    const ref = await this.db.collection(this.RECURRING).add(data);
-    return { id: ref.id, ...data };
-  }
-
-  async findRecurring(userId: string, isActive?: boolean) {
-    let query: any = this.db.collection(this.RECURRING).where('userId', '==', userId);
-    if (isActive !== undefined) query = query.where('isActive', '==', isActive);
-    const snap = await query.get();
-    return snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
-  }
-
-  async updateRecurring(userId: string, id: string, dto: UpdateRecurringDto) {
-    const existing = await this.assertOwner(this.RECURRING, id, userId);
-    const updates = { ...this.clean(dto as any), updatedAt: this.now() };
-    await this.db.collection(this.RECURRING).doc(id).update(updates);
-    return { ...existing, ...updates };
-  }
-
-  async deleteRecurring(userId: string, id: string) {
-    await this.assertOwner(this.RECURRING, id, userId);
-    await this.db.collection(this.RECURRING).doc(id).delete();
-    return { message: 'Recurring deleted' };
-  }
-
-  async applyRecurring(userId: string, id: string) {
-    const rule: any = await this.assertOwner(this.RECURRING, id, userId);
-
-    const today = new Date().toISOString().slice(0, 10);
-    const txData = {
-      userId,
-      accountId: rule.accountId,
-      categoryId: rule.categoryId,
-      amount: rule.amount,
-      type: rule.type,
-      date: today,
-      description: rule.description,
-      recurringId: id,
-      createdAt: this.now(),
-      updatedAt: this.now(),
-    };
-    const txRef = await this.db.collection(this.TRANSACTIONS).add(txData);
-    await this.adjustBalance(rule.accountId, rule.amount, rule.type);
-
-    const nextDueDate = this.calcNextDueDate(rule.nextDueDate ?? today, rule.frequency);
-    await this.db.collection(this.RECURRING).doc(id).update({ nextDueDate, updatedAt: this.now() });
-
-    this.logger.log(`Recurring ${id} applied → tx ${txRef.id}, next: ${nextDueDate}`);
-    return { transaction: { id: txRef.id, ...txData }, nextDueDate };
   }
 
   // ─── Budgets ────────────────────────────────────────────────────────────────
@@ -684,14 +619,4 @@ export class FinanceService {
     return { id: statementId, status: 'paid', paymentTransactionId: txRef.id };
   }
 
-  private calcNextDueDate(current: string, frequency: string): string {
-    const d = new Date(current);
-    switch (frequency) {
-      case 'daily': d.setDate(d.getDate() + 1); break;
-      case 'weekly': d.setDate(d.getDate() + 7); break;
-      case 'monthly': d.setMonth(d.getMonth() + 1); break;
-      case 'yearly': d.setFullYear(d.getFullYear() + 1); break;
-    }
-    return d.toISOString().slice(0, 10);
-  }
 }
