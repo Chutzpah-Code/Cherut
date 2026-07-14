@@ -427,19 +427,16 @@ export class FinanceService {
       end = endObj.toISOString().slice(0, 10);
     }
 
-    let txQuery: any = this.db.collection(this.TRANSACTIONS)
-      .where('userId', '==', userId)
-      .where('date', '>=', start)
-      .where('date', '<=', end);
-
-    const [accountsSnap, txSnap, rates] = await Promise.all([
+    const [accountsSnap, allTxSnap, rates] = await Promise.all([
       this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
-      txQuery.get(),
+      this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
       this.getExchangeRates(),
     ]);
 
     const accounts = accountsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
-    const transactions = txSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+    const transactions = allTxSnap.docs
+      .map((d) => ({ id: d.id, ...d.data() } as any))
+      .filter((t) => t.date >= start && t.date <= end);
 
     const accountMap: Record<string, any> = {};
     const accountCurrency: Record<string, string> = {};

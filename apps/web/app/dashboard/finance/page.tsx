@@ -568,7 +568,14 @@ function OverviewView({ onNavigate }: { onNavigate: (v: FinanceView) => void }) 
   }
 
   if (isLoading) return <Center py="xl"><Loader size="sm" color="#4686FE" /></Center>;
-  if (!data) return null;
+  if (!data) return (
+    <Center py="xl">
+      <Stack align="center" gap="xs">
+        <AlertTriangle size={20} color="#c2410c" />
+        <Text size="sm" c="dimmed">Failed to load overview. Try refreshing the page.</Text>
+      </Stack>
+    </Center>
+  );
 
   return (
     <Stack gap="md" style={{ overflow: 'hidden' }}>
