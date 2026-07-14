@@ -204,7 +204,7 @@ export default function AdminUsersPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao promover usuário');
+        throw new Error(errorData.message || 'Failed to promote user');
       }
 
       // Reset form
