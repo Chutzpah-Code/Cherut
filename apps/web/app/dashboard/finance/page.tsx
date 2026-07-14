@@ -10,7 +10,7 @@ import { PieChart, Pie, Cell, Sector } from 'recharts';
 import { useDisclosure } from '@mantine/hooks';
 import {
   TrendingUp, Wallet, Plus, Trash2, Pencil, Check, X,
-  ArrowUpCircle, ArrowDownCircle, RefreshCw,
+  ArrowUpCircle, ArrowDownCircle,
 } from 'lucide-react';
 import {
   useFinanceOverview,
@@ -20,7 +20,6 @@ import {
   useCreateAccount,
   useDeleteAccount,
   useUpdateAccount,
-  useRecalculateBalance,
   useCreateTransaction,
   useUpdateTransaction,
   useDeleteTransaction,
@@ -906,7 +905,6 @@ function AccountsView() {
   const createAccount = useCreateAccount();
   const { mutate: updateAccount } = useUpdateAccount();
   const deleteAccount = useDeleteAccount();
-  const recalculateBalance = useRecalculateBalance();
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
@@ -1001,14 +999,6 @@ function AccountsView() {
                       </ActionIcon>
                     </Group>
                   )}
-                  <ActionIcon
-                    size="sm" variant="subtle" color="blue"
-                    loading={recalculateBalance.isPending && recalculateBalance.variables === acc.id}
-                    title="Recalculate balance from initialBalance + transactions"
-                    onClick={() => recalculateBalance.mutate(acc.id)}
-                  >
-                    <RefreshCw size={14} />
-                  </ActionIcon>
                   <ActionIcon size="sm" variant="subtle" color="red" onClick={() => deleteAccount.mutate(acc.id)}>
                     <Trash2 size={14} />
                   </ActionIcon>
