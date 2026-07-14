@@ -152,6 +152,7 @@ export class FinanceService {
   // ─── Transactions ───────────────────────────────────────────────────────────
 
   async createTransaction(userId: string, dto: CreateTransactionDto) {
+    await this.assertOwner(this.ACCOUNTS, dto.accountId, userId);
     const data = { ...this.clean(dto as any), userId, createdAt: this.now(), updatedAt: this.now() };
     const ref = await this.db.collection(this.TRANSACTIONS).add(data);
     await this.adjustBalance(userId, dto.accountId, dto.amount, dto.type);

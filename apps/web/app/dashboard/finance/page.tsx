@@ -625,6 +625,20 @@ function TransactionForm({
   loading: boolean;
   submitLabel: string;
 }) {
+  if (accounts.length === 0) {
+    return (
+      <Stack gap="md" py="sm">
+        <Group gap="sm" p="sm" style={{ background: '#fff8f0', borderRadius: 8, border: '1px solid #fed7aa' }}>
+          <AlertTriangle size={15} color="#c2410c" style={{ flexShrink: 0 }} />
+          <Text size="sm" style={{ color: '#9a3412' }}>
+            Você precisa criar uma <strong>conta</strong> antes de adicionar transações.
+          </Text>
+        </Group>
+        <Text size="xs" c="dimmed">Vá para a aba <strong>Accounts</strong> e crie sua primeira conta.</Text>
+      </Stack>
+    );
+  }
+
   return (
     <Stack gap="sm">
       <Select
@@ -639,6 +653,7 @@ function TransactionForm({
         value={form.accountId}
         onChange={onAccountChange}
         placeholder="Select account"
+        required
       />
       <Select
         label="Category"
