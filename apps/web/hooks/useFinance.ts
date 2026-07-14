@@ -52,7 +52,11 @@ export function useDeleteAccount() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => financeApi.deleteAccount(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'accounts'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+    },
   });
 }
 

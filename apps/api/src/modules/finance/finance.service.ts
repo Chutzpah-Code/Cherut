@@ -107,8 +107,19 @@ export class FinanceService {
 
   async deleteAccount(userId: string, id: string) {
     await this.assertOwner(this.ACCOUNTS, id, userId);
-    await this.db.collection(this.ACCOUNTS).doc(id).delete();
-    return { message: 'Account deleted' };
+
+    const [txSnap, recurSnap, stmtSnap] = await Promise.all([
+      this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).where('accountId', '==', id).get(),
+      this.db.collection(this.RECURRING).where('userId', '==', userId).where('accountId', '==', id).get(),
+      this.db.collection(this.STATEMENTS).where('userId', '==', userId).where('accountId', '==', id).get(),
+    ]);
+
+    const batch = this.db.batch();
+    for (const doc of [...txSnap.docs, ...recurSnap.docs, ...stmtSnap.docs]) batch.delete(doc.ref);
+    batch.delete(this.db.collection(this.ACCOUNTS).doc(id));
+    await batch.commit();
+
+    return { message: 'Account deleted', transactionsDeleted: txSnap.size };
   }
 
   // ─── Categories ─────────────────────────────────────────────────────────────
@@ -176,7 +187,11 @@ export class FinanceService {
   async deleteTransaction(userId: string, id: string) {
     const tx: any = await this.assertOwner(this.TRANSACTIONS, id, userId);
     const reverseType = tx.type === 'income' ? 'expense' : 'income';
-    await this.adjustBalance(userId, tx.accountId, tx.amount, reverseType);
+    try {
+      await this.adjustBalance(userId, tx.accountId, tx.amount, reverseType);
+    } catch {
+      // Account was already deleted; skip balance reversal
+    }
     await this.db.collection(this.TRANSACTIONS).doc(id).delete();
     return { message: 'Transaction deleted' };
   }

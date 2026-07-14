@@ -896,6 +896,7 @@ function AccountsView() {
   const [editingBalanceId, setEditingBalanceId] = useState<string | null>(null);
   const [editingBalanceVal, setEditingBalanceVal] = useState<number>(0);
   const [editingCatName, setEditingCatName] = useState<string>('');
+  const [deletingAccount, setDeletingAccount] = useState<{ id: string; name: string } | null>(null);
 
   // — queries —
   const { data: accounts = [], isLoading } = useFinanceAccounts();
@@ -999,7 +1000,7 @@ function AccountsView() {
                       </ActionIcon>
                     </Group>
                   )}
-                  <ActionIcon size="sm" variant="subtle" color="red" onClick={() => deleteAccount.mutate(acc.id)}>
+                  <ActionIcon size="sm" variant="subtle" color="red" onClick={() => setDeletingAccount({ id: acc.id, name: acc.name })}>
                     <Trash2 size={14} />
                   </ActionIcon>
                 </Group>
@@ -1065,6 +1066,38 @@ function AccountsView() {
           ))}
         </Stack>
       )}
+
+      {/* Delete account confirmation modal */}
+      <Modal
+        opened={!!deletingAccount}
+        onClose={() => setDeletingAccount(null)}
+        title="Delete account?"
+        centered
+        size="sm"
+      >
+        <Stack gap="md">
+          <Text size="sm">
+            Deleting <strong>{deletingAccount?.name}</strong> will permanently remove the account and
+            all transactions linked to it. This cannot be undone.
+          </Text>
+          <Group justify="flex-end" gap="sm">
+            <Button variant="default" size="sm" onClick={() => setDeletingAccount(null)}>
+              Cancel
+            </Button>
+            <Button
+              color="red"
+              size="sm"
+              loading={deleteAccount.isPending}
+              onClick={() => {
+                if (!deletingAccount) return;
+                deleteAccount.mutate(deletingAccount.id, { onSuccess: () => setDeletingAccount(null) });
+              }}
+            >
+              Delete everything
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
 
       {/* Create account modal */}
       <Modal opened={opened} onClose={close} title="New Account" centered>
