@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { Box, Loader, Center, Group, Button, Modal, TextInput, Stack, Select, Text } from '@mantine/core';
+import { Box, Loader, Center, Group, Button, Modal, TextInput, Stack, Select, Text, ScrollArea } from '@mantine/core';
 import { Plus } from 'lucide-react';
 import {
   DndContext,
@@ -410,9 +410,20 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
         styles={{
           content: {
             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '85dvh',
+          },
+          body: {
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: 0,
           },
         }}
       >
+        <ScrollArea flex={1} px="md" py="md">
         <Stack gap="lg">
           <TextInput
             label="Title"
@@ -523,8 +534,10 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
               },
             }}
           />
-
-          <Group justify="flex-end" mt="lg">
+        </Stack>
+        </ScrollArea>
+        <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
+          <Group justify="flex-end">
             <Button
               variant="outline"
               onClick={() => setCreateModalOpened(false)}
@@ -573,7 +586,7 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
               Create Task
             </Button>
           </Group>
-        </Stack>
+        </Box>
       </Modal>
     </Box>
   );
