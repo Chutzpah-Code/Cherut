@@ -70,11 +70,11 @@ function PayModal({
       title="Pay statement"
       centered
       styles={{
-        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
-        body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
+        body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
       }}
     >
-      <ScrollArea flex={1} px="md" py="xs">
+      <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
         <Stack gap="sm">
           <Box style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
             <Text size="xs" c="dimmed">Statement total</Text>

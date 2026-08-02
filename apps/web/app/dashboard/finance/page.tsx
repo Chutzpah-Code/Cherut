@@ -855,11 +855,11 @@ function TransactionsView() {
         title="New Transaction"
         centered
         styles={{
-          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
-          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
+          body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs">
+        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
           <TransactionForm
             form={createForm}
             setForm={setCreateForm}
@@ -892,11 +892,11 @@ function TransactionsView() {
         title="Edit Transaction"
         centered
         styles={{
-          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
-          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
+          body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs">
+        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
           <TransactionForm
             form={editForm}
             setForm={setEditForm}
@@ -1191,11 +1191,11 @@ function AccountsView() {
         title="New Account"
         centered
         styles={{
-          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
-          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
+          body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs">
+        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
           <Stack gap="sm">
             <TextInput label="Name" placeholder="e.g. Main Checking" value={form.name ?? ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
             <Select

@@ -106,11 +106,11 @@ function PayModal({
       title={<Text fw={600}>Pay — {occurrence?.bill?.name ?? ''}</Text>}
       size="sm"
       styles={{
-        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
-        body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
+        body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
       }}
     >
-      <ScrollArea flex={1} px="md" py="xs">
+      <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
         <Stack gap="sm">
           <Select
             label="Account"
@@ -246,11 +246,11 @@ function BillFormModal({
       title={<Text fw={600}>{editing ? 'Edit Bill' : 'New Bill'}</Text>}
       size="md"
       styles={{
-        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
-        body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
+        body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
       }}
     >
-      <ScrollArea flex={1} px="md" py="xs">
+      <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
         <Stack gap="sm">
           <TextInput
             label="Name"

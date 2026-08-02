@@ -220,9 +220,11 @@ export function TaskModal({
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '85dvh',
+          overflow: 'hidden',
         },
         body: {
           flex: 1,
+          minHeight: 0,
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
@@ -238,7 +240,7 @@ export function TaskModal({
         blur: 4,
       }}
     >
-      <ScrollArea flex={1} px="md" py="md">
+      <ScrollArea flex={1} px="md" py="md" scrollbars="y" style={{ minHeight: 0 }}>
         <Stack gap="md">
           {/* Title */}
         <TextInput

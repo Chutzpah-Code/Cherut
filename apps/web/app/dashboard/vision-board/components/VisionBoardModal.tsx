@@ -153,9 +153,11 @@ export function VisionBoardModal({
             display: 'flex',
             flexDirection: 'column',
             maxHeight: '85dvh',
+            overflow: 'hidden',
           },
           body: {
             flex: 1,
+            minHeight: 0,
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -163,7 +165,7 @@ export function VisionBoardModal({
           },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs">
+        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
         <Stack gap="lg">
         {/* Imagem Preview */}
         <Box>

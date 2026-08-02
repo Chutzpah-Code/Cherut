@@ -161,13 +161,13 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
       }
       centered
       styles={{
-        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
-        body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
+        body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
       }}
     >
       {isEditing ? (
         <>
-          <ScrollArea flex={1} px="md" py="xs">
+          <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
             <Stack gap="md">
               {/* Date info */}
               <Group gap="xs" align="center">
@@ -244,7 +244,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
         </>
       ) : (
         <>
-          <ScrollArea flex={1} px="md" py="xs">
+          <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
             <Stack gap="md">
               {/* Date info */}
               <Group gap="xs" align="center">

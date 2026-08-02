@@ -417,9 +417,11 @@ export default function LifeAreasPage() {
             display: 'flex',
             flexDirection: 'column',
             maxHeight: '85dvh',
+            overflow: 'hidden',
           },
           body: {
             flex: 1,
+            minHeight: 0,
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -429,9 +431,9 @@ export default function LifeAreasPage() {
       >
         <form
           onSubmit={handleSubmit}
-          style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}
+          style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}
         >
-          <ScrollArea flex={1} px="md" py="xs">
+          <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
             <Stack gap="lg" py="xs">
               <TextInput
                 label="Name"

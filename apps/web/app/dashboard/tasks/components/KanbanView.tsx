@@ -413,9 +413,11 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
             display: 'flex',
             flexDirection: 'column',
             maxHeight: '85dvh',
+            overflow: 'hidden',
           },
           body: {
             flex: 1,
+            minHeight: 0,
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -423,7 +425,7 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
           },
         }}
       >
-        <ScrollArea flex={1} px="md" py="md">
+        <ScrollArea flex={1} px="md" py="md" scrollbars="y" style={{ minHeight: 0 }}>
         <Stack gap="lg">
           <TextInput
             label="Title"

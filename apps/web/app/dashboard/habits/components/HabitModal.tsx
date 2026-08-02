@@ -185,9 +185,11 @@ export function HabitModal({
             flexDirection: 'column',
             height: '100dvh',
             maxHeight: '100dvh',
+            overflow: 'hidden',
           },
           body: {
             flex: 1,
+            minHeight: 0,
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -203,7 +205,7 @@ export function HabitModal({
           blur: 4,
         }}
       >
-      <ScrollArea flex={1} px="xl" py="md">
+      <ScrollArea flex={1} px="xl" py="md" scrollbars="y" style={{ minHeight: 0 }}>
         <Stack gap="md">
           {/* Form */}
           <TextInput

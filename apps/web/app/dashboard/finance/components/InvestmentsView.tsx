@@ -187,11 +187,11 @@ function InvestmentCard({ inv, accounts, onDelete }: { inv: FinanceInvestment; a
         title="Add Contribution"
         centered
         styles={{
-          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
-          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
+          body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs">
+        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
           <Stack gap="sm">
             <NumberInput
               label={`Amount (${inv.currency})`}
@@ -243,11 +243,11 @@ function InvestmentCard({ inv, accounts, onDelete }: { inv: FinanceInvestment; a
         title="Edit Investment"
         centered
         styles={{
-          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
-          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
+          body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs">
+        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
           <Stack gap="sm">
             <Select
               label="Account"
@@ -366,11 +366,11 @@ export function InvestmentsView() {
         title="New Investment"
         centered
         styles={{
-          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
-          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
+          body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs">
+        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
           <Stack gap="sm">
             <Select
               label="Account"
