@@ -1074,7 +1074,7 @@ export default function ObjectivesPage() {
           },
         }}
       >
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
           <ScrollArea flex={1} px="md" py="xs">
           <Stack gap="lg">
             <TextInput
