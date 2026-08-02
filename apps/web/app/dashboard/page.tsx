@@ -47,8 +47,8 @@ const LABEL: React.CSSProperties = {
   textTransform: 'uppercase', color: '#64748B', marginBottom: 14,
 };
 
-function Panel({ children, accent = false, style }: {
-  children: React.ReactNode; accent?: boolean; style?: React.CSSProperties;
+function Panel({ children, accent = false, style, h }: {
+  children: React.ReactNode; accent?: boolean; style?: React.CSSProperties; h?: number;
 }) {
   return (
     <Box style={{
@@ -57,7 +57,7 @@ function Panel({ children, accent = false, style }: {
       borderLeft: accent ? '3px solid #0052CC' : '1px solid #E2E8F0',
       borderRadius: 12,
       padding: '20px 22px',
-      height: '100%',
+      height: h,
       boxSizing: 'border-box',
       display: 'flex',
       flexDirection: 'column',
@@ -104,69 +104,71 @@ function HabitsToday() {
   };
 
   return (
-    <Panel>
+    <Panel h={280}>
       <div style={LABEL}>Today — Habits</div>
 
-      {isLoading ? (
-        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
-      ) : visible.length === 0 ? (
-        <Text size="sm" c="dimmed" mb="sm">No active habits.</Text>
-      ) : (
-        <Stack gap={0}>
-          {visible.map((habit, i) => {
-            const done = isLogged(habit.id, habit.lastCompletedAt);
-            const pending = logMutation.isPending;
-            return (
-              <Group
-                key={habit.id}
-                justify="space-between"
-                style={{
-                  padding: '10px 0',
-                  borderBottom: i < visible.length - 1 ? '1px solid #F1F5F9' : 'none',
-                }}
-              >
-                <Group gap={10} style={{ flex: 1, minWidth: 0 }}>
-                  <button
-                    onClick={() => handleLog(habit.id)}
-                    disabled={done || pending}
-                    style={{
-                      background: 'none', border: 'none', cursor: done ? 'default' : 'pointer',
-                      padding: 0, flexShrink: 0, display: 'flex', alignItems: 'center',
-                    }}
-                    aria-label={done ? 'Logged' : 'Log habit'}
-                  >
-                    {done
-                      ? <CheckCircle2 size={22} color="#2e7d32" strokeWidth={1.8} />
-                      : <Circle size={22} color="#CBD5E1" strokeWidth={1.8} />
-                    }
-                  </button>
-                  <Text
-                    size="sm"
-                    fw={500}
-                    style={{
-                      color: done ? '#94A3B8' : '#0F172A',
-                      textDecoration: done ? 'line-through' : 'none',
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {habit.title}
-                  </Text>
+      <Box style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+        {isLoading ? (
+          <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+        ) : visible.length === 0 ? (
+          <Text size="sm" c="dimmed" mb="sm">No active habits.</Text>
+        ) : (
+          <Stack gap={0}>
+            {visible.map((habit, i) => {
+              const done = isLogged(habit.id, habit.lastCompletedAt);
+              const pending = logMutation.isPending;
+              return (
+                <Group
+                  key={habit.id}
+                  justify="space-between"
+                  style={{
+                    padding: '10px 0',
+                    borderBottom: i < visible.length - 1 ? '1px solid #F1F5F9' : 'none',
+                  }}
+                >
+                  <Group gap={10} style={{ flex: 1, minWidth: 0 }}>
+                    <button
+                      onClick={() => handleLog(habit.id)}
+                      disabled={done || pending}
+                      style={{
+                        background: 'none', border: 'none', cursor: done ? 'default' : 'pointer',
+                        padding: 0, flexShrink: 0, display: 'flex', alignItems: 'center',
+                      }}
+                      aria-label={done ? 'Logged' : 'Log habit'}
+                    >
+                      {done
+                        ? <CheckCircle2 size={22} color="#2e7d32" strokeWidth={1.8} />
+                        : <Circle size={22} color="#CBD5E1" strokeWidth={1.8} />
+                      }
+                    </button>
+                    <Text
+                      size="sm"
+                      fw={500}
+                      style={{
+                        color: done ? '#94A3B8' : '#0F172A',
+                        textDecoration: done ? 'line-through' : 'none',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {habit.title}
+                    </Text>
+                  </Group>
+                  {habit.streak > 0 && (
+                    <span style={{
+                      fontSize: 11, fontWeight: 600, color: '#64748B',
+                      background: '#F1F5F9', borderRadius: 4, padding: '2px 6px', flexShrink: 0,
+                    }}>
+                      {habit.streak}d
+                    </span>
+                  )}
                 </Group>
-                {habit.streak > 0 && (
-                  <span style={{
-                    fontSize: 11, fontWeight: 600, color: '#64748B',
-                    background: '#F1F5F9', borderRadius: 4, padding: '2px 6px', flexShrink: 0,
-                  }}>
-                    {habit.streak}d
-                  </span>
-                )}
-              </Group>
-            );
-          })}
-        </Stack>
-      )}
+              );
+            })}
+          </Stack>
+        )}
+      </Box>
 
-      <Box mt="auto" pt={14}>
+      <Box pt={14}>
         {unloggedCount > 0 && (
           <Text size="xs" c="dimmed" mb={6}>{unloggedCount} to log today</Text>
         )}
@@ -195,51 +197,53 @@ function TasksDue() {
   ).length;
 
   return (
-    <Panel>
+    <Panel h={280}>
       <div style={LABEL}>Tasks Due</div>
 
-      {isLoading ? (
-        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
-      ) : due.length === 0 ? (
-        <Text size="sm" c="dimmed">No tasks due today.</Text>
-      ) : (
-        <Stack gap={0}>
-          {due.map((task, i) => {
-            const overdue = task.dueDate < today;
-            return (
-              <Group
-                key={task.id}
-                justify="space-between"
-                style={{
-                  padding: '10px 0',
-                  borderBottom: i < due.length - 1 ? '1px solid #F1F5F9' : 'none',
-                }}
-              >
-                <Text
-                  size="sm"
-                  fw={500}
+      <Box style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+        {isLoading ? (
+          <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+        ) : due.length === 0 ? (
+          <Text size="sm" c="dimmed">No tasks due today.</Text>
+        ) : (
+          <Stack gap={0}>
+            {due.map((task, i) => {
+              const overdue = task.dueDate < today;
+              return (
+                <Group
+                  key={task.id}
+                  justify="space-between"
                   style={{
-                    color: '#0F172A', flex: 1, minWidth: 0,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    padding: '10px 0',
+                    borderBottom: i < due.length - 1 ? '1px solid #F1F5F9' : 'none',
                   }}
                 >
-                  {task.title}
-                </Text>
-                <span style={{
-                  fontSize: 11, fontWeight: 600, borderRadius: 4, padding: '2px 7px',
-                  flexShrink: 0, marginLeft: 8,
-                  background: overdue ? '#FEF2F2' : '#EFF6FF',
-                  color: overdue ? '#c62828' : '#0052CC',
-                }}>
-                  {overdue ? 'Overdue' : 'Today'}
-                </span>
-              </Group>
-            );
-          })}
-        </Stack>
-      )}
+                  <Text
+                    size="sm"
+                    fw={500}
+                    style={{
+                      color: '#0F172A', flex: 1, minWidth: 0,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {task.title}
+                  </Text>
+                  <span style={{
+                    fontSize: 11, fontWeight: 600, borderRadius: 4, padding: '2px 7px',
+                    flexShrink: 0, marginLeft: 8,
+                    background: overdue ? '#FEF2F2' : '#EFF6FF',
+                    color: overdue ? '#c62828' : '#0052CC',
+                  }}>
+                    {overdue ? 'Overdue' : 'Today'}
+                  </span>
+                </Group>
+              );
+            })}
+          </Stack>
+        )}
+      </Box>
 
-      <Box mt="auto" pt={14}>
+      <Box pt={14}>
         {totalDue > 5 && (
           <Text size="xs" c="dimmed" mb={6}>+{totalDue - 5} more</Text>
         )}
@@ -263,38 +267,40 @@ function FinanceSnapshot() {
   const displayCurrency = overview?.displayCurrency ?? currency;
 
   return (
-    <Panel accent>
+    <Panel accent h={280}>
       <div style={LABEL}>Finance</div>
 
-      {isLoading ? (
-        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
-      ) : !hasData ? (
-        <Text size="sm" c="dimmed">Set up Finance to start tracking your money.</Text>
-      ) : (
-        <Stack gap={8}>
-          <Box>
-            <Text style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 2 }}>
-              Consolidated total · {displayCurrency}
-            </Text>
-            <Text style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', color: '#0052CC', lineHeight: 1 }}>
-              {fmtCurrency(overview?.totalBalanceConverted ?? 0, displayCurrency)}
-            </Text>
-          </Box>
+      <Box style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+        {isLoading ? (
+          <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+        ) : !hasData ? (
+          <Text size="sm" c="dimmed">Set up Finance to start tracking your money.</Text>
+        ) : (
+          <Stack gap={8}>
+            <Box>
+              <Text style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 2 }}>
+                Consolidated total · {displayCurrency}
+              </Text>
+              <Text style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', color: '#0052CC', lineHeight: 1 }}>
+                {fmtCurrency(overview?.totalBalanceConverted ?? 0, displayCurrency)}
+              </Text>
+            </Box>
 
-          <Group gap={6} align="center">
-            {net >= 0
-              ? <ArrowUpCircle size={14} color="#2e7d32" />
-              : <ArrowDownCircle size={14} color="#c62828" />
-            }
-            <Text style={{ fontSize: 13, fontWeight: 600, color: net >= 0 ? '#2e7d32' : '#c62828' }}>
-              {net >= 0 ? '+' : ''}{fmtCurrency(net, displayCurrency)}
-            </Text>
-            <Text size="xs" c="dimmed">this month</Text>
-          </Group>
-        </Stack>
-      )}
+            <Group gap={6} align="center">
+              {net >= 0
+                ? <ArrowUpCircle size={14} color="#2e7d32" />
+                : <ArrowDownCircle size={14} color="#c62828" />
+              }
+              <Text style={{ fontSize: 13, fontWeight: 600, color: net >= 0 ? '#2e7d32' : '#c62828' }}>
+                {net >= 0 ? '+' : ''}{fmtCurrency(net, displayCurrency)}
+              </Text>
+              <Text size="xs" c="dimmed">this month</Text>
+            </Group>
+          </Stack>
+        )}
+      </Box>
 
-      <Box mt="auto" pt={14}>
+      <Box pt={14}>
         <NavLink onClick={() => router.push('/dashboard/finance')}>View Finance</NavLink>
       </Box>
     </Panel>
@@ -315,39 +321,41 @@ function ObjectivesProgress() {
   }, [objectives]);
 
   return (
-    <Panel>
+    <Panel h={280}>
       <div style={LABEL}>Objectives</div>
 
-      {isLoading ? (
-        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
-      ) : top.length === 0 ? (
-        <Text size="sm" c="dimmed">No active objectives.</Text>
-      ) : (
-        <Stack gap={14}>
-          {top.map(obj => (
-            <Box key={obj.id}>
-              <Group justify="space-between" mb={6}>
-                <Text
-                  size="sm"
-                  fw={500}
-                  style={{
-                    color: '#0F172A', flex: 1,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}
-                >
-                  {obj.title}
-                </Text>
-                <Text style={{ fontSize: 12, fontWeight: 600, color: '#64748B', flexShrink: 0, marginLeft: 8 }}>
-                  {Math.round(obj.progress)}%
-                </Text>
-              </Group>
-              <Progress value={obj.progress} size={6} color="#0052CC" radius={3} />
-            </Box>
-          ))}
-        </Stack>
-      )}
+      <Box style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+        {isLoading ? (
+          <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+        ) : top.length === 0 ? (
+          <Text size="sm" c="dimmed">No active objectives.</Text>
+        ) : (
+          <Stack gap={14}>
+            {top.map(obj => (
+              <Box key={obj.id}>
+                <Group justify="space-between" mb={6}>
+                  <Text
+                    size="sm"
+                    fw={500}
+                    style={{
+                      color: '#0F172A', flex: 1,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {obj.title}
+                  </Text>
+                  <Text style={{ fontSize: 12, fontWeight: 600, color: '#64748B', flexShrink: 0, marginLeft: 8 }}>
+                    {Math.round(obj.progress)}%
+                  </Text>
+                </Group>
+                <Progress value={obj.progress} size={6} color="#0052CC" radius={3} />
+              </Box>
+            ))}
+          </Stack>
+        )}
+      </Box>
 
-      <Box mt="auto" pt={14}>
+      <Box pt={14}>
         <NavLink onClick={() => router.push('/dashboard/objectives')}>View all objectives</NavLink>
       </Box>
     </Panel>
@@ -366,52 +374,60 @@ function KeyResultsPanel() {
       .flatMap(o => (o.keyResults ?? []).map((kr: any) => ({ ...kr, objectiveTitle: o.title })));
   }, [objectives]);
 
+  const totalKRs = keyResults.length;
+  const visibleKRs = keyResults.slice(0, 4);
+
   return (
-    <Panel>
+    <Panel h={280}>
       <div style={LABEL}>Key Results</div>
 
-      {isLoading ? (
-        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
-      ) : keyResults.length === 0 ? (
-        <Text size="sm" c="dimmed">No key results yet.</Text>
-      ) : (
-        <Stack gap={14}>
-          {keyResults.map((kr: any) => {
-            const pct = kr.targetValue > 0
-              ? Math.min(100, Math.round((kr.currentValue / kr.targetValue) * 100))
-              : 0;
-            const done = kr.completedAt != null;
-            return (
-              <Box key={kr.id}>
-                <Group justify="space-between" mb={4} wrap="nowrap">
-                  <Box style={{ flex: 1, minWidth: 0 }}>
-                    <Text
-                      size="sm"
-                      fw={500}
-                      style={{
-                        color: done ? '#94A3B8' : '#0F172A',
-                        textDecoration: done ? 'line-through' : 'none',
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {kr.title}
+      <Box style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+        {isLoading ? (
+          <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+        ) : visibleKRs.length === 0 ? (
+          <Text size="sm" c="dimmed">No key results yet.</Text>
+        ) : (
+          <Stack gap={14}>
+            {visibleKRs.map((kr: any) => {
+              const pct = kr.targetValue > 0
+                ? Math.min(100, Math.round((kr.currentValue / kr.targetValue) * 100))
+                : 0;
+              const done = kr.completedAt != null;
+              return (
+                <Box key={kr.id}>
+                  <Group justify="space-between" mb={4} wrap="nowrap">
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text
+                        size="sm"
+                        fw={500}
+                        style={{
+                          color: done ? '#94A3B8' : '#0F172A',
+                          textDecoration: done ? 'line-through' : 'none',
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {kr.title}
+                      </Text>
+                      <Text size="xs" c="dimmed" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {kr.objectiveTitle}
+                      </Text>
+                    </Box>
+                    <Text style={{ fontSize: 12, fontWeight: 600, color: done ? '#2e7d32' : '#64748B', flexShrink: 0, marginLeft: 8 }}>
+                      {kr.currentValue}/{kr.targetValue}
                     </Text>
-                    <Text size="xs" c="dimmed" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {kr.objectiveTitle}
-                    </Text>
-                  </Box>
-                  <Text style={{ fontSize: 12, fontWeight: 600, color: done ? '#2e7d32' : '#64748B', flexShrink: 0, marginLeft: 8 }}>
-                    {kr.currentValue}/{kr.targetValue}
-                  </Text>
-                </Group>
-                <Progress value={pct} size={5} color={done ? 'green' : '#4686FE'} radius={3} />
-              </Box>
-            );
-          })}
-        </Stack>
-      )}
+                  </Group>
+                  <Progress value={pct} size={5} color={done ? 'green' : '#4686FE'} radius={3} />
+                </Box>
+              );
+            })}
+          </Stack>
+        )}
+      </Box>
 
-      <Box mt="auto" pt={14}>
+      <Box pt={14}>
+        {totalKRs > 4 && (
+          <Text size="xs" c="dimmed" mb={6}>+{totalKRs - 4} more</Text>
+        )}
         <NavLink onClick={() => router.push('/dashboard/objectives')}>View objectives</NavLink>
       </Box>
     </Panel>
@@ -433,48 +449,50 @@ function JournalPanel() {
     : null;
 
   return (
-    <Panel>
+    <Panel h={280}>
       <div style={LABEL}>Journal</div>
 
-      {isLoading ? (
-        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
-      ) : !latest ? (
-        <Text size="sm" c="dimmed">No entries yet. Start reflecting today.</Text>
-      ) : wroteToday ? (
-        <Box style={{ padding: '12px 14px', background: '#F0FDF4', borderRadius: 8, border: '1px solid #bbf7d0' }}>
-          <Group gap={6} mb={4}>
-            <CheckCircle2 size={14} color="#2e7d32" />
-            <Text size="xs" fw={600} style={{ color: '#2e7d32' }}>Written today</Text>
-          </Group>
-          <Text
-            size="sm"
-            fw={500}
-            style={{ color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-          >
-            {latest.title}
-          </Text>
-          {latest.content && (
-            <Text size="xs" c="dimmed" lineClamp={2} mt={2}>
-              {latest.content.replace(/<[^>]+>/g, '')}
+      <Box style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+        {isLoading ? (
+          <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+        ) : !latest ? (
+          <Text size="sm" c="dimmed">No entries yet. Start reflecting today.</Text>
+        ) : wroteToday ? (
+          <Box style={{ padding: '12px 14px', background: '#F0FDF4', borderRadius: 8, border: '1px solid #bbf7d0' }}>
+            <Group gap={6} mb={4}>
+              <CheckCircle2 size={14} color="#2e7d32" />
+              <Text size="xs" fw={600} style={{ color: '#2e7d32' }}>Written today</Text>
+            </Group>
+            <Text
+              size="sm"
+              fw={500}
+              style={{ color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
+              {latest.title}
             </Text>
-          )}
-        </Box>
-      ) : (
-        <Box>
-          <Text size="xs" c="dimmed" mb={4}>
-            Last entry: {daysSince === 1 ? 'yesterday' : `${daysSince} days ago`}
-          </Text>
-          <Text
-            size="sm"
-            fw={500}
-            style={{ color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-          >
-            {latest.title}
-          </Text>
-        </Box>
-      )}
+            {latest.content && (
+              <Text size="xs" c="dimmed" lineClamp={2} mt={2}>
+                {latest.content.replace(/<[^>]+>/g, '')}
+              </Text>
+            )}
+          </Box>
+        ) : (
+          <Box>
+            <Text size="xs" c="dimmed" mb={4}>
+              Last entry: {daysSince === 1 ? 'yesterday' : `${daysSince} days ago`}
+            </Text>
+            <Text
+              size="sm"
+              fw={500}
+              style={{ color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
+              {latest.title}
+            </Text>
+          </Box>
+        )}
+      </Box>
 
-      <Box mt="auto" pt={14}>
+      <Box pt={14}>
         <NavLink onClick={() => router.push('/dashboard/journal')}>
           {!latest ? 'Write first entry' : !wroteToday ? 'Write today' : 'View all entries'}
         </NavLink>
@@ -489,38 +507,43 @@ function LifeAreasPanel() {
   const router = useRouter();
   const { data: areas = [], isLoading } = useLifeAreas();
 
+  const allAreas = areas as any[];
+  const visibleAreas = allAreas.slice(0, 8);
+
   return (
-    <Panel>
+    <Panel h={280}>
       <div style={LABEL}>Life Areas</div>
 
-      {isLoading ? (
-        <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
-      ) : (areas as any[]).length === 0 ? (
-        <Text size="sm" c="dimmed">No life areas defined yet.</Text>
-      ) : (
-        <Box>
-          <Text size="xs" c="dimmed" mb={12}>{(areas as any[]).length} area{(areas as any[]).length !== 1 ? 's' : ''} defined</Text>
-          <Group gap={8} wrap="wrap">
-            {(areas as any[]).map((area: any) => (
-              <span
-                key={area.id}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  padding: '5px 12px', borderRadius: 20,
-                  fontSize: 13, fontWeight: 500,
-                  background: '#F1F5F9',
-                  color: '#64748B',
-                  border: '1px solid #E2E8F0',
-                }}
-              >
-                {area.name}
-              </span>
-            ))}
-          </Group>
-        </Box>
-      )}
+      <Box style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+        {isLoading ? (
+          <Group justify="center" py="sm"><Loader size="xs" color="#4686FE" /></Group>
+        ) : allAreas.length === 0 ? (
+          <Text size="sm" c="dimmed">No life areas defined yet.</Text>
+        ) : (
+          <Box>
+            <Text size="xs" c="dimmed" mb={12}>{allAreas.length} area{allAreas.length !== 1 ? 's' : ''} defined</Text>
+            <Group gap={8} wrap="wrap">
+              {visibleAreas.map((area: any) => (
+                <span
+                  key={area.id}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '5px 12px', borderRadius: 20,
+                    fontSize: 13, fontWeight: 500,
+                    background: '#F1F5F9',
+                    color: '#64748B',
+                    border: '1px solid #E2E8F0',
+                  }}
+                >
+                  {area.name}
+                </span>
+              ))}
+            </Group>
+          </Box>
+        )}
+      </Box>
 
-      <Box mt="auto" pt={14}>
+      <Box pt={14}>
         <NavLink onClick={() => router.push('/dashboard/life-areas')}>Manage life areas</NavLink>
       </Box>
     </Panel>

@@ -94,6 +94,7 @@ export default function ObjectivesPage() {
   const [currentObjective, setCurrentObjective] = useState<string>('');
   const [expandedObjectives, setExpandedObjectives] = useState<Set<string>>(new Set());
   const [viewFilter, setViewFilter] = useState<'all' | 'active' | 'archived'>('active');
+  const [descModal, setDescModal] = useState<Objective | null>(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -838,18 +839,32 @@ export default function ObjectivesPage() {
                         )}
                       </Group>
                       {objective.description && (
-                        <Text
-                          style={{
-                            wordBreak: "break-word",
-                            fontFamily: 'Inter, sans-serif',
-                            fontSize: '14px',
-                            fontWeight: 400,
-                            color: '#666666',
-                            lineHeight: '20px',
-                          }}
-                        >
-                          {objective.description}
-                        </Text>
+                        <Box>
+                          <Text
+                            lineClamp={2}
+                            style={{
+                              wordBreak: "break-word",
+                              fontFamily: 'Inter, sans-serif',
+                              fontSize: '14px',
+                              fontWeight: 400,
+                              color: '#666666',
+                              lineHeight: '20px',
+                            }}
+                          >
+                            {objective.description}
+                          </Text>
+                          {objective.description.length > 100 && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setDescModal(objective); }}
+                              style={{
+                                background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                                fontSize: 12, fontWeight: 500, color: '#4686FE', marginTop: 2,
+                              }}
+                            >
+                              See more
+                            </button>
+                          )}
+                        </Box>
                       )}
                     </Stack>
                   </div>
@@ -1406,6 +1421,23 @@ export default function ObjectivesPage() {
             </Grid>
           </Stack>
         </form>
+      </Modal>
+
+      {/* Description read modal */}
+      <Modal
+        opened={!!descModal}
+        onClose={() => setDescModal(null)}
+        title={
+          <Text fw={600} size="lg" style={{ color: '#0F172A' }}>
+            {descModal?.title}
+          </Text>
+        }
+        size="md"
+        radius={12}
+      >
+        <Text style={{ fontSize: 14, color: '#374151', lineHeight: '22px', whiteSpace: 'pre-wrap' }}>
+          {descModal?.description}
+        </Text>
       </Modal>
     </div>
   );

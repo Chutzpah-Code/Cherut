@@ -566,7 +566,7 @@ export function TaskModal({
               <Checkbox
                 checked={item.completed}
                 onChange={() => onToggleChecklistItem(currentTask.id, item.id)}
-                style={{ flex: 0 }}
+                style={{ flexShrink: 0 }}
                 styles={{
                   input: {
                     borderColor: '#CCCCCC',
