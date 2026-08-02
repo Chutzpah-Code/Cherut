@@ -70,7 +70,7 @@ function TabBar({ current, onChange }: { current: FinanceView; onChange: (v: Fin
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        <Group gap={0} style={{ flexWrap: 'nowrap', paddingLeft: 'var(--mantine-spacing-md)' }}>
+        <Group gap={0} style={{ flexWrap: 'nowrap', paddingLeft: 'var(--mantine-spacing-md)', paddingRight: 'var(--mantine-spacing-md)' }}>
           {TABS.map(({ id, label }) => {
             const isActive = current === id;
             return (
@@ -87,6 +87,8 @@ function TabBar({ current, onChange }: { current: FinanceView; onChange: (v: Fin
                   transition: 'border-color 0.15s ease',
                   userSelect: 'none',
                   whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  minWidth: 'max-content',
                 }}
               >
                 <Text
@@ -103,7 +105,7 @@ function TabBar({ current, onChange }: { current: FinanceView; onChange: (v: Fin
       </Box>
       {/* Scroll affordance — right fade */}
       <Box style={{
-        position: 'absolute', right: 0, top: 0, bottom: 0, width: 32,
+        position: 'absolute', right: 'calc(-1 * var(--mantine-spacing-md))', top: 0, bottom: 0, width: 40,
         background: 'linear-gradient(to right, transparent, #ffffff)',
         pointerEvents: 'none',
       }} />
@@ -927,35 +929,39 @@ function TransactionRow({ tx, currency, categoryName, accountName, onDelete, onE
   const isIncome = tx.type === 'income';
   const isOrphaned = !!tx.accountId && !accountName;
   return (
-    <Group justify="space-between" p="sm" style={{ borderRadius: 8, background: isOrphaned ? '#fff8f0' : '#f8fafc', border: `1px solid ${isOrphaned ? '#fed7aa' : '#E2E8F0'}` }}>
-      <Group gap="sm">
+    <Group justify="space-between" p="sm" wrap="nowrap" style={{ borderRadius: 8, background: isOrphaned ? '#fff8f0' : '#f8fafc', border: `1px solid ${isOrphaned ? '#fed7aa' : '#E2E8F0'}` }}>
+      <Group gap="sm" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
         {isIncome
-          ? <ArrowUpCircle size={18} style={{ color: '#2e7d32' }} />
-          : <ArrowDownCircle size={18} style={{ color: '#c62828' }} />}
-        <Box>
-          <Text size="sm" fw={500}>{tx.description || categoryName || tx.type}</Text>
-          <Group gap={4}>
+          ? <ArrowUpCircle size={18} style={{ color: '#2e7d32', flexShrink: 0 }} />
+          : <ArrowDownCircle size={18} style={{ color: '#c62828', flexShrink: 0 }} />}
+        <Box style={{ flex: 1, minWidth: 0 }}>
+          <Text size="sm" fw={500} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {tx.description || categoryName || tx.type}
+          </Text>
+          <Group gap={4} wrap="nowrap">
             {isOrphaned && (
-              <Badge size="xs" variant="light" color="orange" style={{ textTransform: 'none' }}>
+              <Badge size="xs" variant="light" color="orange" style={{ textTransform: 'none', flexShrink: 0 }}>
                 Deleted account
               </Badge>
             )}
-            <Text size="xs" c="dimmed">{categoryName && tx.description ? `${categoryName} · ` : ''}{tx.date}</Text>
+            <Text size="xs" c="dimmed" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {categoryName && tx.description ? `${categoryName} · ` : ''}{tx.date}
+            </Text>
           </Group>
         </Box>
       </Group>
-      <Group gap="xs">
-        <Text fw={600} size="sm" style={{ color: isIncome ? '#2e7d32' : '#c62828' }}>
+      <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
+        <Text fw={600} size="sm" style={{ color: isIncome ? '#2e7d32' : '#c62828', whiteSpace: 'nowrap' }}>
           {isIncome ? '+' : '-'}{fmt(tx.amount, currency)}
         </Text>
         {onEdit && (
-          <ActionIcon size="xs" variant="subtle" color="blue" onClick={onEdit}>
-            <Pencil size={12} />
+          <ActionIcon size="md" variant="subtle" color="blue" onClick={onEdit}>
+            <Pencil size={14} />
           </ActionIcon>
         )}
         {onDelete && (
-          <ActionIcon size="xs" variant="subtle" color="red" onClick={onDelete}>
-            <Trash2 size={12} />
+          <ActionIcon size="md" variant="subtle" color="red" onClick={onDelete}>
+            <Trash2 size={14} />
           </ActionIcon>
         )}
       </Group>
@@ -1027,9 +1033,9 @@ function AccountsView() {
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md" mb="xl">
           {accounts.map((acc: any) => (
             <Card key={acc.id} withBorder radius="md" p="md">
-              <Group justify="space-between">
-                <Box>
-                  <Text fw={600}>{acc.name}</Text>
+              <Group justify="space-between" wrap="wrap" gap="xs">
+                <Box style={{ minWidth: 0 }}>
+                  <Text fw={600} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.name}</Text>
                   <Badge size="xs" variant="light" mt={4}>{acc.type}</Badge>
                 </Box>
                 <Group gap="xs">
@@ -1039,7 +1045,7 @@ function AccountsView() {
                         value={editingBalanceVal}
                         onChange={(v) => setEditingBalanceVal(Number(v))}
                         size="xs"
-                        style={{ width: 110 }}
+                        style={{ flex: '1 1 90px', minWidth: 80, maxWidth: 130 }}
                         hideControls
                         decimalScale={2}
                         onKeyDown={(e) => {

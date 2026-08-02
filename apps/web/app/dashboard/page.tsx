@@ -57,7 +57,7 @@ function Panel({ children, accent = false, style, h }: {
       borderLeft: accent ? '3px solid #0052CC' : '1px solid #E2E8F0',
       borderRadius: 12,
       padding: '20px 22px',
-      height: h,
+      minHeight: h,
       boxSizing: 'border-box',
       display: 'flex',
       flexDirection: 'column',

@@ -249,12 +249,12 @@ function SubscriptionsTab() {
 
   return (
     <Stack gap="md">
-      <Group gap="md">
-        <Box style={{ flex: 1, background: '#EFF6FF', borderRadius: 10, padding: '12px 16px' }}>
+      <Group gap="md" wrap="wrap">
+        <Box style={{ flex: '1 1 140px', background: '#EFF6FF', borderRadius: 10, padding: '12px 16px' }}>
           <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Monthly total</Text>
           <Text size="xl" fw={700} c="#0052CC">{fmt(monthlyTotal, displayCurrency)}</Text>
         </Box>
-        <Box style={{ flex: 1, background: '#F0FDF4', borderRadius: 10, padding: '12px 16px' }}>
+        <Box style={{ flex: '1 1 140px', background: '#F0FDF4', borderRadius: 10, padding: '12px 16px' }}>
           <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Yearly total</Text>
           <Text size="xl" fw={700} c="green.7">{fmt(yearlyTotal, displayCurrency)}</Text>
         </Box>

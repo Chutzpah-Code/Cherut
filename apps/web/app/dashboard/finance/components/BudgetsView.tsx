@@ -96,15 +96,15 @@ export function BudgetsView() {
 
   return (
     <>
-      <Group justify="space-between" mb="md">
-        <Group gap="sm">
-          <Text fw={600} size="sm" c="dimmed">Budgets</Text>
+      <Group justify="space-between" mb="md" wrap="wrap" gap="xs">
+        <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+          <Text fw={600} size="sm" c="dimmed" style={{ flexShrink: 0 }}>Budgets</Text>
           <Select
             data={MONTH_OPTIONS}
             value={month}
             onChange={(v) => v && setMonth(v)}
             size="xs"
-            w={160}
+            style={{ width: 140, minWidth: 0 }}
             comboboxProps={{ withinPortal: true }}
           />
         </Group>
@@ -128,11 +128,11 @@ export function BudgetsView() {
                   <Text size="sm" fw={600}>{cat?.name ?? budget.categoryId}</Text>
                   <Group gap="xs">
                     <Text size="xs" c="dimmed">{fmt(spent, displayCurrency)} / {fmt(budget.amount, displayCurrency)}</Text>
-                    <ActionIcon size="xs" variant="subtle" color="blue" onClick={() => openEdit(budget)}>
-                      <Pencil size={11} />
+                    <ActionIcon size="md" variant="subtle" color="blue" onClick={() => openEdit(budget)}>
+                      <Pencil size={14} />
                     </ActionIcon>
-                    <ActionIcon size="xs" variant="subtle" color="red" onClick={() => deleteBudget.mutate(budget.id)}>
-                      <Trash2 size={11} />
+                    <ActionIcon size="md" variant="subtle" color="red" onClick={() => deleteBudget.mutate(budget.id)}>
+                      <Trash2 size={14} />
                     </ActionIcon>
                   </Group>
                 </Group>

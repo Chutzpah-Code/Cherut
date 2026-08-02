@@ -238,7 +238,7 @@ export function TaskModal({
         blur: 4,
       }}
     >
-      <ScrollArea flex={1} px="xl" py="md">
+      <ScrollArea flex={1} px="md" py="md">
         <Stack gap="md">
           {/* Title */}
         <TextInput
@@ -380,7 +380,7 @@ export function TaskModal({
                 ]}
               />
               <Grid>
-                <Grid.Col span={6}>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
                   <TextInput
                     label="Start date"
                     type="date"
@@ -392,7 +392,7 @@ export function TaskModal({
                     })}
                   />
                 </Grid.Col>
-                <Grid.Col span={6}>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
                   <TextInput
                     label="End date"
                     type="date"
@@ -645,7 +645,7 @@ export function TaskModal({
         </Stack>
       </ScrollArea>
       <Box
-        px="xl"
+        px="md"
         py="sm"
         style={{
           borderTop: '1px solid #E2E8F0',
@@ -653,10 +653,11 @@ export function TaskModal({
           flexShrink: 0,
         }}
       >
-        <Group justify="space-between">
-          <Group gap="sm">
+        <Stack gap="sm">
+          <Group gap="xs" wrap="wrap">
             <Button
-              leftSection={<Archive size={16} />}
+              size="sm"
+              leftSection={<Archive size={14} />}
               variant="light"
               color={currentTask.archived ? 'gray' : 'yellow'}
               onClick={() => onArchive(currentTask.id)}
@@ -664,7 +665,8 @@ export function TaskModal({
               {currentTask.archived ? 'Unarchive' : 'Archive'}
             </Button>
             <Button
-              leftSection={<Trash2 size={16} />}
+              size="sm"
+              leftSection={<Trash2 size={14} />}
               variant="light"
               color="red"
               onClick={() => {
@@ -675,7 +677,7 @@ export function TaskModal({
               Delete
             </Button>
           </Group>
-          <Group gap="sm">
+          <Group gap="sm" justify="flex-end" wrap="wrap">
             <Button
               variant="outline"
               onClick={onClose}
@@ -684,10 +686,11 @@ export function TaskModal({
                 fontFamily: 'Inter, sans-serif',
                 borderColor: '#CCCCCC',
                 color: '#333333',
-                fontSize: '16px',
+                fontSize: '15px',
                 fontWeight: 600,
-                height: '48px',
+                height: '44px',
                 background: 'white',
+                flex: '1 1 100px',
               }}
               styles={{
                 root: {
@@ -707,10 +710,11 @@ export function TaskModal({
                 fontFamily: 'Inter, sans-serif',
                 background: '#4686FE',
                 border: 'none',
-                fontSize: '16px',
+                fontSize: '15px',
                 fontWeight: 600,
                 color: 'white',
-                height: '48px',
+                height: '44px',
+                flex: '1 1 140px',
               }}
               styles={{
                 root: {
@@ -723,7 +727,7 @@ export function TaskModal({
               Save Changes
             </Button>
           </Group>
-        </Group>
+        </Stack>
       </Box>
       </Modal>
     </React.Fragment>

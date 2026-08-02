@@ -243,41 +243,47 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
           </Box>
         </>
       ) : (
-        <Stack gap="md" p="md">
-          {/* Date info */}
-          <Group gap="xs" align="center">
-            <Calendar size={16} />
-            <Text size="sm" c="dimmed">
-              Created {formattedCreatedAt}
-            </Text>
-            {wasUpdated && (
-              <>
-                <Badge size="sm" color="blue" variant="light">
-                  Edited
-                </Badge>
+        <>
+          <ScrollArea flex={1} px="md" py="xs">
+            <Stack gap="md">
+              {/* Date info */}
+              <Group gap="xs" align="center">
+                <Calendar size={16} />
                 <Text size="sm" c="dimmed">
-                  Last updated {formattedUpdatedAt}
+                  Created {formattedCreatedAt}
                 </Text>
-              </>
-            )}
-          </Group>
+                {wasUpdated && (
+                  <>
+                    <Badge size="sm" color="blue" variant="light">
+                      Edited
+                    </Badge>
+                    <Text size="sm" c="dimmed">
+                      Last updated {formattedUpdatedAt}
+                    </Text>
+                  </>
+                )}
+              </Group>
 
-          <ScrollArea.Autosize mah={400}>
-            <Text size="sm" style={{ whiteSpace: 'pre-line' }}>
-              {entry.content}
-            </Text>
-          </ScrollArea.Autosize>
-
-          {/* Footer */}
-          <Group justify="space-between" align="center" pt="xs" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
-            <Text size="xs" c="dimmed">
-              {entry.content.length.toLocaleString('en-US')} characters
-            </Text>
-            <Button variant="light" onClick={onClose}>
-              Close
-            </Button>
-          </Group>
-        </Stack>
+              <Text size="sm" style={{ whiteSpace: 'pre-line' }}>
+                {entry.content}
+              </Text>
+            </Stack>
+          </ScrollArea>
+          <Box px="md" py="sm" style={{
+            borderTop: '1px solid #E2E8F0',
+            paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+            flexShrink: 0,
+          }}>
+            <Group justify="space-between" align="center">
+              <Text size="xs" c="dimmed">
+                {entry.content.length.toLocaleString('en-US')} characters
+              </Text>
+              <Button variant="light" onClick={onClose}>
+                Close
+              </Button>
+            </Group>
+          </Box>
+        </>
       )}
     </Modal>
   );

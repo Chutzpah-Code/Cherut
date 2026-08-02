@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import {
   Stack, Group, Text, Box, Badge, Button, Loader, Center,
   Modal, TextInput, Select, NumberInput, ActionIcon, Collapse,
-  Switch, Divider, UnstyledButton, ScrollArea,
+  Switch, Divider, UnstyledButton, ScrollArea, Grid,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2 } from 'lucide-react';
@@ -259,65 +259,77 @@ function BillFormModal({
             onChange={(e) => setName(e.target.value)}
             required
           />
-          <Group grow>
-            <Select
-              label="Type"
-              data={[
-                { value: 'expense', label: 'Expense' },
-                { value: 'income', label: 'Income' },
-              ]}
-              value={type}
-              onChange={(v) => { setType(v ?? 'expense'); setCategoryId(''); }}
-            />
-            <Select
-              label="Frequency"
-              data={[
-                { value: 'monthly', label: 'Monthly' },
-                { value: 'yearly', label: 'Yearly' },
-                { value: 'weekly', label: 'Weekly' },
-                { value: 'daily', label: 'Daily' },
-              ]}
-              value={frequency}
-              onChange={(v) => setFrequency(v ?? 'monthly')}
-            />
-          </Group>
-          <Group grow>
-            <Select
-              label="Account"
-              placeholder="Select account"
-              data={accountOptions}
-              value={accountId}
-              onChange={(v) => setAccountId(v ?? '')}
-              required
-            />
-            <Select
-              label="Category"
-              placeholder="Select category"
-              data={categoryOptions}
-              value={categoryId}
-              onChange={(v) => setCategoryId(v ?? '')}
-              required
-            />
-          </Group>
-          <Group grow>
-            <NumberInput
-              label="Default Amount"
-              min={0.01}
-              decimalScale={2}
-              value={amount}
-              onChange={(v) => setAmount(Number(v) || 0)}
-              required
-            />
-            <NumberInput
-              label="Due Day (1–28)"
-              description="Day of month"
-              min={1}
-              max={28}
-              value={dueDay}
-              onChange={(v) => setDueDay(Number(v) || 1)}
-              required
-            />
-          </Group>
+          <Grid>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label="Type"
+                data={[
+                  { value: 'expense', label: 'Expense' },
+                  { value: 'income', label: 'Income' },
+                ]}
+                value={type}
+                onChange={(v) => { setType(v ?? 'expense'); setCategoryId(''); }}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label="Frequency"
+                data={[
+                  { value: 'monthly', label: 'Monthly' },
+                  { value: 'yearly', label: 'Yearly' },
+                  { value: 'weekly', label: 'Weekly' },
+                  { value: 'daily', label: 'Daily' },
+                ]}
+                value={frequency}
+                onChange={(v) => setFrequency(v ?? 'monthly')}
+              />
+            </Grid.Col>
+          </Grid>
+          <Grid>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label="Account"
+                placeholder="Select account"
+                data={accountOptions}
+                value={accountId}
+                onChange={(v) => setAccountId(v ?? '')}
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label="Category"
+                placeholder="Select category"
+                data={categoryOptions}
+                value={categoryId}
+                onChange={(v) => setCategoryId(v ?? '')}
+                required
+              />
+            </Grid.Col>
+          </Grid>
+          <Grid>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <NumberInput
+                label="Default Amount"
+                min={0.01}
+                decimalScale={2}
+                value={amount}
+                onChange={(v) => setAmount(Number(v) || 0)}
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <NumberInput
+                label="Due Day (1–28)"
+                description="Day of month"
+                min={1}
+                max={28}
+                value={dueDay}
+                onChange={(v) => setDueDay(Number(v) || 1)}
+                required
+              />
+            </Grid.Col>
+          </Grid>
           <TextInput
             label="Start Date"
             type="date"
@@ -465,12 +477,13 @@ export function BillsView() {
                 opacity: occ.status === 'cancelled' ? 0.6 : 1,
               }}
             >
-              <Group justify="space-between">
-                <Box>
-                  <Text size="sm" fw={600} c={occ.status === 'cancelled' ? 'dimmed' : undefined}>
+              <Group justify="space-between" wrap="wrap" gap="xs">
+                <Box style={{ flex: '1 1 160px', minWidth: 0 }}>
+                  <Text size="sm" fw={600} c={occ.status === 'cancelled' ? 'dimmed' : undefined}
+                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {occ.bill?.name ?? '—'}
                   </Text>
-                  <Group gap={6} mt={2}>
+                  <Group gap={6} mt={2} wrap="wrap">
                     <Badge size="xs" color={STATUS_COLOR[occ.status]} variant="light">
                       {occ.status.charAt(0).toUpperCase() + occ.status.slice(1)}
                     </Badge>
@@ -482,8 +495,8 @@ export function BillsView() {
                     )}
                   </Group>
                 </Box>
-                <Group gap="xs">
-                  <Text size="sm" fw={600} c={occ.bill?.type === 'income' ? 'green.7' : 'red.7'}>
+                <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
+                  <Text size="sm" fw={600} c={occ.bill?.type === 'income' ? 'green.7' : 'red.7'} style={{ whiteSpace: 'nowrap' }}>
                     {occ.bill?.type === 'expense' ? '−' : '+'}{fmt(occ.amount, accountMap[occ.bill?.accountId ?? '']?.currency ?? displayCurrency)}
                   </Text>
                   {(occ.status === 'pending' || occ.status === 'overdue') && (
@@ -492,7 +505,7 @@ export function BillsView() {
                     </Button>
                   )}
                   {occ.status === 'paid' && occ.paidAt && (
-                    <Text size="xs" c="green.7">Paid {fmtDate(occ.paidAt)}</Text>
+                    <Text size="xs" c="green.7" style={{ whiteSpace: 'nowrap' }}>Paid {fmtDate(occ.paidAt)}</Text>
                   )}
                 </Group>
               </Group>
@@ -546,17 +559,17 @@ export function BillsView() {
                       </Text>
                     </Box>
                     <Group gap={4}>
-                      <ActionIcon size="xs" variant="subtle" onClick={() => openEditBill(bill)}>
-                        <Pencil size={12} />
+                      <ActionIcon size="md" variant="subtle" onClick={() => openEditBill(bill)}>
+                        <Pencil size={14} />
                       </ActionIcon>
                       <ActionIcon
-                        size="xs"
+                        size="md"
                         variant="subtle"
                         color="red"
                         loading={deleteBill.isPending}
                         onClick={() => deleteBill.mutate(bill.id)}
                       >
-                        <Trash2 size={13} />
+                        <Trash2 size={15} />
                       </ActionIcon>
                     </Group>
                   </Group>

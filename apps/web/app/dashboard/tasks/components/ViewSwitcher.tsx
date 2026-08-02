@@ -30,7 +30,7 @@ export function ViewSwitcher({ currentView, onViewChange }: ViewSwitcherProps) {
         WebkitOverflowScrolling: 'touch',
       }}
     >
-      <Group gap={0} style={{ flexWrap: 'nowrap', paddingLeft: 'var(--mantine-spacing-md)' }}>
+      <Group gap={0} style={{ flexWrap: 'nowrap', paddingLeft: 'var(--mantine-spacing-md)', paddingRight: 'var(--mantine-spacing-md)' }}>
         {VIEWS.map(({ id, label, icon: Icon, comingSoon }) => {
           const isActive = currentView === id;
 
@@ -49,6 +49,8 @@ export function ViewSwitcher({ currentView, onViewChange }: ViewSwitcherProps) {
                 opacity: comingSoon ? 0.45 : 1,
                 transition: 'border-color 0.15s ease, color 0.15s ease',
                 userSelect: 'none',
+                flexShrink: 0,
+                minWidth: 'max-content',
               }}
             >
               <Icon
