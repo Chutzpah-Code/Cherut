@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
   Stack, Group, Text, Box, Badge, Button, Loader, Center,
-  Modal, Select, NumberInput, TextInput, ActionIcon, Card, Collapse,
+  Modal, Select, NumberInput, TextInput, ActionIcon, Card, Collapse, ScrollArea,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Plus, Trash2, ChevronDown, ChevronRight, Pencil } from 'lucide-react';
@@ -181,96 +181,130 @@ function InvestmentCard({ inv, accounts, onDelete }: { inv: FinanceInvestment; a
       </Collapse>
 
       {/* Add contribution modal */}
-      <Modal opened={entryModal} onClose={closeEntry} title="Add Contribution" centered>
-        <Stack gap="sm">
-          <NumberInput
-            label={`Amount (${inv.currency})`}
-            min={0.01}
-            decimalScale={2}
-            value={entryAmount}
-            onChange={setEntryAmount}
-            leftSection={<Text size="xs" c="dimmed" fw={600}>{inv.currency}</Text>}
-          />
-          <TextInput
-            label="Date"
-            type="date"
-            value={entryDate}
-            onChange={(e) => setEntryDate(e.target.value)}
-          />
-          <TextInput
-            label="Notes"
-            placeholder="Optional"
-            value={entryNotes}
-            onChange={(e) => setEntryNotes(e.target.value)}
-          />
-          {entryError && (
-            <Text size="xs" c="red" style={{ background: '#FEF2F2', padding: '8px 10px', borderRadius: 6 }}>
-              {entryError}
-            </Text>
-          )}
+      <Modal
+        opened={entryModal}
+        onClose={closeEntry}
+        title="Add Contribution"
+        centered
+        styles={{
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
+          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+        }}
+      >
+        <ScrollArea flex={1} px="md" py="xs">
+          <Stack gap="sm">
+            <NumberInput
+              label={`Amount (${inv.currency})`}
+              min={0.01}
+              decimalScale={2}
+              value={entryAmount}
+              onChange={setEntryAmount}
+              leftSection={<Text size="xs" c="dimmed" fw={600}>{inv.currency}</Text>}
+            />
+            <TextInput
+              label="Date"
+              type="date"
+              value={entryDate}
+              onChange={(e) => setEntryDate(e.target.value)}
+            />
+            <TextInput
+              label="Notes"
+              placeholder="Optional"
+              value={entryNotes}
+              onChange={(e) => setEntryNotes(e.target.value)}
+            />
+            {entryError && (
+              <Text size="xs" c="red" style={{ background: '#FEF2F2', padding: '8px 10px', borderRadius: 6 }}>
+                {entryError}
+              </Text>
+            )}
+          </Stack>
+        </ScrollArea>
+        <Box px="md" py="sm" style={{
+          borderTop: '1px solid #E2E8F0',
+          paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+          flexShrink: 0,
+        }}>
           <Button
             onClick={handleCreateEntry}
             loading={createEntry.isPending}
             disabled={!amountValid}
-            style={{ backgroundColor: '#0052CC' }}
+            style={{ backgroundColor: '#0052CC', width: '100%' }}
           >
             Add Contribution
           </Button>
-        </Stack>
+        </Box>
       </Modal>
 
       {/* Edit investment modal */}
-      <Modal opened={editModal} onClose={closeEdit} title="Edit Investment" centered>
-        <Stack gap="sm">
-          <Select
-            label="Account"
-            description="The account this investment is funded from"
-            placeholder="Select account"
-            data={accounts.map((a) => ({
-              value: a.id,
-              label: `${a.name} — ${fmt(a.balance, a.currency)}`,
-            }))}
-            value={editForm.accountId || null}
-            onChange={handleEditAccountChange}
-          />
-          {editForm.currency && (
-            <Group gap={6}>
-              <Text size="xs" c="dimmed">Currency:</Text>
-              <Badge size="sm" variant="light" color="blue">{editForm.currency}</Badge>
-              <Text size="xs" c="dimmed">(from account)</Text>
-            </Group>
-          )}
-          <TextInput
-            label="Name"
-            value={editForm.name}
-            onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-          />
-          <Select
-            label="Type"
-            data={Object.entries(TYPE_LABELS).map(([v, l]) => ({ value: v, label: l }))}
-            value={editForm.type}
-            onChange={(v) => setEditForm((f) => ({ ...f, type: (v ?? f.type) as InvestmentType }))}
-          />
-          <TextInput
-            label="Ticker (optional)"
-            placeholder="e.g. AAPL"
-            value={editForm.ticker}
-            onChange={(e) => setEditForm((f) => ({ ...f, ticker: e.target.value }))}
-          />
-          <TextInput
-            label="Notes (optional)"
-            value={editForm.notes}
-            onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
-          />
+      <Modal
+        opened={editModal}
+        onClose={closeEdit}
+        title="Edit Investment"
+        centered
+        styles={{
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
+          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+        }}
+      >
+        <ScrollArea flex={1} px="md" py="xs">
+          <Stack gap="sm">
+            <Select
+              label="Account"
+              description="The account this investment is funded from"
+              placeholder="Select account"
+              data={accounts.map((a) => ({
+                value: a.id,
+                label: `${a.name} — ${fmt(a.balance, a.currency)}`,
+              }))}
+              value={editForm.accountId || null}
+              onChange={handleEditAccountChange}
+            />
+            {editForm.currency && (
+              <Group gap={6}>
+                <Text size="xs" c="dimmed">Currency:</Text>
+                <Badge size="sm" variant="light" color="blue">{editForm.currency}</Badge>
+                <Text size="xs" c="dimmed">(from account)</Text>
+              </Group>
+            )}
+            <TextInput
+              label="Name"
+              value={editForm.name}
+              onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+            />
+            <Select
+              label="Type"
+              data={Object.entries(TYPE_LABELS).map(([v, l]) => ({ value: v, label: l }))}
+              value={editForm.type}
+              onChange={(v) => setEditForm((f) => ({ ...f, type: (v ?? f.type) as InvestmentType }))}
+            />
+            <TextInput
+              label="Ticker (optional)"
+              placeholder="e.g. AAPL"
+              value={editForm.ticker}
+              onChange={(e) => setEditForm((f) => ({ ...f, ticker: e.target.value }))}
+            />
+            <TextInput
+              label="Notes (optional)"
+              value={editForm.notes}
+              onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
+            />
+          </Stack>
+        </ScrollArea>
+        <Box px="md" py="sm" style={{
+          borderTop: '1px solid #E2E8F0',
+          paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+          flexShrink: 0,
+        }}>
           <Button
             onClick={handleUpdate}
             loading={updateInvestment.isPending}
             disabled={!editForm.name}
-            style={{ backgroundColor: '#0052CC' }}
+            style={{ backgroundColor: '#0052CC', width: '100%' }}
           >
             Save Changes
           </Button>
-        </Stack>
+        </Box>
       </Modal>
     </Card>
   );
@@ -326,59 +360,76 @@ export function InvestmentsView() {
         </Stack>
       )}
 
-      <Modal opened={opened} onClose={close} title="New Investment" centered>
-        <Stack gap="sm">
-          <Select
-            label="Account"
-            description="The account this investment is funded from"
-            placeholder="Select account"
-            required
-            data={accounts.map((a) => ({
-              value: a.id,
-              label: `${a.name} — ${fmt(a.balance, a.currency)}`,
-            }))}
-            value={form.accountId ?? null}
-            onChange={handleAccountChange}
-          />
-          {form.currency && (
-            <Group gap={6}>
-              <Text size="xs" c="dimmed">Currency:</Text>
-              <Badge size="sm" variant="light" color="blue">{form.currency}</Badge>
-              <Text size="xs" c="dimmed">(from account)</Text>
-            </Group>
-          )}
-          <TextInput
-            label="Name"
-            placeholder="e.g. Apple Stock"
-            value={form.name ?? ''}
-            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-          />
-          <Select
-            label="Type"
-            data={Object.entries(TYPE_LABELS).map(([v, l]) => ({ value: v, label: l }))}
-            value={form.type}
-            onChange={(v) => setForm((f) => ({ ...f, type: v as any }))}
-          />
-          <TextInput
-            label="Ticker (optional)"
-            placeholder="e.g. AAPL"
-            value={form.ticker ?? ''}
-            onChange={(e) => setForm((f) => ({ ...f, ticker: e.target.value || undefined }))}
-          />
-          <TextInput
-            label="Notes (optional)"
-            value={form.notes ?? ''}
-            onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value || undefined }))}
-          />
+      <Modal
+        opened={opened}
+        onClose={close}
+        title="New Investment"
+        centered
+        styles={{
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
+          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+        }}
+      >
+        <ScrollArea flex={1} px="md" py="xs">
+          <Stack gap="sm">
+            <Select
+              label="Account"
+              description="The account this investment is funded from"
+              placeholder="Select account"
+              required
+              data={accounts.map((a) => ({
+                value: a.id,
+                label: `${a.name} — ${fmt(a.balance, a.currency)}`,
+              }))}
+              value={form.accountId ?? null}
+              onChange={handleAccountChange}
+            />
+            {form.currency && (
+              <Group gap={6}>
+                <Text size="xs" c="dimmed">Currency:</Text>
+                <Badge size="sm" variant="light" color="blue">{form.currency}</Badge>
+                <Text size="xs" c="dimmed">(from account)</Text>
+              </Group>
+            )}
+            <TextInput
+              label="Name"
+              placeholder="e.g. Apple Stock"
+              value={form.name ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            />
+            <Select
+              label="Type"
+              data={Object.entries(TYPE_LABELS).map(([v, l]) => ({ value: v, label: l }))}
+              value={form.type}
+              onChange={(v) => setForm((f) => ({ ...f, type: v as any }))}
+            />
+            <TextInput
+              label="Ticker (optional)"
+              placeholder="e.g. AAPL"
+              value={form.ticker ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, ticker: e.target.value || undefined }))}
+            />
+            <TextInput
+              label="Notes (optional)"
+              value={form.notes ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value || undefined }))}
+            />
+          </Stack>
+        </ScrollArea>
+        <Box px="md" py="sm" style={{
+          borderTop: '1px solid #E2E8F0',
+          paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+          flexShrink: 0,
+        }}>
           <Button
             onClick={handleCreate}
             loading={createInvestment.isPending}
             disabled={!form.name || !form.accountId}
-            style={{ backgroundColor: '#0052CC' }}
+            style={{ backgroundColor: '#0052CC', width: '100%' }}
           >
             Create Investment
           </Button>
-        </Stack>
+        </Box>
       </Modal>
     </>
   );

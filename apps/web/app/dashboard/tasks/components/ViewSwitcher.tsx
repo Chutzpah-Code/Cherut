@@ -19,16 +19,18 @@ const VIEWS = [
 export function ViewSwitcher({ currentView, onViewChange }: ViewSwitcherProps) {
   return (
     <Box
+      className="scroll-x-hidden"
       style={{
         marginLeft: 'calc(-1 * var(--mantine-spacing-md))',
         marginRight: 'calc(-1 * var(--mantine-spacing-md))',
-        paddingLeft: 'var(--mantine-spacing-md)',
         borderBottom: '1px solid #E2E8F0',
         marginBottom: 16,
         backgroundColor: '#ffffff',
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
       }}
     >
-      <Group gap={0}>
+      <Group gap={0} style={{ flexWrap: 'nowrap', paddingLeft: 'var(--mantine-spacing-md)' }}>
         {VIEWS.map(({ id, label, icon: Icon, comingSoon }) => {
           const isActive = currentView === id;
 

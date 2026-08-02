@@ -19,6 +19,7 @@ import {
   ActionIcon,
   Menu,
   Transition,
+  ScrollArea,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
@@ -578,119 +579,143 @@ export default function ValuesPage() {
         styles={{
           content: {
             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '85dvh',
+          },
+          body: {
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: 0,
           },
         }}
       >
-        <form onSubmit={handleSubmit}>
-          <Stack gap="lg">
-            <TextInput
-              label="Title"
-              placeholder="e.g., Honesty, Growth, Family"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
-              withAsterisk
-              error={!formData.title.trim() && formData.title !== '' ? 'Title is required' : null}
-              size="md"
-              radius={8}
-              styles={{
-                label: {
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#000000',
-                  fontWeight: 600,
-                  marginBottom: 8,
-                  fontSize: '14px',
-                },
-                input: {
-                  fontFamily: 'Inter, sans-serif',
-                  backgroundColor: 'white',
-                  border: '1px solid #CCCCCC',
-                  color: '#000000',
-                  height: '48px',
-                  fontSize: '16px',
-                  '&::placeholder': {
-                    color: '#999999',
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}
+        >
+          <ScrollArea flex={1} px="md" py="xs">
+            <Stack gap="lg" py="xs">
+              <TextInput
+                label="Title"
+                placeholder="e.g., Honesty, Growth, Family"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+                withAsterisk
+                error={!formData.title.trim() && formData.title !== '' ? 'Title is required' : null}
+                size="md"
+                radius={8}
+                styles={{
+                  label: {
+                    fontFamily: 'Inter, sans-serif',
+                    color: '#000000',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
                   },
-                  '&:focus': {
-                    borderColor: '#4686FE',
-                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  input: {
+                    fontFamily: 'Inter, sans-serif',
+                    backgroundColor: 'white',
+                    border: '1px solid #CCCCCC',
+                    color: '#000000',
+                    height: '48px',
+                    fontSize: '16px',
+                    '&::placeholder': {
+                      color: '#999999',
+                    },
+                    '&:focus': {
+                      borderColor: '#4686FE',
+                      boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                    },
                   },
-                },
-                error: {
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#dc2626',
-                },
-              }}
-            />
+                  error: {
+                    fontFamily: 'Inter, sans-serif',
+                    color: '#dc2626',
+                  },
+                }}
+              />
 
-            <TextInput
-              label="Short Description"
-              placeholder="Brief description of this value..."
-              value={formData.shortDescription}
-              onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-              size="md"
-              radius={8}
-              styles={{
-                label: {
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#000000',
-                  fontWeight: 600,
-                  marginBottom: 8,
-                  fontSize: '14px',
-                },
-                input: {
-                  fontFamily: 'Inter, sans-serif',
-                  backgroundColor: 'white',
-                  border: '1px solid #CCCCCC',
-                  color: '#000000',
-                  height: '48px',
-                  fontSize: '16px',
-                  '&::placeholder': {
-                    color: '#999999',
+              <TextInput
+                label="Short Description"
+                placeholder="Brief description of this value..."
+                value={formData.shortDescription}
+                onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                size="md"
+                radius={8}
+                styles={{
+                  label: {
+                    fontFamily: 'Inter, sans-serif',
+                    color: '#000000',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
                   },
-                  '&:focus': {
-                    borderColor: '#4686FE',
-                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  input: {
+                    fontFamily: 'Inter, sans-serif',
+                    backgroundColor: 'white',
+                    border: '1px solid #CCCCCC',
+                    color: '#000000',
+                    height: '48px',
+                    fontSize: '16px',
+                    '&::placeholder': {
+                      color: '#999999',
+                    },
+                    '&:focus': {
+                      borderColor: '#4686FE',
+                      boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                    },
                   },
-                },
-              }}
-            />
+                }}
+              />
 
-            <Textarea
-              label="Reinforcing Behaviors"
-              placeholder="Describe specific behaviors, actions, or practices that reinforce this value..."
-              value={formData.behaviors}
-              onChange={(e) => setFormData({ ...formData, behaviors: e.target.value })}
-              rows={4}
-              autosize
-              maxRows={8}
-              radius={8}
-              styles={{
-                label: {
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#000000',
-                  fontWeight: 600,
-                  marginBottom: 8,
-                  fontSize: '14px',
-                },
-                input: {
-                  fontFamily: 'Inter, sans-serif',
-                  backgroundColor: 'white',
-                  border: '1px solid #CCCCCC',
-                  color: '#000000',
-                  fontSize: '16px',
-                  '&::placeholder': {
-                    color: '#999999',
+              <Textarea
+                label="Reinforcing Behaviors"
+                placeholder="Describe specific behaviors, actions, or practices that reinforce this value..."
+                value={formData.behaviors}
+                onChange={(e) => setFormData({ ...formData, behaviors: e.target.value })}
+                rows={4}
+                autosize
+                maxRows={8}
+                radius={8}
+                styles={{
+                  label: {
+                    fontFamily: 'Inter, sans-serif',
+                    color: '#000000',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
                   },
-                  '&:focus': {
-                    borderColor: '#4686FE',
-                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  input: {
+                    fontFamily: 'Inter, sans-serif',
+                    backgroundColor: 'white',
+                    border: '1px solid #CCCCCC',
+                    color: '#000000',
+                    fontSize: '16px',
+                    '&::placeholder': {
+                      color: '#999999',
+                    },
+                    '&:focus': {
+                      borderColor: '#4686FE',
+                      boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                    },
                   },
-                },
-              }}
-            />
-
-            <Group justify="flex-end" mt="lg">
+                }}
+              />
+            </Stack>
+          </ScrollArea>
+          <Box
+            px="md"
+            py="sm"
+            style={{
+              borderTop: '1px solid #E2E8F0',
+              paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+              flexShrink: 0,
+            }}
+          >
+            <Group justify="flex-end">
               <Button
                 variant="outline"
                 onClick={handleCancel}
@@ -739,7 +764,7 @@ export default function ValuesPage() {
                 {editingValue ? 'Update' : 'Create'}
               </Button>
             </Group>
-          </Stack>
+          </Box>
         </form>
       </Modal>
     </Stack>

@@ -19,6 +19,8 @@ import {
   Grid,
   Switch,
   Tooltip,
+  Box,
+  ScrollArea,
 } from '@mantine/core';
 import { Plus, X, Play, Square, Trash2, Archive, Clock, RefreshCw } from 'lucide-react';
 import { Task, ChecklistItem, UpdateTaskDto, RecurringConfig } from '@/lib/api/services/tasks';
@@ -215,11 +217,16 @@ export function TaskModal({
       styles={{
         content: {
           fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          display: 'flex',
+          flexDirection: 'column',
+          maxHeight: '85dvh',
         },
         body: {
-          maxHeight: '80vh',
-          overflowY: 'auto',
-          padding: '32px',
+          flex: 1,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: 0,
         },
         header: {
           padding: '24px 32px 0 32px',
@@ -231,8 +238,9 @@ export function TaskModal({
         blur: 4,
       }}
     >
-      <Stack gap="md">
-        {/* Title */}
+      <ScrollArea flex={1} px="xl" py="md">
+        <Stack gap="md">
+          {/* Title */}
         <TextInput
           label="Title"
           placeholder="Task title"
@@ -634,94 +642,89 @@ export function TaskModal({
           </Grid.Col>
         </Grid>
 
-        <Divider />
-
-        {/* Actions */}
-        <Stack gap="md">
-          <Grid>
-            <Grid.Col span={{ base: 6, sm: 'content' }}>
-              <Button
-                leftSection={<Archive size={16} />}
-                variant="light"
-                color={currentTask.archived ? 'gray' : 'yellow'}
-                onClick={() => onArchive(currentTask.id)}
-                fullWidth
-              >
-                {currentTask.archived ? 'Unarchive' : 'Archive'}
-              </Button>
-            </Grid.Col>
-            <Grid.Col span={{ base: 6, sm: 'content' }}>
-              <Button
-                leftSection={<Trash2 size={16} />}
-                variant="light"
-                color="red"
-                onClick={() => {
-                  onDelete(currentTask.id);
-                  onClose();
-                }}
-                fullWidth
-              >
-                Delete
-              </Button>
-            </Grid.Col>
-          </Grid>
-
-          <Grid justify="flex-end">
-            <Grid.Col span={{ base: 6, sm: 'content' }}>
-              <Button
-                variant="outline"
-                onClick={onClose}
-                fullWidth
-                radius={8}
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  borderColor: '#CCCCCC',
-                  color: '#333333',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  height: '48px',
-                  background: 'white',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      borderColor: '#4686FE',
-                      color: '#4686FE',
-                    },
-                  },
-                }}
-              >
-                Cancel
-              </Button>
-            </Grid.Col>
-            <Grid.Col span={{ base: 6, sm: 'content' }}>
-              <Button
-                onClick={handleSave}
-                fullWidth
-                radius={8}
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  background: '#4686FE',
-                  border: 'none',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  color: 'white',
-                  height: '48px',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      background: '#3366E5',
-                    },
-                  },
-                }}
-              >
-                Save Changes
-              </Button>
-            </Grid.Col>
-          </Grid>
         </Stack>
-      </Stack>
+      </ScrollArea>
+      <Box
+        px="xl"
+        py="sm"
+        style={{
+          borderTop: '1px solid #E2E8F0',
+          paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+          flexShrink: 0,
+        }}
+      >
+        <Group justify="space-between">
+          <Group gap="sm">
+            <Button
+              leftSection={<Archive size={16} />}
+              variant="light"
+              color={currentTask.archived ? 'gray' : 'yellow'}
+              onClick={() => onArchive(currentTask.id)}
+            >
+              {currentTask.archived ? 'Unarchive' : 'Archive'}
+            </Button>
+            <Button
+              leftSection={<Trash2 size={16} />}
+              variant="light"
+              color="red"
+              onClick={() => {
+                onDelete(currentTask.id);
+                onClose();
+              }}
+            >
+              Delete
+            </Button>
+          </Group>
+          <Group gap="sm">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                borderColor: '#CCCCCC',
+                color: '#333333',
+                fontSize: '16px',
+                fontWeight: 600,
+                height: '48px',
+                background: 'white',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    borderColor: '#4686FE',
+                    color: '#4686FE',
+                  },
+                },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                background: '#4686FE',
+                border: 'none',
+                fontSize: '16px',
+                fontWeight: 600,
+                color: 'white',
+                height: '48px',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    background: '#3366E5',
+                  },
+                },
+              }}
+            >
+              Save Changes
+            </Button>
+          </Group>
+        </Group>
+      </Box>
       </Modal>
     </React.Fragment>
   );

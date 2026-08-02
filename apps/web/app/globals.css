@@ -7,6 +7,26 @@ html,
 html[data-mantine-color-scheme="dark"] {
   color-scheme: light !important;
   background-color: #ffffff !important;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar in horizontal-scroll containers (tabs, etc.) */
+.scroll-x-hidden::-webkit-scrollbar { display: none; }
+.scroll-x-hidden { scrollbar-width: none; -ms-overflow-style: none; }
+
+/* Mobile: all modals scroll when content is taller than viewport / keyboard shrinks it */
+@media (max-width: 768px) {
+  .mantine-Modal-content {
+    max-height: min(90dvh, 90vh) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .mantine-Modal-body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    flex: 1 !important;
+    min-height: 0 !important;
+  }
 }
 
 body,

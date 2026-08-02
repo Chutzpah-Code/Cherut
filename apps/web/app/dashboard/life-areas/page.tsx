@@ -18,6 +18,7 @@ import {
   ActionIcon,
   Box,
   Menu,
+  ScrollArea,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { useLifeAreas, useCreateLifeArea, useUpdateLifeArea, useDeleteLifeArea } from '@/hooks/useLifeAreas';
@@ -413,79 +414,103 @@ export default function LifeAreasPage() {
         styles={{
           content: {
             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '85dvh',
+          },
+          body: {
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: 0,
           },
         }}
       >
-        <form onSubmit={handleSubmit}>
-          <Stack gap="lg">
-            <TextInput
-              label="Name"
-              placeholder="e.g., Health & Fitness"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-              withAsterisk
-              size="md"
-              radius={8}
-              styles={{
-                label: {
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#000000',
-                  fontWeight: 600,
-                  marginBottom: 8,
-                  fontSize: '14px',
-                },
-                input: {
-                  fontFamily: 'Inter, sans-serif',
-                  backgroundColor: 'white',
-                  border: '1px solid #CCCCCC',
-                  color: '#000000',
-                  height: '48px',
-                  fontSize: '16px',
-                  '&::placeholder': {
-                    color: '#999999',
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}
+        >
+          <ScrollArea flex={1} px="md" py="xs">
+            <Stack gap="lg" py="xs">
+              <TextInput
+                label="Name"
+                placeholder="e.g., Health & Fitness"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+                withAsterisk
+                size="md"
+                radius={8}
+                styles={{
+                  label: {
+                    fontFamily: 'Inter, sans-serif',
+                    color: '#000000',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
                   },
-                  '&:focus': {
-                    borderColor: '#4686FE',
-                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  input: {
+                    fontFamily: 'Inter, sans-serif',
+                    backgroundColor: 'white',
+                    border: '1px solid #CCCCCC',
+                    color: '#000000',
+                    height: '48px',
+                    fontSize: '16px',
+                    '&::placeholder': {
+                      color: '#999999',
+                    },
+                    '&:focus': {
+                      borderColor: '#4686FE',
+                      boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                    },
                   },
-                },
-              }}
-            />
+                }}
+              />
 
-            <Textarea
-              label="Description"
-              placeholder="Describe this life area..."
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              radius={8}
-              styles={{
-                label: {
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#000000',
-                  fontWeight: 600,
-                  marginBottom: 8,
-                  fontSize: '14px',
-                },
-                input: {
-                  fontFamily: 'Inter, sans-serif',
-                  backgroundColor: 'white',
-                  border: '1px solid #CCCCCC',
-                  color: '#000000',
-                  fontSize: '16px',
-                  '&::placeholder': {
-                    color: '#999999',
+              <Textarea
+                label="Description"
+                placeholder="Describe this life area..."
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+                radius={8}
+                styles={{
+                  label: {
+                    fontFamily: 'Inter, sans-serif',
+                    color: '#000000',
+                    fontWeight: 600,
+                    marginBottom: 8,
+                    fontSize: '14px',
                   },
-                  '&:focus': {
-                    borderColor: '#4686FE',
-                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                  input: {
+                    fontFamily: 'Inter, sans-serif',
+                    backgroundColor: 'white',
+                    border: '1px solid #CCCCCC',
+                    color: '#000000',
+                    fontSize: '16px',
+                    '&::placeholder': {
+                      color: '#999999',
+                    },
+                    '&:focus': {
+                      borderColor: '#4686FE',
+                      boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
+                    },
                   },
-                },
-              }}
-            />
-
-            <Group justify="flex-end" mt="lg">
+                }}
+              />
+            </Stack>
+          </ScrollArea>
+          <Box
+            px="md"
+            py="sm"
+            style={{
+              borderTop: '1px solid #E2E8F0',
+              paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+              flexShrink: 0,
+            }}
+          >
+            <Group justify="flex-end">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -537,7 +562,7 @@ export default function LifeAreasPage() {
                 {editingArea ? 'Update' : 'Create'}
               </Button>
             </Group>
-          </Stack>
+          </Box>
         </form>
       </Modal>
     </Stack>

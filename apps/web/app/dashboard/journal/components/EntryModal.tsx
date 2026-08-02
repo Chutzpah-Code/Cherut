@@ -13,6 +13,7 @@ import {
   Alert,
   ScrollArea,
   TextInput,
+  Box,
 } from '@mantine/core';
 import { Edit, Trash2, Calendar, Save, X, Archive } from 'lucide-react';
 import { modals } from '@mantine/modals';
@@ -159,57 +160,66 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
         </Group>
       }
       centered
+      styles={{
+        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
+        body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+      }}
     >
-      <Stack gap="md">
-        {/* Date info */}
-        <Group gap="xs" align="center">
-          <Calendar size={16} />
-          <Text size="sm" c="dimmed">
-            Created {formattedCreatedAt}
-          </Text>
-          {wasUpdated && (
-            <>
-              <Badge size="sm" color="blue" variant="light">
-                Edited
-              </Badge>
-              <Text size="sm" c="dimmed">
-                Last updated {formattedUpdatedAt}
-              </Text>
-            </>
-          )}
-        </Group>
+      {isEditing ? (
+        <>
+          <ScrollArea flex={1} px="md" py="xs">
+            <Stack gap="md">
+              {/* Date info */}
+              <Group gap="xs" align="center">
+                <Calendar size={16} />
+                <Text size="sm" c="dimmed">
+                  Created {formattedCreatedAt}
+                </Text>
+                {wasUpdated && (
+                  <>
+                    <Badge size="sm" color="blue" variant="light">
+                      Edited
+                    </Badge>
+                    <Text size="sm" c="dimmed">
+                      Last updated {formattedUpdatedAt}
+                    </Text>
+                  </>
+                )}
+              </Group>
 
-        {error && (
-          <Alert color="red" variant="light">
-            {error}
-          </Alert>
-        )}
+              {error && (
+                <Alert color="red" variant="light">
+                  {error}
+                </Alert>
+              )}
 
-        {/* Content */}
-        {isEditing ? (
-          <Stack gap="md">
-            <TextInput
-              label="Title"
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              disabled={updateMutation.isPending}
-            />
+              <TextInput
+                label="Title"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                disabled={updateMutation.isPending}
+              />
 
-            <Textarea
-              label="Content"
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              minRows={10}
-              maxRows={20}
-              autosize
-              disabled={updateMutation.isPending}
-            />
-
-            <Group justify="space-between" align="center">
-              <Text size="sm" c={characterCountColor}>
+              <Textarea
+                label="Content"
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                minRows={10}
+                maxRows={20}
+                autosize
+                disabled={updateMutation.isPending}
+              />
+            </Stack>
+          </ScrollArea>
+          <Box px="md" py="sm" style={{
+            borderTop: '1px solid #E2E8F0',
+            paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+            flexShrink: 0,
+          }}>
+            <Group justify="space-between">
+              <Text size="xs" c={characterCountColor}>
                 {characterCount.toLocaleString('en-US')} / 20,000 characters
               </Text>
-
               <Group>
                 <Button
                   variant="light"
@@ -230,17 +240,35 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
                 </Button>
               </Group>
             </Group>
-          </Stack>
-        ) : (
+          </Box>
+        </>
+      ) : (
+        <Stack gap="md" p="md">
+          {/* Date info */}
+          <Group gap="xs" align="center">
+            <Calendar size={16} />
+            <Text size="sm" c="dimmed">
+              Created {formattedCreatedAt}
+            </Text>
+            {wasUpdated && (
+              <>
+                <Badge size="sm" color="blue" variant="light">
+                  Edited
+                </Badge>
+                <Text size="sm" c="dimmed">
+                  Last updated {formattedUpdatedAt}
+                </Text>
+              </>
+            )}
+          </Group>
+
           <ScrollArea.Autosize mah={400}>
             <Text size="sm" style={{ whiteSpace: 'pre-line' }}>
               {entry.content}
             </Text>
           </ScrollArea.Autosize>
-        )}
 
-        {/* Footer */}
-        {!isEditing && (
+          {/* Footer */}
           <Group justify="space-between" align="center" pt="xs" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
             <Text size="xs" c="dimmed">
               {entry.content.length.toLocaleString('en-US')} characters
@@ -249,8 +277,8 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
               Close
             </Button>
           </Group>
-        )}
-      </Stack>
+        </Stack>
+      )}
     </Modal>
   );
 }

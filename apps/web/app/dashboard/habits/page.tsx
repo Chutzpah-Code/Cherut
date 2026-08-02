@@ -412,9 +412,16 @@ export default function HabitsPage() {
         styles={{
           content: {
             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '85dvh',
           },
           body: {
-            padding: '32px',
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: 0,
           },
           header: {
             padding: '24px 32px 0 32px',
@@ -426,160 +433,157 @@ export default function HabitsPage() {
           blur: 4,
         }}
       >
-        <form onSubmit={handleCreateSubmit}>
-          <Stack gap="md">
-            <Alert
-              variant="light"
-              color="blue"
-              title="21-Day Challenge"
-              radius={12}
-              styles={{
-                root: {
-                  backgroundColor: '#EBF8FF',
-                  border: `1px solid ${colors.primary}`,
-                },
-                icon: {
-                  color: colors.primary,
-                },
-                title: {
+        <form onSubmit={handleCreateSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+          <ScrollArea flex={1} px="md" py="xs">
+            <Stack gap="md">
+              <Alert
+                variant="light"
+                color="blue"
+                title="21-Day Challenge"
+                radius={12}
+                styles={{
+                  root: {
+                    backgroundColor: '#EBF8FF',
+                    border: `1px solid ${colors.primary}`,
+                  },
+                  icon: {
+                    color: colors.primary,
+                  },
+                  title: {
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: colors.text.primary,
+                  },
+                  message: {
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: colors.text.secondary,
+                  },
+                }}
+              >
+                Research shows it takes <strong>21 days</strong> of consistent practice to form a new habit.
+                Stay committed and track your progress daily!
+              </Alert>
+              <Select
+                label="Life Area"
+                placeholder="Select an area"
+                value={formData.lifeAreaId}
+                onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
+                data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
+                required
+                withAsterisk
+              />
+
+              <TextInput
+                label="Title"
+                placeholder="E.g., Morning meditation"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+                withAsterisk
+              />
+
+              <Textarea
+                label="Description"
+                placeholder="Describe this habit..."
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+              />
+
+              <Grid grow>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <DateInput
+                    label="Start Date"
+                    description="When do you want to start this habit?"
+                    placeholder="Select start date"
+                    value={startDateValue}
+                    onChange={(date) => {
+                      setStartDateValue(date);
+                      setFormData({
+                        ...formData,
+                        startDate: date ? date.toISOString().split('T')[0] : '',
+                      });
+                    }}
+                    minDate={new Date()}
+                    withAsterisk
+                  />
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <DateInput
+                    label="Due Date"
+                    description="Set your target completion date (21-day challenge)"
+                    placeholder="Select end date"
+                    value={dueDateValue}
+                    onChange={(date) => {
+                      setDueDateValue(date);
+                      setFormData({
+                        ...formData,
+                        dueDate: date ? date.toISOString().split('T')[0] : '',
+                      });
+                    }}
+                    minDate={startDateValue || new Date()}
+                    withAsterisk
+                  />
+                </Grid.Col>
+              </Grid>
+            </Stack>
+          </ScrollArea>
+          <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
+            <Group justify="flex-end">
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateModalOpen(false)}
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  borderColor: colors.border,
+                  color: colors.text.primary,
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  height: '48px',
+                  background: colors.surfaceElevated,
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      borderColor: colors.primary,
+                      color: colors.primary,
+                    },
+                  },
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                loading={createMutation.isPending}
+                color={creatingCategory === 'good' ? 'green' : 'red'}
+                radius={8}
+                style={{
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '16px',
                   fontWeight: 600,
-                  color: colors.text.primary,
-                },
-                message: {
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '14px',
-                  fontWeight: 400,
-                  color: colors.text.secondary,
-                },
-              }}
-            >
-              Research shows it takes <strong>21 days</strong> of consistent practice to form a new habit.
-              Stay committed and track your progress daily!
-            </Alert>
-            <Select
-              label="Life Area"
-              placeholder="Select an area"
-              value={formData.lifeAreaId}
-              onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
-              data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
-              required
-              withAsterisk
-            />
-
-            <TextInput
-              label="Title"
-              placeholder="E.g., Morning meditation"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
-              withAsterisk
-            />
-
-            <Textarea
-              label="Description"
-              placeholder="Describe this habit..."
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-            />
-
-            <Grid grow>
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <DateInput
-                  label="Start Date"
-                  description="When do you want to start this habit?"
-                  placeholder="Select start date"
-                  value={startDateValue}
-                  onChange={(date) => {
-                    setStartDateValue(date);
-                    setFormData({
-                      ...formData,
-                      startDate: date ? date.toISOString().split('T')[0] : '',
-                    });
-                  }}
-                  minDate={new Date()}
-                  withAsterisk
-                />
-              </Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <DateInput
-                  label="Due Date"
-                  description="Set your target completion date (21-day challenge)"
-                  placeholder="Select end date"
-                  value={dueDateValue}
-                  onChange={(date) => {
-                    setDueDateValue(date);
-                    setFormData({
-                      ...formData,
-                      dueDate: date ? date.toISOString().split('T')[0] : '',
-                    });
-                  }}
-                  minDate={startDateValue || new Date()}
-                  withAsterisk
-                />
-              </Grid.Col>
-            </Grid>
-
-            <Grid justify="flex-end" align="center" mt="md">
-              <Grid.Col span={{ base: 6, sm: 'content' }}>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  fullWidth
-                  radius={8}
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    borderColor: colors.border,
-                    color: colors.text.primary,
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    height: '48px',
-                    background: colors.surfaceElevated,
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        borderColor: colors.primary,
-                        color: colors.primary,
-                      },
+                  height: '48px',
+                  backgroundColor: creatingCategory === 'good' ? '#22C55E' : '#EF4444',
+                  border: 'none',
+                  color: 'white',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      backgroundColor: creatingCategory === 'good' ? '#16A34A' : '#DC2626',
+                      transform: 'translateY(-1px)',
                     },
-                  }}
-                >
-                  Cancel
-                </Button>
-              </Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 'content' }}>
-                <Button
-                  type="submit"
-                  loading={createMutation.isPending}
-                  color={creatingCategory === 'good' ? 'green' : 'red'}
-                  fullWidth
-                  radius={8}
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    height: '48px',
-                    backgroundColor: creatingCategory === 'good' ? '#22C55E' : '#EF4444',
-                    border: 'none',
-                    color: 'white',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        backgroundColor: creatingCategory === 'good' ? '#16A34A' : '#DC2626',
-                        transform: 'translateY(-1px)',
-                      },
-                    },
-                  }}
-                >
-                  Create Habit
-                </Button>
-              </Grid.Col>
-            </Grid>
-          </Stack>
+                  },
+                }}
+              >
+                Create Habit
+              </Button>
+            </Group>
+          </Box>
         </form>
       </Modal>
 

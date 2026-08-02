@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {
   Stack, Group, Text, Box, Badge, Button, Loader, Center,
   Card, Progress, Modal, Select, NumberInput, Collapse,
-  ActionIcon,
+  ActionIcon, ScrollArea,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { CreditCard, ChevronDown, ChevronRight, AlertCircle } from 'lucide-react';
@@ -64,41 +64,59 @@ function PayModal({
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Pay statement" centered>
-      <Stack gap="sm">
-        <Box style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
-          <Text size="xs" c="dimmed">Statement total</Text>
-          <Text size="xl" fw={700} c="green.7">{fmt(statement.total, cardAccount.currency)}</Text>
-          <Text size="xs" c="dimmed">Due: {fmtDate(statement.dueDate)}</Text>
-        </Box>
-        <Select
-          label="Pay from"
-          placeholder="Select account"
-          required
-          data={checkingAccounts.map((a) => ({
-            value: a.id,
-            label: `${a.name} — ${fmt(a.balance, a.currency)}`,
-          }))}
-          value={fromAccountId}
-          onChange={setFromAccountId}
-        />
-        <NumberInput
-          label="Amount"
-          min={0.01}
-          decimalScale={2}
-          value={amount}
-          onChange={setAmount}
-          leftSection={<Text size="xs" c="dimmed" fw={600}>{cardAccount.currency}</Text>}
-        />
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title="Pay statement"
+      centered
+      styles={{
+        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
+        body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+      }}
+    >
+      <ScrollArea flex={1} px="md" py="xs">
+        <Stack gap="sm">
+          <Box style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
+            <Text size="xs" c="dimmed">Statement total</Text>
+            <Text size="xl" fw={700} c="green.7">{fmt(statement.total, cardAccount.currency)}</Text>
+            <Text size="xs" c="dimmed">Due: {fmtDate(statement.dueDate)}</Text>
+          </Box>
+          <Select
+            label="Pay from"
+            placeholder="Select account"
+            required
+            data={checkingAccounts.map((a) => ({
+              value: a.id,
+              label: `${a.name} — ${fmt(a.balance, a.currency)}`,
+            }))}
+            value={fromAccountId}
+            onChange={setFromAccountId}
+          />
+          <NumberInput
+            label="Amount"
+            min={0.01}
+            decimalScale={2}
+            value={amount}
+            onChange={setAmount}
+            leftSection={<Text size="xs" c="dimmed" fw={600}>{cardAccount.currency}</Text>}
+          />
+        </Stack>
+      </ScrollArea>
+      <Box px="md" py="sm" style={{
+        borderTop: '1px solid #E2E8F0',
+        paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+        flexShrink: 0,
+      }}>
         <Button
           onClick={handlePay}
           loading={payStatement.isPending}
           disabled={!fromAccountId || isNaN(parsedAmount) || parsedAmount <= 0}
           color="green"
+          style={{ width: '100%' }}
         >
           Confirm payment
         </Button>
-      </Stack>
+      </Box>
     </Modal>
   );
 }

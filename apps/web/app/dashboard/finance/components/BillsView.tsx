@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import {
   Stack, Group, Text, Box, Badge, Button, Loader, Center,
   Modal, TextInput, Select, NumberInput, ActionIcon, Collapse,
-  Switch, Divider, UnstyledButton,
+  Switch, Divider, UnstyledButton, ScrollArea,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2 } from 'lucide-react';
@@ -105,42 +105,58 @@ function PayModal({
       onClose={onClose}
       title={<Text fw={600}>Pay — {occurrence?.bill?.name ?? ''}</Text>}
       size="sm"
+      styles={{
+        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
+        body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+      }}
     >
-      <Stack gap="sm">
-        <Select
-          label="Account"
-          placeholder="Select account"
-          data={accountOptions}
-          value={accountId}
-          onChange={(v) => {
-            setAccountId(v ?? '');
-            setSelectedCurrency((accounts as any[]).find((a) => a.id === v)?.currency ?? 'USD');
-          }}
-          required
-        />
-        <NumberInput
-          label="Amount"
-          min={0.01}
-          decimalScale={2}
-          value={amount}
-          onChange={(v) => setAmount(Number(v) || 0)}
-          leftSection={<Text size="xs" fw={600}>{selectedCurrency}</Text>}
-          leftSectionWidth={42}
-          required
-        />
-        <TextInput
-          label="Payment date"
-          type="date"
-          value={paidAt}
-          onChange={(e) => setPaidAt(e.target.value)}
-          required
-        />
-        <TextInput
-          label="Notes (optional)"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
-        <Group justify="flex-end" mt="sm">
+      <ScrollArea flex={1} px="md" py="xs">
+        <Stack gap="sm">
+          <Select
+            label="Account"
+            placeholder="Select account"
+            data={accountOptions}
+            value={accountId}
+            onChange={(v) => {
+              setAccountId(v ?? '');
+              setSelectedCurrency((accounts as any[]).find((a) => a.id === v)?.currency ?? 'USD');
+            }}
+            required
+          />
+          <NumberInput
+            label="Amount"
+            min={0.01}
+            decimalScale={2}
+            value={amount}
+            onChange={(v) => setAmount(Number(v) || 0)}
+            leftSection={<Text size="xs" fw={600}>{selectedCurrency}</Text>}
+            leftSectionWidth={42}
+            required
+          />
+          <TextInput
+            label="Payment date"
+            type="date"
+            value={paidAt}
+            onChange={(e) => setPaidAt(e.target.value)}
+            required
+          />
+          <TextInput
+            label="Notes (optional)"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </Stack>
+      </ScrollArea>
+      <Box
+        px="md"
+        py="sm"
+        style={{
+          borderTop: '1px solid #E2E8F0',
+          paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+          flexShrink: 0,
+        }}
+      >
+        <Group justify="flex-end">
           <Button variant="light" onClick={onClose}>Cancel</Button>
           <Button
             onClick={handlePay}
@@ -151,7 +167,7 @@ function PayModal({
             Confirm Payment
           </Button>
         </Group>
-      </Stack>
+      </Box>
     </Modal>
   );
 }
@@ -229,92 +245,108 @@ function BillFormModal({
       onClose={onClose}
       title={<Text fw={600}>{editing ? 'Edit Bill' : 'New Bill'}</Text>}
       size="md"
+      styles={{
+        content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
+        body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+      }}
     >
-      <Stack gap="sm">
-        <TextInput
-          label="Name"
-          placeholder="e.g. Rent, Netflix, Salary"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <Group grow>
-          <Select
-            label="Type"
-            data={[
-              { value: 'expense', label: 'Expense' },
-              { value: 'income', label: 'Income' },
-            ]}
-            value={type}
-            onChange={(v) => { setType(v ?? 'expense'); setCategoryId(''); }}
-          />
-          <Select
-            label="Frequency"
-            data={[
-              { value: 'monthly', label: 'Monthly' },
-              { value: 'yearly', label: 'Yearly' },
-              { value: 'weekly', label: 'Weekly' },
-              { value: 'daily', label: 'Daily' },
-            ]}
-            value={frequency}
-            onChange={(v) => setFrequency(v ?? 'monthly')}
-          />
-        </Group>
-        <Group grow>
-          <Select
-            label="Account"
-            placeholder="Select account"
-            data={accountOptions}
-            value={accountId}
-            onChange={(v) => setAccountId(v ?? '')}
+      <ScrollArea flex={1} px="md" py="xs">
+        <Stack gap="sm">
+          <TextInput
+            label="Name"
+            placeholder="e.g. Rent, Netflix, Salary"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
           />
-          <Select
-            label="Category"
-            placeholder="Select category"
-            data={categoryOptions}
-            value={categoryId}
-            onChange={(v) => setCategoryId(v ?? '')}
+          <Group grow>
+            <Select
+              label="Type"
+              data={[
+                { value: 'expense', label: 'Expense' },
+                { value: 'income', label: 'Income' },
+              ]}
+              value={type}
+              onChange={(v) => { setType(v ?? 'expense'); setCategoryId(''); }}
+            />
+            <Select
+              label="Frequency"
+              data={[
+                { value: 'monthly', label: 'Monthly' },
+                { value: 'yearly', label: 'Yearly' },
+                { value: 'weekly', label: 'Weekly' },
+                { value: 'daily', label: 'Daily' },
+              ]}
+              value={frequency}
+              onChange={(v) => setFrequency(v ?? 'monthly')}
+            />
+          </Group>
+          <Group grow>
+            <Select
+              label="Account"
+              placeholder="Select account"
+              data={accountOptions}
+              value={accountId}
+              onChange={(v) => setAccountId(v ?? '')}
+              required
+            />
+            <Select
+              label="Category"
+              placeholder="Select category"
+              data={categoryOptions}
+              value={categoryId}
+              onChange={(v) => setCategoryId(v ?? '')}
+              required
+            />
+          </Group>
+          <Group grow>
+            <NumberInput
+              label="Default Amount"
+              min={0.01}
+              decimalScale={2}
+              value={amount}
+              onChange={(v) => setAmount(Number(v) || 0)}
+              required
+            />
+            <NumberInput
+              label="Due Day (1–28)"
+              description="Day of month"
+              min={1}
+              max={28}
+              value={dueDay}
+              onChange={(v) => setDueDay(Number(v) || 1)}
+              required
+            />
+          </Group>
+          <TextInput
+            label="Start Date"
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
             required
           />
-        </Group>
-        <Group grow>
-          <NumberInput
-            label="Default Amount"
-            min={0.01}
-            decimalScale={2}
-            value={amount}
-            onChange={(v) => setAmount(Number(v) || 0)}
-            required
+          <TextInput
+            label="Description (optional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
-          <NumberInput
-            label="Due Day (1–28)"
-            description="Day of month"
-            min={1}
-            max={28}
-            value={dueDay}
-            onChange={(v) => setDueDay(Number(v) || 1)}
-            required
+          <Switch
+            label="Active"
+            checked={isActive}
+            onChange={(e) => setIsActive(e.currentTarget.checked)}
           />
-        </Group>
-        <TextInput
-          label="Start Date"
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          required
-        />
-        <TextInput
-          label="Description (optional)"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <Switch
-          label="Active"
-          checked={isActive}
-          onChange={(e) => setIsActive(e.currentTarget.checked)}
-        />
-        <Group justify="flex-end" mt="sm">
+        </Stack>
+      </ScrollArea>
+      <Box
+        px="md"
+        py="sm"
+        style={{
+          borderTop: '1px solid #E2E8F0',
+          paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+          flexShrink: 0,
+        }}
+      >
+        <Group justify="flex-end">
           <Button variant="light" onClick={onClose}>Cancel</Button>
           <Button
             onClick={handleSubmit}
@@ -325,7 +357,7 @@ function BillFormModal({
             {editing ? 'Save Changes' : 'Create Bill'}
           </Button>
         </Group>
-      </Stack>
+      </Box>
     </Modal>
   );
 }

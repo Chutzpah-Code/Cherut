@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import {
   Stack, Group, Title, Text, Box, SimpleGrid, Card, Badge, Grid,
   Button, Loader, Center, UnstyledButton, Modal,
-  TextInput, Select, NumberInput, ActionIcon,
+  TextInput, Select, NumberInput, ActionIcon, ScrollArea,
 } from '@mantine/core';
 import { PieChart, Pie, Cell, Sector } from 'recharts';
 import { useDisclosure } from '@mantine/hooks';
@@ -59,16 +59,18 @@ function fmt(value: number, currency?: string) {
 function TabBar({ current, onChange }: { current: FinanceView; onChange: (v: FinanceView) => void }) {
   return (
     <Box
+      className="scroll-x-hidden"
       style={{
         marginLeft: 'calc(-1 * var(--mantine-spacing-md))',
         marginRight: 'calc(-1 * var(--mantine-spacing-md))',
-        paddingLeft: 'var(--mantine-spacing-md)',
         borderBottom: '1px solid #E2E8F0',
         marginBottom: 20,
         backgroundColor: '#ffffff',
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
       }}
     >
-      <Group gap={0}>
+      <Group gap={0} style={{ flexWrap: 'nowrap', paddingLeft: 'var(--mantine-spacing-md)' }}>
         {TABS.map(({ id, label }) => {
           const isActive = current === id;
           return (
@@ -772,7 +774,7 @@ function TransactionsView() {
           value={filterAccount}
           onChange={setFilterAccount}
           clearable
-          style={{ minWidth: 140 }}
+          style={{ flex: '1 1 130px', minWidth: 0 }}
         />
         <Select
           size="xs"
@@ -781,7 +783,7 @@ function TransactionsView() {
           value={filterType}
           onChange={setFilterType}
           clearable
-          style={{ minWidth: 120 }}
+          style={{ flex: '1 1 110px', minWidth: 0 }}
         />
         <TextInput
           size="xs"
@@ -789,7 +791,7 @@ function TransactionsView() {
           placeholder="From"
           value={filterStart}
           onChange={(e) => setFilterStart(e.target.value)}
-          style={{ width: 140 }}
+          style={{ flex: '1 1 130px', minWidth: 0 }}
         />
         <TextInput
           size="xs"
@@ -797,7 +799,7 @@ function TransactionsView() {
           placeholder="To"
           value={filterEnd}
           onChange={(e) => setFilterEnd(e.target.value)}
-          style={{ width: 140 }}
+          style={{ flex: '1 1 130px', minWidth: 0 }}
         />
         {(filterAccount || filterType || filterStart || filterEnd) && (
           <Button size="xs" variant="subtle" color="gray" onClick={() => { setFilterAccount(null); setFilterType(null); setFilterStart(''); setFilterEnd(''); }}>
@@ -1122,68 +1124,89 @@ function AccountsView() {
       </Modal>
 
       {/* Create account modal */}
-      <Modal opened={opened} onClose={close} title="New Account" centered>
-        <Stack gap="sm">
-          <TextInput label="Name" placeholder="e.g. Main Checking" value={form.name ?? ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
-          <Select
-            label="Type"
-            data={['checking', 'savings', 'credit', 'wallet', 'other'].map((v) => ({ value: v, label: v.charAt(0).toUpperCase() + v.slice(1) }))}
-            value={form.type}
-            onChange={(v) => setForm((f) => ({ ...f, type: v as any }))}
-          />
-          <Select
-            label="Currency"
-            data={[
-              { value: 'BRL', label: 'BRL — Real' },
-              { value: 'USD', label: 'USD — Dollar' },
-              { value: 'EUR', label: 'EUR — Euro' },
-              { value: 'GBP', label: 'GBP — Pound' },
-              { value: 'JPY', label: 'JPY — Yen' },
-              { value: 'ARS', label: 'ARS — Peso' },
-            ]}
-            value={form.currency}
-            onChange={(v) => setForm((f) => ({ ...f, currency: v ?? 'USD' }))}
-          />
-          <NumberInput
-            label={`Initial Balance (${form.currency ?? 'USD'})`}
-            value={form.balance}
-            onChange={(v) => setForm((f) => ({ ...f, balance: typeof v === 'number' ? v : 0 }))}
-            leftSection={<Text size="xs" c="dimmed" fw={600}>{form.currency ?? 'USD'}</Text>}
-            decimalScale={2}
-          />
-          {form.type === 'credit' && (
-            <>
-              <NumberInput
-                label={`Credit Limit (${form.currency ?? 'USD'})`}
-                description="Maximum spending limit"
-                min={0}
-                decimalScale={2}
-                value={form.creditLimit ?? ''}
-                onChange={(v) => setForm((f) => ({ ...f, creditLimit: typeof v === 'number' ? v : undefined }))}
-                leftSection={<Text size="xs" c="dimmed" fw={600}>{form.currency ?? 'USD'}</Text>}
-              />
-              <NumberInput
-                label="Statement Closing Day"
-                description="Day of month when billing cycle closes (1–28)"
-                min={1}
-                max={28}
-                value={form.statementClosingDay ?? ''}
-                onChange={(v) => setForm((f) => ({ ...f, statementClosingDay: typeof v === 'number' ? v : undefined }))}
-              />
-              <NumberInput
-                label="Payment Due Day"
-                description="Day of month when payment is due (1–28)"
-                min={1}
-                max={28}
-                value={form.statementDueDay ?? ''}
-                onChange={(v) => setForm((f) => ({ ...f, statementDueDay: typeof v === 'number' ? v : undefined }))}
-              />
-            </>
-          )}
-          <Button onClick={handleCreate} loading={createAccount.isPending} disabled={!form.name} style={{ backgroundColor: '#0052CC' }}>
+      <Modal
+        opened={opened}
+        onClose={close}
+        title="New Account"
+        centered
+        styles={{
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
+          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+        }}
+      >
+        <ScrollArea flex={1} px="md" py="xs">
+          <Stack gap="sm">
+            <TextInput label="Name" placeholder="e.g. Main Checking" value={form.name ?? ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+            <Select
+              label="Type"
+              data={['checking', 'savings', 'credit', 'wallet', 'other'].map((v) => ({ value: v, label: v.charAt(0).toUpperCase() + v.slice(1) }))}
+              value={form.type}
+              onChange={(v) => setForm((f) => ({ ...f, type: v as any }))}
+            />
+            <Select
+              label="Currency"
+              data={[
+                { value: 'BRL', label: 'BRL — Real' },
+                { value: 'USD', label: 'USD — Dollar' },
+                { value: 'EUR', label: 'EUR — Euro' },
+                { value: 'GBP', label: 'GBP — Pound' },
+                { value: 'JPY', label: 'JPY — Yen' },
+                { value: 'ARS', label: 'ARS — Peso' },
+              ]}
+              value={form.currency}
+              onChange={(v) => setForm((f) => ({ ...f, currency: v ?? 'USD' }))}
+            />
+            <NumberInput
+              label={`Initial Balance (${form.currency ?? 'USD'})`}
+              value={form.balance}
+              onChange={(v) => setForm((f) => ({ ...f, balance: typeof v === 'number' ? v : 0 }))}
+              leftSection={<Text size="xs" c="dimmed" fw={600}>{form.currency ?? 'USD'}</Text>}
+              decimalScale={2}
+            />
+            {form.type === 'credit' && (
+              <>
+                <NumberInput
+                  label={`Credit Limit (${form.currency ?? 'USD'})`}
+                  description="Maximum spending limit"
+                  min={0}
+                  decimalScale={2}
+                  value={form.creditLimit ?? ''}
+                  onChange={(v) => setForm((f) => ({ ...f, creditLimit: typeof v === 'number' ? v : undefined }))}
+                  leftSection={<Text size="xs" c="dimmed" fw={600}>{form.currency ?? 'USD'}</Text>}
+                />
+                <NumberInput
+                  label="Statement Closing Day"
+                  description="Day of month when billing cycle closes (1–28)"
+                  min={1}
+                  max={28}
+                  value={form.statementClosingDay ?? ''}
+                  onChange={(v) => setForm((f) => ({ ...f, statementClosingDay: typeof v === 'number' ? v : undefined }))}
+                />
+                <NumberInput
+                  label="Payment Due Day"
+                  description="Day of month when payment is due (1–28)"
+                  min={1}
+                  max={28}
+                  value={form.statementDueDay ?? ''}
+                  onChange={(v) => setForm((f) => ({ ...f, statementDueDay: typeof v === 'number' ? v : undefined }))}
+                />
+              </>
+            )}
+          </Stack>
+        </ScrollArea>
+        <Box
+          px="md"
+          py="sm"
+          style={{
+            borderTop: '1px solid #E2E8F0',
+            paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+            flexShrink: 0,
+          }}
+        >
+          <Button onClick={handleCreate} loading={createAccount.isPending} disabled={!form.name} style={{ backgroundColor: '#0052CC', width: '100%' }}>
             Create Account
           </Button>
-        </Stack>
+        </Box>
       </Modal>
 
       {/* Create category modal */}

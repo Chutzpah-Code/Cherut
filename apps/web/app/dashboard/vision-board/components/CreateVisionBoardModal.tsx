@@ -14,6 +14,7 @@ import {
   Image,
   Loader,
   Alert,
+  ScrollArea,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { Upload, AlertCircle, ImageIcon } from 'lucide-react';
@@ -156,9 +157,20 @@ export function CreateVisionBoardModal({
         styles={{
           content: {
             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '85dvh',
+          },
+          body: {
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: 0,
           },
         }}
       >
+        <ScrollArea flex={1} px="md" py="xs">
         <Stack gap="lg">
         {/* Upload de Imagem */}
         <Box>
@@ -496,58 +508,60 @@ export function CreateVisionBoardModal({
           </Alert>
         )}
 
-        {/* Action buttons */}
-        <Group justify="flex-end" mt="lg">
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            radius={8}
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              borderColor: '#CCCCCC',
-              color: '#333333',
-              fontSize: '16px',
-              fontWeight: 600,
-              height: '48px',
-              background: 'white',
-            }}
-            styles={{
-              root: {
-                '&:hover': {
-                  borderColor: '#4686FE',
-                  color: '#4686FE',
+        </Stack>
+        </ScrollArea>
+        <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
+          <Group justify="flex-end">
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                borderColor: '#CCCCCC',
+                color: '#333333',
+                fontSize: '16px',
+                fontWeight: 600,
+                height: '48px',
+                background: 'white',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    borderColor: '#4686FE',
+                    color: '#4686FE',
+                  },
                 },
-              },
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleCreate}
-            loading={isCreating}
-            disabled={!title.trim() || !imageUrl || isUploadingImage}
-            radius={8}
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              background: '#4686FE',
-              border: 'none',
-              fontSize: '16px',
-              fontWeight: 600,
-              color: 'white',
-              height: '48px',
-            }}
-            styles={{
-              root: {
-                '&:hover': {
-                  background: '#3366E5',
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreate}
+              loading={isCreating}
+              disabled={!title.trim() || !imageUrl || isUploadingImage}
+              radius={8}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                background: '#4686FE',
+                border: 'none',
+                fontSize: '16px',
+                fontWeight: 600,
+                color: 'white',
+                height: '48px',
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    background: '#3366E5',
+                  },
                 },
-              },
-            }}
-          >
-            Add to Vision Board
-          </Button>
-        </Group>
-      </Stack>
+              }}
+            >
+              Add to Vision Board
+            </Button>
+          </Group>
+        </Box>
     </Modal>
     </>
   );

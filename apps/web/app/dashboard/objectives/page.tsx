@@ -1058,18 +1058,24 @@ export default function ObjectivesPage() {
         }
         size="lg"
         radius={16}
-        scrollAreaComponent={ScrollArea.Autosize}
         styles={{
           content: {
             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '85dvh',
           },
           body: {
-            maxHeight: 'calc(100dvh - 120px)',
-            overflowY: 'auto',
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: 0,
           },
         }}
       >
         <form onSubmit={handleSubmit}>
+          <ScrollArea flex={1} px="md" py="xs">
           <Stack gap="lg">
             <TextInput
               label="Title"
@@ -1364,7 +1370,10 @@ export default function ObjectivesPage() {
               </Stack>
             </div>
 
-            <Grid justify="flex-end" align="center" mt="lg">
+          </Stack>
+          </ScrollArea>
+          <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
+            <Grid justify="flex-end" align="center">
               <Grid.Col span={{ base: 6, sm: 'content' }}>
                 <Button
                   variant="outline"
@@ -1419,7 +1428,7 @@ export default function ObjectivesPage() {
                 </Button>
               </Grid.Col>
             </Grid>
-          </Stack>
+          </Box>
         </form>
       </Modal>
 

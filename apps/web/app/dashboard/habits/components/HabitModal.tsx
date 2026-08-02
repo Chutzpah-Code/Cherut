@@ -181,11 +181,17 @@ export function HabitModal({
         styles={{
           content: {
             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100dvh',
+            maxHeight: '100dvh',
           },
           body: {
-            maxHeight: '80vh',
-            overflowY: 'auto',
-            padding: '32px',
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: 0,
           },
           header: {
             padding: '24px 32px 0 32px',
@@ -197,143 +203,145 @@ export function HabitModal({
           blur: 4,
         }}
       >
-      <Stack gap="md">
-        {/* Form */}
-        <TextInput
-          label="Title"
-          placeholder="Habit name"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
+      <ScrollArea flex={1} px="xl" py="md">
+        <Stack gap="md">
+          {/* Form */}
+          <TextInput
+            label="Title"
+            placeholder="Habit name"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
 
-        <Textarea
-          label="Description"
-          placeholder="Describe your habit..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-        />
+          <Textarea
+            label="Description"
+            placeholder="Describe your habit..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+          />
 
-        <Grid grow>
-          <Grid.Col span={{ base: 12, sm: 6 }}>
-            <DateInput
-              label="Start Date"
-              description="When did you start this habit?"
-              placeholder="Select start date"
-              value={startDateValue}
-              onChange={setStartDateValue}
-              clearable
-            />
-          </Grid.Col>
-          <Grid.Col span={{ base: 12, sm: 6 }}>
-            <DateInput
-              label="Due Date"
-              description="Target completion date for this habit"
-              placeholder="Select end date"
-              value={dueDateValue}
-              onChange={setDueDateValue}
-              minDate={startDateValue || new Date()}
-              clearable
-            />
-          </Grid.Col>
-        </Grid>
+          <Grid grow>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <DateInput
+                label="Start Date"
+                description="When did you start this habit?"
+                placeholder="Select start date"
+                value={startDateValue}
+                onChange={setStartDateValue}
+                clearable
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <DateInput
+                label="Due Date"
+                description="Target completion date for this habit"
+                placeholder="Select end date"
+                value={dueDateValue}
+                onChange={setDueDateValue}
+                minDate={startDateValue || new Date()}
+                clearable
+              />
+            </Grid.Col>
+          </Grid>
 
-        <Divider label="Statistics" labelPosition="center" />
+          <Divider label="Statistics" labelPosition="center" />
 
-        {/* Progress Bar */}
-        {stats.currentStreak < totalDays && (
-          <Box p="sm" style={{ backgroundColor: 'var(--mantine-color-blue-0)', borderRadius: 8 }}>
-            <Group justify="space-between" mb="xs">
-              <Text size="sm" fw={600}>Habit Challenge Progress</Text>
-              <Text size="sm" fw={700} c="blue">{stats.currentStreak}/{totalDays} days</Text>
-            </Group>
-            <Box style={{ width: '100%', height: 8, backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: 4, overflow: 'hidden' }}>
-              <Box
-                style={{
-                  width: `${(stats.currentStreak / totalDays) * 100}%`,
-                  height: '100%',
-                  backgroundColor: categoryColor === 'green' ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)',
-                  transition: 'width 0.3s ease'
-                }}
+          {/* Progress Bar */}
+          {stats.currentStreak < totalDays && (
+            <Box p="sm" style={{ backgroundColor: 'var(--mantine-color-blue-0)', borderRadius: 8 }}>
+              <Group justify="space-between" mb="xs">
+                <Text size="sm" fw={600}>Habit Challenge Progress</Text>
+                <Text size="sm" fw={700} c="blue">{stats.currentStreak}/{totalDays} days</Text>
+              </Group>
+              <Box style={{ width: '100%', height: 8, backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: 4, overflow: 'hidden' }}>
+                <Box
+                  style={{
+                    width: `${(stats.currentStreak / totalDays) * 100}%`,
+                    height: '100%',
+                    backgroundColor: categoryColor === 'green' ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)',
+                    transition: 'width 0.3s ease'
+                  }}
+                />
+              </Box>
+              <Text size="xs" c="dimmed" mt="xs">
+                {totalDays - stats.currentStreak} days until goal completion!
+              </Text>
+            </Box>
+          )}
+
+          {stats.currentStreak >= totalDays && (
+            <Box p="sm" style={{ backgroundColor: 'var(--mantine-color-green-0)', borderRadius: 8 }}>
+              <Group>
+                <Text size="lg">🎉</Text>
+                <Box style={{ flex: 1 }}>
+                  <Text size="sm" fw={600} c="green">Goal Completed!</Text>
+                  <Text size="xs" c="dimmed">You&apos;ve reached your target! Keep it up!</Text>
+                </Box>
+              </Group>
+            </Box>
+          )}
+
+          {/* Stats */}
+          <Grid grow>
+            <Grid.Col span={{ base: 4, sm: 4 }}>
+              <Box ta="center">
+                <Text size="xl" fw={700} c={categoryColor}>
+                  {stats.currentStreak}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  Current Streak
+                </Text>
+              </Box>
+            </Grid.Col>
+            <Grid.Col span={{ base: 4, sm: 4 }}>
+              <Box ta="center">
+                <Text size="xl" fw={700} c="blue">
+                  {stats.bestStreak}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  Best Streak
+                </Text>
+              </Box>
+            </Grid.Col>
+            <Grid.Col span={{ base: 4, sm: 4 }}>
+              <Box ta="center">
+                <Text size="xl" fw={700} c="grape">
+                  {stats.completionRate}%
+                </Text>
+                <Text size="xs" c="dimmed">
+                  Completion Rate
+                </Text>
+              </Box>
+            </Grid.Col>
+          </Grid>
+
+          <Divider label="Complete History" labelPosition="center" />
+
+          {/* Streak completa */}
+          <ScrollArea h={200} type="auto">
+            <Box p="xs">
+              <StreakVisualizer
+                habitId={habit.id}
+                category={habit.category}
+                logs={logs}
+                onDayClick={(date) => onDayClick(habit.id, date)}
+                compact={false}
+                habitStartDate={habit.startDate}
+                habitCreatedAt={habit.createdAt}
+                habitDueDate={habit.dueDate}
               />
             </Box>
-            <Text size="xs" c="dimmed" mt="xs">
-              {totalDays - stats.currentStreak} days until goal completion!
-            </Text>
-          </Box>
-        )}
+          </ScrollArea>
 
-        {stats.currentStreak >= totalDays && (
-          <Box p="sm" style={{ backgroundColor: 'var(--mantine-color-green-0)', borderRadius: 8 }}>
-            <Group>
-              <Text size="lg">🎉</Text>
-              <Box style={{ flex: 1 }}>
-                <Text size="sm" fw={600} c="green">Goal Completed!</Text>
-                <Text size="xs" c="dimmed">You&apos;ve reached your target! Keep it up!</Text>
-              </Box>
-            </Group>
-          </Box>
-        )}
-
-        {/* Stats */}
-        <Grid grow>
-          <Grid.Col span={{ base: 4, sm: 4 }}>
-            <Box ta="center">
-              <Text size="xl" fw={700} c={categoryColor}>
-                {stats.currentStreak}
-              </Text>
-              <Text size="xs" c="dimmed">
-                Current Streak
-              </Text>
-            </Box>
-          </Grid.Col>
-          <Grid.Col span={{ base: 4, sm: 4 }}>
-            <Box ta="center">
-              <Text size="xl" fw={700} c="blue">
-                {stats.bestStreak}
-              </Text>
-              <Text size="xs" c="dimmed">
-                Best Streak
-              </Text>
-            </Box>
-          </Grid.Col>
-          <Grid.Col span={{ base: 4, sm: 4 }}>
-            <Box ta="center">
-              <Text size="xl" fw={700} c="grape">
-                {stats.completionRate}%
-              </Text>
-              <Text size="xs" c="dimmed">
-                Completion Rate
-              </Text>
-            </Box>
-          </Grid.Col>
-        </Grid>
-
-        <Divider label="Complete History" labelPosition="center" />
-
-        {/* Streak completa */}
-        <ScrollArea h={200} type="auto">
-          <Box p="xs">
-            <StreakVisualizer
-              habitId={habit.id}
-              category={habit.category}
-              logs={logs}
-              onDayClick={(date) => onDayClick(habit.id, date)}
-              compact={false}
-              habitStartDate={habit.startDate}
-              habitCreatedAt={habit.createdAt}
-              habitDueDate={habit.dueDate}
-            />
-          </Box>
-        </ScrollArea>
-
-        <Text size="xs" c="dimmed" ta="center">
-          Click on the squares to mark/unmark days
-        </Text>
-
-        {/* Action buttons */}
-        <Stack gap="md" mt="md">
+          <Text size="xs" c="dimmed" ta="center">
+            Click on the squares to mark/unmark days
+          </Text>
+        </Stack>
+      </ScrollArea>
+      <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
+        <Stack gap="md">
           <Grid>
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <Button
@@ -450,7 +458,7 @@ export function HabitModal({
             </Grid.Col>
           </Grid>
         </Stack>
-      </Stack>
+      </Box>
       </Modal>
     </>
   );

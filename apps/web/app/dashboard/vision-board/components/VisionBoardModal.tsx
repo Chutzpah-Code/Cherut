@@ -14,6 +14,7 @@ import {
   FileButton,
   Loader,
   Alert,
+  ScrollArea,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { Trash2, Upload, AlertCircle } from 'lucide-react';
@@ -149,9 +150,20 @@ export function VisionBoardModal({
         styles={{
           content: {
             fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '85dvh',
+          },
+          body: {
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: 0,
           },
         }}
       >
+        <ScrollArea flex={1} px="md" py="xs">
         <Stack gap="lg">
         {/* Imagem Preview */}
         <Box>
@@ -413,43 +425,20 @@ export function VisionBoardModal({
           </Alert>
         )}
 
-        {/* Action buttons */}
-        <Group justify="space-between" mt="lg">
-          <Button
-            variant="outline"
-            color="red"
-            leftSection={<Trash2 size={16} />}
-            onClick={() => onDelete(item.id)}
-            radius={8}
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              borderColor: '#dc2626',
-              color: '#dc2626',
-              fontSize: '16px',
-              fontWeight: 600,
-              height: '48px',
-              background: 'white',
-            }}
-            styles={{
-              root: {
-                '&:hover': {
-                  backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                },
-              },
-            }}
-          >
-            Delete
-          </Button>
-
-          <Group>
+        </Stack>
+        </ScrollArea>
+        <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
+          <Group justify="space-between">
             <Button
               variant="outline"
-              onClick={onClose}
+              color="red"
+              leftSection={<Trash2 size={16} />}
+              onClick={() => onDelete(item.id)}
               radius={8}
               style={{
                 fontFamily: 'Inter, sans-serif',
-                borderColor: '#CCCCCC',
-                color: '#333333',
+                borderColor: '#dc2626',
+                color: '#dc2626',
                 fontSize: '16px',
                 fontWeight: 600,
                 height: '48px',
@@ -458,41 +447,66 @@ export function VisionBoardModal({
               styles={{
                 root: {
                   '&:hover': {
-                    borderColor: '#4686FE',
-                    color: '#4686FE',
+                    backgroundColor: 'rgba(239, 68, 68, 0.08)',
                   },
                 },
               }}
             >
-              Cancel
+              Delete
             </Button>
-            <Button
-              onClick={handleSave}
-              loading={isSaving}
-              disabled={!title.trim() || isUploadingImage}
-              radius={8}
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                background: '#4686FE',
-                border: 'none',
-                fontSize: '16px',
-                fontWeight: 600,
-                color: 'white',
-                height: '48px',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    background: '#3366E5',
+
+            <Group>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  borderColor: '#CCCCCC',
+                  color: '#333333',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  height: '48px',
+                  background: 'white',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      borderColor: '#4686FE',
+                      color: '#4686FE',
+                    },
                   },
-                },
-              }}
-            >
-              Save Changes
-            </Button>
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSave}
+                loading={isSaving}
+                disabled={!title.trim() || isUploadingImage}
+                radius={8}
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  background: '#4686FE',
+                  border: 'none',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: 'white',
+                  height: '48px',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      background: '#3366E5',
+                    },
+                  },
+                }}
+              >
+                Save Changes
+              </Button>
+            </Group>
           </Group>
-        </Group>
-      </Stack>
+        </Box>
     </Modal>
     </>
   );
