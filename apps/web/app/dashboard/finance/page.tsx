@@ -58,47 +58,55 @@ function fmt(value: number, currency?: string) {
 
 function TabBar({ current, onChange }: { current: FinanceView; onChange: (v: FinanceView) => void }) {
   return (
-    <Box
-      className="scroll-x-hidden"
-      style={{
-        marginLeft: 'calc(-1 * var(--mantine-spacing-md))',
-        marginRight: 'calc(-1 * var(--mantine-spacing-md))',
-        borderBottom: '1px solid #E2E8F0',
-        marginBottom: 20,
-        backgroundColor: '#ffffff',
-        overflowX: 'auto',
-        WebkitOverflowScrolling: 'touch',
-      }}
-    >
-      <Group gap={0} style={{ flexWrap: 'nowrap', paddingLeft: 'var(--mantine-spacing-md)' }}>
-        {TABS.map(({ id, label }) => {
-          const isActive = current === id;
-          return (
-            <UnstyledButton
-              key={id}
-              onClick={() => onChange(id)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '10px 16px',
-                marginBottom: -1,
-                borderBottom: isActive ? '2px solid #0052CC' : '2px solid transparent',
-                cursor: 'pointer',
-                transition: 'border-color 0.15s ease',
-                userSelect: 'none',
-              }}
-            >
-              <Text
-                size="sm"
-                fw={isActive ? 600 : 500}
-                style={{ color: isActive ? '#0052CC' : '#42526E', letterSpacing: '-0.01em', lineHeight: 1 }}
+    <Box style={{ position: 'relative', marginBottom: 20 }}>
+      <Box
+        className="scroll-x-hidden"
+        style={{
+          marginLeft: 'calc(-1 * var(--mantine-spacing-md))',
+          marginRight: 'calc(-1 * var(--mantine-spacing-md))',
+          borderBottom: '1px solid #E2E8F0',
+          backgroundColor: '#ffffff',
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        <Group gap={0} style={{ flexWrap: 'nowrap', paddingLeft: 'var(--mantine-spacing-md)' }}>
+          {TABS.map(({ id, label }) => {
+            const isActive = current === id;
+            return (
+              <UnstyledButton
+                key={id}
+                onClick={() => onChange(id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '10px 10px',
+                  marginBottom: -1,
+                  borderBottom: isActive ? '2px solid #0052CC' : '2px solid transparent',
+                  cursor: 'pointer',
+                  transition: 'border-color 0.15s ease',
+                  userSelect: 'none',
+                  whiteSpace: 'nowrap',
+                }}
               >
-                {label}
-              </Text>
-            </UnstyledButton>
-          );
-        })}
-      </Group>
+                <Text
+                  size="sm"
+                  fw={isActive ? 600 : 500}
+                  style={{ color: isActive ? '#0052CC' : '#42526E', letterSpacing: '-0.01em', lineHeight: 1 }}
+                >
+                  {label}
+                </Text>
+              </UnstyledButton>
+            );
+          })}
+        </Group>
+      </Box>
+      {/* Scroll affordance — right fade */}
+      <Box style={{
+        position: 'absolute', right: 0, top: 0, bottom: 0, width: 32,
+        background: 'linear-gradient(to right, transparent, #ffffff)',
+        pointerEvents: 'none',
+      }} />
     </Box>
   );
 }
@@ -279,7 +287,7 @@ function DonutCard({ displayCurrency }: { displayCurrency: string }) {
       border: '1px solid #F1F5F9',
     }}>
       {/* Header */}
-      <Group justify="space-between" align="center" mb={18}>
+      <Group justify="space-between" align="center" mb={18} style={{ flexWrap: 'wrap', gap: 8 }}>
         <Box>
           <Text style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             Cash Flow
@@ -604,7 +612,7 @@ const EMPTY_FORM: Partial<CreateTransactionDto> = {
 
 function TransactionForm({
   form, setForm, formCurrency, accounts, categories,
-  onAccountChange, onSubmit, loading, submitLabel,
+  onAccountChange, onSubmit, loading, submitLabel, hideSubmit,
 }: {
   form: Partial<CreateTransactionDto>;
   setForm: React.Dispatch<React.SetStateAction<Partial<CreateTransactionDto>>>;
@@ -615,6 +623,7 @@ function TransactionForm({
   onSubmit: () => void;
   loading: boolean;
   submitLabel: string;
+  hideSubmit?: boolean;
 }) {
   if (accounts.length === 0) {
     return (
@@ -673,14 +682,16 @@ function TransactionForm({
         value={form.description ?? ''}
         onChange={(e) => setForm((f) => ({ ...f, description: e.target.value || undefined }))}
       />
-      <Button
-        onClick={onSubmit}
-        loading={loading}
-        disabled={!form.accountId || !form.categoryId || !form.amount}
-        style={{ backgroundColor: '#0052CC' }}
-      >
-        {submitLabel}
-      </Button>
+      {!hideSubmit && (
+        <Button
+          onClick={onSubmit}
+          loading={loading}
+          disabled={!form.accountId || !form.categoryId || !form.amount}
+          style={{ backgroundColor: '#0052CC' }}
+        >
+          {submitLabel}
+        </Button>
+      )}
     </Stack>
   );
 }
@@ -836,33 +847,77 @@ function TransactionsView() {
       )}
 
       {/* Create modal */}
-      <Modal opened={createOpened} onClose={closeCreate} title="New Transaction" centered>
-        <TransactionForm
-          form={createForm}
-          setForm={setCreateForm}
-          formCurrency={createCurrency}
-          accounts={accounts as FinanceAccount[]}
-          categories={categories}
-          onAccountChange={handleCreateAccountChange}
-          onSubmit={handleCreate}
-          loading={createTx.isPending}
-          submitLabel="Add Transaction"
-        />
+      <Modal
+        opened={createOpened}
+        onClose={closeCreate}
+        title="New Transaction"
+        centered
+        styles={{
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
+          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+        }}
+      >
+        <ScrollArea flex={1} px="md" py="xs">
+          <TransactionForm
+            form={createForm}
+            setForm={setCreateForm}
+            formCurrency={createCurrency}
+            accounts={accounts as FinanceAccount[]}
+            categories={categories}
+            onAccountChange={handleCreateAccountChange}
+            onSubmit={handleCreate}
+            loading={createTx.isPending}
+            submitLabel="Add Transaction"
+            hideSubmit
+          />
+        </ScrollArea>
+        <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
+          <Button
+            onClick={handleCreate}
+            loading={createTx.isPending}
+            disabled={!createForm.accountId || !createForm.categoryId || !createForm.amount}
+            style={{ backgroundColor: '#0052CC', width: '100%' }}
+          >
+            Add Transaction
+          </Button>
+        </Box>
       </Modal>
 
       {/* Edit modal */}
-      <Modal opened={!!editTx} onClose={() => setEditTx(null)} title="Edit Transaction" centered>
-        <TransactionForm
-          form={editForm}
-          setForm={setEditForm}
-          formCurrency={editCurrency}
-          accounts={accounts as FinanceAccount[]}
-          categories={categories}
-          onAccountChange={handleEditAccountChange}
-          onSubmit={handleEdit}
-          loading={updateTx.isPending}
-          submitLabel="Save Changes"
-        />
+      <Modal
+        opened={!!editTx}
+        onClose={() => setEditTx(null)}
+        title="Edit Transaction"
+        centered
+        styles={{
+          content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh' },
+          body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+        }}
+      >
+        <ScrollArea flex={1} px="md" py="xs">
+          <TransactionForm
+            form={editForm}
+            setForm={setEditForm}
+            formCurrency={editCurrency}
+            accounts={accounts as FinanceAccount[]}
+            categories={categories}
+            onAccountChange={handleEditAccountChange}
+            onSubmit={handleEdit}
+            loading={updateTx.isPending}
+            submitLabel="Save Changes"
+            hideSubmit
+          />
+        </ScrollArea>
+        <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
+          <Button
+            onClick={handleEdit}
+            loading={updateTx.isPending}
+            disabled={!editForm.accountId || !editForm.categoryId || !editForm.amount}
+            style={{ backgroundColor: '#0052CC', width: '100%' }}
+          >
+            Save Changes
+          </Button>
+        </Box>
       </Modal>
     </>
   );
