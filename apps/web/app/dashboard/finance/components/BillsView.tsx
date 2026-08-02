@@ -70,6 +70,7 @@ function PayModal({
   const payMutation = usePayOccurrence();
 
   const [accountId, setAccountId] = useState('');
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [amount, setAmount] = useState(0);
   const [paidAt, setPaidAt] = useState(today);
   const [notes, setNotes] = useState('');
@@ -80,8 +81,10 @@ function PayModal({
       setPaidAt(today);
       setAccountId('');
       setNotes('');
+      const billAcct = (accounts as any[]).find((a) => a.id === occurrence.bill?.accountId);
+      setSelectedCurrency(billAcct?.currency ?? 'USD');
     }
-  }, [occurrence, opened, today]);
+  }, [occurrence, opened, today, accounts]);
 
   function handlePay() {
     if (!occurrence || !accountId || amount <= 0) return;
@@ -109,7 +112,10 @@ function PayModal({
           placeholder="Select account"
           data={accountOptions}
           value={accountId}
-          onChange={(v) => setAccountId(v ?? '')}
+          onChange={(v) => {
+            setAccountId(v ?? '');
+            setSelectedCurrency((accounts as any[]).find((a) => a.id === v)?.currency ?? 'USD');
+          }}
           required
         />
         <NumberInput
@@ -118,6 +124,8 @@ function PayModal({
           decimalScale={2}
           value={amount}
           onChange={(v) => setAmount(Number(v) || 0)}
+          leftSection={<Text size="xs" fw={600}>{selectedCurrency}</Text>}
+          leftSectionWidth={42}
           required
         />
         <TextInput
@@ -332,9 +340,14 @@ export function BillsView() {
   const [billFormOpened, { open: openBillForm, close: closeBillForm }] = useDisclosure(false);
   const [editingBill, setEditingBill] = useState<FinanceBill | null>(null);
   const [manageOpen, setManageOpen] = useState(false);
+  const [displayCurrency] = useState<string>(() => {
+    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
+  });
 
   const { data: occurrences = [], isLoading } = useBillOccurrences(selectedMonth);
   const { data: bills = [] } = useBills();
+  const { data: accounts = [] } = useFinanceAccounts();
+  const accountMap = Object.fromEntries((accounts as any[]).map((a: any) => [a.id, a]));
   const deleteBill = useDeleteBill();
 
   const summary = {
@@ -383,17 +396,17 @@ export function BillsView() {
         <Box style={{ background: '#EFF6FF', borderRadius: 10, padding: '12px 16px' }}>
           <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Pending</Text>
           <Text size="lg" fw={700} c="#0052CC">{summary.pending.length}</Text>
-          <Text size="xs" c="dimmed">{fmt(summary.pending.reduce((s, o) => s + o.amount, 0))}</Text>
+          <Text size="xs" c="dimmed">{fmt(summary.pending.reduce((s, o) => s + o.amount, 0), displayCurrency)}</Text>
         </Box>
         <Box style={{ background: '#FFF5F5', borderRadius: 10, padding: '12px 16px' }}>
           <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Overdue</Text>
           <Text size="lg" fw={700} c="red.7">{summary.overdue.length}</Text>
-          <Text size="xs" c="dimmed">{fmt(summary.overdue.reduce((s, o) => s + o.amount, 0))}</Text>
+          <Text size="xs" c="dimmed">{fmt(summary.overdue.reduce((s, o) => s + o.amount, 0), displayCurrency)}</Text>
         </Box>
         <Box style={{ background: '#F0FDF4', borderRadius: 10, padding: '12px 16px' }}>
           <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Paid</Text>
           <Text size="lg" fw={700} c="green.7">{summary.paid.length}</Text>
-          <Text size="xs" c="dimmed">{fmt(summary.paid.reduce((s, o) => s + o.amount, 0))}</Text>
+          <Text size="xs" c="dimmed">{fmt(summary.paid.reduce((s, o) => s + o.amount, 0), displayCurrency)}</Text>
         </Box>
       </Group>
 
@@ -439,7 +452,7 @@ export function BillsView() {
                 </Box>
                 <Group gap="xs">
                   <Text size="sm" fw={600} c={occ.bill?.type === 'income' ? 'green.7' : 'red.7'}>
-                    {occ.bill?.type === 'expense' ? '−' : '+'}{fmt(occ.amount)}
+                    {occ.bill?.type === 'expense' ? '−' : '+'}{fmt(occ.amount, accountMap[occ.bill?.accountId ?? '']?.currency ?? displayCurrency)}
                   </Text>
                   {(occ.status === 'pending' || occ.status === 'overdue') && (
                     <Button size="xs" onClick={() => openPayModal(occ)} style={{ backgroundColor: '#0052CC' }}>
@@ -497,7 +510,7 @@ export function BillsView() {
                         )}
                       </Group>
                       <Text size="xs" c="dimmed">
-                        {FREQ_LABELS[bill.frequency]} · Day {bill.dueDay} · {fmt(bill.amount)}
+                        {FREQ_LABELS[bill.frequency]} · Day {bill.dueDay} · {fmt(bill.amount, accountMap[bill.accountId]?.currency ?? displayCurrency)}
                       </Text>
                     </Box>
                     <Group gap={4}>

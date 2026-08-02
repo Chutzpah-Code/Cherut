@@ -13,11 +13,11 @@ import {
 } from '@/hooks/useFinance';
 import { CreateBudgetDto } from '@/lib/api/services/finance';
 
-function fmt(value: number) {
+function fmt(value: number, currency = 'USD') {
   try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value);
   } catch {
-    return value.toFixed(2);
+    return `${currency} ${value.toFixed(2)}`;
   }
 }
 
@@ -43,6 +43,9 @@ const MONTH_OPTIONS = monthOptions();
 export function BudgetsView() {
   const [opened, { open, close }] = useDisclosure();
   const [month, setMonth] = useState(currentMonth());
+  const [displayCurrency] = useState<string>(() => {
+    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
+  });
   const { data: budgets = [], isLoading } = useFinanceBudgets(month);
   const { data: categories = [] } = useFinanceCategories('expense');
   const createBudget = useCreateBudget();
@@ -124,7 +127,7 @@ export function BudgetsView() {
                 <Group justify="space-between" mb="xs">
                   <Text size="sm" fw={600}>{cat?.name ?? budget.categoryId}</Text>
                   <Group gap="xs">
-                    <Text size="xs" c="dimmed">{fmt(spent)} / {fmt(budget.amount)}</Text>
+                    <Text size="xs" c="dimmed">{fmt(spent, displayCurrency)} / {fmt(budget.amount, displayCurrency)}</Text>
                     <ActionIcon size="xs" variant="subtle" color="blue" onClick={() => openEdit(budget)}>
                       <Pencil size={11} />
                     </ActionIcon>
@@ -141,7 +144,7 @@ export function BudgetsView() {
                 />
                 {over && (
                   <Text size="xs" c="red" mt={4}>
-                    Over budget by {fmt(spent - budget.amount)}
+                    Over budget by {fmt(spent - budget.amount, displayCurrency)}
                   </Text>
                 )}
               </Card>

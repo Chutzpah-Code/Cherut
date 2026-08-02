@@ -58,6 +58,8 @@ function UpcomingBillsTab() {
 
   const { data: thisOcc = [], isLoading: l1 } = useBillOccurrences(thisMonth);
   const { data: nextOcc = [], isLoading: l2 } = useBillOccurrences(nxtMonth);
+  const { data: accounts = [] } = useFinanceAccounts();
+  const accountMap = Object.fromEntries((accounts as FinanceAccount[]).map((a) => [a.id, a]));
   const isLoading = l1 || l2;
 
   const upcoming = useMemo(() => {
@@ -111,7 +113,7 @@ function UpcomingBillsTab() {
                     </Group>
                   </Box>
                   <Text size="sm" fw={600} c={occ.bill?.type === 'income' ? 'green.7' : 'red.7'}>
-                    {occ.bill?.type === 'expense' ? '−' : '+'}{fmt(occ.amount)}
+                    {occ.bill?.type === 'expense' ? '−' : '+'}{fmt(occ.amount, accountMap[occ.bill?.accountId ?? '']?.currency)}
                   </Text>
                 </Group>
               </Box>
@@ -190,7 +192,10 @@ function ProjectionTab() {
           <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
           <XAxis dataKey="date" tick={{ fontSize: 11 }} interval={9} />
           <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-          <Tooltip formatter={(v: number) => fmt(v)} />
+          <Tooltip formatter={(v: number, name: string) => {
+            const acct = (accounts as FinanceAccount[]).find((a) => a.name === name);
+            return fmt(v, acct?.currency);
+          }} />
           <Legend wrapperStyle={{ fontSize: 12 }} />
           {accountNames.map((name, idx) => (
             <Line
@@ -212,6 +217,11 @@ function ProjectionTab() {
 
 function SubscriptionsTab() {
   const { data: bills = [], isLoading } = useBills();
+  const { data: accounts = [] } = useFinanceAccounts();
+  const accountMap = Object.fromEntries((accounts as FinanceAccount[]).map((a) => [a.id, a]));
+  const displayCurrency = (() => {
+    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
+  })();
 
   const subscriptions = useMemo(() => {
     return (bills as FinanceBill[]).filter(
@@ -242,11 +252,11 @@ function SubscriptionsTab() {
       <Group gap="md">
         <Box style={{ flex: 1, background: '#EFF6FF', borderRadius: 10, padding: '12px 16px' }}>
           <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Monthly total</Text>
-          <Text size="xl" fw={700} c="#0052CC">{fmt(monthlyTotal)}</Text>
+          <Text size="xl" fw={700} c="#0052CC">{fmt(monthlyTotal, displayCurrency)}</Text>
         </Box>
         <Box style={{ flex: 1, background: '#F0FDF4', borderRadius: 10, padding: '12px 16px' }}>
           <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Yearly total</Text>
-          <Text size="xl" fw={700} c="green.7">{fmt(yearlyTotal)}</Text>
+          <Text size="xl" fw={700} c="green.7">{fmt(yearlyTotal, displayCurrency)}</Text>
         </Box>
       </Group>
 
@@ -267,9 +277,9 @@ function SubscriptionsTab() {
                   </Badge>
                 </Box>
                 <Box style={{ textAlign: 'right' }}>
-                  <Text size="sm" fw={600} c="red.7">{fmt(bill.amount)}</Text>
+                  <Text size="sm" fw={600} c="red.7">{fmt(bill.amount, accountMap[bill.accountId]?.currency ?? displayCurrency)}</Text>
                   {bill.frequency === 'yearly' && (
-                    <Text size="xs" c="dimmed">{fmt(monthly)}/mo</Text>
+                    <Text size="xs" c="dimmed">{fmt(monthly, accountMap[bill.accountId]?.currency ?? displayCurrency)}/mo</Text>
                   )}
                 </Box>
               </Group>
