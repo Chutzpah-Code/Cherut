@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import {
   Stack, Group, Text, Box, Badge, Button, Loader, Center,
   Modal, TextInput, Select, NumberInput, ActionIcon, Collapse,
-  Switch, Divider, UnstyledButton, ScrollArea, Grid,
+  Switch, Divider, UnstyledButton, Grid,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2 } from 'lucide-react';
@@ -110,7 +110,7 @@ function PayModal({
         body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
       }}
     >
-      <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+      <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
         <Stack gap="sm">
           <Select
             label="Account"
@@ -146,7 +146,7 @@ function PayModal({
             onChange={(e) => setNotes(e.target.value)}
           />
         </Stack>
-      </ScrollArea>
+      </Box>
       <Box
         px="md"
         py="sm"
@@ -250,7 +250,7 @@ function BillFormModal({
         body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
       }}
     >
-      <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+      <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
         <Stack gap="sm">
           <TextInput
             label="Name"
@@ -348,7 +348,7 @@ function BillFormModal({
             onChange={(e) => setIsActive(e.currentTarget.checked)}
           />
         </Stack>
-      </ScrollArea>
+      </Box>
       <Box
         px="md"
         py="sm"

@@ -205,7 +205,7 @@ export function HabitModal({
           blur: 4,
         }}
       >
-      <ScrollArea flex={1} px="xl" py="md" scrollbars="y" style={{ minHeight: 0 }}>
+      <Box px="xl" py="md" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
         <Stack gap="md">
           {/* Form */}
           <TextInput
@@ -341,7 +341,7 @@ export function HabitModal({
             Click on the squares to mark/unmark days
           </Text>
         </Stack>
-      </ScrollArea>
+      </Box>
       <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
         <Stack gap="md">
           <Grid>

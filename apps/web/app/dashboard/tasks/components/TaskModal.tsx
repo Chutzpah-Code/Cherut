@@ -20,7 +20,6 @@ import {
   Switch,
   Tooltip,
   Box,
-  ScrollArea,
 } from '@mantine/core';
 import { Plus, X, Play, Square, Trash2, Archive, Clock, RefreshCw } from 'lucide-react';
 import { Task, ChecklistItem, UpdateTaskDto, RecurringConfig } from '@/lib/api/services/tasks';
@@ -240,7 +239,7 @@ export function TaskModal({
         blur: 4,
       }}
     >
-      <ScrollArea flex={1} px="md" py="md" scrollbars="y" style={{ minHeight: 0 }}>
+      <Box px="md" py="md" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
         <Stack gap="md">
           {/* Title */}
         <TextInput
@@ -645,7 +644,7 @@ export function TaskModal({
         </Grid>
 
         </Stack>
-      </ScrollArea>
+      </Box>
       <Box
         px="md"
         py="sm"

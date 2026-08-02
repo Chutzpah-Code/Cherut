@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import {
   Stack, Group, Title, Text, Box, SimpleGrid, Card, Badge, Grid,
   Button, Loader, Center, UnstyledButton, Modal,
-  TextInput, Select, NumberInput, ActionIcon, ScrollArea,
+  TextInput, Select, NumberInput, ActionIcon,
 } from '@mantine/core';
 import { PieChart, Pie, Cell, Sector } from 'recharts';
 import { useDisclosure } from '@mantine/hooks';
@@ -859,7 +859,7 @@ function TransactionsView() {
           body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+        <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
           <TransactionForm
             form={createForm}
             setForm={setCreateForm}
@@ -872,7 +872,7 @@ function TransactionsView() {
             submitLabel="Add Transaction"
             hideSubmit
           />
-        </ScrollArea>
+        </Box>
         <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
           <Button
             onClick={handleCreate}
@@ -896,7 +896,7 @@ function TransactionsView() {
           body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+        <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
           <TransactionForm
             form={editForm}
             setForm={setEditForm}
@@ -909,7 +909,7 @@ function TransactionsView() {
             submitLabel="Save Changes"
             hideSubmit
           />
-        </ScrollArea>
+        </Box>
         <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
           <Button
             onClick={handleEdit}
@@ -1195,7 +1195,7 @@ function AccountsView() {
           body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+        <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
           <Stack gap="sm">
             <TextInput label="Name" placeholder="e.g. Main Checking" value={form.name ?? ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
             <Select
@@ -1254,7 +1254,7 @@ function AccountsView() {
               </>
             )}
           </Stack>
-        </ScrollArea>
+        </Box>
         <Box
           px="md"
           py="sm"

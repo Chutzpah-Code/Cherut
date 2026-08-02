@@ -27,7 +27,6 @@ import {
   Paper,
   Tooltip,
   Box,
-  ScrollArea,
   NumberInput,
   Menu,
 } from '@mantine/core';
@@ -1077,7 +1076,7 @@ export default function ObjectivesPage() {
         }}
       >
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+          <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
           <Stack gap="lg">
             <TextInput
               label="Title"
@@ -1373,7 +1372,7 @@ export default function ObjectivesPage() {
             </div>
 
           </Stack>
-          </ScrollArea>
+          </Box>
           <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
             <Grid justify="flex-end" align="center">
               <Grid.Col span={{ base: 6, sm: 'content' }}>

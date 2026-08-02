@@ -14,7 +14,6 @@ import {
   FileButton,
   Loader,
   Alert,
-  ScrollArea,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { Trash2, Upload, AlertCircle } from 'lucide-react';
@@ -165,7 +164,7 @@ export function VisionBoardModal({
           },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+        <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
         <Stack gap="lg">
         {/* Imagem Preview */}
         <Box>
@@ -428,7 +427,7 @@ export function VisionBoardModal({
         )}
 
         </Stack>
-        </ScrollArea>
+        </Box>
         <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
           <Group justify="space-between">
             <Button

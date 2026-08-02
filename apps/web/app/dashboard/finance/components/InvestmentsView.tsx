@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
   Stack, Group, Text, Box, Badge, Button, Loader, Center,
-  Modal, Select, NumberInput, TextInput, ActionIcon, Card, Collapse, ScrollArea,
+  Modal, Select, NumberInput, TextInput, ActionIcon, Card, Collapse,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Plus, Trash2, ChevronDown, ChevronRight, Pencil } from 'lucide-react';
@@ -191,7 +191,7 @@ function InvestmentCard({ inv, accounts, onDelete }: { inv: FinanceInvestment; a
           body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+        <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
           <Stack gap="sm">
             <NumberInput
               label={`Amount (${inv.currency})`}
@@ -219,7 +219,7 @@ function InvestmentCard({ inv, accounts, onDelete }: { inv: FinanceInvestment; a
               </Text>
             )}
           </Stack>
-        </ScrollArea>
+        </Box>
         <Box px="md" py="sm" style={{
           borderTop: '1px solid #E2E8F0',
           paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
@@ -247,7 +247,7 @@ function InvestmentCard({ inv, accounts, onDelete }: { inv: FinanceInvestment; a
           body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+        <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
           <Stack gap="sm">
             <Select
               label="Account"
@@ -290,7 +290,7 @@ function InvestmentCard({ inv, accounts, onDelete }: { inv: FinanceInvestment; a
               onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
             />
           </Stack>
-        </ScrollArea>
+        </Box>
         <Box px="md" py="sm" style={{
           borderTop: '1px solid #E2E8F0',
           paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
@@ -370,7 +370,7 @@ export function InvestmentsView() {
           body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
         }}
       >
-        <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+        <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
           <Stack gap="sm">
             <Select
               label="Account"
@@ -415,7 +415,7 @@ export function InvestmentsView() {
               onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value || undefined }))}
             />
           </Stack>
-        </ScrollArea>
+        </Box>
         <Box px="md" py="sm" style={{
           borderTop: '1px solid #E2E8F0',
           paddingBottom: 'max(12px, env(safe-area-inset-bottom))',

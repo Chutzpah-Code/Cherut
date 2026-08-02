@@ -11,7 +11,6 @@ import {
   Textarea,
   Stack,
   Alert,
-  ScrollArea,
   TextInput,
   Box,
 } from '@mantine/core';
@@ -167,7 +166,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
     >
       {isEditing ? (
         <>
-          <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+          <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
             <Stack gap="md">
               {/* Date info */}
               <Group gap="xs" align="center">
@@ -210,7 +209,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
                 disabled={updateMutation.isPending}
               />
             </Stack>
-          </ScrollArea>
+          </Box>
           <Box px="md" py="sm" style={{
             borderTop: '1px solid #E2E8F0',
             paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
@@ -244,7 +243,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
         </>
       ) : (
         <>
-          <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+          <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
             <Stack gap="md">
               {/* Date info */}
               <Group gap="xs" align="center">
@@ -268,7 +267,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
                 {entry.content}
               </Text>
             </Stack>
-          </ScrollArea>
+          </Box>
           <Box px="md" py="sm" style={{
             borderTop: '1px solid #E2E8F0',
             paddingBottom: 'max(12px, env(safe-area-inset-bottom))',

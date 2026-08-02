@@ -19,7 +19,6 @@ import {
   ActionIcon,
   Menu,
   Transition,
-  ScrollArea,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
@@ -598,7 +597,7 @@ export default function ValuesPage() {
           onSubmit={handleSubmit}
           style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}
         >
-          <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+          <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
             <Stack gap="lg" py="xs">
               <TextInput
                 label="Title"
@@ -707,7 +706,7 @@ export default function ValuesPage() {
                 }}
               />
             </Stack>
-          </ScrollArea>
+          </Box>
           <Box
             px="md"
             py="sm"

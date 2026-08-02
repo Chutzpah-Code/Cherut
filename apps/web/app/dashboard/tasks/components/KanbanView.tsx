@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { Box, Loader, Center, Group, Button, Modal, TextInput, Stack, Select, Text, ScrollArea } from '@mantine/core';
+import { Box, Loader, Center, Group, Button, Modal, TextInput, Stack, Select, Text } from '@mantine/core';
 import { Plus } from 'lucide-react';
 import {
   DndContext,
@@ -425,7 +425,7 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
           },
         }}
       >
-        <ScrollArea flex={1} px="md" py="md" scrollbars="y" style={{ minHeight: 0 }}>
+        <Box px="md" py="md" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
         <Stack gap="lg">
           <TextInput
             label="Title"
@@ -537,7 +537,7 @@ export function KanbanView({ currentFilter, onFilterChange }: KanbanViewProps) {
             }}
           />
         </Stack>
-        </ScrollArea>
+        </Box>
         <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
           <Group justify="flex-end">
             <Button

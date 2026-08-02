@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {
   Stack, Group, Text, Box, Badge, Button, Loader, Center,
   Card, Progress, Modal, Select, NumberInput, Collapse,
-  ActionIcon, ScrollArea,
+  ActionIcon,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { CreditCard, ChevronDown, ChevronRight, AlertCircle } from 'lucide-react';
@@ -74,7 +74,7 @@ function PayModal({
         body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
       }}
     >
-      <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+      <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
         <Stack gap="sm">
           <Box style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
             <Text size="xs" c="dimmed">Statement total</Text>
@@ -101,7 +101,7 @@ function PayModal({
             leftSection={<Text size="xs" c="dimmed" fw={600}>{cardAccount.currency}</Text>}
           />
         </Stack>
-      </ScrollArea>
+      </Box>
       <Box px="md" py="sm" style={{
         borderTop: '1px solid #E2E8F0',
         paddingBottom: 'max(12px, env(safe-area-inset-bottom))',

@@ -18,7 +18,6 @@ import {
   ActionIcon,
   Box,
   Menu,
-  ScrollArea,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { useLifeAreas, useCreateLifeArea, useUpdateLifeArea, useDeleteLifeArea } from '@/hooks/useLifeAreas';
@@ -433,7 +432,7 @@ export default function LifeAreasPage() {
           onSubmit={handleSubmit}
           style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}
         >
-          <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+          <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
             <Stack gap="lg" py="xs">
               <TextInput
                 label="Name"
@@ -502,7 +501,7 @@ export default function LifeAreasPage() {
                 }}
               />
             </Stack>
-          </ScrollArea>
+          </Box>
           <Box
             px="md"
             py="sm"

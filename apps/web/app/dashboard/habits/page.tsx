@@ -18,7 +18,6 @@ import {
   Divider,
   Alert,
   Grid,
-  ScrollArea,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { modals } from '@mantine/modals';
@@ -436,7 +435,7 @@ export default function HabitsPage() {
         }}
       >
         <form onSubmit={handleCreateSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <ScrollArea flex={1} px="md" py="xs" scrollbars="y" style={{ minHeight: 0 }}>
+          <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
             <Stack gap="md">
               <Alert
                 variant="light"
@@ -532,7 +531,7 @@ export default function HabitsPage() {
                 </Grid.Col>
               </Grid>
             </Stack>
-          </ScrollArea>
+          </Box>
           <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
             <Group justify="flex-end">
               <Button
