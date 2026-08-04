@@ -91,6 +91,7 @@ export class FirebaseService implements OnModuleInit {
       db.settings({
         host: 'localhost:8080',
         ssl: false,
+        ignoreUndefinedProperties: true,
       });
 
       // Configura Auth para usar emulator
@@ -111,6 +112,7 @@ export class FirebaseService implements OnModuleInit {
       this.firebaseApp = admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
+      admin.firestore(this.firebaseApp).settings({ ignoreUndefinedProperties: true });
 
       return;
     }
@@ -127,6 +129,7 @@ export class FirebaseService implements OnModuleInit {
         }),
         storageBucket: this.config.storageBucket || `${this.config.projectId}.appspot.com`,
       });
+      admin.firestore(this.firebaseApp).settings({ ignoreUndefinedProperties: true });
 
       return;
     }
