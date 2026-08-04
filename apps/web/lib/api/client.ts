@@ -5,7 +5,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export const apiClient = axios.create({
   baseURL: API_URL,
-  timeout: 10000,
+  // Render free tier spins down after inactivity — cold starts can take
+  // 20-40s+, well past a typical request timeout.
+  timeout: 45000,
   headers: {
     'Content-Type': 'application/json',
   },

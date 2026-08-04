@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { notifications } from '@mantine/notifications';
 import {
   boardsApi,
   CreateBoardDto,
@@ -116,6 +117,11 @@ export const useUpdateColumn = () => {
       if (context?.previous) {
         queryClient.setQueryData(['boards', boardId, 'kanban'], context.previous);
       }
+      notifications.show({
+        title: 'Could not rename list',
+        message: 'The change was not saved — please try again.',
+        color: 'red',
+      });
     },
     onSettled: (_data, _err, { boardId }) => {
       queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'columns'] });
