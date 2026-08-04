@@ -103,7 +103,21 @@ export const useUpdateColumn = () => {
       columnId: string;
       dto: UpdateColumnDto;
     }) => boardsApi.updateColumn(boardId, columnId, dto),
-    onSuccess: (_data, { boardId }) => {
+    onMutate: async ({ boardId, columnId, dto }) => {
+      await queryClient.cancelQueries({ queryKey: ['boards', boardId, 'kanban'] });
+      const previous = queryClient.getQueryData(['boards', boardId, 'kanban']);
+      queryClient.setQueryData(['boards', boardId, 'kanban'], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((col: any) => (col.id === columnId ? { ...col, ...dto } : col));
+      });
+      return { previous };
+    },
+    onError: (_err, { boardId }, context: any) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['boards', boardId, 'kanban'], context.previous);
+      }
+    },
+    onSettled: (_data, _err, { boardId }) => {
       queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'columns'] });
       queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'kanban'] });
     },
