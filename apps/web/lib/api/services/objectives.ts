@@ -68,6 +68,7 @@ export interface UpdateObjectiveDto {
   endDate?: string;
   status?: 'active' | 'completed' | 'cancelled';
   progress?: number;
+  isArchived?: boolean;
 }
 
 export const objectivesApi = {

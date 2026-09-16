@@ -33,12 +33,12 @@ export function FinanceCard() {
     : null;
 
   return (
-    <Box style={{ padding: '20px 24px' }}>
+    <Box id="finance" style={{ padding: '20px 24px' }}>
       <Group justify="space-between" mb={14}>
         <Text style={LABEL}>Finance</Text>
-        <Link href="/dashboard/finance" style={{ fontSize: 13, fontWeight: 500, color: '#0052CC', textDecoration: 'none' }}>
-          View Finance →
-        </Link>
+        <Text style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#94A3B8' }}>
+          Consolidated · {displayCurrency}
+        </Text>
       </Group>
 
       {isLoading ? (
@@ -88,6 +88,10 @@ export function FinanceCard() {
               </Text>
             </Stack>
           </Group>
+
+          <Link href="/dashboard/finance" style={{ fontSize: 13, fontWeight: 500, color: '#0052CC', textDecoration: 'none' }}>
+            View Finance →
+          </Link>
         </Stack>
       )}
     </Box>

@@ -9,7 +9,8 @@ import { FinanceCard } from './components/FinanceCard';
 
 export default function DashboardPage() {
   return (
-    <Box style={{ border: '1px solid #DDE1E8', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
+    <Box style={{ background: '#EDEFF3', padding: 16, borderRadius: 8 }}>
+    <Box style={{ maxWidth: 1400, margin: '0 auto', border: '1px solid #DDE1E8', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
       <StatusStrip />
 
       <Box
@@ -24,7 +25,7 @@ export default function DashboardPage() {
         <Box style={{ borderBottom: '1px solid #E2E5EB' }} className="dashboard-col-tasks">
           <TasksDuePanel />
         </Box>
-        <Box className="dashboard-col-objectives">
+        <Box id="objectives" className="dashboard-col-objectives">
           <ObjectivesPanel />
         </Box>
       </Box>
@@ -59,6 +60,7 @@ export default function DashboardPage() {
           }
         }
       `}</style>
+    </Box>
     </Box>
   );
 }

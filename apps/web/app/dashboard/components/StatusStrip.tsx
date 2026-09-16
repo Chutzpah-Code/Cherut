@@ -22,15 +22,16 @@ function greeting() {
   return 'Good evening';
 }
 
-function fmtCurrency(value: number, currency = 'USD') {
+// Abbreviated for the KPI tile only — the full figure lives in the Finance card
+function fmtCompact(value: number, currency = 'USD') {
   try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(value);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency, notation: 'compact', maximumFractionDigits: 1 }).format(value);
   } catch {
     return `${currency} ${value.toFixed(0)}`;
   }
 }
 
-function Tile({ href, label, value, tone }: { href: string; label: string; value: string; tone?: 'danger' | 'accent' }) {
+function Tile({ href, label, value, tone }: { href: string; label: string; value: React.ReactNode; tone?: 'danger' | 'accent' }) {
   const color = tone === 'danger' ? '#B91C1C' : tone === 'accent' ? '#0052CC' : '#0F172A';
   return (
     <Link href={href} style={{ textDecoration: 'none', flex: '1 1 0', minWidth: 132 }}>
@@ -106,8 +107,12 @@ export function StatusStrip() {
         <Group gap={10} wrap="wrap" style={{ overflowX: 'auto', flexWrap: 'nowrap' }} className="dashboard-kpi-row">
           <Tile href="#tasks-due" label="Overdue" value={String(overdueCount)} tone={overdueCount > 0 ? 'danger' : undefined} />
           <Tile href="#tasks-due" label="Due today" value={String(dueTodayCount)} tone={dueTodayCount > 0 ? 'accent' : undefined} />
-          <Tile href="/dashboard/habits" label="Habits" value={`${loggedHabits}/${scheduledHabits}`} />
-          <Tile href="/dashboard/finance" label="Balance" value={fmtCurrency(overview?.totalBalanceConverted ?? 0, overview?.displayCurrency ?? currency)} />
+          <Tile
+            href="#today-habits"
+            label="Habits"
+            value={<>{loggedHabits}<span style={{ color: '#94A3B8' }}>/{scheduledHabits}</span></>}
+          />
+          <Tile href="/dashboard/finance" label="Balance" value={fmtCompact(overview?.totalBalanceConverted ?? 0, overview?.displayCurrency ?? currency)} />
         </Group>
       )}
     </Box>
