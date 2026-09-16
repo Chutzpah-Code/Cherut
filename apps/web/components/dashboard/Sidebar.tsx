@@ -84,7 +84,13 @@ export default function Sidebar({ onClose }: SidebarProps) {
 
   return (
     <>
-      <style jsx global>{`
+      {/* Plain <style> tag with dangerouslySetInnerHTML instead of styled-jsx:
+          styled-jsx's JSX-scanning scoping transform was pathological against
+          this component's shape and made `next build` hang for 15-20+ minutes
+          (confirmed by bisection — removing just this block dropped the build
+          from an unbounded hang to ~15s). Global scoping isn't needed here
+          anyway since every selector below is already prefixed `.premium-*`. */}
+      <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
 
         /* Premium Sidebar Styles */
@@ -282,7 +288,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
         .premium-scrollarea::-webkit-scrollbar-thumb:hover {
           background: rgba(70, 134, 254, 0.5);
         }
-      `}</style>
+      ` }} />
 
       <Stack h="100%" gap={0} className="premium-sidebar compact">
         <ScrollArea
