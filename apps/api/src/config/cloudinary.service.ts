@@ -143,6 +143,37 @@ export class CloudinaryService {
   }
 
   /**
+   * Faz upload de um comprovante/recibo (imagem ou PDF) para o Cloudinary
+   *
+   * @param fileBuffer - Buffer do arquivo
+   * @param userId - ID do usuário (para organizar os arquivos)
+   * @returns URL pública do arquivo
+   */
+  async uploadReceipt(fileBuffer: Buffer, userId: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: `cherut/finance-receipts/${userId}`,
+          resource_type: 'auto', // supports images and PDFs
+        },
+        (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
+          if (error) {
+            this.logger.error('Error uploading receipt to Cloudinary', error);
+            return reject(error);
+          }
+          if (!result) {
+            this.logger.error('No result from Cloudinary upload');
+            return reject(new Error('Upload failed: no result'));
+          }
+          this.logger.log(`Receipt uploaded successfully: ${result.public_id}`);
+          resolve(result.secure_url);
+        },
+      );
+      uploadStream.end(fileBuffer);
+    });
+  }
+
+  /**
    * Extrai o public_id de uma URL do Cloudinary
    */
   private extractPublicId(url: string): string | null {

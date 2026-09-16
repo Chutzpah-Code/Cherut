@@ -22,6 +22,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migrate:key-results-order": "ts-node -r tsconfig-paths/register scripts/migrate-key-results-order.ts",
+    "migrate:investments-asset-classes": "ts-node -r tsconfig-paths/register scripts/migrate-investments-asset-classes.ts",
     "script:create-admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts",
     "script:populate-sample-data": "ts-node -r tsconfig-paths/register scripts/populate-sample-data.ts",
     "emulators": "firebase emulators:start",

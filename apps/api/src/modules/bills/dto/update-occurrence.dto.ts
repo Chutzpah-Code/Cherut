@@ -5,6 +5,7 @@ export enum OccurrenceStatus {
   PAID = 'paid',
   OVERDUE = 'overdue',
   CANCELLED = 'cancelled',
+  SKIPPED = 'skipped',
 }
 
 export class UpdateOccurrenceDto {

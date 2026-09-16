@@ -1,6 +1,9 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import * as admin from 'firebase-admin';
 import { FirebaseService } from '../../config/firebase.service';
+import { CloudinaryService } from '../../config/cloudinary.service';
+import { BillsService } from '../bills/bills.service';
+import { AssetClass, ASSET_CLASSES, isValidAssetType } from './constants/asset-classes';
 import {
   CreateAccountDto,
   UpdateAccountDto,
@@ -51,9 +54,14 @@ export class FinanceService {
   private readonly BUDGETS = 'finance_budgets';
   private readonly INVESTMENTS = 'finance_investments';
   private readonly INVESTMENT_ENTRIES = 'finance_investment_entries';
+  private readonly INVESTMENT_VALUATIONS = 'finance_investment_valuations';
   private readonly STATEMENTS = 'finance_statements';
 
-  constructor(private readonly firebaseService: FirebaseService) {}
+  constructor(
+    private readonly firebaseService: FirebaseService,
+    private readonly cloudinaryService: CloudinaryService,
+    private readonly billsService: BillsService,
+  ) {}
 
   private get db() {
     return this.firebaseService.getFirestore();
@@ -92,9 +100,10 @@ export class FinanceService {
     return { id: ref.id, ...data };
   }
 
-  async findAccounts(userId: string) {
+  async findAccounts(userId: string, includeArchived = false) {
     const snap = await this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const accounts = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+    return includeArchived ? accounts : accounts.filter((a) => !a.archived);
   }
 
   async updateAccount(userId: string, id: string, dto: UpdateAccountDto) {
@@ -193,8 +202,105 @@ export class FinanceService {
     } catch {
       // Account was already deleted; skip balance reversal
     }
+    if (tx.attachmentUrl) {
+      // Best-effort cleanup — never block the delete on a Cloudinary failure.
+      this.cloudinaryService.deleteImage(tx.attachmentUrl).catch(() => {});
+    }
+    if (tx.billOccurrenceId) {
+      // The transaction that settled a bill occurrence was removed — put the
+      // occurrence back to pending instead of leaving it stuck as "paid".
+      await this.billsService.revertOccurrenceToPending(tx.billOccurrenceId).catch(() => {});
+    }
     await this.db.collection(this.TRANSACTIONS).doc(id).delete();
     return { message: 'Transaction deleted' };
+  }
+
+  async uploadReceipt(userId: string, file: { buffer: Buffer }) {
+    const attachmentUrl = await this.cloudinaryService.uploadReceipt(file.buffer, userId);
+    return { attachmentUrl };
+  }
+
+  async findTransactionsPaged(
+    userId: string,
+    opts: {
+      month?: string;
+      accountId?: string;
+      categoryId?: string;
+      search?: string;
+      offset?: number;
+      limit?: number;
+    } = {},
+  ) {
+    const month = opts.month ?? new Date().toISOString().slice(0, 7);
+    const startDate = `${month}-01`;
+    const [y, m] = month.split('-').map(Number);
+    const endStr = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+
+    let query: any = this.db.collection(this.TRANSACTIONS).where('userId', '==', userId);
+    if (opts.accountId) query = query.where('accountId', '==', opts.accountId);
+
+    let docs: any[];
+    try {
+      const snap = await query.where('date', '>=', startDate).where('date', '<=', endStr).orderBy('date', 'desc').get();
+      docs = snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+    } catch {
+      const snap = await query.get();
+      docs = (snap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as any[])
+        .filter((t) => t.date >= startDate && t.date <= endStr)
+        .sort((a, b) => (a.date < b.date ? 1 : -1));
+    }
+
+    if (opts.categoryId === 'uncategorized') {
+      docs = docs.filter((t) => !t.categoryId);
+    } else if (opts.categoryId) {
+      docs = docs.filter((t) => t.categoryId === opts.categoryId);
+    }
+
+    if (opts.search) {
+      const [accountsSnap, categoriesSnap] = await Promise.all([
+        this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
+        this.db.collection(this.CATEGORIES).where('userId', '==', userId).get(),
+      ]);
+      const accountName: Record<string, string> = {};
+      accountsSnap.docs.forEach((d) => { accountName[d.id] = (d.data() as any).name ?? ''; });
+      const categoryName: Record<string, string> = {};
+      categoriesSnap.docs.forEach((d) => { categoryName[d.id] = (d.data() as any).name ?? ''; });
+
+      const q = opts.search.toLowerCase();
+      docs = docs.filter((t) =>
+        (t.description ?? '').toLowerCase().includes(q) ||
+        (accountName[t.accountId] ?? '').toLowerCase().includes(q) ||
+        (t.categoryId && (categoryName[t.categoryId] ?? '').toLowerCase().includes(q)),
+      );
+    }
+
+    const total = docs.length;
+    const offset = opts.offset ?? 0;
+    const limit = opts.limit ?? 20;
+    const items = docs.slice(offset, offset + limit);
+    const hasMore = offset + limit < total;
+
+    return { items, total, hasMore };
+  }
+
+  async bulkDeleteTransactions(userId: string, ids: string[]) {
+    const results = await Promise.all(ids.map((id) => this.deleteTransaction(userId, id).catch(() => null)));
+    return { deleted: results.filter(Boolean).length };
+  }
+
+  async bulkRecategorizeTransactions(userId: string, ids: string[], categoryId: string | null | undefined) {
+    if (ids.length === 0) return { updated: 0 };
+    const refs = ids.map((id) => this.db.collection(this.TRANSACTIONS).doc(id));
+    const docs = await this.db.getAll(...refs);
+    const batch = this.db.batch();
+    let updated = 0;
+    for (const doc of docs) {
+      if (!doc.exists || (doc.data() as any).userId !== userId) continue;
+      batch.update(doc.ref, { categoryId: categoryId ?? null, updatedAt: this.now() });
+      updated++;
+    }
+    if (updated > 0) await batch.commit();
+    return { updated };
   }
 
   // ─── Budgets ────────────────────────────────────────────────────────────────
@@ -235,6 +341,69 @@ export class FinanceService {
     return budgets.map((b) => ({ ...b, spent: spent[b.categoryId] ?? 0 }));
   }
 
+  async getSpendingByCategory(userId: string, month?: string, displayCurrency = 'USD') {
+    const targetMonth = month ?? new Date().toISOString().slice(0, 7);
+    const startDate = `${targetMonth}-01`;
+    const [y, m] = targetMonth.split('-').map(Number);
+    const endStr = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+
+    const [accountsSnap, categoriesSnap, budgetsSnap, txSnap, rates] = await Promise.all([
+      this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
+      this.db.collection(this.CATEGORIES).where('userId', '==', userId).where('type', '==', 'expense').get(),
+      this.db.collection(this.BUDGETS).where('userId', '==', userId).where('month', '==', targetMonth).get(),
+      this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
+      this.getExchangeRates(),
+    ]);
+
+    const accountCurrency: Record<string, string> = {};
+    for (const d of accountsSnap.docs) accountCurrency[d.id] = (d.data() as any).currency ?? 'USD';
+
+    const categories = categoriesSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+    const budgetByCategory: Record<string, any> = {};
+    for (const d of budgetsSnap.docs) {
+      const b = { id: d.id, ...d.data() } as any;
+      budgetByCategory[b.categoryId] = b;
+    }
+
+    const spentByCategory: Record<string, number> = {};
+    let uncategorizedSpent = 0;
+    for (const d of txSnap.docs) {
+      const t = d.data() as any;
+      if (t.type !== 'expense' || t.date < startDate || t.date > endStr) continue;
+      const cur = accountCurrency[t.accountId] ?? 'USD';
+      const converted = this.toDisplay(t.amount, cur, displayCurrency, rates);
+      if (!t.categoryId) {
+        uncategorizedSpent += converted;
+      } else {
+        spentByCategory[t.categoryId] = (spentByCategory[t.categoryId] ?? 0) + converted;
+      }
+    }
+
+    const categoryRows = categories.map((c) => {
+      const budget = budgetByCategory[c.id];
+      const budgetCurrency = budget?.currency ?? 'USD';
+      return {
+        categoryId: c.id,
+        name: c.name,
+        spent: spentByCategory[c.id] ?? 0,
+        budgetId: budget?.id,
+        budgetAmount: budget ? this.toDisplay(budget.amount, budgetCurrency, displayCurrency, rates) : undefined,
+      };
+    });
+
+    const plannedTotal = categoryRows.reduce((s, c) => s + (c.budgetAmount ?? 0), 0);
+    const spentTotal = categoryRows.reduce((s, c) => s + c.spent, 0) + uncategorizedSpent;
+
+    return {
+      month: targetMonth,
+      displayCurrency,
+      categories: categoryRows,
+      uncategorized: { spent: uncategorizedSpent },
+      spentTotal,
+      plannedTotal,
+    };
+  }
+
   async updateBudget(userId: string, id: string, dto: UpdateBudgetDto) {
     const existing = await this.assertOwner(this.BUDGETS, id, userId);
     const updates = { ...this.clean(dto as any), updatedAt: this.now() };
@@ -248,9 +417,34 @@ export class FinanceService {
     return { message: 'Budget deleted' };
   }
 
-  // ─── Investments ─────────────────────────────────────────────────────────────
+  // ─── Investments (Portfolio assets) ────────────────────────────────────────
+  // Every asset carries acquiredValue/currentValue/valuedDate/liquidity per
+  // FINANCE-SPEC.md §7's valuation model. Depreciating assets (vehicles,
+  // equipment) get their displayed value derived on read, never stored —
+  // see withDerivedValue.
+
+  private async recordValuation(userId: string, investmentId: string, value: number, valuedOn: string, source: 'manual' | 'depreciation') {
+    await this.db.collection(this.INVESTMENT_VALUATIONS).add({
+      userId, investmentId, value, valuedOn, source, createdAt: this.now(),
+    });
+  }
+
+  private withDerivedValue(inv: any): any {
+    if (!inv.depreciationPerYear || !inv.acquiredDate) return inv;
+    // Only auto-depreciate while no manual revaluation has happened since acquisition.
+    if (inv.valuedDate !== inv.acquiredDate) return inv;
+    const acquired = new Date(inv.acquiredDate + 'T00:00:00');
+    const yearsElapsed = (Date.now() - acquired.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+    const rate = inv.depreciationPerYear / 100;
+    const base = inv.acquiredValue ?? inv.currentValue;
+    const currentValue = base * Math.pow(1 - rate, Math.max(0, yearsElapsed));
+    return { ...inv, currentValue };
+  }
 
   async createInvestment(userId: string, dto: CreateInvestmentDto) {
+    if (!isValidAssetType(dto.assetClass, dto.assetType)) {
+      throw new BadRequestException(`Invalid assetType "${dto.assetType}" for class "${dto.assetClass}"`);
+    }
     const data = {
       ...this.clean(dto as any),
       userId,
@@ -260,18 +454,25 @@ export class FinanceService {
       updatedAt: this.now(),
     };
     const ref = await this.db.collection(this.INVESTMENTS).add(data);
+    await this.recordValuation(userId, ref.id, dto.currentValue, dto.valuedDate, 'manual');
     return { id: ref.id, ...data };
   }
 
   async findInvestments(userId: string) {
     const snap = await this.db.collection(this.INVESTMENTS).where('userId', '==', userId).get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return (snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[]).map((inv) => this.withDerivedValue(inv));
   }
 
   async updateInvestment(userId: string, id: string, dto: UpdateInvestmentDto) {
     const existing = await this.assertOwner(this.INVESTMENTS, id, userId);
+    if (dto.assetClass && dto.assetType && !isValidAssetType(dto.assetClass, dto.assetType)) {
+      throw new BadRequestException(`Invalid assetType "${dto.assetType}" for class "${dto.assetClass}"`);
+    }
     const updates = { ...this.clean(dto as any), updatedAt: this.now() };
     await this.db.collection(this.INVESTMENTS).doc(id).update(updates);
+    if (dto.currentValue !== undefined && dto.valuedDate) {
+      await this.recordValuation(userId, id, dto.currentValue, dto.valuedDate, 'manual');
+    }
     return { ...existing, ...updates };
   }
 
@@ -279,6 +480,62 @@ export class FinanceService {
     await this.assertOwner(this.INVESTMENTS, id, userId);
     await this.db.collection(this.INVESTMENTS).doc(id).delete();
     return { message: 'Investment deleted' };
+  }
+
+  async getInvestmentValuations(userId: string, investmentId: string) {
+    await this.assertOwner(this.INVESTMENTS, investmentId, userId);
+    const snap = await this.db
+      .collection(this.INVESTMENT_VALUATIONS)
+      .where('userId', '==', userId)
+      .where('investmentId', '==', investmentId)
+      .get();
+    return (snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[]).sort((a, b) => (a.valuedOn < b.valuedOn ? 1 : -1));
+  }
+
+  async bulkUpdateValuations(userId: string, updates: { id: string; currentValue: number; valuedDate: string }[]) {
+    if (updates.length === 0) return { updated: 0 };
+    const refs = updates.map((u) => this.db.collection(this.INVESTMENTS).doc(u.id));
+    const docs = await this.db.getAll(...refs);
+    const batch = this.db.batch();
+    let updated = 0;
+    const applied: typeof updates = [];
+    for (let i = 0; i < docs.length; i++) {
+      const doc = docs[i];
+      if (!doc.exists || (doc.data() as any).userId !== userId) continue;
+      batch.update(doc.ref, { currentValue: updates[i].currentValue, valuedDate: updates[i].valuedDate, updatedAt: this.now() });
+      applied.push(updates[i]);
+      updated++;
+    }
+    if (updated > 0) await batch.commit();
+    await Promise.all(applied.map((u) => this.recordValuation(userId, u.id, u.currentValue, u.valuedDate, 'manual')));
+    return { updated };
+  }
+
+  async getInvestmentsSummary(userId: string, displayCurrency = 'USD') {
+    const [snap, rates] = await Promise.all([
+      this.db.collection(this.INVESTMENTS).where('userId', '==', userId).get(),
+      this.getExchangeRates(),
+    ]);
+    const investments = (snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[]).map((inv) => this.withDerivedValue(inv));
+
+    const classTotals: Record<string, number> = {};
+    let totalValue = 0;
+    for (const inv of investments) {
+      const converted = this.toDisplay(inv.currentValue ?? 0, inv.currency ?? 'USD', displayCurrency, rates);
+      classTotals[inv.assetClass] = (classTotals[inv.assetClass] ?? 0) + converted;
+      totalValue += converted;
+    }
+
+    const classes = Object.entries(classTotals)
+      .map(([assetClass, value]) => ({
+        assetClass,
+        label: ASSET_CLASSES[assetClass as AssetClass]?.label ?? assetClass,
+        value,
+        pct: totalValue > 0 ? (value / totalValue) * 100 : 0,
+      }))
+      .sort((a, b) => b.value - a.value);
+
+    return { totalValue, classes, assetCount: investments.length };
   }
 
   async createInvestmentEntry(userId: string, dto: CreateInvestmentEntryDto) {
@@ -302,13 +559,18 @@ export class FinanceService {
     try {
       const ref = await this.db.collection(this.INVESTMENT_ENTRIES).add(data);
 
+      // A contribution is itself a revaluation for financial assets — it
+      // grows both the contribution ledger and the asset's tracked value.
       await this.db.collection(this.INVESTMENTS).doc(dto.investmentId).update({
         totalContributed: admin.firestore.FieldValue.increment(amount),
+        currentValue: admin.firestore.FieldValue.increment(amount),
+        valuedDate: dto.date,
         updatedAt: this.now(),
       });
+      await this.recordValuation(userId, dto.investmentId, (inv.currentValue ?? 0) + amount, dto.date, 'manual');
 
-      if (inv.accountId) {
-        await this.adjustBalance(inv.accountId, amount, 'expense');
+      if (inv.linkedAccountId) {
+        await this.adjustBalance(inv.linkedAccountId, amount, 'expense');
       }
 
       return { id: ref.id, ...data };
@@ -332,15 +594,16 @@ export class FinanceService {
     const entry: any = await this.assertOwner(this.INVESTMENT_ENTRIES, id, userId);
     await this.db.collection(this.INVESTMENT_ENTRIES).doc(id).delete();
 
-    // Reverse totalContributed and restore account balance
+    // Reverse totalContributed + currentValue and restore the linked account balance
     try {
       const inv: any = await this.assertOwner(this.INVESTMENTS, entry.investmentId, userId);
       await this.db.collection(this.INVESTMENTS).doc(entry.investmentId).update({
         totalContributed: admin.firestore.FieldValue.increment(-entry.amount),
+        currentValue: admin.firestore.FieldValue.increment(-entry.amount),
         updatedAt: this.now(),
       });
-      if (inv.accountId) {
-        await this.adjustBalance(inv.accountId, entry.amount, 'income');
+      if (inv.linkedAccountId) {
+        await this.adjustBalance(inv.linkedAccountId, entry.amount, 'income');
       }
     } catch { /* investment may have been deleted */ }
 
@@ -382,7 +645,12 @@ export class FinanceService {
     const accountMap: Record<string, any> = {};
     const accountCurrency: Record<string, string> = {};
     const computedBalance: Record<string, number> = {};
+    const archivedAccountIds = new Set<string>();
     for (const a of accounts) {
+      if (a.archived) {
+        archivedAccountIds.add(a.id);
+        continue;
+      }
       const cur = a.currency ?? 'USD';
       accountMap[a.id] = a;
       accountCurrency[a.id] = cur;
@@ -404,6 +672,7 @@ export class FinanceService {
     const incomeByCurrency: Record<string, number> = {};
     const expensesByCurrency: Record<string, number> = {};
     for (const t of transactions) {
+      if (archivedAccountIds.has(t.accountId)) continue;
       const cur = accountCurrency[t.accountId] ?? 'USD';
       if (t.type === 'income') incomeByCurrency[cur] = (incomeByCurrency[cur] ?? 0) + t.amount;
       else if (t.type === 'expense') expensesByCurrency[cur] = (expensesByCurrency[cur] ?? 0) + t.amount;
@@ -463,6 +732,152 @@ export class FinanceService {
       updatedAt: this.now(),
     });
     return { balance };
+  }
+
+  // ─── Balance projection ─────────────────────────────────────────────────────
+  // Cash accounts only — illiquid assets never enter this, by design (see
+  // FINANCE-SPEC.md §2.5/§2.7). Uses BillsService's upcoming-occurrences walk
+  // for pending bills/recurring income within the horizon.
+
+  private addDaysStr(dateStr: string, days: number): string {
+    const d = new Date(dateStr + 'T00:00:00');
+    d.setDate(d.getDate() + days);
+    return d.toISOString().slice(0, 10);
+  }
+
+  async getProjection(userId: string, horizonDays: number, displayCurrency = 'USD') {
+    const [accountsSnap, rates] = await Promise.all([
+      this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
+      this.getExchangeRates(),
+    ]);
+    const cashAccounts = accountsSnap.docs
+      .map((d) => ({ id: d.id, ...d.data() } as any))
+      .filter((a) => a.type !== 'credit' && !a.archived);
+    const cashAccountIds = new Set(cashAccounts.map((a) => a.id));
+    const cashAccountCurrency: Record<string, string> = {};
+    for (const a of cashAccounts) cashAccountCurrency[a.id] = a.currency ?? 'USD';
+
+    let currentTotal = 0;
+    for (const a of cashAccounts) currentTotal += this.toDisplay(a.balance ?? 0, a.currency ?? 'USD', displayCurrency, rates);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const occurrences = await this.billsService.getUpcomingOccurrences(userId, horizonDays);
+
+    const deltaByDate: Record<string, number> = {};
+    for (const occ of occurrences as any[]) {
+      const bill = occ.bill;
+      if (!bill || !cashAccountIds.has(bill.accountId)) continue;
+      const cur = cashAccountCurrency[bill.accountId] ?? 'USD';
+      const converted = this.toDisplay(occ.amount, cur, displayCurrency, rates);
+      const delta = bill.type === 'income' ? converted : -converted;
+      deltaByDate[occ.dueDate] = (deltaByDate[occ.dueDate] ?? 0) + delta;
+    }
+
+    const points: { date: string; total: number }[] = [];
+    let running = currentTotal;
+    let lowestPoint = { date: today, total: currentTotal };
+    for (let i = 0; i <= horizonDays; i++) {
+      const d = this.addDaysStr(today, i);
+      running += deltaByDate[d] ?? 0;
+      points.push({ date: d, total: running });
+      if (running < lowestPoint.total) lowestPoint = { date: d, total: running };
+    }
+
+    const endOfHorizon = points[points.length - 1] ?? { date: today, total: currentTotal };
+    return { points, lowestPoint, endOfHorizon, scope: 'cash accounts only' as const };
+  }
+
+  // ─── Net worth ──────────────────────────────────────────────────────────────
+  // Liquid = cash accounts + liquid-flagged assets; illiquid = illiquid-flagged
+  // assets. Illiquid assets count here but are never read by getProjection.
+
+  async getNetWorth(userId: string, displayCurrency = 'USD') {
+    const [accountsSnap, investmentsSnap, rates] = await Promise.all([
+      this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
+      this.db.collection(this.INVESTMENTS).where('userId', '==', userId).get(),
+      this.getExchangeRates(),
+    ]);
+    const accounts = (accountsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[]).filter((a) => !a.archived);
+
+    let liquid = 0;
+    let creditCardOwed = 0;
+    for (const a of accounts) {
+      const converted = this.toDisplay(a.balance ?? 0, a.currency ?? 'USD', displayCurrency, rates);
+      if (a.type === 'credit') {
+        creditCardOwed += Math.max(0, -converted);
+      } else {
+        liquid += converted;
+      }
+    }
+
+    let illiquid = 0;
+    const investments = (investmentsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[]).map((inv) => this.withDerivedValue(inv));
+    for (const inv of investments) {
+      const converted = this.toDisplay(inv.currentValue ?? 0, inv.currency ?? 'USD', displayCurrency, rates);
+      if (inv.liquidity === 'illiquid') illiquid += converted;
+      else liquid += converted;
+    }
+
+    const netWorth = liquid + illiquid - creditCardOwed;
+
+    return { liquid, illiquid, creditCardOwed, netWorth, displayCurrency };
+  }
+
+  // ─── Upcoming bills + credit card statements (merged) ──────────────────────
+  // A credit card's statement isn't a bill rule — it's derived live from the
+  // account's closing/due day — but FINANCE-SPEC.md requires it to show up as
+  // an occurrence in Upcoming bills automatically. This merges BillsService's
+  // real occurrences with a synthesized pseudo-occurrence per credit account
+  // that has a positive current-statement total due within the horizon.
+
+  async getUpcomingBillsAndStatements(userId: string, days: number) {
+    const [occurrences, accountsSnap] = await Promise.all([
+      this.billsService.getUpcomingOccurrences(userId, days),
+      this.db.collection(this.ACCOUNTS).where('userId', '==', userId).where('type', '==', 'credit').get(),
+    ]);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const toDate = this.addDaysStr(today, days);
+    const creditAccounts = (accountsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[]).filter((a) => !a.archived);
+
+    const statementItems: any[] = [];
+    for (const account of creditAccounts) {
+      try {
+        const statement = await this.getCurrentStatement(userId, account.id);
+        if (statement.total > 0 && statement.dueDate <= toDate) {
+          statementItems.push({
+            id: `statement-${account.id}`,
+            userId,
+            billId: null,
+            period: statement.dueDate.slice(0, 7),
+            dueDate: statement.dueDate,
+            amount: statement.total,
+            status: statement.dueDate < today ? 'overdue' : 'pending',
+            isStatement: true,
+            statementAccountId: account.id,
+            bill: { id: null, name: `${account.name} statement`, type: 'expense', accountId: account.id, categoryId: null },
+          });
+        }
+      } catch {
+        // Account may lack statement config yet — skip it rather than fail the whole list.
+      }
+    }
+
+    return [...occurrences, ...statementItems].sort((a: any, b: any) => (a.dueDate < b.dueDate ? -1 : 1));
+  }
+
+  // ─── Full backup export ─────────────────────────────────────────────────────
+
+  async exportBackup(userId: string) {
+    const collections = [
+      this.ACCOUNTS, this.CATEGORIES, this.TRANSACTIONS, this.BUDGETS,
+      this.INVESTMENTS, this.INVESTMENT_ENTRIES, this.INVESTMENT_VALUATIONS, this.STATEMENTS,
+      'finance_bills', 'finance_bill_occurrences',
+    ];
+    const snaps = await Promise.all(collections.map((c) => this.db.collection(c).where('userId', '==', userId).get()));
+    const data: Record<string, any[]> = {};
+    collections.forEach((c, i) => { data[c] = snaps[i].docs.map((d) => ({ id: d.id, ...d.data() })); });
+    return { exportedAt: this.now(), data };
   }
 
   // ─── Private helpers ────────────────────────────────────────────────────────

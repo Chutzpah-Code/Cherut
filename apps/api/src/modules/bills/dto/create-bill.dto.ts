@@ -1,10 +1,14 @@
 import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsBoolean, IsInt, Min, Max, Matches } from 'class-validator';
 
 export enum BillFrequency {
-  DAILY = 'daily',
   WEEKLY = 'weekly',
+  BIWEEKLY = 'biweekly',
   MONTHLY = 'monthly',
-  YEARLY = 'yearly',
+  BIMONTHLY = 'bimonthly',
+  QUARTERLY = 'quarterly',
+  SEMIANNUAL = 'semiannual',
+  ANNUAL = 'annual',
+  CUSTOM = 'custom',
 }
 
 export enum BillType {
@@ -40,10 +44,21 @@ export class CreateBillDto {
   @Max(28)
   dueDay: number;
 
+  // Only used when frequency === 'custom' — the rule repeats every N days.
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  interval?: number;
+
   @IsString()
   @IsNotEmpty()
   @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'startDate must be YYYY-MM-DD' })
   startDate: string;
+
+  @IsString()
+  @IsOptional()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'endDate must be YYYY-MM-DD' })
+  endDate?: string;
 
   @IsString()
   @IsOptional()

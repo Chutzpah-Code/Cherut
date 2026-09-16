@@ -12,8 +12,8 @@ export class CreateTransactionDto {
   accountId: string;
 
   @IsString()
-  @IsNotEmpty()
-  categoryId: string;
+  @IsOptional()
+  categoryId?: string;
 
   @IsNumber()
   @Min(0)
@@ -38,6 +38,10 @@ export class CreateTransactionDto {
   @IsString()
   @IsOptional()
   toAccountId?: string;
+
+  @IsString()
+  @IsOptional()
+  attachmentUrl?: string;
 
   @IsString()
   @IsOptional()

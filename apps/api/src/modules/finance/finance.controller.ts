@@ -9,7 +9,12 @@ import {
   Query,
   Request,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import type { Express } from 'express';
 import { FinanceService } from './finance.service';
 import {
   CreateAccountDto, UpdateAccountDto,
@@ -18,6 +23,8 @@ import {
   CreateBudgetDto, UpdateBudgetDto,
   CreateInvestmentDto, UpdateInvestmentDto,
   CreateInvestmentEntryDto,
+  BulkDeleteTransactionsDto,
+  BulkRecategorizeTransactionsDto,
 } from './dto';
 import { PayStatementDto } from './dto/pay-statement.dto';
 import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
@@ -39,6 +46,21 @@ export class FinanceController {
     return this.financeService.getOverview(req.user.uid, month, displayCurrency ?? 'USD', startDate, endDate);
   }
 
+  @Get('projection')
+  getProjection(@Request() req, @Query('horizon') horizon?: string, @Query('displayCurrency') displayCurrency?: string) {
+    return this.financeService.getProjection(req.user.uid, Number(horizon) || 90, displayCurrency ?? 'USD');
+  }
+
+  @Get('net-worth')
+  getNetWorth(@Request() req, @Query('displayCurrency') displayCurrency?: string) {
+    return this.financeService.getNetWorth(req.user.uid, displayCurrency ?? 'USD');
+  }
+
+  @Get('upcoming-bills')
+  getUpcomingBillsAndStatements(@Request() req, @Query('days') days?: string) {
+    return this.financeService.getUpcomingBillsAndStatements(req.user.uid, Number(days) || 90);
+  }
+
   // Accounts
   @Post('accounts')
   createAccount(@Request() req, @Body() dto: CreateAccountDto) {
@@ -46,8 +68,8 @@ export class FinanceController {
   }
 
   @Get('accounts')
-  findAccounts(@Request() req) {
-    return this.financeService.findAccounts(req.user.uid);
+  findAccounts(@Request() req, @Query('includeArchived') includeArchived?: string) {
+    return this.financeService.findAccounts(req.user.uid, includeArchived === 'true');
   }
 
   @Patch('accounts/:id')
@@ -103,6 +125,54 @@ export class FinanceController {
     return this.financeService.findTransactions(req.user.uid, { accountId, startDate, endDate, type });
   }
 
+  @Get('transactions/page')
+  findTransactionsPaged(
+    @Request() req,
+    @Query('month') month?: string,
+    @Query('accountId') accountId?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('search') search?: string,
+    @Query('offset') offset?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.financeService.findTransactionsPaged(req.user.uid, {
+      month,
+      accountId,
+      categoryId,
+      search,
+      offset: offset ? Number(offset) : undefined,
+      limit: limit ? Number(limit) : undefined,
+    });
+  }
+
+  @Post('transactions/upload-receipt')
+  @UseInterceptors(
+    FileInterceptor('receipt', {
+      limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+      fileFilter: (req, file, callback) => {
+        const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+        if (!allowedMimes.includes(file.mimetype)) {
+          return callback(new BadRequestException('Only images or PDF files are allowed'), false);
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  uploadReceipt(@UploadedFile() file: Express.Multer.File, @Request() req) {
+    if (!file) throw new BadRequestException('No file uploaded');
+    return this.financeService.uploadReceipt(req.user.uid, file);
+  }
+
+  @Post('transactions/bulk-delete')
+  bulkDeleteTransactions(@Request() req, @Body() dto: BulkDeleteTransactionsDto) {
+    return this.financeService.bulkDeleteTransactions(req.user.uid, dto.ids);
+  }
+
+  @Post('transactions/bulk-recategorize')
+  bulkRecategorizeTransactions(@Request() req, @Body() dto: BulkRecategorizeTransactionsDto) {
+    return this.financeService.bulkRecategorizeTransactions(req.user.uid, dto.ids, dto.categoryId);
+  }
+
   @Patch('transactions/:id')
   updateTransaction(@Request() req, @Param('id') id: string, @Body() dto: UpdateTransactionDto) {
     return this.financeService.updateTransaction(req.user.uid, id, dto);
@@ -114,6 +184,15 @@ export class FinanceController {
   }
 
   // Budgets
+  @Get('spending-by-category')
+  getSpendingByCategory(
+    @Request() req,
+    @Query('month') month?: string,
+    @Query('displayCurrency') displayCurrency?: string,
+  ) {
+    return this.financeService.getSpendingByCategory(req.user.uid, month, displayCurrency ?? 'USD');
+  }
+
   @Post('budgets')
   createBudget(@Request() req, @Body() dto: CreateBudgetDto) {
     return this.financeService.createBudget(req.user.uid, dto);
@@ -143,6 +222,28 @@ export class FinanceController {
   @Get('investments')
   findInvestments(@Request() req) {
     return this.financeService.findInvestments(req.user.uid);
+  }
+
+  // Literal-segment routes must be registered before the `investments/:id`
+  // param routes below, otherwise Express would match e.g. "summary" as an id.
+  @Get('investments/summary')
+  getInvestmentsSummary(@Request() req, @Query('displayCurrency') displayCurrency?: string) {
+    return this.financeService.getInvestmentsSummary(req.user.uid, displayCurrency ?? 'USD');
+  }
+
+  @Patch('investments/bulk-valuations')
+  bulkUpdateValuations(@Request() req, @Body() dto: { updates: { id: string; currentValue: number; valuedDate: string }[] }) {
+    return this.financeService.bulkUpdateValuations(req.user.uid, dto.updates);
+  }
+
+  @Get('investments/:id/valuations')
+  getInvestmentValuations(@Request() req, @Param('id') id: string) {
+    return this.financeService.getInvestmentValuations(req.user.uid, id);
+  }
+
+  @Get('export/backup')
+  exportBackup(@Request() req) {
+    return this.financeService.exportBackup(req.user.uid);
   }
 
   @Patch('investments/:id')

@@ -1,8 +1,8 @@
 import { apiClient } from '../client';
 
-export type BillFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
+export type BillFrequency = 'weekly' | 'biweekly' | 'monthly' | 'bimonthly' | 'quarterly' | 'semiannual' | 'annual' | 'custom';
 export type BillType = 'income' | 'expense';
-export type BillOccurrenceStatus = 'pending' | 'paid' | 'overdue' | 'cancelled';
+export type BillOccurrenceStatus = 'pending' | 'paid' | 'overdue' | 'cancelled' | 'skipped';
 
 export interface FinanceBill {
   id: string;
@@ -15,7 +15,9 @@ export interface FinanceBill {
   type: BillType;
   frequency: BillFrequency;
   dueDay: number;
+  interval?: number;
   startDate: string;
+  endDate?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -46,7 +48,9 @@ export type CreateBillDto = {
   type: BillType;
   frequency: BillFrequency;
   dueDay: number;
+  interval?: number;
   startDate: string;
+  endDate?: string;
   description?: string;
   isActive?: boolean;
 };
@@ -83,9 +87,21 @@ export const billsApi = {
   deleteBill: async (id: string): Promise<void> => {
     await apiClient.delete(`/bills/${id}`);
   },
+  pauseBill: async (id: string): Promise<FinanceBill> => {
+    const { data } = await apiClient.post(`/bills/${id}/pause`);
+    return data;
+  },
+  resumeBill: async (id: string): Promise<FinanceBill> => {
+    const { data } = await apiClient.post(`/bills/${id}/resume`);
+    return data;
+  },
 
   getOccurrences: async (month: string): Promise<FinanceBillOccurrence[]> => {
     const { data } = await apiClient.get('/bills/occurrences', { params: { month } });
+    return data;
+  },
+  getUpcomingOccurrences: async (days: number): Promise<FinanceBillOccurrence[]> => {
+    const { data } = await apiClient.get('/bills/occurrences/upcoming', { params: { days } });
     return data;
   },
   payOccurrence: async (
@@ -93,6 +109,10 @@ export const billsApi = {
     dto: PayOccurrenceDto,
   ): Promise<{ occurrenceId: string; transactionId: string; status: string; paidAt: string }> => {
     const { data } = await apiClient.post(`/bills/occurrences/${id}/pay`, dto);
+    return data;
+  },
+  skipOccurrence: async (id: string): Promise<{ message: string }> => {
+    const { data } = await apiClient.post(`/bills/occurrences/${id}/skip`);
     return data;
   },
   updateOccurrence: async (id: string, dto: UpdateOccurrenceDto): Promise<FinanceBillOccurrence> => {

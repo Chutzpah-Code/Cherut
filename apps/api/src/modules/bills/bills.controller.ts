@@ -29,6 +29,16 @@ export class BillsController {
     return this.billsService.deleteBill(req.user.uid, id);
   }
 
+  @Post(':id/pause')
+  pauseBill(@Request() req, @Param('id') id: string) {
+    return this.billsService.pauseBill(req.user.uid, id);
+  }
+
+  @Post(':id/resume')
+  resumeBill(@Request() req, @Param('id') id: string) {
+    return this.billsService.resumeBill(req.user.uid, id);
+  }
+
   // Occurrences
   @Get('occurrences')
   getOccurrences(@Request() req, @Query('month') month: string) {
@@ -36,9 +46,19 @@ export class BillsController {
     return this.billsService.getOccurrences(req.user.uid, m);
   }
 
+  @Get('occurrences/upcoming')
+  getUpcomingOccurrences(@Request() req, @Query('days') days?: string) {
+    return this.billsService.getUpcomingOccurrences(req.user.uid, Number(days) || 90);
+  }
+
   @Post('occurrences/:id/pay')
   payOccurrence(@Request() req, @Param('id') id: string, @Body() dto: PayOccurrenceDto) {
     return this.billsService.payOccurrence(req.user.uid, id, dto);
+  }
+
+  @Post('occurrences/:id/skip')
+  skipOccurrence(@Request() req, @Param('id') id: string) {
+    return this.billsService.skipOccurrence(req.user.uid, id);
   }
 
   @Patch('occurrences/:id')

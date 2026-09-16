@@ -10,3 +10,5 @@ export * from './create-investment.dto';
 export * from './update-investment.dto';
 export * from './create-investment-entry.dto';
 export * from './update-investment-entry.dto';
+export * from './bulk-delete-transactions.dto';
+export * from './bulk-recategorize-transactions.dto';

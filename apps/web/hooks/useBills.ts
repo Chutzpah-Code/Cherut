@@ -19,7 +19,10 @@ export function useCreateBill() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: CreateBillDto) => billsApi.createBill(dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['bills'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['bills'] });
+      qc.invalidateQueries({ queryKey: ['bill-occurrences'] });
+    },
   });
 }
 
@@ -27,7 +30,10 @@ export function useUpdateBill() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateBillDto }) => billsApi.updateBill(id, dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['bills'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['bills'] });
+      qc.invalidateQueries({ queryKey: ['bill-occurrences'] });
+    },
   });
 }
 
@@ -35,6 +41,28 @@ export function useDeleteBill() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => billsApi.deleteBill(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['bills'] });
+      qc.invalidateQueries({ queryKey: ['bill-occurrences'] });
+    },
+  });
+}
+
+export function usePauseBill() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => billsApi.pauseBill(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['bills'] });
+      qc.invalidateQueries({ queryKey: ['bill-occurrences'] });
+    },
+  });
+}
+
+export function useResumeBill() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => billsApi.resumeBill(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bills'] });
       qc.invalidateQueries({ queryKey: ['bill-occurrences'] });
@@ -50,17 +78,38 @@ export function useBillOccurrences(month: string) {
   });
 }
 
+export function useUpcomingOccurrences(days: number) {
+  return useQuery({
+    queryKey: ['bill-occurrences', 'upcoming', days],
+    queryFn: () => billsApi.getUpcomingOccurrences(days),
+    staleTime: 15_000,
+  });
+}
+
+function invalidateAfterOccurrenceChange(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: ['bill-occurrences'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'transactions-page'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'net-worth'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'projection'] });
+}
+
 export function usePayOccurrence() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: PayOccurrenceDto }) =>
       billsApi.payOccurrence(id, dto),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['bill-occurrences'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
-    },
+    onSuccess: () => invalidateAfterOccurrenceChange(qc),
+  });
+}
+
+export function useSkipOccurrence() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => billsApi.skipOccurrence(id),
+    onSuccess: () => invalidateAfterOccurrenceChange(qc),
   });
 }
 
@@ -69,7 +118,7 @@ export function useUpdateOccurrence() {
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateOccurrenceDto }) =>
       billsApi.updateOccurrence(id, dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['bill-occurrences'] }),
+    onSuccess: () => invalidateAfterOccurrenceChange(qc),
   });
 }
 
@@ -77,6 +126,6 @@ export function useDeleteOccurrence() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => billsApi.deleteOccurrence(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['bill-occurrences'] }),
+    onSuccess: () => invalidateAfterOccurrenceChange(qc),
   });
 }

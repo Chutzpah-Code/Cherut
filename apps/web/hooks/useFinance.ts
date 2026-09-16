@@ -17,14 +17,44 @@ export function useFinanceOverview(month?: string, displayCurrency?: string, sta
   });
 }
 
+// ─── Projection & net worth ──────────────────────────────────────────────────
+
+export function useProjection(horizon: number, displayCurrency?: string) {
+  return useQuery({
+    queryKey: ['finance', 'projection', horizon, displayCurrency],
+    queryFn: () => financeApi.getProjection(horizon, displayCurrency),
+    staleTime: 30_000,
+  });
+}
+
+export function useNetWorth(displayCurrency?: string) {
+  return useQuery({
+    queryKey: ['finance', 'net-worth', displayCurrency],
+    queryFn: () => financeApi.getNetWorth(displayCurrency),
+    staleTime: 30_000,
+  });
+}
+
+export function useUpcomingBillsAndStatements(days: number) {
+  return useQuery({
+    queryKey: ['finance', 'upcoming-bills', days],
+    queryFn: () => financeApi.getUpcomingBillsAndStatements(days),
+    staleTime: 15_000,
+  });
+}
+
 // ─── Accounts ───────────────────────────────────────────────────────────────
 
-export function useFinanceAccounts() {
+export function useFinanceAccounts(includeArchived = false) {
   return useQuery({
-    queryKey: ['finance', 'accounts'],
-    queryFn: financeApi.getAccounts,
+    queryKey: ['finance', 'accounts', includeArchived],
+    queryFn: () => financeApi.getAccounts(includeArchived),
     staleTime: 60_000,
   });
+}
+
+function invalidateUpcomingBills(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: ['finance', 'upcoming-bills'] });
 }
 
 export function useCreateAccount() {
@@ -34,6 +64,7 @@ export function useCreateAccount() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
       qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+      invalidateUpcomingBills(qc);
     },
   });
 }
@@ -46,6 +77,7 @@ export function useUpdateAccount() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
       qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+      invalidateUpcomingBills(qc);
     },
   });
 }
@@ -58,6 +90,7 @@ export function useDeleteAccount() {
       qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
       qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
       qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+      invalidateUpcomingBills(qc);
     },
   });
 }
@@ -117,14 +150,61 @@ export function useFinanceTransactions(params?: { accountId?: string; startDate?
   });
 }
 
+export function useFinanceTransactionsPaged(params: {
+  month?: string; accountId?: string; categoryId?: string; search?: string; offset?: number; limit?: number;
+}) {
+  return useQuery({
+    queryKey: ['finance', 'transactions-page', params],
+    queryFn: () => financeApi.getTransactionsPaged(params),
+    staleTime: 15_000,
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useUploadReceipt() {
+  return useMutation({
+    mutationFn: (file: File) => financeApi.uploadReceipt(file),
+  });
+}
+
+export function useBulkDeleteTransactions() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: string[]) => financeApi.bulkDeleteTransactions(ids),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'transactions-page'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+    },
+  });
+}
+
+export function useBulkRecategorizeTransactions() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ ids, categoryId }: { ids: string[]; categoryId: string | null }) =>
+      financeApi.bulkRecategorizeTransactions(ids, categoryId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'transactions-page'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+    },
+  });
+}
+
 export function useCreateTransaction() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: CreateTransactionDto) => financeApi.createTransaction(dto),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'transactions-page'] });
       qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
       qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+      invalidateUpcomingBills(qc);
     },
   });
 }
@@ -135,7 +215,10 @@ export function useUpdateTransaction() {
     mutationFn: ({ id, dto }: { id: string; dto: UpdateTransactionDto }) => financeApi.updateTransaction(id, dto),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'transactions-page'] });
       qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+      invalidateUpcomingBills(qc);
     },
   });
 }
@@ -146,9 +229,22 @@ export function useDeleteTransaction() {
     mutationFn: (id: string) => financeApi.deleteTransaction(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'transactions-page'] });
       qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
       qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+      invalidateUpcomingBills(qc);
     },
+  });
+}
+
+// ─── Spending by category ────────────────────────────────────────────────────
+
+export function useSpendingByCategory(month?: string, displayCurrency?: string) {
+  return useQuery({
+    queryKey: ['finance', 'spending-by-category', month, displayCurrency],
+    queryFn: () => financeApi.getSpendingByCategory(month, displayCurrency),
+    staleTime: 30_000,
   });
 }
 
@@ -166,7 +262,10 @@ export function useCreateBudget() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: CreateBudgetDto) => financeApi.createBudget(dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'budgets'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['finance', 'budgets'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+    },
   });
 }
 
@@ -174,7 +273,10 @@ export function useUpdateBudget() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateBudgetDto }) => financeApi.updateBudget(id, dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'budgets'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['finance', 'budgets'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+    },
   });
 }
 
@@ -182,7 +284,10 @@ export function useDeleteBudget() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => financeApi.deleteBudget(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'budgets'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['finance', 'budgets'] });
+      qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+    },
   });
 }
 
@@ -196,11 +301,17 @@ export function useFinanceInvestments() {
   });
 }
 
+function invalidateAfterInvestmentChange(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: ['finance', 'investments'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'investments-summary'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'net-worth'] });
+}
+
 export function useCreateInvestment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: CreateInvestmentDto) => financeApi.createInvestment(dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'investments'] }),
+    onSuccess: () => invalidateAfterInvestmentChange(qc),
   });
 }
 
@@ -208,7 +319,10 @@ export function useUpdateInvestment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateInvestmentDto }) => financeApi.updateInvestment(id, dto),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'investments'] }),
+    onSuccess: (_data, { id }) => {
+      invalidateAfterInvestmentChange(qc);
+      qc.invalidateQueries({ queryKey: ['finance', 'investment-valuations', id] });
+    },
   });
 }
 
@@ -216,7 +330,38 @@ export function useDeleteInvestment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => financeApi.deleteInvestment(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['finance', 'investments'] }),
+    onSuccess: () => invalidateAfterInvestmentChange(qc),
+  });
+}
+
+export function useInvestmentsSummary(displayCurrency?: string) {
+  return useQuery({
+    queryKey: ['finance', 'investments-summary', displayCurrency],
+    queryFn: () => financeApi.getInvestmentsSummary(displayCurrency),
+    staleTime: 30_000,
+  });
+}
+
+export function useBulkUpdateValuations() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (updates: { id: string; currentValue: number; valuedDate: string }[]) => financeApi.bulkUpdateValuations(updates),
+    onSuccess: () => invalidateAfterInvestmentChange(qc),
+  });
+}
+
+export function useInvestmentValuations(investmentId: string) {
+  return useQuery({
+    queryKey: ['finance', 'investment-valuations', investmentId],
+    queryFn: () => financeApi.getInvestmentValuations(investmentId),
+    staleTime: 30_000,
+    enabled: !!investmentId,
+  });
+}
+
+export function useExportBackup() {
+  return useMutation({
+    mutationFn: () => financeApi.exportBackup(),
   });
 }
 
@@ -279,6 +424,7 @@ export function useCloseStatement() {
     onSuccess: (_data, accountId) => {
       qc.invalidateQueries({ queryKey: ['finance', 'statement-current', accountId] });
       qc.invalidateQueries({ queryKey: ['finance', 'statements', accountId] });
+      invalidateUpcomingBills(qc);
     },
   });
 }
@@ -293,6 +439,7 @@ export function usePayStatement() {
       qc.invalidateQueries({ queryKey: ['finance', 'statement-current', accountId] });
       qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
       qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+      invalidateUpcomingBills(qc);
     },
   });
 }

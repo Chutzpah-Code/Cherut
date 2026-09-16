@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsBoolean, Min } from 'class-validator';
 
 export enum AccountType {
   CHECKING = 'checking',
@@ -43,4 +43,8 @@ export class CreateAccountDto {
   @Min(1)
   @IsOptional()
   statementDueDay?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  archived?: boolean;
 }
