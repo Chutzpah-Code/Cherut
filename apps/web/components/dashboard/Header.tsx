@@ -11,13 +11,11 @@ import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
 
 interface HeaderProps {
   mobileOpened: boolean;
-  desktopOpened: boolean;
   toggleMobile: () => void;
-  toggleDesktop: () => void;
   onOpenWelcome?: () => void;
 }
 
-export default function Header({ mobileOpened, desktopOpened, toggleMobile, toggleDesktop, onOpenWelcome }: HeaderProps) {
+export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: HeaderProps) {
   const { user } = useAuth();
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light');
@@ -79,7 +77,6 @@ export default function Header({ mobileOpened, desktopOpened, toggleMobile, togg
     <Group h="100%" px="md" justify="space-between">
       <Group gap="md">
         <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="lg" size="sm" />
-        <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="lg" size="sm" />
       </Group>
 
       <Group gap="xs">

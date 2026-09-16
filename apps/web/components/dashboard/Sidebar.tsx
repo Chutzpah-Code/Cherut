@@ -18,9 +18,8 @@ import {
   Bot,
   Wallet,
 } from 'lucide-react';
-import { Stack, NavLink, ScrollArea, Box, Divider, Button, Group, Badge, Text, Tooltip, ActionIcon } from '@mantine/core';
+import { Stack, ScrollArea, Tooltip, ActionIcon } from '@mantine/core';
 import { logoutUser } from '@/lib/firebase/auth';
-import { CMark } from '@/components/shell/Shell';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
@@ -59,7 +58,7 @@ interface SidebarProps {
 export default function Sidebar({ onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { isCompact, screenSize } = useSidebar();
+  const { screenSize } = useSidebar();
   const colors = useThemeColors();
 
   useEffect(() => {
@@ -285,7 +284,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
         }
       `}</style>
 
-      <Stack h="100%" gap={0} className={`premium-sidebar ${isCompact ? 'compact' : ''}`}>
+      <Stack h="100%" gap={0} className="premium-sidebar compact">
         <ScrollArea
           style={{ flex: 1 }}
           className="premium-scrollarea"
@@ -293,95 +292,15 @@ export default function Sidebar({ onClose }: SidebarProps) {
             scrollbar: { display: 'none' },
           }}
         >
-          {!isCompact && (
-            <div className="premium-logo-container">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0 }}>
-                <CMark size={34} color="#0F0F1E" />
-                <span style={{
-                  fontWeight: 700,
-                  fontSize: 22,
-                  letterSpacing: '-0.02em',
-                  color: '#0F0F1E',
-                  fontFamily: 'Inter, sans-serif',
-                  lineHeight: 1,
-                  marginLeft: -13,
-                }}>herut.</span>
-              </div>
-            </div>
-          )}
-
-          {!isCompact && <Divider className="premium-divider" />}
-
-          <Stack gap="2px" px={isCompact ? "8px" : "12px"} pt={isCompact ? "24px" : "0"}>
+          <Stack gap="2px" px="8px" pt="24px">
             {navigation.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = item.href === '/dashboard' ? pathname === item.href : pathname.startsWith(item.href);
               const Icon = item.icon;
-
-              const navContent = isCompact ? (
-                <Tooltip
-                  label={item.name}
-                  position="right"
-                  withArrow
-                  offset={8}
-                  openDelay={300}
-                  styles={{
-                    tooltip: {
-                      backgroundColor: '#1F2937',
-                      color: 'white',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      fontFamily: 'Inter, sans-serif',
-                      borderRadius: '8px',
-                      padding: '8px 12px'
-                    }
-                  }}
-                >
-                  <div className={`premium-compact-icon-wrapper ${isActive ? 'active' : ''}`}>
-                    <Icon size={20} strokeWidth={1.5} style={{ color: isActive ? colors.primary : colors.text.secondary }} />
-                  </div>
-                </Tooltip>
-              ) : (
-                <div className={`premium-nav-item ${isActive ? 'active' : ''}`}>
-                  <Icon size={20} strokeWidth={1.5} className="premium-nav-icon" />
-                  <Text
-                    className="premium-nav-text"
-                    style={{
-                      color: isActive ? colors.primary : colors.text.primary,
-                      fontWeight: isActive ? 600 : 500,
-                      fontSize: '15px',
-                      fontFamily: 'Inter, sans-serif',
-                      letterSpacing: '-0.01em',
-                      marginLeft: '16px'
-                    }}
-                  >
-                    {item.name}
-                  </Text>
-                </div>
-              );
 
               return (
                 <Link key={item.name} href={item.href} onClick={handleLinkClick} style={{ textDecoration: 'none' }}>
-                  {navContent}
-                </Link>
-              );
-            })}
-
-            {!isCompact && <Divider className="premium-divider" my="md" />}
-
-            {!isCompact && (
-              <div className="premium-section-header">
-                Coming Soon
-              </div>
-            )}
-
-            {comingSoonItems.map((item) => {
-              const Icon = item.icon;
-
-              if (isCompact) {
-                return (
                   <Tooltip
-                    key={item.name}
-                    label={`${item.name} (Coming Soon)`}
+                    label={item.name}
                     position="right"
                     withArrow
                     offset={8}
@@ -398,109 +317,79 @@ export default function Sidebar({ onClose }: SidebarProps) {
                       }
                     }}
                   >
-                    <div className="premium-coming-soon-compact">
-                      <div className="premium-compact-icon-wrapper">
-                        <Icon size={20} strokeWidth={1.5} style={{ color: colors.text.tertiary }} />
-                      </div>
+                    <div className={`premium-compact-icon-wrapper ${isActive ? 'active' : ''}`}>
+                      <Icon size={20} strokeWidth={1.5} style={{ color: isActive ? colors.primary : colors.text.secondary }} />
                     </div>
                   </Tooltip>
-                );
-              }
+                </Link>
+              );
+            })}
+
+            {comingSoonItems.map((item) => {
+              const Icon = item.icon;
 
               return (
-                <div key={item.name} className="premium-nav-item" style={{ opacity: 0.6, cursor: 'not-allowed' }}>
-                  <Group gap="16px" align="center" h="100%" justify="space-between">
-                    <Group gap="16px" align="center">
-                      <Icon size={20} strokeWidth={1.5} className="premium-nav-icon" style={{ color: colors.text.tertiary }} />
-                      <div>
-                        <Text
-                          style={{
-                            color: colors.text.secondary,
-                            fontWeight: 500,
-                            fontSize: '15px',
-                            fontFamily: 'Inter, sans-serif',
-                            letterSpacing: '-0.01em'
-                          }}
-                        >
-                          {item.name}
-                        </Text>
-                        <Text
-                          size="xs"
-                          c="dimmed"
-                          style={{
-                            fontSize: '13px',
-                            lineHeight: 1.3,
-                            marginTop: '2px',
-                            color: colors.text.tertiary
-                          }}
-                        >
-                          {item.description}
-                        </Text>
-                      </div>
-                    </Group>
-                    <div className="premium-coming-soon-badge">
-                      Soon
+                <Tooltip
+                  key={item.name}
+                  label={`${item.name} (Coming Soon)`}
+                  position="right"
+                  withArrow
+                  offset={8}
+                  openDelay={300}
+                  styles={{
+                    tooltip: {
+                      backgroundColor: '#1F2937',
+                      color: 'white',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      fontFamily: 'Inter, sans-serif',
+                      borderRadius: '8px',
+                      padding: '8px 12px'
+                    }
+                  }}
+                >
+                  <div className="premium-coming-soon-compact">
+                    <div className="premium-compact-icon-wrapper">
+                      <Icon size={20} strokeWidth={1.5} style={{ color: colors.text.tertiary }} />
                     </div>
-                  </Group>
-                </div>
+                  </div>
+                </Tooltip>
               );
             })}
           </Stack>
 
-          {!isCompact && <Divider className="premium-divider" my="md" />}
-
-          {isCompact ? (
-            <Tooltip
-              label="Logout"
-              position="right"
-              withArrow
-              offset={8}
-              openDelay={300}
-              styles={{
-                tooltip: {
-                  backgroundColor: '#1F2937',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  fontFamily: 'Inter, sans-serif',
-                  borderRadius: '8px',
-                  padding: '8px 12px'
-                }
+          <Tooltip
+            label="Logout"
+            position="right"
+            withArrow
+            offset={8}
+            openDelay={300}
+            styles={{
+              tooltip: {
+                backgroundColor: '#1F2937',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: 500,
+                fontFamily: 'Inter, sans-serif',
+                borderRadius: '8px',
+                padding: '8px 12px'
+              }
+            }}
+          >
+            <ActionIcon
+              onClick={handleLogout}
+              variant="subtle"
+              color="red"
+              size={48}
+              radius={12}
+              style={{
+                margin: '8px auto 16px auto',
+                display: 'flex'
               }}
             >
-              <ActionIcon
-                onClick={handleLogout}
-                variant="subtle"
-                color="red"
-                size={48}
-                radius={12}
-                style={{
-                  margin: '8px auto 16px auto',
-                  display: 'flex'
-                }}
-              >
-                <LogOut size={20} strokeWidth={1.5} />
-              </ActionIcon>
-            </Tooltip>
-          ) : (
-            <Box px="md" pb="md">
-              <Button
-                leftSection={<LogOut size={20} strokeWidth={1.5} />}
-                onClick={handleLogout}
-                variant="subtle"
-                fullWidth
-                className="premium-logout-btn"
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  height: '48px'
-                }}
-              >
-                Logout
-              </Button>
-            </Box>
-          )}
+              <LogOut size={20} strokeWidth={1.5} />
+            </ActionIcon>
+          </Tooltip>
         </ScrollArea>
       </Stack>
     </>

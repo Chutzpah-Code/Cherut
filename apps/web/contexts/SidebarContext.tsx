@@ -2,11 +2,10 @@
 
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 
-type SidebarMode = 'expanded' | 'compact' | 'hidden';
+type SidebarMode = 'compact' | 'hidden';
 
 interface SidebarContextType {
   mobileOpened: boolean;
-  desktopOpened: boolean;
   sidebarMode: SidebarMode;
   isCompact: boolean;
   screenSize: 'mobile' | 'tablet' | 'desktop';
@@ -17,14 +16,12 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 export function SidebarProvider({
   children,
   mobileOpened,
-  desktopOpened
 }: {
   children: ReactNode;
   mobileOpened: boolean;
-  desktopOpened: boolean;
 }) {
   const [screenSize, setScreenSize] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
-  const [sidebarMode, setSidebarMode] = useState<SidebarMode>('expanded');
+  const [sidebarMode, setSidebarMode] = useState<SidebarMode>('compact');
 
   useEffect(() => {
     const updateScreenSize = () => {
@@ -37,7 +34,7 @@ export function SidebarProvider({
         setSidebarMode('compact');
       } else {
         setScreenSize('desktop');
-        setSidebarMode(desktopOpened ? 'expanded' : 'compact');
+        setSidebarMode('compact');
       }
     };
 
@@ -47,14 +44,13 @@ export function SidebarProvider({
     // Add event listener
     window.addEventListener('resize', updateScreenSize);
     return () => window.removeEventListener('resize', updateScreenSize);
-  }, [desktopOpened]);
+  }, []);
 
   const isCompact = sidebarMode === 'compact';
 
   return (
     <SidebarContext.Provider value={{
       mobileOpened,
-      desktopOpened,
       sidebarMode,
       isCompact,
       screenSize

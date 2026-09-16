@@ -20,7 +20,6 @@ export default function DashboardLayout({
   const { user, loading, backendAuthenticated, isAdmin } = useAuth();
   const router = useRouter();
   const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] = useDisclosure();
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const { isOpen: isWelcomeOpen, openModal: openWelcome, closeModal: closeWelcome } = useWelcomeModal();
 
   // Usar hook de redirecionamento automático
@@ -59,12 +58,10 @@ export default function DashboardLayout({
   }
 
   return (
-    <SidebarProvider mobileOpened={mobileOpened} desktopOpened={desktopOpened}>
+    <SidebarProvider mobileOpened={mobileOpened}>
       <ResponsiveDashboard
         mobileOpened={mobileOpened}
-        desktopOpened={desktopOpened}
         toggleMobile={toggleMobile}
-        toggleDesktop={toggleDesktop}
         openWelcome={openWelcome}
         closeMobile={closeMobile}
         isWelcomeOpen={isWelcomeOpen}
@@ -79,9 +76,7 @@ export default function DashboardLayout({
 function ResponsiveDashboard({
   children,
   mobileOpened,
-  desktopOpened,
   toggleMobile,
-  toggleDesktop,
   openWelcome,
   closeMobile,
   isWelcomeOpen,
@@ -89,37 +84,19 @@ function ResponsiveDashboard({
 }: {
   children: React.ReactNode;
   mobileOpened: boolean;
-  desktopOpened: boolean;
   toggleMobile: () => void;
-  toggleDesktop: () => void;
   openWelcome: () => void;
   closeMobile: () => void;
   isWelcomeOpen: boolean;
   closeWelcome: () => void;
 }) {
-  const { sidebarMode, isCompact, screenSize } = useSidebar();
-
-  const getSidebarWidth = () => {
-    if (screenSize === 'mobile') return 260;
-    if (isCompact) return 80;
-    return 260;
-  };
-
-  const getSidebarCollapsed = () => {
-    if (screenSize === 'mobile') {
-      return { mobile: !mobileOpened, desktop: false };
-    }
-    if (screenSize === 'tablet') {
-      return { mobile: false, desktop: false }; // Always show in compact mode
-    }
-    return { mobile: !mobileOpened, desktop: !desktopOpened };
-  };
+  const getSidebarCollapsed = () => ({ mobile: !mobileOpened, desktop: false });
 
   return (
     <AppShell
       header={{ height: 60 }}
       navbar={{
-        width: getSidebarWidth(),
+        width: 80,
         breakpoint: 'sm',
         collapsed: getSidebarCollapsed(),
       }}
@@ -128,9 +105,7 @@ function ResponsiveDashboard({
       <AppShell.Header>
         <Header
           mobileOpened={mobileOpened}
-          desktopOpened={desktopOpened}
           toggleMobile={toggleMobile}
-          toggleDesktop={toggleDesktop}
           onOpenWelcome={openWelcome}
         />
       </AppShell.Header>
