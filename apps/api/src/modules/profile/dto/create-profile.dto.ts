@@ -54,5 +54,6 @@ export class CreateProfileDto {
     theme?: string;
     notifications?: boolean | object;
     weekStartsOn?: number;
+    currency?: string;
   };
 }

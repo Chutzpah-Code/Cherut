@@ -77,6 +77,7 @@ export default function ProfilePage() {
       theme: 'dark',
       notifications: true,
       weekStartsOn: 0,
+      currency: 'USD',
     },
   });
 
@@ -102,6 +103,7 @@ export default function ProfilePage() {
           theme: computedColorScheme as 'light' | 'dark',
           notifications: profile.preferences?.notifications ?? true,
           weekStartsOn: profile.preferences?.weekStartsOn ?? 0,
+          currency: profile.preferences?.currency ?? 'USD',
         },
       });
     }
@@ -111,6 +113,13 @@ export default function ProfilePage() {
     e.preventDefault();
     try {
       await updateMutation.mutateAsync(formData);
+      if (formData.preferences?.currency) {
+        try {
+          localStorage.setItem('finance_display_currency', formData.preferences.currency);
+        } catch {
+          // ignore write failures (private browsing, storage disabled)
+        }
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
     }
@@ -408,6 +417,31 @@ export default function ProfilePage() {
                   data={[
                     { value: '0', label: 'Sunday' },
                     { value: '1', label: 'Monday' },
+                  ]}
+                />
+
+                <Select
+                  label="Currency"
+                  description="Used across Finance for balances, totals and projections"
+                  value={formData.preferences?.currency ?? 'USD'}
+                  onChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      preferences: {
+                        ...formData.preferences,
+                        currency: value || 'USD',
+                      },
+                    })
+                  }
+                  radius={8}
+                  styles={INPUT_STYLES}
+                  data={[
+                    { value: 'USD', label: 'USD — US Dollar' },
+                    { value: 'EUR', label: 'EUR — Euro' },
+                    { value: 'GBP', label: 'GBP — British Pound' },
+                    { value: 'BRL', label: 'BRL — Brazilian Real' },
+                    { value: 'JPY', label: 'JPY — Japanese Yen' },
+                    { value: 'ARS', label: 'ARS — Argentine Peso' },
                   ]}
                 />
 

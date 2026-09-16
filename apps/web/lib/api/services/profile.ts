@@ -12,6 +12,7 @@ export interface Profile {
     theme?: 'light' | 'dark';
     notifications?: boolean;
     weekStartsOn?: number;
+    currency?: string;
   };
   createdAt: string;
   updatedAt: string;
@@ -27,6 +28,7 @@ export interface CreateProfileDto {
     theme?: 'light' | 'dark';
     notifications?: boolean;
     weekStartsOn?: number;
+    currency?: string;
   };
 }
 
@@ -40,6 +42,7 @@ export interface UpdateProfileDto {
     theme?: 'light' | 'dark';
     notifications?: boolean;
     weekStartsOn?: number;
+    currency?: string;
   };
 }
 
