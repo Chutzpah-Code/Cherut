@@ -42,6 +42,11 @@ export class HabitsController {
     return this.habitsService.getHabitCounts(req.user.uid, lifeAreaId);
   }
 
+  @Get('today')
+  getTodayHabits(@Request() req, @Query('date') date?: string) {
+    return this.habitsService.getTodayHabits(req.user.uid, date);
+  }
+
   @Get(':id')
   findOne(@Request() req, @Param('id') id: string) {
     return this.habitsService.findOne(req.user.uid, id);

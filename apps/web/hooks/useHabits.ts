@@ -110,6 +110,7 @@ export const useLogHabit = () => {
     mutationFn: (dto: LogHabitDto) => habitsApi.logHabit(dto),
     onSuccess: (_data, dto) => {
       queryClient.invalidateQueries({ queryKey: ['habitLogs'] });
+      queryClient.invalidateQueries({ queryKey: ['habits', 'today'] });
       // Refresh habit list so lastCompletedAt reflects immediately after page reload
       if (dto.completed) {
         queryClient.invalidateQueries({ queryKey: ['habits'] });
@@ -134,6 +135,15 @@ export const useArchivedHabits = (lifeAreaId?: string) => {
     queryFn: () => habitsApi.getArchived(lifeAreaId),
     staleTime: 5 * 60 * 1000, // 5 minutes - archived habits change less frequently
     gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
+export const useTodayHabits = (date?: string) => {
+  return useQuery({
+    queryKey: ['habits', 'today', date],
+    queryFn: () => habitsApi.getTodayHabits(date),
+    staleTime: 60 * 1000, // 1 minute
+    gcTime: 5 * 60 * 1000,
   });
 };
 

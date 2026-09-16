@@ -319,6 +319,48 @@ export class HabitsService {
   }
 
   /**
+   * Habits scheduled for a given date, joined with that date's log (if any).
+   * `monthly` habits have no day-of-month rule anywhere in the codebase yet,
+   * so they fall back to always-scheduled, same as `daily`.
+   */
+  async getTodayHabits(userId: string, date?: string) {
+    const targetDate = date ?? new Date().toISOString().slice(0, 10);
+    const dow = new Date(`${targetDate}T00:00:00`).getDay();
+
+    const db = this.firebaseService.getFirestore();
+    const [habitsSnap, logsSnap] = await Promise.all([
+      db
+        .collection(this.habitsCollection)
+        .where('userId', '==', userId)
+        .where('isActive', '==', true)
+        .get(),
+      db
+        .collection(this.logsCollection)
+        .where('userId', '==', userId)
+        .where('date', '==', targetDate)
+        .get(),
+    ]);
+
+    const logByHabitId = new Map(
+      logsSnap.docs.map((doc) => [doc.data().habitId, { id: doc.id, ...doc.data() }]),
+    );
+
+    const scheduled = habitsSnap.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }) as any)
+      .filter(
+        (h) =>
+          h.frequency === 'daily' ||
+          h.frequency === 'monthly' ||
+          (h.frequency === 'weekly' && (h.weekDays ?? []).includes(dow)),
+      );
+
+    return scheduled.map((habit) => {
+      const log = logByHabitId.get(habit.id) ?? null;
+      return { habit, log, loggedToday: !!(log as any)?.completed };
+    });
+  }
+
+  /**
    * Permanently delete a habit and all its logs
    */
   async permanentDelete(userId: string, id: string) {

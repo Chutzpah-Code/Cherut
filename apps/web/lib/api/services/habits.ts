@@ -79,6 +79,12 @@ export interface HabitCounts {
   total: number;
 }
 
+export interface TodayHabitItem {
+  habit: Habit;
+  log: HabitLog | null;
+  loggedToday: boolean;
+}
+
 export const habitsApi = {
   // Habits CRUD
   getAll: async (lifeAreaId?: string, archived?: boolean): Promise<Habit[]> => {
@@ -99,6 +105,12 @@ export const habitsApi = {
   getCounts: async (lifeAreaId?: string): Promise<HabitCounts> => {
     const params = lifeAreaId ? { lifeAreaId } : {};
     const { data } = await apiClient.get('/habits/counts', { params });
+    return data;
+  },
+
+  getTodayHabits: async (date?: string): Promise<TodayHabitItem[]> => {
+    const params = date ? { date } : {};
+    const { data } = await apiClient.get('/habits/today', { params });
     return data;
   },
 
