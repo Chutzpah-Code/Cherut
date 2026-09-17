@@ -1,13 +1,23 @@
 'use client';
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import type { EventDropArg } from '@fullcalendar/core';
+import type { EventClickArg, EventDropArg } from '@fullcalendar/core';
 import { Box, Center, Loader, Text } from '@mantine/core';
 import { useBoardKanban } from '@/hooks/useBoards';
-import { useUpdateTask } from '@/hooks/useTasks';
+import {
+  useUpdateTask,
+  useDeleteTask,
+  useToggleArchive,
+  useStartTimeTracking,
+  usePauseTimeTracking,
+  useStopTimeTracking,
+  useToggleChecklistItem,
+} from '@/hooks/useTasks';
+import { Task, UpdateTaskDto } from '@/lib/api/services/tasks';
+import { TaskModal } from '../../components/TaskModal';
 
 interface BoardCalendarViewProps {
   boardId: string;
@@ -22,6 +32,15 @@ const STATUS_COLORS: Record<string, string> = {
 export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
   const { data: columns, isLoading } = useBoardKanban(boardId);
   const updateTask = useUpdateTask();
+  const deleteTask = useDeleteTask();
+  const archiveTask = useToggleArchive();
+  const startTracking = useStartTimeTracking();
+  const pauseTracking = usePauseTimeTracking();
+  const stopTracking = useStopTimeTracking();
+  const toggleChecklistItem = useToggleChecklistItem();
+
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [modalOpened, setModalOpened] = useState(false);
 
   const events = useMemo(() => {
     if (!columns) return [];
@@ -48,6 +67,16 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
       );
     },
     [updateTask],
+  );
+
+  const handleEventClick = useCallback(
+    (info: EventClickArg) => {
+      const task = columns?.flatMap((c) => c.tasks).find((t) => t.id === info.event.id);
+      if (!task) return;
+      setSelectedTask(task);
+      setModalOpened(true);
+    },
+    [columns],
   );
 
   if (isLoading) {
@@ -108,6 +137,7 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
         events={events}
         editable
         eventDrop={handleEventDrop}
+        eventClick={handleEventClick}
         // +32px vs. the pre-Surface value, accounting for the page's
         // wrapping Surface (apps/web/components/ui/Surface.tsx) now adding
         // its own 16px top + 16px bottom padding around this view.
@@ -116,6 +146,21 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
         eventDisplay="block"
         firstDay={1}
       />
+
+      {selectedTask && (
+        <TaskModal
+          task={selectedTask}
+          opened={modalOpened}
+          onClose={() => { setModalOpened(false); setSelectedTask(null); }}
+          onSave={(id, dto: UpdateTaskDto) => updateTask.mutate({ id, dto })}
+          onDelete={(id) => { deleteTask.mutate(id); setModalOpened(false); setSelectedTask(null); }}
+          onArchive={(id) => archiveTask.mutate(id)}
+          onStartTimeTracking={(id) => startTracking.mutate(id)}
+          onPauseTimeTracking={(id, trackingId) => pauseTracking.mutate({ id, trackingId })}
+          onStopTimeTracking={(id, trackingId) => stopTracking.mutate({ id, trackingId })}
+          onToggleChecklistItem={(taskId, itemId) => toggleChecklistItem.mutate({ id: taskId, checklistItemId: itemId })}
+        />
+      )}
     </Box>
   );
 }

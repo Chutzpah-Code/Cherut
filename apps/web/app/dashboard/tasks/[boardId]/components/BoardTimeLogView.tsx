@@ -12,8 +12,14 @@ import {
   useAddManualTimeEntry,
   useEditTimeEntry,
   useDeleteTimeEntry,
+  useUpdateTask,
+  useDeleteTask,
+  useToggleArchive,
+  usePauseTimeTracking,
+  useToggleChecklistItem,
 } from '@/hooks/useTasks';
-import { Task, TimeTrackingEntry } from '@/lib/api/services/tasks';
+import { Task, TimeTrackingEntry, UpdateTaskDto } from '@/lib/api/services/tasks';
+import { TaskModal } from '../../components/TaskModal';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -265,9 +271,10 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
 interface TimeEntryRowProps {
   fe: FlatEntry;
   isLast: boolean;
+  onOpenTask: () => void;
 }
 
-function TimeEntryRow({ fe, isLast }: TimeEntryRowProps) {
+function TimeEntryRow({ fe, isLast, onOpenTask }: TimeEntryRowProps) {
   const [editing, setEditing] = useState(false);
   const [editDate, setEditDate] = useState('');
   const [editStart, setEditStart] = useState('');
@@ -321,7 +328,10 @@ function TimeEntryRow({ fe, isLast }: TimeEntryRowProps) {
   }
 
   return (
-    <Box style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom }}>
+    <Box
+      onClick={onOpenTask}
+      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom, cursor: 'pointer' }}
+    >
       <div style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
       <Text size="sm" fw={500} style={{ flex: 1, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {fe.taskTitle}
@@ -334,10 +344,10 @@ function TimeEntryRow({ fe, isLast }: TimeEntryRowProps) {
       <Text size="sm" fw={600} style={{ flexShrink: 0, minWidth: 52, textAlign: 'right', color: '#0F172A', fontFamily: 'monospace' }}>
         {fmtHuman(duration)}
       </Text>
-      <ActionIcon size="sm" variant="subtle" color="blue" onClick={enterEdit}>
+      <ActionIcon size="sm" variant="subtle" color="blue" onClick={(e) => { e.stopPropagation(); enterEdit(); }}>
         <Pencil size={12} />
       </ActionIcon>
-      <ActionIcon size="sm" variant="subtle" color="red" onClick={handleDelete} loading={deleteMutation.isPending}>
+      <ActionIcon size="sm" variant="subtle" color="red" onClick={(e) => { e.stopPropagation(); handleDelete(); }} loading={deleteMutation.isPending}>
         <Trash2 size={12} />
       </ActionIcon>
     </Box>
@@ -356,10 +366,28 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
   const [filterFrom, setFilterFrom] = useState('');
   const [filterTo, setFilterTo] = useState('');
 
+  const updateTask = useUpdateTask();
+  const deleteTask = useDeleteTask();
+  const archiveTask = useToggleArchive();
+  const startTracking = useStartTimeTracking();
+  const pauseTracking = usePauseTimeTracking();
+  const stopTracking = useStopTimeTracking();
+  const toggleChecklistItem = useToggleChecklistItem();
+
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [modalOpened, setModalOpened] = useState(false);
+
   const tasks: Task[] = useMemo(
     () => columns?.flatMap(c => c.tasks).filter(t => !t.archived) ?? [],
     [columns],
   );
+
+  const openTask = (taskId: string) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task) return;
+    setSelectedTask(task);
+    setModalOpened(true);
+  };
 
   const activeTask = useMemo(
     () => tasks.find(t => t.timeTracking?.some(e => e.status === 'running')) ?? null,
@@ -463,7 +491,10 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
                     Running now
                   </Text>
                 </Box>
-                <Box style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', background: '#F0FDF4', borderBottom: '1px solid #E2E8F0' }}>
+                <Box
+                  onClick={() => openTask(activeTask.id)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', background: '#F0FDF4', borderBottom: '1px solid #E2E8F0', cursor: 'pointer' }}
+                >
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', animation: 'ttPulse 1.5s ease-in-out infinite', flexShrink: 0 }} />
                   <Text size="sm" fw={500} style={{ flex: 1, color: '#166534' }}>{activeTask.title}</Text>
                   <Text size="sm" c="green.7">{toLocalTime(activeEntry.startTime)} – now</Text>
@@ -482,7 +513,12 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
                     <Text size="xs" fw={600} c="dimmed">Total: {fmtHuman(dayTotal)}</Text>
                   </Box>
                   {entries.map((fe, i) => (
-                    <TimeEntryRow key={fe.entry.id} fe={fe} isLast={i === entries.length - 1} />
+                    <TimeEntryRow
+                      key={fe.entry.id}
+                      fe={fe}
+                      isLast={i === entries.length - 1}
+                      onOpenTask={() => openTask(fe.taskId)}
+                    />
                   ))}
                 </React.Fragment>
               );
@@ -490,6 +526,21 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
           </Box>
         )}
       </Stack>
+
+      {selectedTask && (
+        <TaskModal
+          task={selectedTask}
+          opened={modalOpened}
+          onClose={() => { setModalOpened(false); setSelectedTask(null); }}
+          onSave={(id, dto: UpdateTaskDto) => updateTask.mutate({ id, dto })}
+          onDelete={(id) => { deleteTask.mutate(id); setModalOpened(false); setSelectedTask(null); }}
+          onArchive={(id) => archiveTask.mutate(id)}
+          onStartTimeTracking={(id) => startTracking.mutate(id)}
+          onPauseTimeTracking={(id, trackingId) => pauseTracking.mutate({ id, trackingId })}
+          onStopTimeTracking={(id, trackingId) => stopTracking.mutate({ id, trackingId })}
+          onToggleChecklistItem={(taskId, itemId) => toggleChecklistItem.mutate({ id: taskId, checklistItemId: itemId })}
+        />
+      )}
     </>
   );
 }
