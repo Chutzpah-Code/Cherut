@@ -112,7 +112,17 @@ function ResponsiveDashboard({
         />
       </AppShell.Header>
 
-      <AppShell.Navbar>
+      {/* Mantine's AppShell forces --app-shell-navbar-width to 100% below the
+          `breakpoint` whenever navbar.collapsed.mobile is false (i.e. exactly
+          when we open it) — its built-in assumption is a full-screen mobile
+          drawer. Our navbar is a fixed 80px icon rail (Sidebar.tsx's
+          .premium-sidebar.compact), so left un-pinned, the *wrapper* stretches
+          to the full viewport width with an opaque background while only the
+          left 80px has visible content — painting the rest of the screen (and
+          our backdrop below it, and the real page content under that) solid
+          white. Pin the width back to 80px so it always renders as an 80px
+          overlay instead of a full-bleed opaque curtain. */}
+      <AppShell.Navbar style={{ '--app-shell-navbar-width': '80px' } as React.CSSProperties}>
         <Sidebar onClose={closeMobile} />
       </AppShell.Navbar>
 
