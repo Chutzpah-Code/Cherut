@@ -86,7 +86,10 @@ export function AddPanel() {
         position="right"
         size={404}
         title={<Text fw={700} size="lg">Add</Text>}
-        styles={{ body: { padding: 0, height: 'calc(100% - 60px)', display: 'flex', flexDirection: 'column' } }}
+        styles={{
+          content: { maxWidth: '100vw' },
+          body: { padding: 0, height: 'calc(100% - 60px)', display: 'flex', flexDirection: 'column' },
+        }}
       >
         {state.mode === 'create' && (
           <Box px="md" pb="md" style={{ borderBottom: '1px solid #E2E5EB' }}>
