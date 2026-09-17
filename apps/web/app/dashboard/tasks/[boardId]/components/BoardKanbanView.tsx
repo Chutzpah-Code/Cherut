@@ -18,7 +18,7 @@ import {
   useSensors,
   closestCenter,
 } from '@dnd-kit/core';
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { arrayMove, horizontalListSortingStrategy, sortableKeyboardCoordinates, SortableContext } from '@dnd-kit/sortable';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { KanbanList } from '../../components/KanbanList';
 import { KanbanCard } from '../../components/KanbanCard';
@@ -166,6 +166,12 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
     return null;
   }, [activeId, kanbanColumns]);
 
+  const activeColumnData = useMemo(() => {
+    if (!activeId || !activeId.startsWith('col:') || !kanbanColumns) return null;
+    const colId = activeId.slice(4);
+    return kanbanColumns.find((c) => c.id === colId) ?? null;
+  }, [activeId, kanbanColumns]);
+
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id as string);
     scrollSpeedRef.current = 0;
@@ -195,7 +201,46 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
       const { active, over } = event;
       if (!over || active.id === over.id || !kanbanColumns) return;
 
-      const taskId = active.id as string;
+      const activeIdStr = active.id as string;
+
+      // ── Column reorder ──────────────────────────────────────────────────
+      if (activeIdStr.startsWith('col:')) {
+        const overIdStr = over.id as string;
+        if (!overIdStr.startsWith('col:')) return;
+
+        const activeColId = activeIdStr.slice(4);
+        const overColId = overIdStr.slice(4);
+        const oldIndex = kanbanColumns.findIndex((c) => c.id === activeColId);
+        const newIndex = kanbanColumns.findIndex((c) => c.id === overColId);
+        if (oldIndex === -1 || newIndex === -1) return;
+
+        const reordered = arrayMove(kanbanColumns, oldIndex, newIndex);
+        const prevOrder = newIndex > 0 ? reordered[newIndex - 1].order : undefined;
+        const nextOrder = newIndex < reordered.length - 1 ? reordered[newIndex + 1].order : undefined;
+        const newOrder =
+          prevOrder !== undefined && nextOrder !== undefined
+            ? (prevOrder + nextOrder) / 2
+            : prevOrder !== undefined
+              ? prevOrder + 1
+              : nextOrder !== undefined
+                ? nextOrder - 1
+                : 0;
+
+        queryClient.setQueryData(['boards', boardId, 'kanban'], (old: any) => {
+          if (!old) return old;
+          const oi = old.findIndex((c: any) => c.id === activeColId);
+          const ni = old.findIndex((c: any) => c.id === overColId);
+          if (oi === -1 || ni === -1) return old;
+          const moved = arrayMove(old, oi, ni);
+          return moved.map((c: any) => (c.id === activeColId ? { ...c, order: newOrder } : c));
+        });
+
+        updateColumn.mutate({ boardId, columnId: activeColId, dto: { order: newOrder } });
+        return;
+      }
+
+      // ── Task reorder ────────────────────────────────────────────────────
+      const taskId = activeIdStr;
       const overIdStr = over.id as string;
 
       const sourceCol = findColumnOfTask(taskId);
@@ -239,7 +284,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         updateOrderMutation.mutate({ taskId, newOrder, newColumnId: targetCol.id });
       }
     },
-    [kanbanColumns, findColumnOfTask, updateOrderMutation, stopEdgeScroll]
+    [kanbanColumns, findColumnOfTask, updateOrderMutation, stopEdgeScroll, queryClient, boardId, updateColumn]
   );
 
   const handleAddTask = useCallback(
@@ -335,52 +380,54 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
             gap="md"
             style={{ minWidth: 'max-content', height: '100%', padding: '4px 2px 16px' }}
           >
-            {kanbanColumns.map((col) => (
-              <Box key={col.id} style={{ width: isMobile ? 260 : 272, flexShrink: 0, height: '100%' }}>
-                <KanbanList
-                  id={col.id}
-                  title={col.name}
-                  tasks={col.tasks}
-                  onTaskClick={(task) => { setSelectedTask(task); setModalOpened(true); }}
-                  onAddTask={handleAddTask}
-                  onEditTitle={(name) =>
-                    updateColumn.mutate({ boardId, columnId: col.id, dto: { name } })
-                  }
-                  onDelete={
-                    kanbanColumns.length > 1
-                      ? () => deleteColumn.mutate({ boardId, columnId: col.id })
-                      : undefined
-                  }
-                  activeId={activeId}
-                  overId={overId}
-                  onToggleComplete={(taskId) => {
-                    const task = kanbanColumns.flatMap((c) => c.tasks).find((t) => t.id === taskId);
-                    if (!task) return;
-                    const newStatus = task.status === 'done' ? 'todo' : 'done';
+            <SortableContext items={kanbanColumns.map((c) => `col:${c.id}`)} strategy={horizontalListSortingStrategy}>
+              {kanbanColumns.map((col) => (
+                <Box key={col.id} style={{ width: isMobile ? 260 : 272, flexShrink: 0, height: '100%' }}>
+                  <KanbanList
+                    id={col.id}
+                    title={col.name}
+                    tasks={col.tasks}
+                    onTaskClick={(task) => { setSelectedTask(task); setModalOpened(true); }}
+                    onAddTask={handleAddTask}
+                    onEditTitle={(name) =>
+                      updateColumn.mutate({ boardId, columnId: col.id, dto: { name } })
+                    }
+                    onDelete={
+                      kanbanColumns.length > 1
+                        ? () => deleteColumn.mutate({ boardId, columnId: col.id })
+                        : undefined
+                    }
+                    activeId={activeId}
+                    overId={overId}
+                    onToggleComplete={(taskId) => {
+                      const task = kanbanColumns.flatMap((c) => c.tasks).find((t) => t.id === taskId);
+                      if (!task) return;
+                      const newStatus = task.status === 'done' ? 'todo' : 'done';
 
-                    queryClient.setQueryData(['boards', boardId, 'kanban'], (old: any) => {
-                      if (!old) return old;
-                      return old.map((col: any) => ({
-                        ...col,
-                        tasks: col.tasks.map((t: any) =>
-                          t.id === taskId ? { ...t, status: newStatus } : t
-                        ),
-                      }));
-                    });
+                      queryClient.setQueryData(['boards', boardId, 'kanban'], (old: any) => {
+                        if (!old) return old;
+                        return old.map((col: any) => ({
+                          ...col,
+                          tasks: col.tasks.map((t: any) =>
+                            t.id === taskId ? { ...t, status: newStatus } : t
+                          ),
+                        }));
+                      });
 
-                    updateMutation.mutate(
-                      { id: taskId, dto: { status: newStatus } },
-                      {
-                        onError: () => {
-                          queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'kanban'] });
-                        },
-                      }
-                    );
-                  }}
-                  onEditTask={(task) => { setSelectedTask(task); setModalOpened(true); }}
-                />
-              </Box>
-            ))}
+                      updateMutation.mutate(
+                        { id: taskId, dto: { status: newStatus } },
+                        {
+                          onError: () => {
+                            queryClient.invalidateQueries({ queryKey: ['boards', boardId, 'kanban'] });
+                          },
+                        }
+                      );
+                    }}
+                    onEditTask={(task) => { setSelectedTask(task); setModalOpened(true); }}
+                  />
+                </Box>
+              ))}
+            </SortableContext>
 
             <Box style={{ width: 272, flexShrink: 0, paddingTop: 2 }}>
               <Button
@@ -412,11 +459,33 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           </Group>
 
           <DragOverlay dropAnimation={null}>
-            {activeTask && (
+            {activeColumnData ? (
+              <Box style={{ width: isMobile ? 260 : 272 }}>
+                <Box
+                  style={{
+                    background: '#F4F5F7',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 12,
+                    padding: '14px 16px',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.22), 0 0 0 2px rgba(70,134,254,0.35)',
+                    transform: 'rotate(1.5deg)',
+                    fontFamily: 'Inter Display, sans-serif',
+                    fontWeight: 600,
+                    fontSize: 14,
+                    color: '#172B4D',
+                  }}
+                >
+                  {activeColumnData.name}
+                  <span style={{ marginLeft: 8, color: '#97A0AF', fontWeight: 400, fontSize: 12 }}>
+                    {activeColumnData.tasks.length} task{activeColumnData.tasks.length !== 1 ? 's' : ''}
+                  </span>
+                </Box>
+              </Box>
+            ) : activeTask ? (
               <div className="drag-overlay-card">
                 <KanbanCard task={activeTask} onClick={() => {}} />
               </div>
-            )}
+            ) : null}
           </DragOverlay>
         </DndContext>
       </Box>

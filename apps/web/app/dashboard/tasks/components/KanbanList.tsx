@@ -2,13 +2,15 @@
 
 import React from 'react';
 import { Card, Text, Badge, Stack, Button, TextInput, ActionIcon, Group, ScrollArea } from '@mantine/core';
-import { Plus, X, Check } from 'lucide-react';
+import { Plus, X, Check, Trash2, GripVertical } from 'lucide-react';
 import { Task } from '@/lib/api/services/tasks';
 import { useDroppable } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { KanbanCard } from './KanbanCard';
 import { DragPlaceholder } from './DragPlaceholder';
 import { useState } from 'react';
+import { modals } from '@mantine/modals';
 
 interface KanbanListProps {
   id: string;
@@ -39,6 +41,14 @@ export function KanbanList({
   onEditTask,
 }: KanbanListProps) {
   const { setNodeRef, isOver } = useDroppable({ id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setSortableNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: `col:${id}`, data: { type: 'column', columnId: id } });
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [newCardTitle, setNewCardTitle] = useState('');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -51,12 +61,40 @@ export function KanbanList({
     setIsEditingTitle(false);
   };
 
+  const handleDeleteClick = () => {
+    modals.openConfirmModal({
+      title: 'Delete list',
+      children: (
+        <Text
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '14px',
+            fontWeight: 400,
+            color: '#666666',
+            lineHeight: '20px',
+          }}
+        >
+          {tasks.length > 0
+            ? `Are you sure you want to delete "${title}"? This will also permanently delete ${tasks.length} task${tasks.length !== 1 ? 's' : ''} inside it. This action cannot be undone.`
+            : `Are you sure you want to delete "${title}"? This action cannot be undone.`}
+        </Text>
+      ),
+      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      confirmProps: {
+        color: 'red',
+        style: { fontFamily: 'Inter, sans-serif', fontWeight: 600 },
+      },
+      onConfirm: () => onDelete?.(),
+    });
+  };
+
   const showPlaceholder = activeId && (overId === id || tasks.some(task => task.id === overId));
   const overTask = overId && tasks.find(task => task.id === overId);
   const overTaskIndex = overTask ? tasks.indexOf(overTask) : -1;
 
   return (
     <Card
+      ref={setSortableNodeRef}
       shadow="xs"
       padding="md"
       radius="lg"
@@ -64,7 +102,11 @@ export function KanbanList({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'box-shadow 0.15s ease, border-color 0.15s ease',
+        transform: CSS.Transform.toString(transform),
+        transition: isDragging
+          ? 'none'
+          : [transition, 'box-shadow 0.15s ease', 'border-color 0.15s ease'].filter(Boolean).join(', '),
+        opacity: isDragging ? 0 : 1,
         borderColor: isOver ? '#CBD5E1' : '#E9ECEF',
         borderWidth: '1px',
         backgroundColor: isOver ? '#F8FAFC' : '#F4F5F7',
@@ -72,7 +114,22 @@ export function KanbanList({
       }}
     >
       {/* Header */}
-      <Group justify="space-between" mb="md" wrap="nowrap">
+      <Group justify="space-between" mb="md" wrap="nowrap" gap={4}>
+        <div
+          {...attributes}
+          {...listeners}
+          aria-label="Drag to reorder list"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            color: '#97A0AF',
+            cursor: 'grab',
+            touchAction: 'none',
+            flexShrink: 0,
+          }}
+        >
+          <GripVertical size={14} />
+        </div>
         {isEditingTitle ? (
           <Group gap="xs" style={{ flex: 1 }} wrap="nowrap">
             <TextInput
@@ -135,10 +192,10 @@ export function KanbanList({
             size="sm"
             color="gray"
             variant="subtle"
-            onClick={onDelete}
+            onClick={handleDeleteClick}
             style={{ color: '#97A0AF' }}
           >
-            <X size={14} />
+            <Trash2 size={14} />
           </ActionIcon>
         )}
       </Group>

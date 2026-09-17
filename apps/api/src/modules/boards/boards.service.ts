@@ -178,8 +178,23 @@ export class BoardsService {
     await this.findOneBoard(userId, boardId);
 
     const db = this.firebaseService.getFirestore();
-    await db.collection(this.columnsCollection).doc(columnId).delete();
-    this.logger.log(`Column ${columnId} deleted from board ${boardId}`);
+    const batch = db.batch();
+
+    // Cascade-delete every task in this column — tasks reference columnId
+    // but aren't cleaned up automatically by Firestore.
+    const taskSnap = await db
+      .collection(this.tasksCollection)
+      .where('userId', '==', userId)
+      .where('columnId', '==', columnId)
+      .get();
+    taskSnap.docs.forEach((doc) => batch.delete(doc.ref));
+
+    batch.delete(db.collection(this.columnsCollection).doc(columnId));
+
+    await batch.commit();
+    this.logger.log(
+      `Column ${columnId} and ${taskSnap.size} task(s) deleted from board ${boardId}`,
+    );
   }
 
   // ─── Kanban view ───────────────────────────────────────────────────────────
