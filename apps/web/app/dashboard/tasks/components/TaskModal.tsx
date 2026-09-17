@@ -534,7 +534,7 @@ export function TaskModal({
             )}
             <Button
               leftSection={<Play size={16} />}
-              color="green"
+              style={{ backgroundColor: '#4686FE' }}
               onClick={() => onStartTimeTracking(currentTask.id)}
             >
               Start Tracking
