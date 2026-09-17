@@ -8,6 +8,7 @@ import { RowsSkeleton } from './skeletons';
 
 const LABEL: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: '#0F172A' };
 const KR_VISIBLE = 4;
+const OBJECTIVES_VISIBLE = 5;
 
 function quarterOf(dateStr: string) {
   return Math.floor(new Date(dateStr).getMonth() / 3) + 1;
@@ -83,6 +84,8 @@ export function ObjectivesReadOnly() {
     () => (objectives as any[]).filter((o) => o.isActive !== false && !o.isArchived && o.status === 'active'),
     [objectives],
   );
+  const visibleObjectives = active.slice(0, OBJECTIVES_VISIBLE);
+  const remainingObjectives = active.length - visibleObjectives.length;
   const { totalKRs, completeKRs } = useMemo(() => {
     let total = 0;
     let complete = 0;
@@ -116,7 +119,12 @@ export function ObjectivesReadOnly() {
         </Stack>
       ) : (
         <Stack gap={10}>
-          {active.map((objective) => <ObjectiveCard key={objective.id} objective={objective} />)}
+          {visibleObjectives.map((objective) => <ObjectiveCard key={objective.id} objective={objective} />)}
+          {remainingObjectives > 0 && (
+            <Link href="/dashboard/objectives" style={{ fontSize: 12.5, fontWeight: 500, color: '#1D4ED8', textDecoration: 'none' }}>
+              +{remainingObjectives} more objective{remainingObjectives !== 1 ? 's' : ''}
+            </Link>
+          )}
         </Stack>
       )}
     </Box>
