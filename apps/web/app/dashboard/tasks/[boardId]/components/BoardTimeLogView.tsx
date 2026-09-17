@@ -317,7 +317,7 @@ function TimeEntryRow({ fe, isLast, onOpenTask }: TimeEntryRowProps) {
         <Text size="xs" c="dimmed" style={{ paddingBottom: 7 }}>–</Text>
         <TextInput type="time" value={editEnd} onChange={e => setEditEnd(e.target.value)} size="xs" style={{ width: 100 }} />
         <Group gap={4} style={{ paddingBottom: 2 }}>
-          <ActionIcon size="sm" color="green" onClick={handleSave} disabled={!isEditValid} loading={editMutation.isPending}>
+          <ActionIcon size="sm" style={{ backgroundColor: '#4686FE' }} onClick={handleSave} disabled={!isEditValid} loading={editMutation.isPending}>
             <Check size={12} />
           </ActionIcon>
           <ActionIcon size="sm" color="gray" variant="subtle" onClick={() => setEditing(false)}>

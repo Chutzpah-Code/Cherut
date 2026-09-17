@@ -82,7 +82,7 @@ export default function BoardDetailPage({ params }: { params: Promise<{ boardId:
                 },
               }}
             />
-            <ActionIcon size={32} color="green" onClick={handleSaveName}>
+            <ActionIcon size={32} style={{ backgroundColor: '#4686FE' }} onClick={handleSaveName}>
               <Check size={16} />
             </ActionIcon>
             <ActionIcon
