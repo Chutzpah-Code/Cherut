@@ -131,14 +131,14 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
       {activeEntry ? (
         <>
           <Group gap={8} style={{ flex: 1 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', animation: 'ttPulse 1.5s ease-in-out infinite', flexShrink: 0 }} />
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }} />
             <Text size="sm" fw={600} c="green.7">Running</Text>
             <Text size="sm" c="dimmed">—</Text>
             <Text size="sm" fw={500} style={{ color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 260 }}>
               {activeTask?.title}
             </Text>
           </Group>
-          <Text fw={700} style={{ fontFamily: 'monospace', fontSize: 24, color: '#166534', letterSpacing: 2, flexShrink: 0 }}>
+          <Text fw={700} style={{ fontFamily: 'Inter, sans-serif', fontVariantNumeric: 'tabular-nums', fontSize: 24, color: '#0F172A', letterSpacing: 1, flexShrink: 0 }}>
             {fmtTimer(liveElapsed)}
           </Text>
           <Button
@@ -163,12 +163,12 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
             size="sm"
             style={{ flex: 1, minWidth: 200 }}
           />
-          <Text style={{ fontFamily: 'monospace', fontSize: 22, color: '#94A3B8', letterSpacing: 2, flexShrink: 0 }}>
+          <Text style={{ fontFamily: 'Inter, sans-serif', fontVariantNumeric: 'tabular-nums', fontSize: 22, color: '#94A3B8', letterSpacing: 1, flexShrink: 0 }}>
             00:00:00
           </Text>
           <Button
             leftSection={<Play size={14} />}
-            color="green"
+            style={{ backgroundColor: '#4686FE' }}
             size="sm"
             onClick={handleStart}
             disabled={!selectedTaskId}
@@ -341,7 +341,7 @@ function TimeEntryRow({ fe, isLast, onOpenTask }: TimeEntryRowProps) {
         {' – '}
         {fe.entry.endTime ? toLocalTime(fe.entry.endTime) : '...'}
       </Text>
-      <Text size="sm" fw={600} style={{ flexShrink: 0, minWidth: 52, textAlign: 'right', color: '#0F172A', fontFamily: 'monospace' }}>
+      <Text size="sm" fw={600} style={{ flexShrink: 0, minWidth: 52, textAlign: 'right', color: '#0F172A', fontFamily: 'Inter, sans-serif', fontVariantNumeric: 'tabular-nums' }}>
         {fmtHuman(duration)}
       </Text>
       <ActionIcon size="sm" variant="subtle" color="blue" onClick={(e) => { e.stopPropagation(); enterEdit(); }}>
