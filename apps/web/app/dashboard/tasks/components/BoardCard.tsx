@@ -12,7 +12,7 @@ import {
   TextInput,
   Button,
 } from '@mantine/core';
-import { MoreHorizontal, Edit2, Trash2, LayoutGrid } from 'lucide-react';
+import { MoreHorizontal, Edit2, Trash2, LayoutGrid, Palette, Check } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export interface Board {
@@ -36,13 +36,15 @@ interface BoardCardProps {
   board: Board;
   onRename: (id: string, newName: string) => void;
   onDelete: (id: string) => void;
+  onColorChange: (id: string, colorIndex: number) => void;
 }
 
-export function BoardCard({ board, onRename, onDelete }: BoardCardProps) {
+export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCardProps) {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState('');
+  const [colorOpen, setColorOpen] = useState(false);
   const color = BOARD_COLORS[board.colorIndex % BOARD_COLORS.length];
 
   const openRename = (e: React.MouseEvent) => {
@@ -115,6 +117,15 @@ export function BoardCard({ board, onRename, onDelete }: BoardCardProps) {
                 <Menu.Item leftSection={<Edit2 size={14} />} onClick={openRename}>
                   Rename
                 </Menu.Item>
+                <Menu.Item
+                  leftSection={<Palette size={14} />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setColorOpen(true);
+                  }}
+                >
+                  Color
+                </Menu.Item>
                 <Menu.Divider />
                 <Menu.Item
                   color="red"
@@ -182,6 +193,47 @@ export function BoardCard({ board, onRename, onDelete }: BoardCardProps) {
             </Button>
           </Group>
         </Stack>
+      </Modal>
+
+      <Modal
+        opened={colorOpen}
+        onClose={() => setColorOpen(false)}
+        title={
+          <Text fw={600} style={{ fontFamily: 'Inter Display, sans-serif' }}>
+            Board color
+          </Text>
+        }
+        radius="lg"
+        centered
+        size="sm"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Group gap="sm" justify="center" py="xs">
+          {BOARD_COLORS.map((swatch, index) => {
+            const selected = index === board.colorIndex % BOARD_COLORS.length;
+            return (
+              <ActionIcon
+                key={index}
+                aria-label={`Board color ${index + 1}`}
+                onClick={() => {
+                  onColorChange(board.id, index);
+                  setColorOpen(false);
+                }}
+                radius="xl"
+                size={40}
+                style={{
+                  backgroundColor: swatch.accent,
+                  border: selected ? '2px solid #111' : '2px solid transparent',
+                  outline: selected ? '2px solid #fff' : 'none',
+                  outlineOffset: selected ? -4 : 0,
+                  cursor: 'pointer',
+                }}
+              >
+                {selected && <Check size={18} color="#fff" strokeWidth={3} />}
+              </ActionIcon>
+            );
+          })}
+        </Group>
       </Modal>
     </>
   );

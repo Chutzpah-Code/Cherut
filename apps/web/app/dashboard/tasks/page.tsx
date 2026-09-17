@@ -73,6 +73,10 @@ export default function TasksPage() {
     deleteBoard.mutate(id);
   };
 
+  const handleColorChange = (id: string, colorIndex: number) => {
+    updateBoard.mutate({ boardId: id, dto: { colorIndex } });
+  };
+
   return (
     <>
       <style jsx global>{`
@@ -136,6 +140,7 @@ export default function TasksPage() {
                 board={{ id: board.id, name: board.name, colorIndex: board.colorIndex }}
                 onRename={handleRename}
                 onDelete={handleDelete}
+                onColorChange={handleColorChange}
               />
             ))}
 
