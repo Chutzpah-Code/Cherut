@@ -43,22 +43,6 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
     touchAction: 'none' as const,
   };
 
-  const priorityColor = useMemo(() => {
-    switch (task.priority) {
-      case 'urgent':
-        return 'red';
-      case 'high':
-        return 'orange';
-      case 'medium':
-        return 'yellow';
-      case 'low':
-        return 'green';
-      default:
-        return 'gray';
-    }
-  }, [task.priority]);
-
-
   const hasActiveTimeTracking = useMemo(() =>
     task.timeTracking?.some((t) => t.status === 'running'),
     [task.timeTracking]
@@ -89,7 +73,6 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
       ref={setNodeRef}
       style={{
         ...style,
-        borderLeft: `4px solid var(--mantine-color-${priorityColor}-6)`,
         transition: isDragging ? 'none' : 'all 0.2s ease',
         backgroundColor: task.archived ? colors.surface : (isDragging ? colors.hover : colors.surfaceElevated),
         opacity: isDragging ? 0.8 : (task.archived ? 0.7 : 1),
@@ -161,11 +144,11 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
                 width: 20,
                 height: 20,
                 borderRadius: '50%',
-                border: `2px solid var(--mantine-color-${priorityColor}-6)`,
+                border: '2px solid #CBD5E1',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: task.status === 'done' ? `var(--mantine-color-green-6)` : 'transparent',
+                backgroundColor: task.status === 'done' ? '#4686FE' : 'transparent',
                 transition: 'all 0.2s ease',
               }}>
               {task.status === 'done' && (
