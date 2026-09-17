@@ -23,6 +23,7 @@ import {
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { useValues, useCreateValue, useUpdateValue, useDeleteValue } from '@/hooks/useValues';
+import { Surface } from '@/components/ui/Surface';
 import { CreateValueDto, Value } from '@/lib/api/services/values';
 
 
@@ -233,6 +234,7 @@ export default function ValuesPage() {
   }
 
   return (
+    <Surface p={{ base: 'md', sm: 'xl' }}>
     <Stack
       gap="xl"
       style={{
@@ -769,5 +771,6 @@ export default function ValuesPage() {
         </form>
       </Modal>
     </Stack>
+    </Surface>
   );
 }

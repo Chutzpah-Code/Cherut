@@ -34,6 +34,7 @@ import { changePassword } from '@/lib/firebase/auth';
 import { getPasswordErrorMessage } from '@/lib/utils/auth-errors';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
+import { Surface } from '@/components/ui/Surface';
 
 // ── Shared style constants ─────────────────────────────────────────────────────
 
@@ -195,7 +196,7 @@ export default function ProfilePage() {
   const displayInitial = (formData.displayName?.[0] ?? user?.email?.[0] ?? 'U').toUpperCase();
 
   return (
-    <>
+    <Surface p={{ base: 'md', sm: 'xl' }}>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
@@ -645,6 +646,6 @@ export default function ProfilePage() {
           </form>
         )}
       </Modal>
-    </>
+    </Surface>
   );
 }

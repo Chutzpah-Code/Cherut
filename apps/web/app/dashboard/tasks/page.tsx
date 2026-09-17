@@ -18,6 +18,7 @@ import {
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { Plus, Search } from 'lucide-react';
+import { Surface } from '@/components/ui/Surface';
 import { BoardCard } from './components/BoardCard';
 import {
   useBoards,
@@ -78,7 +79,8 @@ export default function TasksPage() {
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
 
-      <Stack gap="xl" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <Surface p={{ base: 'md', sm: 'xl' }} style={{ fontFamily: 'Inter, sans-serif' }}>
+      <Stack gap="xl">
         <Box>
           <Title
             order={1}
@@ -169,6 +171,7 @@ export default function TasksPage() {
           </Text>
         )}
       </Stack>
+      </Surface>
 
       <Modal
         opened={createModalOpen}

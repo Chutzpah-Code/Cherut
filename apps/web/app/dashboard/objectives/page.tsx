@@ -50,6 +50,7 @@ import {
   useUnarchiveObjective,
 } from '@/hooks/useObjectives';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
+import { Surface } from '@/components/ui/Surface';
 import { useQueryClient } from '@tanstack/react-query';
 import { CreateObjectiveDto, Objective, KeyResult, CreateKeyResultDto } from '@/lib/api/services/objectives';
 
@@ -530,7 +531,8 @@ export default function ObjectivesPage() {
   }
 
   return (
-    <div
+    <Surface
+      p={{ base: 'md', sm: 'xl' }}
       style={{
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       }}
@@ -1449,6 +1451,6 @@ export default function ObjectivesPage() {
           {descModal?.description}
         </Text>
       </Modal>
-    </div>
+    </Surface>
   );
 }

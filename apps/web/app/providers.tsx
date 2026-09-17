@@ -102,7 +102,7 @@ const theme = createTheme({
         dark: '#5A67E6'
       },
       background: {
-        light: '#FFFFFF',
+        light: '#F1F5F9',
         dark: '#0F172A'
       },
       surface: {

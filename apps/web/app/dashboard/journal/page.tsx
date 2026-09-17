@@ -19,6 +19,7 @@ import {
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useJournalEntries, useAllJournalEntries, useArchivedJournalEntries, useCreateJournalEntry, useToggleJournalArchive, useJournalCounts } from '@/hooks/useJournal';
+import { Surface } from '@/components/ui/Surface';
 import { JournalEntryForm } from './components/JournalEntryForm';
 import { EntryCard } from './components/EntryCard';
 import { EntryModal } from './components/EntryModal';
@@ -130,6 +131,7 @@ export default function JournalPage() {
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
+      <Surface p={{ base: 'md', sm: 'xl' }}>
       <Stack
         gap="xl"
         style={{
@@ -339,6 +341,7 @@ export default function JournalPage() {
         />
       )}
       </Stack>
+      </Surface>
     </>
   );
 }

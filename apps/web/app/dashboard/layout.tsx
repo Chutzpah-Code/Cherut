@@ -11,6 +11,7 @@ import Header from '@/components/dashboard/Header';
 import WelcomeModal from '@/components/ui/WelcomeModal';
 import { useWelcomeModal } from '@/hooks/useWelcomeModal';
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 export default function DashboardLayout({
   children,
@@ -91,6 +92,7 @@ function ResponsiveDashboard({
   closeWelcome: () => void;
 }) {
   const getSidebarCollapsed = () => ({ mobile: !mobileOpened, desktop: false });
+  const colors = useThemeColors();
 
   return (
     <AppShell
@@ -114,7 +116,7 @@ function ResponsiveDashboard({
         <Sidebar onClose={closeMobile} />
       </AppShell.Navbar>
 
-      <AppShell.Main>
+      <AppShell.Main style={{ background: colors.background }}>
         {children}
       </AppShell.Main>
 

@@ -20,7 +20,10 @@ import {
   Loader,
   ActionIcon,
   Tooltip,
+  Box,
+  SimpleGrid,
 } from '@mantine/core';
+import { Surface } from '@/components/ui/Surface';
 import {
   IconSettings,
   IconDatabase,
@@ -178,9 +181,9 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div>
+    <Surface p={{ base: 'md', sm: 'xl' }}>
       {/* Header */}
-      <Group justify="space-between" mb="xl">
+      <Group justify="space-between" mb="xl" wrap="wrap">
         <div>
           <Title order={1}>System Settings</Title>
           <Text c="dimmed">Configure platform settings and preferences</Text>
@@ -215,23 +218,25 @@ export default function AdminSettingsPage() {
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onChange={(value) => setActiveTab(value || 'general')}>
-        <Tabs.List>
-          <Tabs.Tab value="general" leftSection={<IconSettings size={16} />}>
-            General
-          </Tabs.Tab>
-          <Tabs.Tab value="security" leftSection={<IconShield size={16} />}>
-            Security
-          </Tabs.Tab>
-          <Tabs.Tab value="email" leftSection={<IconMail size={16} />}>
-            Email
-          </Tabs.Tab>
-          <Tabs.Tab value="notifications" leftSection={<IconBell size={16} />}>
-            Notifications
-          </Tabs.Tab>
-          <Tabs.Tab value="maintenance" leftSection={<IconDatabase size={16} />}>
-            Maintenance
-          </Tabs.Tab>
-        </Tabs.List>
+        <Box style={{ overflowX: 'auto' }} className="scroll-x-hidden">
+          <Tabs.List style={{ flexWrap: 'nowrap' }}>
+            <Tabs.Tab value="general" leftSection={<IconSettings size={16} />} style={{ whiteSpace: 'nowrap' }}>
+              General
+            </Tabs.Tab>
+            <Tabs.Tab value="security" leftSection={<IconShield size={16} />} style={{ whiteSpace: 'nowrap' }}>
+              Security
+            </Tabs.Tab>
+            <Tabs.Tab value="email" leftSection={<IconMail size={16} />} style={{ whiteSpace: 'nowrap' }}>
+              Email
+            </Tabs.Tab>
+            <Tabs.Tab value="notifications" leftSection={<IconBell size={16} />} style={{ whiteSpace: 'nowrap' }}>
+              Notifications
+            </Tabs.Tab>
+            <Tabs.Tab value="maintenance" leftSection={<IconDatabase size={16} />} style={{ whiteSpace: 'nowrap' }}>
+              Maintenance
+            </Tabs.Tab>
+          </Tabs.List>
+        </Box>
 
         {/* General Settings */}
         <Tabs.Panel value="general" pt="lg">
@@ -342,7 +347,7 @@ export default function AdminSettingsPage() {
                 ]}
               />
 
-              <Group grow>
+              <SimpleGrid cols={{ base: 1, sm: 2 }}>
                 <TextInput
                   label="SMTP Host"
                   value={settings.email.smtpHost}
@@ -354,7 +359,7 @@ export default function AdminSettingsPage() {
                   value={settings.email.smtpPort}
                   onChange={(value) => updateSetting('email', 'smtpPort', value)}
                 />
-              </Group>
+              </SimpleGrid>
 
               <Switch
                 label="SMTP Secure"
@@ -363,7 +368,7 @@ export default function AdminSettingsPage() {
                 onChange={(e) => updateSetting('email', 'smtpSecure', e.currentTarget.checked)}
               />
 
-              <Group grow>
+              <SimpleGrid cols={{ base: 1, sm: 2 }}>
                 <TextInput
                   label="From Email"
                   value={settings.email.fromEmail}
@@ -375,7 +380,7 @@ export default function AdminSettingsPage() {
                   value={settings.email.fromName}
                   onChange={(e) => updateSetting('email', 'fromName', e.target.value)}
                 />
-              </Group>
+              </SimpleGrid>
             </Stack>
           </Card>
         </Tabs.Panel>
@@ -469,6 +474,6 @@ export default function AdminSettingsPage() {
       <Text size="xs" c="dimmed" ta="center" mt="xl">
         Changes are saved automatically. Critical settings require system restart.
       </Text>
-    </div>
+    </Surface>
   );
 }

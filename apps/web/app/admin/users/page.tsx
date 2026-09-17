@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState, useCallback } from 'react';
+import { Surface } from '@/components/ui/Surface';
 import {
   Title,
   Table,
@@ -291,9 +292,9 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div>
+    <Surface p={{ base: 'md', sm: 'xl' }}>
       {/* Header */}
-      <Group justify="space-between" mb="xl">
+      <Group justify="space-between" mb="xl" wrap="wrap">
         <div>
           <Title order={1}>User Management</Title>
           <Text c="dimmed">Manage users and administrative permissions</Text>
@@ -321,13 +322,13 @@ export default function AdminUsersPage() {
 
       {/* Filtros */}
       <Card shadow="sm" padding="lg" radius="md" withBorder mb="lg">
-        <Group>
+        <Group wrap="wrap">
           <TextInput
             placeholder="Search by email or name..."
             leftSection={<IconSearch size={16} />}
             value={filters.search || ''}
             onChange={(e) => handleFilterChange('search', e.target.value)}
-            style={{ flex: 1 }}
+            style={{ flex: '1 1 200px' }}
           />
 
           <Select
@@ -340,6 +341,7 @@ export default function AdminUsersPage() {
             value={filters.role || ''}
             onChange={(value) => handleFilterChange('role', value || '')}
             clearable
+            style={{ flex: '1 1 140px' }}
           />
 
           <Select
@@ -354,6 +356,7 @@ export default function AdminUsersPage() {
             value={filters.plan || ''}
             onChange={(value) => handleFilterChange('plan', value || '')}
             clearable
+            style={{ flex: '1 1 140px' }}
           />
 
           <Select
@@ -367,12 +370,14 @@ export default function AdminUsersPage() {
             value={filters.status || ''}
             onChange={(value) => handleFilterChange('status', value || '')}
             clearable
+            style={{ flex: '1 1 140px' }}
           />
         </Group>
       </Card>
 
       {/* Tabela de usuários */}
       <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Table.ScrollContainer minWidth={600}>
         <Table>
           <Table.Thead>
             <Table.Tr>
@@ -380,8 +385,8 @@ export default function AdminUsersPage() {
               <Table.Th>Role</Table.Th>
               <Table.Th>Plan</Table.Th>
               <Table.Th>Status</Table.Th>
-              <Table.Th>Onboarding</Table.Th>
-              <Table.Th>Created</Table.Th>
+              <Table.Th visibleFrom="sm">Onboarding</Table.Th>
+              <Table.Th visibleFrom="sm">Created</Table.Th>
               <Table.Th>Actions</Table.Th>
             </Table.Tr>
           </Table.Thead>
@@ -423,7 +428,7 @@ export default function AdminUsersPage() {
                     {user.subscription.status}
                   </Badge>
                 </Table.Td>
-                <Table.Td>
+                <Table.Td visibleFrom="sm">
                   <Badge
                     color={user.onboardingCompleted ? 'green' : 'orange'}
                     variant="dot"
@@ -431,7 +436,7 @@ export default function AdminUsersPage() {
                     {user.onboardingCompleted ? 'Complete' : 'Pending'}
                   </Badge>
                 </Table.Td>
-                <Table.Td>
+                <Table.Td visibleFrom="sm">
                   <Text size="sm">
                     {new Date(user.createdAt).toLocaleDateString('en-US')}
                   </Text>
@@ -463,6 +468,7 @@ export default function AdminUsersPage() {
             ))}
           </Table.Tbody>
         </Table>
+        </Table.ScrollContainer>
 
         {/* Paginação */}
         {totalPages > 1 && (
@@ -682,6 +688,6 @@ export default function AdminUsersPage() {
           </Stack>
         )}
       </Modal>
-    </div>
+    </Surface>
   );
 }

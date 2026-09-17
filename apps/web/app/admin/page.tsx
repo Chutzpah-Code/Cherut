@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
+import { Surface } from '@/components/ui/Surface';
 import {
   Title,
   Grid,
@@ -180,7 +181,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div>
+    <Surface p={{ base: 'md', sm: 'xl' }}>
       {/* Header */}
       <Group justify="space-between" mb="xl">
         <div>
@@ -316,6 +317,6 @@ export default function AdminDashboard() {
       <Text size="xs" c="dimmed" ta="center" mt="xl">
         Last updated: {new Date(dashboardData.lastUpdated).toLocaleString('en-US')}
       </Text>
-    </div>
+    </Surface>
   );
 }

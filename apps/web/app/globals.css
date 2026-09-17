@@ -2,11 +2,13 @@
 @tailwind components;
 @tailwind utilities; */
 
-/* Force light mode globally — dark mode is not supported */
+/* Force light mode globally — dark mode is not supported.
+   Background is the shared page canvas (gray) that every module's white
+   Surface sits on top of — see apps/web/components/ui/Surface.tsx. */
 html,
 html[data-mantine-color-scheme="dark"] {
   color-scheme: light !important;
-  background-color: #ffffff !important;
+  background-color: #F1F5F9 !important;
   overflow-x: hidden;
 }
 
@@ -16,7 +18,7 @@ html[data-mantine-color-scheme="dark"] {
 
 body,
 html[data-mantine-color-scheme="dark"] body {
-  background-color: #ffffff !important;
+  background-color: #F1F5F9 !important;
   color: #000000 !important;
   overflow-x: hidden;
 }

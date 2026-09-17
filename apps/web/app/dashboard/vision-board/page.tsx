@@ -16,6 +16,7 @@ import {
 } from '@/hooks/useVisionBoard';
 import { VisionBoardItem } from '@/lib/api/services/vision-board';
 import { VisionBoardCard } from './components/VisionBoardCard';
+import { Surface } from '@/components/ui/Surface';
 import { VisionBoardModal } from './components/VisionBoardModal';
 import { CreateVisionBoardModal } from './components/CreateVisionBoardModal';
 import { ArchivedVisionBoardGrid } from './components/ArchivedVisionBoardGrid';
@@ -186,6 +187,7 @@ export default function VisionBoardPage() {
   }
 
   return (
+    <Surface p={{ base: 'md', sm: 'xl' }}>
     <Stack
       gap="xl"
       style={{
@@ -453,5 +455,6 @@ export default function VisionBoardPage() {
         />
       )}
     </Stack>
+    </Surface>
   );
 }

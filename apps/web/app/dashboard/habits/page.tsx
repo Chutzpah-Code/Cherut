@@ -25,6 +25,7 @@ import { useHabits, useAllHabits, useCreateHabit, useUpdateHabit, useDeleteHabit
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { CreateHabitDto, Habit } from '@/lib/api/services/habits';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { Surface } from '@/components/ui/Surface';
 import { HabitCard } from './components/HabitCard';
 import { HabitModal } from './components/HabitModal';
 import { HabitsFilter, HabitsFilterType } from './components/HabitsFilter';
@@ -273,6 +274,7 @@ export default function HabitsPage() {
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
+      <Surface p={{ base: 'md', sm: 'xl' }}>
       <Stack
         gap="xl"
         style={{
@@ -606,6 +608,7 @@ export default function HabitsPage() {
         />
       )}
       </Stack>
+      </Surface>
     </React.Fragment>
   );
 }

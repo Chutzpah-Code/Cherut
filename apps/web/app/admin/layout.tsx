@@ -27,6 +27,7 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import CherutLogo from '@/components/ui/CherutLogo';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 /**
  * Layout específico para páginas administrativas
@@ -61,6 +62,7 @@ export default function AdminLayout({
   const [opened, { toggle }] = useDisclosure();
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [isVerifying, setIsVerifying] = useState(true);
+  const colors = useThemeColors();
 
   // Verificar se usuário é admin
   useEffect(() => {
@@ -275,7 +277,7 @@ export default function AdminLayout({
       </AppShell.Navbar>
 
       {/* Conteúdo principal */}
-      <AppShell.Main>
+      <AppShell.Main style={{ background: colors.background }}>
         {children}
       </AppShell.Main>
     </AppShell>

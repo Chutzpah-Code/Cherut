@@ -1,6 +1,7 @@
 'use client';
 
 import { Stack } from '@mantine/core';
+import { Surface } from '@/components/ui/Surface';
 import { FinanceCurrencyProvider } from './currency-context';
 import { AddPanelProvider } from './add-panel-context';
 import { FinanceHeader } from './components/FinanceHeader';
@@ -10,9 +11,9 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
   return (
     <FinanceCurrencyProvider>
       <AddPanelProvider>
-        <Stack gap={0}>
+        <Stack gap="md">
           <FinanceHeader />
-          {children}
+          <Surface p={{ base: 'md', sm: 'xl' }}>{children}</Surface>
         </Stack>
         <AddPanel />
 

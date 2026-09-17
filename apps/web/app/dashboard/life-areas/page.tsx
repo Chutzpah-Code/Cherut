@@ -21,6 +21,7 @@ import {
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { useLifeAreas, useCreateLifeArea, useUpdateLifeArea, useDeleteLifeArea } from '@/hooks/useLifeAreas';
+import { Surface } from '@/components/ui/Surface';
 import { CreateLifeAreaDto, LifeArea } from '@/lib/api/services/lifeAreas';
 
 export default function LifeAreasPage() {
@@ -133,6 +134,7 @@ export default function LifeAreasPage() {
   }
 
   return (
+    <Surface p={{ base: 'md', sm: 'xl' }}>
     <Stack
       gap="xl"
       style={{
@@ -567,5 +569,6 @@ export default function LifeAreasPage() {
         </form>
       </Modal>
     </Stack>
+    </Surface>
   );
 }

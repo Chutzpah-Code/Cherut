@@ -1,6 +1,7 @@
 'use client';
 
 import { Box } from '@mantine/core';
+import { Surface } from '@/components/ui/Surface';
 import { StatusStrip } from './components/StatusStrip';
 import { BalanceChart } from './components/BalanceChart';
 import { TaskThroughputChart } from './components/TaskThroughputChart';
@@ -13,16 +14,15 @@ import { KeyResultsSplitChart } from './components/KeyResultsSplitChart';
 import { SpendingThisMonth } from './components/SpendingThisMonth';
 import { NetWorthSummary } from './components/NetWorthSummary';
 
-// Dashboard 2A — read-only briefing. No outer frame or background tint: this
-// page sits on the same plain background as every other module page (see
-// apps/web/app/dashboard/finance/page.tsx for the pattern being matched).
-// Responsive column overrides use a plain <style> tag rather than styled-jsx
-// — styled-jsx's scoping transform previously made `next build` hang for
-// 20+ minutes against this exact dashboard route (see git history), so it is
-// deliberately not used anywhere in this module going forward.
+// Dashboard 2A — read-only briefing. Sits in a white Surface on top of the
+// app's shared gray canvas (apps/web/components/ui/Surface.tsx), same as
+// every other module page. Responsive column overrides use a plain <style>
+// tag rather than styled-jsx — styled-jsx's scoping transform previously
+// made `next build` hang for 20+ minutes against this exact dashboard route
+// (see git history), so it is deliberately not used anywhere in this module.
 export default function DashboardPage() {
   return (
-    <Box>
+    <Surface style={{ overflow: 'hidden' }}>
       <StatusStrip />
 
       <Box className="dash-row-3" style={{ borderTop: '1px solid #E2E5EB', borderBottom: '1px solid #E2E5EB' }}>
@@ -73,6 +73,6 @@ export default function DashboardPage() {
       `,
         }}
       />
-    </Box>
+    </Surface>
   );
 }
