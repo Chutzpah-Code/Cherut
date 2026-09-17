@@ -142,6 +142,11 @@ export const tasksApi = {
     return data;
   },
 
+  getArchivedByBoard: async (boardId: string): Promise<Task[]> => {
+    const { data } = await apiClient.get(`/tasks/board/${boardId}/archived`);
+    return data;
+  },
+
   getCounts: async (lifeAreaId?: string): Promise<TaskCounts> => {
     const params = lifeAreaId ? { lifeAreaId } : {};
     const { data } = await apiClient.get('/tasks/counts', { params });

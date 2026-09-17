@@ -471,9 +471,21 @@ export const useToggleArchive = () => {
     mutationFn: (id: string) => tasksApi.toggleArchive(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      // Archived tasks are excluded from the kanban query server-side, so
+      // archiving/restoring a task needs this to make the board columns
+      // (and the archived-tasks list) reflect the change without a reload.
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });
 };
+
+export const useArchivedTasksByBoard = (boardId: string, enabled: boolean = true) =>
+  useQuery({
+    queryKey: ['tasks', 'archived', boardId],
+    queryFn: () => tasksApi.getArchivedByBoard(boardId),
+    enabled: enabled && !!boardId,
+    staleTime: 30 * 1000,
+  });
 
 // Recurring date toggle — optimistic update on completedDates
 export const useToggleRecurringDate = () => {

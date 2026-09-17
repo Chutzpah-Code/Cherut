@@ -75,6 +75,11 @@ export class TasksController {
     return this.tasksService.getTaskCounts(req.user.uid, lifeAreaId);
   }
 
+  @Get('board/:boardId/archived')
+  findArchivedByBoard(@Request() req, @Param('boardId') boardId: string) {
+    return this.tasksService.findArchivedByBoard(req.user.uid, boardId);
+  }
+
   @Get(':id')
   findOne(@Request() req, @Param('id') id: string) {
     return this.tasksService.findOne(req.user.uid, id);

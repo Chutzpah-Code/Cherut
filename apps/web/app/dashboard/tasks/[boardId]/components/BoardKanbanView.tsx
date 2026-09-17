@@ -3,11 +3,12 @@
 import { useState, useCallback } from 'react';
 import { Box, Button, Group, Center, Loader, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { Plus, Settings2 } from 'lucide-react';
+import { Plus, Settings2, Archive } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { KanbanList } from '../../components/KanbanList';
 import { TaskModal } from '../../components/TaskModal';
 import { ManageBoardModal } from './ManageBoardModal';
+import { ArchivedTasksModal } from './ArchivedTasksModal';
 import { Task, UpdateTaskDto } from '@/lib/api/services/tasks';
 import {
   useUpdateTask,
@@ -30,6 +31,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalOpened, setModalOpened] = useState(false);
   const [manageOpened, setManageOpened] = useState(false);
+  const [archivedOpened, setArchivedOpened] = useState(false);
 
   const queryClient = useQueryClient();
   const { data: kanbanColumns, isLoading } = useBoardKanban(boardId);
@@ -121,6 +123,16 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         >
           Add another list
         </Button>
+        <Button
+          variant="subtle"
+          leftSection={<Archive size={14} />}
+          onClick={() => setArchivedOpened(true)}
+          radius={8}
+          size="sm"
+          style={{ color: '#6B778C', fontWeight: 500 }}
+        >
+          Archived tasks
+        </Button>
       </Group>
 
       <Box
@@ -188,6 +200,17 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         columns={kanbanColumns}
         opened={manageOpened}
         onClose={() => setManageOpened(false)}
+      />
+
+      <ArchivedTasksModal
+        boardId={boardId}
+        opened={archivedOpened}
+        onClose={() => setArchivedOpened(false)}
+        onSelectTask={(task) => {
+          setArchivedOpened(false);
+          setSelectedTask(task);
+          setModalOpened(true);
+        }}
       />
 
       {selectedTask && (

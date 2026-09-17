@@ -77,6 +77,22 @@ export class TasksService {
     return tasks;
   }
 
+  // Equality-only filters (no orderBy) so this doesn't need a new
+  // composite index — same pattern already used for the column
+  // cascade-delete query.
+  async findArchivedByBoard(userId: string, boardId: string) {
+    const db = this.firebaseService.getFirestore();
+
+    const snapshot = await db
+      .collection(this.collection)
+      .where('userId', '==', userId)
+      .where('boardId', '==', boardId)
+      .where('archived', '==', true)
+      .get();
+
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  }
+
   async findOne(userId: string, id: string) {
     const db = this.firebaseService.getFirestore();
 
