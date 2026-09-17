@@ -9,6 +9,7 @@ import { BoardCalendarView } from './components/BoardCalendarView';
 import { BoardTimeLogView } from './components/BoardTimeLogView';
 import { ViewSwitcher, TaskView } from '../components/ViewSwitcher';
 import { useBoard, useUpdateBoard } from '@/hooks/useBoards';
+import { Surface } from '@/components/ui/Surface';
 
 export default function BoardDetailPage({ params }: { params: Promise<{ boardId: string }> }) {
   const { boardId } = use(params);
@@ -35,6 +36,7 @@ export default function BoardDetailPage({ params }: { params: Promise<{ boardId:
   const displayName = board?.name ?? '';
 
   return (
+    <Surface p="md" style={{ height: '100%' }}>
     <Stack
       gap={0}
       style={{ fontFamily: 'Inter, sans-serif', height: '100%' }}
@@ -119,5 +121,6 @@ export default function BoardDetailPage({ params }: { params: Promise<{ boardId:
       {currentView === 'calendar' && <BoardCalendarView boardId={boardId} />}
       {currentView === 'timetracker' && <BoardTimeLogView boardId={boardId} />}
     </Stack>
+    </Surface>
   );
 }

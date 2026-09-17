@@ -310,7 +310,10 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         style={{
           overflowX: 'auto',
           overflowY: 'hidden',
-          height: isMobile ? 'calc(100dvh - 175px)' : 'calc(100dvh - 200px)',
+          // +32px vs. the pre-Surface values, accounting for the page's
+          // wrapping Surface (apps/web/components/ui/Surface.tsx) now adding
+          // its own 16px top + 16px bottom padding around this view.
+          height: isMobile ? 'calc(100dvh - 207px)' : 'calc(100dvh - 232px)',
           paddingBottom: 16,
           marginLeft: isMobile ? -4 : 0,
           marginRight: isMobile ? -4 : 0,

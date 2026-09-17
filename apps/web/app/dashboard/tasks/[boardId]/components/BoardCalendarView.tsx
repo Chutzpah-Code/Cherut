@@ -108,7 +108,10 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
         events={events}
         editable
         eventDrop={handleEventDrop}
-        height="calc(100dvh - 200px)"
+        // +32px vs. the pre-Surface value, accounting for the page's
+        // wrapping Surface (apps/web/components/ui/Surface.tsx) now adding
+        // its own 16px top + 16px bottom padding around this view.
+        height="calc(100dvh - 232px)"
         dayMaxEvents={4}
         eventDisplay="block"
         firstDay={1}
