@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAdminRedirect } from '@/hooks/useAdminRedirect';
-import { AppShell, Burger, Group, Loader, Center } from '@mantine/core';
+import { AppShell, Burger, Group, Loader, Center, Box } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
@@ -115,6 +115,27 @@ function ResponsiveDashboard({
       <AppShell.Navbar>
         <Sidebar onClose={closeMobile} />
       </AppShell.Navbar>
+
+      {/* Mobile-only backdrop behind the sidebar drawer — Mantine's AppShell
+          has no built-in overlay, so the main content otherwise shows through
+          solid and unobscured while the drawer is open. Sits just under the
+          navbar's z-index (100) so the drawer itself stays fully opaque. */}
+      <Box
+        hiddenFrom="sm"
+        onClick={closeMobile}
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 99,
+          background: 'rgba(241, 245, 249, 0.5)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          opacity: mobileOpened ? 1 : 0,
+          pointerEvents: mobileOpened ? 'auto' : 'none',
+          transition: 'opacity 200ms ease',
+        }}
+      />
 
       <AppShell.Main style={{ background: colors.background }}>
         {children}

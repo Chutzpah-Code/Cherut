@@ -13,7 +13,7 @@ const getSecureApiUrl = (): string => {
   }
   return apiUrl;
 };
-import { AppShell, Group, Title, Button, Loader, Center, Alert, Burger } from '@mantine/core';
+import { AppShell, Group, Title, Button, Loader, Center, Alert, Burger, Box } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconDashboard,
@@ -275,6 +275,25 @@ export default function AdminLayout({
           </Alert>
         </div>
       </AppShell.Navbar>
+
+      {/* Mobile-only backdrop behind the sidebar drawer — see the same fix in
+          apps/web/app/dashboard/layout.tsx for why this is needed. */}
+      <Box
+        hiddenFrom="md"
+        onClick={toggle}
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 99,
+          background: 'rgba(241, 245, 249, 0.5)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          opacity: opened ? 1 : 0,
+          pointerEvents: opened ? 'auto' : 'none',
+          transition: 'opacity 200ms ease',
+        }}
+      />
 
       {/* Conteúdo principal */}
       <AppShell.Main style={{ background: colors.background }}>
