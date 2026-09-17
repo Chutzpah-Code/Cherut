@@ -131,8 +131,8 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
       {activeEntry ? (
         <>
           <Group gap={8} style={{ flex: 1 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }} />
-            <Text size="sm" fw={600} c="green.7">Running</Text>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4686FE', flexShrink: 0 }} />
+            <Text size="sm" fw={600} style={{ color: '#0F172A' }}>Running</Text>
             <Text size="sm" c="dimmed">—</Text>
             <Text size="sm" fw={500} style={{ color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 260 }}>
               {activeTask?.title}
@@ -169,6 +169,7 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
           <Button
             leftSection={<Play size={14} />}
             style={{ backgroundColor: '#4686FE' }}
+            styles={{ root: { '&[data-disabled]': { backgroundColor: '#4686FE', color: '#fff', opacity: 1, cursor: 'not-allowed' } } }}
             size="sm"
             onClick={handleStart}
             disabled={!selectedTaskId}
@@ -486,18 +487,18 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
           <Box style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: 12, overflow: 'hidden' }}>
             {activeTask && activeEntry && (
               <>
-                <Box style={{ padding: '8px 20px', background: '#F0FDF4', borderBottom: '1px solid #BBF7D0' }}>
-                  <Text size="xs" fw={700} c="green.7" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                <Box style={{ padding: '8px 20px', background: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
+                  <Text size="xs" fw={700} c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     Running now
                   </Text>
                 </Box>
                 <Box
                   onClick={() => openTask(activeTask.id)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', background: '#F0FDF4', borderBottom: '1px solid #E2E8F0', cursor: 'pointer' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: '1px solid #F1F5F9', cursor: 'pointer' }}
                 >
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', animation: 'ttPulse 1.5s ease-in-out infinite', flexShrink: 0 }} />
-                  <Text size="sm" fw={500} style={{ flex: 1, color: '#166534' }}>{activeTask.title}</Text>
-                  <Text size="sm" c="green.7">{toLocalTime(activeEntry.startTime)} – now</Text>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4686FE', animation: 'ttPulse 1.5s ease-in-out infinite', flexShrink: 0 }} />
+                  <Text size="sm" fw={500} style={{ flex: 1, color: '#0F172A' }}>{activeTask.title}</Text>
+                  <Text size="sm" c="dimmed">{toLocalTime(activeEntry.startTime)} – now</Text>
                 </Box>
               </>
             )}
