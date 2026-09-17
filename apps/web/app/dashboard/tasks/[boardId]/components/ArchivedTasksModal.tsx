@@ -1,7 +1,7 @@
 'use client';
 
-import { Modal, Stack, Box, Group, Text, Center, Loader } from '@mantine/core';
-import { Archive } from 'lucide-react';
+import { Modal, Stack, Box, Group, Text, Center, Loader, Button } from '@mantine/core';
+import { Archive, AlertCircle } from 'lucide-react';
 import { useArchivedTasksByBoard } from '@/hooks/useTasks';
 import { Task } from '@/lib/api/services/tasks';
 
@@ -17,7 +17,7 @@ function formatUpdatedAt(iso: string): string {
 }
 
 export function ArchivedTasksModal({ boardId, opened, onClose, onSelectTask }: ArchivedTasksModalProps) {
-  const { data: tasks, isLoading } = useArchivedTasksByBoard(boardId, opened);
+  const { data: tasks, isLoading, isError, error, refetch, isFetching } = useArchivedTasksByBoard(boardId, opened);
   const sorted = [...(tasks ?? [])].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 
   return (
@@ -31,6 +31,21 @@ export function ArchivedTasksModal({ boardId, opened, onClose, onSelectTask }: A
       {isLoading ? (
         <Center py="xl">
           <Loader size="sm" color="#4686FE" />
+        </Center>
+      ) : isError ? (
+        <Center py="xl">
+          <Stack align="center" gap={4}>
+            <AlertCircle size={28} color="#B91C1C" />
+            <Text size="sm" fw={500} c="red">Couldn't load archived tasks</Text>
+            <Text size="xs" c="dimmed" ta="center" maw={320}>
+              {(error as any)?.response?.status
+                ? `Server responded with ${(error as any).response.status}.`
+                : (error as any)?.message || 'Something went wrong.'}
+            </Text>
+            <Button size="xs" variant="light" mt={6} loading={isFetching} onClick={() => refetch()}>
+              Try again
+            </Button>
+          </Stack>
         </Center>
       ) : sorted.length === 0 ? (
         <Center py="xl">

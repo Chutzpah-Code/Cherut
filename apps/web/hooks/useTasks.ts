@@ -469,12 +469,25 @@ export const useToggleArchive = () => {
 
   return useMutation({
     mutationFn: (id: string) => tasksApi.toggleArchive(id),
-    onSuccess: () => {
+    onSuccess: (task) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       // Archived tasks are excluded from the kanban query server-side, so
       // archiving/restoring a task needs this to make the board columns
       // (and the archived-tasks list) reflect the change without a reload.
       queryClient.invalidateQueries({ queryKey: ['boards'] });
+      notifications.show({
+        title: task.archived ? 'Task archived' : 'Task restored',
+        message: task.title,
+        color: task.archived ? 'gray' : 'green',
+        autoClose: 2500,
+      });
+    },
+    onError: (err: any) => {
+      notifications.show({
+        title: 'Could not update the task',
+        message: err?.response?.data?.message || err?.message || 'Please try again.',
+        color: 'red',
+      });
     },
   });
 };
