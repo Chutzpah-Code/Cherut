@@ -21,7 +21,7 @@ import {
 import { DateInput, TimeInput } from '@mantine/dates';
 import { useMediaQuery } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
-import { X, Play, Square, RefreshCw, Plus, ListPlus } from 'lucide-react';
+import { X, Play, Square, RefreshCw, Plus, ListPlus, Clock } from 'lucide-react';
 import { Task, ChecklistItem, UpdateTaskDto, RecurringConfig } from '@/lib/api/services/tasks';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
@@ -606,6 +606,7 @@ interface DueDatePillsProps {
 }
 
 function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePillsProps) {
+  const timeInputRef = useRef<HTMLInputElement>(null);
   const today = useMemo(() => localISODate(new Date()), []);
   const tomorrow = useMemo(() => {
     const d = new Date();
@@ -683,6 +684,7 @@ function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePills
 
       {value && (
         <TimeInput
+          ref={timeInputRef}
           value={timeValue ?? ''}
           onChange={(e) => onTimeChange(e.currentTarget.value || undefined)}
           size="xs"
@@ -690,6 +692,17 @@ function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePills
           placeholder="Optional time"
           style={{ width: 130 }}
           styles={{ input: { fontSize: 12.5, borderColor: BORDER } }}
+          rightSection={
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              size="xs"
+              aria-label="Pick time"
+              onClick={() => (timeInputRef.current as any)?.showPicker?.()}
+            >
+              <Clock size={13} color={MUTED} />
+            </ActionIcon>
+          }
         />
       )}
     </Stack>
