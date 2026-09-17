@@ -1,11 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
 import { Box, Group, Stack, Text, Title } from '@mantine/core';
 import { useTasks } from '@/hooks/useTasks';
-import { useTodayHabits } from '@/hooks/useHabits';
-import { useFinanceOverview } from '@/hooks/useFinance';
+import { useTodayHabits, useHabitConsistency } from '@/hooks/useHabits';
+import { useNetWorth } from '@/hooks/useFinance';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { TilesSkeleton } from './skeletons';
@@ -22,7 +21,6 @@ function greeting() {
   return 'Good evening';
 }
 
-// Abbreviated for the KPI tile only — the full figure lives in the Finance card
 function fmtCompact(value: number, currency = 'USD') {
   try {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency, notation: 'compact', maximumFractionDigits: 1 }).format(value);
@@ -31,27 +29,29 @@ function fmtCompact(value: number, currency = 'USD') {
   }
 }
 
-function Tile({ href, label, value, tone }: { href: string; label: string; value: React.ReactNode; tone?: 'danger' | 'accent' }) {
-  const color = tone === 'danger' ? '#B91C1C' : tone === 'accent' ? '#0052CC' : '#0F172A';
+function Tile({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: 'danger' }) {
   return (
-    <Link href={href} style={{ textDecoration: 'none', flex: '1 1 0', minWidth: 132 }}>
-      <Box
-        style={{
-          background: '#F8FAFC',
-          border: '1px solid #E8EBF0',
-          borderRadius: 6,
-          padding: '10px 16px',
-          height: '100%',
-        }}
-      >
-        <Text style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#64748B' }}>
-          {label}
+    <Box
+      style={{
+        background: '#F8FAFC', border: '1px solid #E8EBF0', borderRadius: 6,
+        padding: '11px 16px', minWidth: 138, flex: '1 1 0',
+      }}
+    >
+      <Text style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#64748B' }}>
+        {label}
+      </Text>
+      <Text style={{
+        fontSize: 20, fontWeight: 700, lineHeight: 1.1, whiteSpace: 'nowrap', marginTop: 5,
+        color: tone === 'danger' ? '#B91C1C' : '#0F172A', fontVariantNumeric: 'tabular-nums',
+      }}>
+        {value}
+      </Text>
+      {sub && (
+        <Text style={{ fontSize: 11.5, color: '#64748B', marginTop: 5 }}>
+          {sub}
         </Text>
-        <Text style={{ fontSize: 20, fontWeight: 700, color, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-          {value}
-        </Text>
-      </Box>
-    </Link>
+      )}
+    </Box>
   );
 }
 
@@ -62,59 +62,75 @@ export function StatusStrip() {
 
   const { data: tasks = [], isLoading: tasksLoading } = useTasks();
   const { data: todayHabits = [], isLoading: habitsLoading } = useTodayHabits(today);
+  const { data: consistency, isLoading: consistencyLoading } = useHabitConsistency(14);
   const [currency] = useState<string>(() => {
     try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
   });
-  const { data: overview, isLoading: financeLoading } = useFinanceOverview(undefined, currency);
+  const { data: netWorth, isLoading: netWorthLoading } = useNetWorth(currency);
 
-  const { overdueCount, dueTodayCount } = useMemo(() => {
+  const { overdueCount, dueTodayCount, oldestOverdueDays } = useMemo(() => {
     let overdue = 0;
     let dueToday = 0;
+    let oldestDays = 0;
     for (const t of tasks as any[]) {
       if (!t.dueDate || t.status === 'done' || t.archived) continue;
-      if (t.dueDate < today) overdue++;
-      else if (t.dueDate === today) dueToday++;
+      if (t.dueDate < today) {
+        overdue++;
+        const days = Math.floor((new Date(`${today}T00:00:00`).getTime() - new Date(`${t.dueDate}T00:00:00`).getTime()) / 86_400_000);
+        if (days > oldestDays) oldestDays = days;
+      } else if (t.dueDate === today) {
+        dueToday++;
+      }
     }
-    return { overdueCount: overdue, dueTodayCount: dueToday };
+    return { overdueCount: overdue, dueTodayCount: dueToday, oldestOverdueDays: oldestDays };
   }, [tasks, today]);
 
-  const loggedHabits = todayHabits.filter((h) => h.loggedToday).length;
-  const scheduledHabits = todayHabits.length;
+  const loggedToday = todayHabits.filter((h) => h.loggedToday).length;
+  const scheduledToday = todayHabits.length;
 
   const firstName = profile?.displayName?.split(' ')[0] ?? user?.displayName?.split(' ')[0] ?? '';
   const attentionCount = overdueCount + dueTodayCount;
   const dateLabel = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
-  const isLoading = tasksLoading || habitsLoading || financeLoading;
+  const isLoading = tasksLoading || habitsLoading || consistencyLoading || netWorthLoading;
 
   return (
-    <Box style={{ padding: '22px 24px' }}>
-      <Group justify="space-between" align="flex-start" wrap="wrap" gap="xs" mb={16}>
-        <Stack gap={2}>
-          <Title order={1} style={{ fontSize: 'clamp(20px, 4vw, 24px)', fontWeight: 700, letterSpacing: '-0.02em', color: '#0F172A', lineHeight: 1.2 }}>
+    <Box style={{ padding: '22px 32px' }}>
+      <Group justify="space-between" align="center" wrap="wrap" gap="xl">
+        <Stack gap={4}>
+          <Title order={1} style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.015em', color: '#0F172A' }}>
             {greeting()}{firstName ? `, ${firstName}` : ''}
           </Title>
-          <Text size="sm" c="dimmed">
+          <Text style={{ fontSize: 13, color: '#64748B' }}>
             {dateLabel}
             {attentionCount > 0 && ` · ${attentionCount} item${attentionCount !== 1 ? 's' : ''} need attention`}
           </Text>
         </Stack>
-      </Group>
 
-      {isLoading ? (
-        <TilesSkeleton count={4} />
-      ) : (
-        <Group gap={10} wrap="wrap" style={{ overflowX: 'auto', flexWrap: 'nowrap' }} className="dashboard-kpi-row">
-          <Tile href="#tasks-due" label="Overdue" value={String(overdueCount)} tone={overdueCount > 0 ? 'danger' : undefined} />
-          <Tile href="#tasks-due" label="Due today" value={String(dueTodayCount)} tone={dueTodayCount > 0 ? 'accent' : undefined} />
-          <Tile
-            href="#today-habits"
-            label="Habits"
-            value={<>{loggedHabits}<span style={{ color: '#94A3B8' }}>/{scheduledHabits}</span></>}
-          />
-          <Tile href="/dashboard/finance" label="Balance" value={fmtCompact(overview?.totalBalanceConverted ?? 0, overview?.displayCurrency ?? currency)} />
-        </Group>
-      )}
+        {isLoading ? (
+          <TilesSkeleton count={4} />
+        ) : (
+          <Group gap={10} wrap="wrap" style={{ overflowX: 'auto', flexWrap: 'nowrap' }}>
+            <Tile
+              label="Overdue"
+              value={String(overdueCount)}
+              sub={overdueCount > 0 ? `Oldest ${oldestOverdueDays} day${oldestOverdueDays !== 1 ? 's' : ''} late` : undefined}
+              tone={overdueCount > 0 ? 'danger' : undefined}
+            />
+            <Tile label="Due today" value={String(dueTodayCount)} />
+            <Tile
+              label="Habits"
+              value={`${loggedToday}/${scheduledToday}`}
+              sub={consistency?.overallPct != null ? `${consistency.overallPct}% last 14 days` : undefined}
+            />
+            <Tile
+              label="Net worth"
+              value={fmtCompact(netWorth?.netWorth ?? 0, netWorth?.displayCurrency ?? currency)}
+              sub={netWorth?.monthChangePct != null ? `${netWorth.monthChangePct >= 0 ? '+' : ''}${netWorth.monthChangePct.toFixed(1)}% this month` : undefined}
+            />
+          </Group>
+        )}
+      </Group>
     </Box>
   );
 }

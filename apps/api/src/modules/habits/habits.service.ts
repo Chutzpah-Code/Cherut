@@ -361,6 +361,77 @@ export class HabitsService {
   }
 
   /**
+   * Per-habit logged/missed grid over the last N days, for the dashboard's
+   * Habit consistency chart. Same 2-query shape as getTodayHabits — one range
+   * query across all habits' logs, not one query per habit. A day the habit
+   * wasn't scheduled is `null` (a gap), never counted as missed.
+   */
+  async getConsistency(userId: string, days: number) {
+    const today = new Date().toISOString().slice(0, 10);
+    const startDate = new Date(`${today}T00:00:00`);
+    startDate.setDate(startDate.getDate() - (days - 1));
+    const startDateStr = startDate.toISOString().slice(0, 10);
+
+    const db = this.firebaseService.getFirestore();
+    const habitsQuery = db.collection(this.habitsCollection).where('userId', '==', userId).where('isActive', '==', true).get();
+
+    let logsSnap;
+    try {
+      logsSnap = await db
+        .collection(this.logsCollection)
+        .where('userId', '==', userId)
+        .where('date', '>=', startDateStr)
+        .where('date', '<=', today)
+        .get();
+    } catch (error) {
+      // Composite index may not be deployed yet — fall back to an in-memory filter.
+      this.logger.warn(`Falling back to in-memory filter for habit consistency: ${error.message}`);
+      const allLogsSnap = await db.collection(this.logsCollection).where('userId', '==', userId).get();
+      logsSnap = { docs: allLogsSnap.docs.filter((doc) => { const d = (doc.data() as any).date; return d >= startDateStr && d <= today; }) };
+    }
+
+    const habitsSnap = await habitsQuery;
+    const habits = habitsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as any);
+
+    const loggedByHabitAndDate = new Map<string, boolean>();
+    for (const doc of logsSnap.docs) {
+      const log = doc.data() as any;
+      loggedByHabitAndDate.set(`${log.habitId}|${log.date}`, !!log.completed);
+    }
+
+    const dateList: string[] = [];
+    for (let i = 0; i < days; i++) {
+      const d = new Date(startDate);
+      d.setDate(d.getDate() + i);
+      dateList.push(d.toISOString().slice(0, 10));
+    }
+
+    const result = habits.map((habit) => {
+      const dayResults = dateList.map((dateStr) => {
+        const dow = new Date(`${dateStr}T00:00:00`).getDay();
+        const scheduled =
+          habit.frequency === 'daily' ||
+          habit.frequency === 'monthly' ||
+          (habit.frequency === 'weekly' && (habit.weekDays ?? []).includes(dow));
+        if (!scheduled) return null;
+        return loggedByHabitAndDate.get(`${habit.id}|${dateStr}`) ?? false;
+      });
+      const scheduledDays = dayResults.filter((d) => d !== null) as boolean[];
+      const pct = scheduledDays.length > 0
+        ? Math.round((scheduledDays.filter(Boolean).length / scheduledDays.length) * 100)
+        : null;
+      return { habitId: habit.id, title: habit.title, days: dayResults, pct };
+    });
+
+    const allScheduled = result.flatMap((h) => h.days.filter((d) => d !== null)) as boolean[];
+    const overallPct = allScheduled.length > 0
+      ? Math.round((allScheduled.filter(Boolean).length / allScheduled.length) * 100)
+      : null;
+
+    return { habits: result, overallPct };
+  }
+
+  /**
    * Permanently delete a habit and all its logs
    */
   async permanentDelete(userId: string, id: string) {

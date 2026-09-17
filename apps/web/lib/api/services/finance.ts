@@ -85,6 +85,30 @@ export interface FinanceNetWorth {
   illiquid: number;
   creditCardOwed: number;
   netWorth: number;
+  monthChangePct: number | null;
+  displayCurrency: string;
+}
+
+export interface BalanceHistoryPoint {
+  date: string;
+  total: number;
+}
+
+export interface FinanceBalanceHistory {
+  points: BalanceHistoryPoint[];
+  deltaPct: number | null;
+  displayCurrency: string;
+}
+
+export interface CashFlowMonth {
+  label: string;
+  income: number;
+  expenses: number;
+}
+
+export interface FinanceCashFlow {
+  months: CashFlowMonth[];
+  positiveMonths: number;
   displayCurrency: string;
 }
 
@@ -272,6 +296,18 @@ export const financeApi = {
   },
   getUpcomingBillsAndStatements: async (days: number): Promise<UpcomingBillItem[]> => {
     const { data } = await apiClient.get('/finance/upcoming-bills', { params: { days } });
+    return data;
+  },
+  getBalanceHistory: async (days: number, displayCurrency?: string): Promise<FinanceBalanceHistory> => {
+    const params: any = { days };
+    if (displayCurrency) params.displayCurrency = displayCurrency;
+    const { data } = await apiClient.get('/finance/balance-history', { params });
+    return data;
+  },
+  getCashFlow: async (months: number, displayCurrency?: string): Promise<FinanceCashFlow> => {
+    const params: any = { months };
+    if (displayCurrency) params.displayCurrency = displayCurrency;
+    const { data } = await apiClient.get('/finance/cash-flow', { params });
     return data;
   },
 

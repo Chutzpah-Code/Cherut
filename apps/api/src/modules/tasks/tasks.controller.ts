@@ -65,6 +65,11 @@ export class TasksController {
     );
   }
 
+  @Get('throughput')
+  getThroughput(@Request() req, @Query('weeks') weeks?: string) {
+    return this.tasksService.getThroughput(req.user.uid, Number(weeks) || 8);
+  }
+
   @Get('counts')
   getTaskCounts(@Request() req, @Query('lifeAreaId') lifeAreaId?: string) {
     return this.tasksService.getTaskCounts(req.user.uid, lifeAreaId);

@@ -522,4 +522,42 @@ export class TasksService {
 
     return { active, archived, total };
   }
+
+  // ─── Throughput (dashboard) ─────────────────────────────────────────────────
+  // Completed tasks bucketed by week, split on-time vs closed-late. There is
+  // no dedicated completedAt field, so updatedAt on a status==='done' task is
+  // used as the closest existing proxy for its completion date.
+
+  async getThroughput(userId: string, weeks: number) {
+    const db = this.firebaseService.getFirestore();
+    const snapshot = await db
+      .collection(this.collection)
+      .where('userId', '==', userId)
+      .where('status', '==', 'done')
+      .get();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const windowStart = new Date(today);
+    windowStart.setDate(windowStart.getDate() - weeks * 7);
+
+    const buckets = Array.from({ length: weeks }, () => ({ onTime: 0, late: 0 }));
+
+    for (const doc of snapshot.docs) {
+      const t = doc.data() as any;
+      if (!t.updatedAt) continue;
+      const completedAt = new Date(t.updatedAt);
+      if (completedAt < windowStart || completedAt > today) continue;
+      const daysSinceStart = Math.floor((completedAt.getTime() - windowStart.getTime()) / 86_400_000);
+      const weekIndex = Math.min(weeks - 1, Math.floor(daysSinceStart / 7));
+      const isLate = t.dueDate ? t.updatedAt.slice(0, 10) > t.dueDate : false;
+      if (isLate) buckets[weekIndex].late++;
+      else buckets[weekIndex].onTime++;
+    }
+
+    const totalCompleted = buckets.reduce((s, b) => s + b.onTime + b.late, 0);
+    const weeklyAvg = weeks > 0 ? Math.round(totalCompleted / weeks) : 0;
+
+    return { weeks: buckets, weeklyAvg };
+  }
 }

@@ -61,6 +61,16 @@ export class FinanceController {
     return this.financeService.getUpcomingBillsAndStatements(req.user.uid, Number(days) || 90);
   }
 
+  @Get('balance-history')
+  getBalanceHistory(@Request() req, @Query('days') days?: string, @Query('displayCurrency') displayCurrency?: string) {
+    return this.financeService.getBalanceHistory(req.user.uid, Number(days) || 30, displayCurrency ?? 'USD');
+  }
+
+  @Get('cash-flow')
+  getCashFlow(@Request() req, @Query('months') months?: string, @Query('displayCurrency') displayCurrency?: string) {
+    return this.financeService.getCashFlow(req.user.uid, Number(months) || 6, displayCurrency ?? 'USD');
+  }
+
   // Accounts
   @Post('accounts')
   createAccount(@Request() req, @Body() dto: CreateAccountDto) {

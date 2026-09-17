@@ -43,6 +43,22 @@ export function useUpcomingBillsAndStatements(days: number) {
   });
 }
 
+export function useBalanceHistory(days: number, displayCurrency?: string) {
+  return useQuery({
+    queryKey: ['finance', 'balance-history', days, displayCurrency],
+    queryFn: () => financeApi.getBalanceHistory(days, displayCurrency),
+    staleTime: 30_000,
+  });
+}
+
+export function useCashFlow(months: number, displayCurrency?: string) {
+  return useQuery({
+    queryKey: ['finance', 'cash-flow', months, displayCurrency],
+    queryFn: () => financeApi.getCashFlow(months, displayCurrency),
+    staleTime: 30_000,
+  });
+}
+
 // ─── Accounts ───────────────────────────────────────────────────────────────
 
 export function useFinanceAccounts(includeArchived = false) {

@@ -107,6 +107,16 @@ export interface TaskCounts {
   total: number;
 }
 
+export interface TaskThroughputWeek {
+  onTime: number;
+  late: number;
+}
+
+export interface TaskThroughput {
+  weeks: TaskThroughputWeek[];
+  weeklyAvg: number;
+}
+
 export const tasksApi = {
   getAll: async (lifeAreaId?: string): Promise<Task[]> => {
     const params = lifeAreaId ? { lifeAreaId } : {};
@@ -132,6 +142,12 @@ export const tasksApi = {
   getCounts: async (lifeAreaId?: string): Promise<TaskCounts> => {
     const params = lifeAreaId ? { lifeAreaId } : {};
     const { data } = await apiClient.get('/tasks/counts', { params });
+    return data;
+  },
+
+  getThroughput: async (weeks?: number): Promise<TaskThroughput> => {
+    const params = weeks ? { weeks } : {};
+    const { data } = await apiClient.get('/tasks/throughput', { params });
     return data;
   },
 

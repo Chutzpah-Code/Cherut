@@ -2,65 +2,77 @@
 
 import { Box } from '@mantine/core';
 import { StatusStrip } from './components/StatusStrip';
-import { TasksDuePanel } from './components/TasksDuePanel';
-import { ObjectivesPanel } from './components/ObjectivesPanel';
-import { TodaysHabitsPanel } from './components/TodaysHabitsPanel';
-import { FinanceCard } from './components/FinanceCard';
+import { BalanceChart } from './components/BalanceChart';
+import { TaskThroughputChart } from './components/TaskThroughputChart';
+import { HabitConsistencyChart } from './components/HabitConsistencyChart';
+import { TasksDueList } from './components/TasksDueList';
+import { ObjectivesReadOnly } from './components/ObjectivesReadOnly';
+import { CashFlowChart } from './components/CashFlowChart';
+import { UpcomingBillsChart } from './components/UpcomingBillsChart';
+import { KeyResultsSplitChart } from './components/KeyResultsSplitChart';
+import { SpendingThisMonth } from './components/SpendingThisMonth';
+import { NetWorthSummary } from './components/NetWorthSummary';
 
+// Dashboard 2A — read-only briefing. No outer frame or background tint: this
+// page sits on the same plain background as every other module page (see
+// apps/web/app/dashboard/finance/page.tsx for the pattern being matched).
+// Responsive column overrides use a plain <style> tag rather than styled-jsx
+// — styled-jsx's scoping transform previously made `next build` hang for
+// 20+ minutes against this exact dashboard route (see git history), so it is
+// deliberately not used anywhere in this module going forward.
 export default function DashboardPage() {
   return (
-    <Box style={{ background: '#EDEFF3', padding: 16, borderRadius: 8 }}>
-    <Box style={{ maxWidth: 1400, margin: '0 auto', border: '1px solid #DDE1E8', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
+    <Box>
       <StatusStrip />
 
-      <Box
-        style={{
-          borderTop: '1px solid #E2E5EB',
-          borderBottom: '1px solid #E2E5EB',
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0,1fr)',
-        }}
-        className="dashboard-row-action"
-      >
-        <Box style={{ borderBottom: '1px solid #E2E5EB' }} className="dashboard-col-tasks">
-          <TasksDuePanel />
-        </Box>
-        <Box id="objectives" className="dashboard-col-objectives">
-          <ObjectivesPanel />
-        </Box>
+      <Box className="dash-row-3" style={{ borderTop: '1px solid #E2E5EB', borderBottom: '1px solid #E2E5EB' }}>
+        <Box className="dash-col dash-col-a"><BalanceChart /></Box>
+        <Box className="dash-col dash-col-b"><TaskThroughputChart /></Box>
+        <Box className="dash-col dash-col-c"><HabitConsistencyChart /></Box>
       </Box>
 
-      <Box
-        style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr)' }}
-        className="dashboard-row-secondary"
-      >
-        <Box style={{ borderBottom: '1px solid #E2E5EB' }} className="dashboard-col-habits">
-          <TodaysHabitsPanel />
-        </Box>
-        <Box className="dashboard-col-finance">
-          <FinanceCard />
-        </Box>
+      <Box className="dash-row-2" style={{ borderBottom: '1px solid #E2E5EB' }}>
+        <Box className="dash-col dash-col-a"><TasksDueList /></Box>
+        <Box className="dash-col dash-col-b"><ObjectivesReadOnly /></Box>
       </Box>
 
-      <style jsx global>{`
-        @media (min-width: 1100px) {
-          .dashboard-row-action {
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) !important;
-          }
-          .dashboard-col-tasks {
-            border-bottom: none !important;
-            border-right: 1px solid #E2E5EB;
-          }
-          .dashboard-row-secondary {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-          }
-          .dashboard-col-habits {
-            border-bottom: none !important;
-            border-right: 1px solid #E2E5EB;
-          }
+      <Box className="dash-row-3" style={{ borderBottom: '1px solid #E2E5EB' }}>
+        <Box className="dash-col dash-col-a"><CashFlowChart /></Box>
+        <Box className="dash-col dash-col-b"><UpcomingBillsChart /></Box>
+        <Box className="dash-col dash-col-c"><KeyResultsSplitChart /></Box>
+      </Box>
+
+      <Box className="dash-row-2">
+        <Box className="dash-col dash-col-a"><SpendingThisMonth /></Box>
+        <Box className="dash-col dash-col-b"><NetWorthSummary /></Box>
+      </Box>
+
+      <style
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: `
+        .dash-row-2, .dash-row-3 { display: grid; grid-template-columns: minmax(0,1fr); }
+        .dash-col { border-bottom: 1px solid #E2E5EB; }
+        .dash-col:last-child { border-bottom: none; }
+
+        @media (min-width: 768px) {
+          .dash-row-3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+          .dash-row-3 .dash-col-a { grid-column: span 2; border-bottom: 1px solid #E2E5EB; }
+          .dash-row-3 .dash-col-b { border-right: 1px solid #E2E5EB; border-bottom: none; }
+          .dash-row-3 .dash-col-c { border-bottom: none; }
+          .dash-row-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+          .dash-row-2 .dash-col-a { border-right: 1px solid #E2E5EB; border-bottom: none; }
+          .dash-row-2 .dash-col-b { border-bottom: none; }
         }
-      `}</style>
-    </Box>
+
+        @media (min-width: 1024px) {
+          .dash-row-3 { grid-template-columns: minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr); }
+          .dash-row-3 .dash-col-a { grid-column: span 1; border-bottom: none; border-right: 1px solid #E2E5EB; }
+          .dash-row-3 .dash-col-b { border-right: 1px solid #E2E5EB; }
+        }
+      `,
+        }}
+      />
     </Box>
   );
 }

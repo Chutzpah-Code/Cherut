@@ -37,3 +37,16 @@ export function BigStatSkeleton() {
     </Stack>
   );
 }
+
+export function ChartSkeleton({ height = 104 }: { height?: number }) {
+  return (
+    <Stack gap={8}>
+      <Skeleton height={height} radius="sm" />
+      <Group gap={16}>
+        <Skeleton height={13} width={70} radius="sm" />
+        <Skeleton height={13} width={70} radius="sm" />
+        <Skeleton height={13} width={70} radius="sm" />
+      </Group>
+    </Stack>
+  );
+}

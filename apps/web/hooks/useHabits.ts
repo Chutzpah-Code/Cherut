@@ -147,6 +147,15 @@ export const useTodayHabits = (date?: string) => {
   });
 };
 
+export const useHabitConsistency = (days = 13) => {
+  return useQuery({
+    queryKey: ['habits', 'consistency', days],
+    queryFn: () => habitsApi.getConsistency(days),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+};
+
 export const useHabitCounts = (lifeAreaId?: string) => {
   return useQuery({
     queryKey: ['habits', 'counts', lifeAreaId],

@@ -85,6 +85,18 @@ export interface TodayHabitItem {
   loggedToday: boolean;
 }
 
+export interface HabitConsistencyItem {
+  habitId: string;
+  title: string;
+  days: (boolean | null)[];
+  pct: number | null;
+}
+
+export interface HabitConsistency {
+  habits: HabitConsistencyItem[];
+  overallPct: number | null;
+}
+
 export const habitsApi = {
   // Habits CRUD
   getAll: async (lifeAreaId?: string, archived?: boolean): Promise<Habit[]> => {
@@ -111,6 +123,12 @@ export const habitsApi = {
   getTodayHabits: async (date?: string): Promise<TodayHabitItem[]> => {
     const params = date ? { date } : {};
     const { data } = await apiClient.get('/habits/today', { params });
+    return data;
+  },
+
+  getConsistency: async (days?: number): Promise<HabitConsistency> => {
+    const params = days ? { days } : {};
+    const { data } = await apiClient.get('/habits/consistency', { params });
     return data;
   },
 

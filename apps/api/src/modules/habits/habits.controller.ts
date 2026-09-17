@@ -47,6 +47,11 @@ export class HabitsController {
     return this.habitsService.getTodayHabits(req.user.uid, date);
   }
 
+  @Get('consistency')
+  getConsistency(@Request() req, @Query('days') days?: string) {
+    return this.habitsService.getConsistency(req.user.uid, Number(days) || 13);
+  }
+
   @Get(':id')
   findOne(@Request() req, @Param('id') id: string) {
     return this.habitsService.findOne(req.user.uid, id);

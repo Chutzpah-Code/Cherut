@@ -38,6 +38,15 @@ export const useTaskCounts = (lifeAreaId?: string) => {
   });
 };
 
+export const useTaskThroughput = (weeks = 8) => {
+  return useQuery({
+    queryKey: ['tasks', 'throughput', weeks],
+    queryFn: () => tasksApi.getThroughput(weeks),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+};
+
 export const useTask = (id: string) => {
   return useQuery({
     queryKey: ['tasks', id],
