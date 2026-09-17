@@ -4,8 +4,6 @@ import React, { useState } from 'react';
 import { Card, Text, Group, Stack, Badge, Tooltip, ActionIcon } from '@mantine/core';
 import { Clock, Archive, Edit2, RefreshCw } from 'lucide-react';
 import { Task } from '@/lib/api/services/tasks';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { memo, useMemo } from 'react';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
@@ -20,28 +18,6 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
   const [isHovered, setIsHovered] = useState(false);
   const [isTouchDevice] = useState(() => typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches);
   const colors = useThemeColors();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: task.id,
-    data: {
-      type: 'task',
-      task,
-    },
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)',
-    opacity: isDragging ? 0 : 1,
-    willChange: 'transform',
-    touchAction: 'none' as const,
-  };
 
   const hasActiveTimeTracking = useMemo(() =>
     task.timeTracking?.some((t) => t.status === 'running'),
@@ -70,18 +46,11 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
       <Card
-      ref={setNodeRef}
       style={{
-        ...style,
-        transition: isDragging ? 'none' : 'all 0.2s ease',
-        backgroundColor: task.archived ? colors.surface : (isDragging ? colors.hover : colors.surfaceElevated),
-        opacity: isDragging ? 0.8 : (task.archived ? 0.7 : 1),
-        cursor: isDragging ? 'grabbing' : 'grab',
-        transform: isDragging ? 'translate3d(0, 0, 0) rotate(3deg) scale(1.02)' : 'translate3d(0, 0, 0)',
-        boxShadow: isDragging
-          ? '0 8px 25px rgba(0,0,0,0.15), 0 0 0 1px rgba(70,134,254,0.3)'
-          : undefined,
-        zIndex: isDragging ? 1000 : 'auto',
+        transition: 'all 0.2s ease',
+        backgroundColor: task.archived ? colors.surface : colors.surfaceElevated,
+        opacity: task.archived ? 0.7 : 1,
+        cursor: 'pointer',
       }}
       shadow="sm"
       padding="sm"
@@ -90,8 +59,6 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      {...attributes}
-      {...listeners}
     >
       <Stack gap="xs">
         {/* Archived badge - only show if task is archived */}
