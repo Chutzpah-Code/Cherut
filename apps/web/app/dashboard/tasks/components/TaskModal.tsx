@@ -632,10 +632,25 @@ function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePills
     <Stack gap={7}>
       <Text style={fieldLabelStyle}>Due date</Text>
       {isCustom ? (
-        <Group gap={6}>
-          <Box style={pillStyle(true)}>
-            {new Date(value + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-          </Box>
+        <Group gap={6} align="center">
+          <DateInput
+            value={new Date(value + 'T00:00:00')}
+            onChange={(date) => {
+              const d = date as unknown as Date | null;
+              if (d) onChange(localISODate(d));
+            }}
+            valueFormat="MMM D, YYYY"
+            size="xs"
+            w={150}
+            styles={{
+              input: {
+                ...pillStyle(true),
+                textAlign: 'center',
+                height: 'auto',
+                minHeight: 0,
+              },
+            }}
+          />
           <ActionIcon size="sm" variant="subtle" color="gray" onClick={() => { onChange(undefined); onTimeChange(undefined); }}>
             <X size={14} />
           </ActionIcon>
