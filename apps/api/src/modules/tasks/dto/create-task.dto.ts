@@ -11,6 +11,7 @@ import {
   ValidateNested,
   IsBoolean,
   Matches,
+  MaxLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -50,6 +51,7 @@ export class ChecklistItemDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200, { message: 'Checklist item cannot exceed 200 characters' })
   title: string;
 
   @IsBoolean()

@@ -21,9 +21,9 @@ import {
 import { DateInput, TimeInput } from '@mantine/dates';
 import { useMediaQuery } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
-import { X, Play, Square, RefreshCw } from 'lucide-react';
+import { X, Play, Square, RefreshCw, Plus, ListPlus } from 'lucide-react';
 import { Task, ChecklistItem, UpdateTaskDto, RecurringConfig } from '@/lib/api/services/tasks';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { useObjectives } from '@/hooks/useObjectives';
 import { useKeyResults } from '@/hooks/useKeyResults';
@@ -54,6 +54,11 @@ const DISABLED_BORDER = '#EDF1F6';
 
 const SESSION_SECONDS = 25 * 60;
 
+// Mirrored on the backend (ChecklistItemDto.title in create-task.dto.ts) —
+// no shared constants package between apps/web and apps/api in this repo,
+// same "manually mirrored" convention used for the finance asset taxonomy.
+const CHECKLIST_ITEM_MAX_LENGTH = 200;
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 function getRecurringDates(config: RecurringConfig): string[] {
   const dates: string[] = [];
@@ -66,6 +71,26 @@ function getRecurringDates(config: RecurringConfig): string[] {
     else current.setMonth(current.getMonth() + 1);
   }
   return dates;
+}
+
+function parseChecklistLines(text: string): string[] {
+  return text.split(/\r\n|\r|\n/).map((l) => l.trim()).filter(Boolean);
+}
+
+// Breaks a too-long item into ≤max chunks, preferring to cut at the last
+// space before the limit so words aren't split mid-way; falls back to a
+// hard cut only when no space is found in that window.
+function splitLongText(text: string, max: number): string[] {
+  const chunks: string[] = [];
+  let remaining = text.trim();
+  while (remaining.length > max) {
+    let cut = remaining.lastIndexOf(' ', max);
+    if (cut <= 0) cut = max;
+    chunks.push(remaining.slice(0, cut).trim());
+    remaining = remaining.slice(cut).trim();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks;
 }
 
 function localISODate(d: Date): string {
@@ -261,12 +286,107 @@ interface ChecklistSectionProps {
   onAddItem: () => void;
   onToggleItem: (itemId: string) => void;
   onRemoveItem: (itemId: string) => void;
+  onEditItem: (itemId: string, newTitle: string) => void;
+  onAddItems: (titles: string[]) => void;
 }
 
-function ChecklistSection({ items, newItemValue, onNewItemChange, onAddItem, onToggleItem, onRemoveItem }: ChecklistSectionProps) {
+interface PasteChoice {
+  lines: string[];
+}
+
+interface OverLimitChoice {
+  valid: string[];
+  overLong: string[];
+}
+
+function ChecklistSection({
+  items, newItemValue, onNewItemChange, onAddItem, onToggleItem, onRemoveItem, onEditItem, onAddItems,
+}: ChecklistSectionProps) {
   const completed = items.filter((i) => i.completed).length;
   const total = items.length;
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState('');
+
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkText, setBulkText] = useState('');
+  const bulkRef = useRef<HTMLTextAreaElement>(null);
+  const bulkLines = useMemo(() => parseChecklistLines(bulkText), [bulkText]);
+
+  const [pasteChoice, setPasteChoice] = useState<PasteChoice | null>(null);
+  const [overLimit, setOverLimit] = useState<OverLimitChoice | null>(null);
+
+  const startEdit = (item: ChecklistItem) => {
+    setEditingId(item.id);
+    setEditingValue(item.title);
+  };
+  const commitEdit = () => {
+    const trimmed = editingValue.trim();
+    if (editingId && trimmed) onEditItem(editingId, trimmed);
+    setEditingId(null);
+  };
+
+  const closeBulk = () => {
+    setBulkOpen(false);
+    setBulkText('');
+  };
+
+  const commitBulk = (lines: string[]) => {
+    if (lines.length === 0) return;
+    const valid: string[] = [];
+    const overLong: string[] = [];
+    for (const line of lines) {
+      (line.length <= CHECKLIST_ITEM_MAX_LENGTH ? valid : overLong).push(line);
+    }
+    if (overLong.length > 0) {
+      setOverLimit({ valid, overLong });
+      return;
+    }
+    onAddItems(valid);
+    closeBulk();
+  };
+
+  const insertIntoBulkText = (insertText: string) => {
+    const el = bulkRef.current;
+    if (!el) {
+      setBulkText((prev) => (prev ? `${prev}\n${insertText}` : insertText));
+      return;
+    }
+    const start = el.selectionStart ?? bulkText.length;
+    const end = el.selectionEnd ?? bulkText.length;
+    const next = bulkText.slice(0, start) + insertText + bulkText.slice(end);
+    setBulkText(next);
+    requestAnimationFrame(() => {
+      el.focus();
+      const pos = start + insertText.length;
+      el.setSelectionRange(pos, pos);
+    });
+  };
+
+  const handleBulkPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const pasted = e.clipboardData.getData('text');
+    const lines = parseChecklistLines(pasted);
+    if (lines.length >= 2) {
+      e.preventDefault();
+      setPasteChoice({ lines });
+    }
+    // 0 or 1 detected line: let the paste happen normally, single item.
+  };
+
+  const resolveOverLimitAddValidOnly = () => {
+    if (!overLimit) return;
+    if (overLimit.valid.length > 0) onAddItems(overLimit.valid);
+    setOverLimit(null);
+    closeBulk();
+  };
+  const resolveOverLimitAutoSplit = () => {
+    if (!overLimit) return;
+    const split = overLimit.overLong.flatMap((t) => splitLongText(t, CHECKLIST_ITEM_MAX_LENGTH));
+    onAddItems([...overLimit.valid, ...split]);
+    setOverLimit(null);
+    closeBulk();
+  };
 
   return (
     <Stack gap={10}>
@@ -297,19 +417,38 @@ function ChecklistSection({ items, newItemValue, onNewItemChange, onAddItem, onT
                 },
               }}
             />
-            <Text
-              size="sm"
-              style={{
-                flex: 1,
-                minWidth: 0,
-                fontSize: 13.5,
-                fontWeight: item.completed ? 400 : 500,
-                color: item.completed ? MUTED : INK,
-                textDecoration: item.completed ? 'line-through' : 'none',
-              }}
-            >
-              {item.title}
-            </Text>
+            {editingId === item.id ? (
+              <TextInput
+                value={editingValue}
+                onChange={(e) => setEditingValue(e.target.value)}
+                onBlur={commitEdit}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') { e.preventDefault(); commitEdit(); }
+                  if (e.key === 'Escape') setEditingId(null);
+                }}
+                maxLength={CHECKLIST_ITEM_MAX_LENGTH}
+                autoFocus
+                size="xs"
+                style={{ flex: 1 }}
+                styles={{ input: { fontSize: 13.5, borderColor: BORDER } }}
+              />
+            ) : (
+              <Text
+                size="sm"
+                onClick={() => startEdit(item)}
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: 13.5,
+                  fontWeight: item.completed ? 400 : 500,
+                  color: item.completed ? MUTED : INK,
+                  textDecoration: item.completed ? 'line-through' : 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                {item.title}
+              </Text>
+            )}
             <ActionIcon size="sm" variant="subtle" color="gray" onClick={() => onRemoveItem(item.id)} style={{ color: FAINT }}>
               <X size={13} />
             </ActionIcon>
@@ -317,33 +456,143 @@ function ChecklistSection({ items, newItemValue, onNewItemChange, onAddItem, onT
         ))}
       </Stack>
 
-      <Group gap={8}>
-        <TextInput
-          placeholder="Add an item"
-          value={newItemValue}
-          onChange={(e) => onNewItemChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              onAddItem();
-            }
-          }}
-          size="sm"
-          radius={6}
-          style={{ flex: 1 }}
-          styles={{ input: { fontSize: 13, borderColor: BORDER } }}
-        />
-        <Button
-          size="sm"
-          radius={6}
-          variant="default"
-          onClick={onAddItem}
-          disabled={!newItemValue.trim()}
-          style={{ fontSize: 13, fontWeight: 600, color: SECONDARY, borderColor: BORDER }}
-        >
-          Add
-        </Button>
-      </Group>
+      {bulkOpen ? (
+        <Stack gap={8}>
+          <Textarea
+            ref={bulkRef}
+            value={bulkText}
+            onChange={(e) => setBulkText(e.target.value)}
+            onPaste={handleBulkPaste}
+            placeholder="Paste or type multiple items, one per line…"
+            autosize
+            minRows={4}
+            maxRows={10}
+            autoFocus
+            radius={6}
+            styles={{ input: { fontSize: 13, borderColor: BORDER } }}
+          />
+          <Group justify="space-between" align="center" wrap="wrap">
+            <Text size="xs" c="dimmed">
+              {bulkLines.length} item{bulkLines.length !== 1 ? 's' : ''} detected
+            </Text>
+            <Group gap={8}>
+              <Button size="xs" radius={6} variant="default" onClick={closeBulk} style={{ color: SECONDARY, borderColor: BORDER }}>
+                Cancel
+              </Button>
+              <Button
+                size="xs"
+                radius={6}
+                disabled={bulkLines.length === 0}
+                onClick={() => commitBulk(bulkLines)}
+                style={{ backgroundColor: PRIMARY, fontWeight: 600 }}
+              >
+                Add {bulkLines.length} item{bulkLines.length !== 1 ? 's' : ''}
+              </Button>
+            </Group>
+          </Group>
+        </Stack>
+      ) : (
+        <Group gap={8}>
+          <TextInput
+            placeholder="Add an item"
+            value={newItemValue}
+            onChange={(e) => onNewItemChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                onAddItem();
+              }
+            }}
+            size="sm"
+            radius={6}
+            style={{ flex: 1 }}
+            styles={{ input: { fontSize: 13, borderColor: BORDER } }}
+          />
+          <Button
+            size="sm"
+            radius={6}
+            variant="default"
+            leftSection={<Plus size={14} />}
+            onClick={onAddItem}
+            disabled={!newItemValue.trim()}
+            style={{ fontSize: 13, fontWeight: 600, color: SECONDARY, borderColor: BORDER }}
+          >
+            Add item
+          </Button>
+          <Button
+            size="sm"
+            radius={6}
+            variant="default"
+            leftSection={<ListPlus size={14} />}
+            onClick={() => setBulkOpen(true)}
+            style={{ fontSize: 13, fontWeight: 600, color: SECONDARY, borderColor: BORDER }}
+          >
+            Bulk add
+          </Button>
+        </Group>
+      )}
+
+      <Modal
+        opened={!!pasteChoice}
+        onClose={() => setPasteChoice(null)}
+        title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>Multiple items detected</Text>}
+        centered
+        size="sm"
+      >
+        <Stack gap="md">
+          <Text size="sm" style={{ color: MUTED }}>
+            Found {pasteChoice?.lines.length} lines in what you pasted. Add each line as its own checklist item, or keep it as a single item?
+          </Text>
+          <Group justify="flex-end" gap="sm">
+            <Button
+              variant="default"
+              onClick={() => {
+                if (pasteChoice) insertIntoBulkText(pasteChoice.lines.join(' '));
+                setPasteChoice(null);
+              }}
+            >
+              Add as one item
+            </Button>
+            <Button
+              style={{ backgroundColor: PRIMARY }}
+              onClick={() => {
+                if (pasteChoice) insertIntoBulkText(pasteChoice.lines.join('\n'));
+                setPasteChoice(null);
+              }}
+            >
+              Split into {pasteChoice?.lines.length} items
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      <Modal
+        opened={!!overLimit}
+        onClose={() => setOverLimit(null)}
+        title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>Some items are too long</Text>}
+        centered
+        size="sm"
+      >
+        <Stack gap="md">
+          <Text size="sm" style={{ color: MUTED }}>
+            {overLimit?.overLong.length} item{overLimit && overLimit.overLong.length !== 1 ? 's' : ''} over the {CHECKLIST_ITEM_MAX_LENGTH}-character limit.
+            Nothing has been added yet — choose how to handle {overLimit && overLimit.overLong.length !== 1 ? 'them' : 'it'}:
+          </Text>
+          <Stack gap={6}>
+            {overLimit && overLimit.valid.length > 0 && (
+              <Button variant="default" onClick={resolveOverLimitAddValidOnly}>
+                Add the {overLimit.valid.length} valid item{overLimit.valid.length !== 1 ? 's' : ''} only
+              </Button>
+            )}
+            <Button style={{ backgroundColor: PRIMARY }} onClick={resolveOverLimitAutoSplit}>
+              Auto-split the long item{overLimit && overLimit.overLong.length !== 1 ? 's' : ''}
+            </Button>
+            <Button variant="subtle" color="gray" onClick={() => setOverLimit(null)}>
+              Cancel
+            </Button>
+          </Stack>
+        </Stack>
+      </Modal>
     </Stack>
   );
 }
@@ -545,6 +794,24 @@ export function TaskModal({
     updateTaskMutation.mutate({ id: currentTask.id, dto: { checklist: updatedChecklist } });
   };
 
+  const handleEditChecklistItem = (itemId: string, newTitle: string) => {
+    const updatedChecklist = (currentTask.checklist ?? []).map((item) =>
+      item.id === itemId ? { ...item, title: newTitle } : item
+    );
+    updateTaskMutation.mutate({ id: currentTask.id, dto: { checklist: updatedChecklist } });
+  };
+
+  const handleAddChecklistItems = (titles: string[]) => {
+    if (titles.length === 0) return;
+    const newItems: ChecklistItem[] = titles.map((title) => ({
+      id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      title,
+      completed: false,
+    }));
+    const updatedChecklist = [...(currentTask.checklist || []), ...newItems];
+    updateTaskMutation.mutate({ id: currentTask.id, dto: { checklist: updatedChecklist } });
+  };
+
   const handleDeleteClick = () => {
     modals.openConfirmModal({
       title: 'Delete task',
@@ -667,6 +934,8 @@ export function TaskModal({
               onAddItem={handleAddChecklistItem}
               onToggleItem={(itemId) => onToggleChecklistItem(currentTask.id, itemId)}
               onRemoveItem={handleRemoveChecklistItem}
+              onEditItem={handleEditChecklistItem}
+              onAddItems={handleAddChecklistItems}
             />
           </Box>
 
