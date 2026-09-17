@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Box, Group, Progress, Stack, Text } from '@mantine/core';
+import { Box, Group, Progress, Stack, Text, ActionIcon } from '@mantine/core';
+import { ChevronRight } from 'lucide-react';
 import { useObjectives } from '@/hooks/useObjectives';
 import { RowsSkeleton } from './skeletons';
 
@@ -26,6 +27,7 @@ function quarterChip(startDate?: string, endDate?: string): string | null {
 }
 
 function ObjectiveCard({ objective }: { objective: any }) {
+  const [expanded, setExpanded] = useState(false);
   const keyResults = objective.keyResults ?? [];
   const visibleKRs = keyResults.slice(0, KR_VISIBLE);
   const remaining = keyResults.length - visibleKRs.length;
@@ -33,7 +35,22 @@ function ObjectiveCard({ objective }: { objective: any }) {
 
   return (
     <Box style={{ border: '1px solid #E8EBF0', borderRadius: 8, padding: '14px 16px' }}>
-      <Group align="center" gap={12} wrap="nowrap">
+      <Group
+        align="center"
+        gap={12}
+        wrap="nowrap"
+        onClick={() => setExpanded((v) => !v)}
+        style={{ cursor: 'pointer' }}
+      >
+        <ActionIcon
+          size="xs"
+          variant="subtle"
+          color="gray"
+          aria-label={expanded ? 'Collapse key results' : 'Expand key results'}
+          style={{ flexShrink: 0, color: '#94A3B8', transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s ease' }}
+        >
+          <ChevronRight size={14} />
+        </ActionIcon>
         <Text style={{ flex: 1, minWidth: 0, fontSize: 14.5, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {objective.title}
         </Text>
@@ -42,36 +59,38 @@ function ObjectiveCard({ objective }: { objective: any }) {
           {Math.round(objective.progress ?? 0)}%
         </Text>
       </Group>
-      <Progress value={objective.progress ?? 0} size={6} color="#9DB8F2" radius={3} style={{ margin: '10px 0 14px' }} />
+      <Progress value={objective.progress ?? 0} size={6} color="#9DB8F2" radius={3} style={{ margin: '10px 0 0' }} />
 
-      {keyResults.length === 0 ? (
-        <Text style={{ fontSize: 12.5, color: '#64748B' }}>No key results defined yet</Text>
-      ) : (
-        <Stack gap={10}>
-          {visibleKRs.map((kr: any) => {
-            const pct = kr.targetValue > 0 ? Math.min(100, Math.round((kr.currentValue / kr.targetValue) * 100)) : 0;
-            return (
-              <Box key={kr.id} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 84px 76px', alignItems: 'center', gap: 12 }}>
-                <Text style={{
-                  fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  color: kr.isCompleted ? '#64748B' : '#0F172A', textDecoration: kr.isCompleted ? 'line-through' : 'none',
-                }}>
-                  {kr.title}
-                </Text>
-                <Box style={{ height: 4, background: '#EDF1F6', borderRadius: 2, overflow: 'hidden' }}>
-                  {pct > 0 && <Box style={{ width: `${pct}%`, height: '100%', background: kr.isCompleted ? '#8FC9A6' : '#9DB8F2' }} />}
+      {expanded && (
+        keyResults.length === 0 ? (
+          <Text style={{ fontSize: 12.5, color: '#64748B', marginTop: 14 }}>No key results defined yet</Text>
+        ) : (
+          <Stack gap={10} mt={14}>
+            {visibleKRs.map((kr: any) => {
+              const pct = kr.targetValue > 0 ? Math.min(100, Math.round((kr.currentValue / kr.targetValue) * 100)) : 0;
+              return (
+                <Box key={kr.id} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 84px 76px', alignItems: 'center', gap: 12 }}>
+                  <Text style={{
+                    fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    color: kr.isCompleted ? '#64748B' : '#0F172A', textDecoration: kr.isCompleted ? 'line-through' : 'none',
+                  }}>
+                    {kr.title}
+                  </Text>
+                  <Box style={{ height: 4, background: '#EDF1F6', borderRadius: 2, overflow: 'hidden' }}>
+                    {pct > 0 && <Box style={{ width: `${pct}%`, height: '100%', background: kr.isCompleted ? '#8FC9A6' : '#9DB8F2' }} />}
+                  </Box>
+                  <Text style={{
+                    fontSize: 12.5, fontWeight: 700, textAlign: 'right', fontVariantNumeric: 'tabular-nums',
+                    color: kr.isCompleted ? '#15803D' : '#64748B',
+                  }}>
+                    {kr.currentValue}/{kr.targetValue}
+                  </Text>
                 </Box>
-                <Text style={{
-                  fontSize: 12.5, fontWeight: 700, textAlign: 'right', fontVariantNumeric: 'tabular-nums',
-                  color: kr.isCompleted ? '#15803D' : '#64748B',
-                }}>
-                  {kr.currentValue}/{kr.targetValue}
-                </Text>
-              </Box>
-            );
-          })}
-          {remaining > 0 && <Text style={{ fontSize: 12.5, color: '#64748B' }}>{remaining} more key result{remaining !== 1 ? 's' : ''}</Text>}
-        </Stack>
+              );
+            })}
+            {remaining > 0 && <Text style={{ fontSize: 12.5, color: '#64748B' }}>{remaining} more key result{remaining !== 1 ? 's' : ''}</Text>}
+          </Stack>
+        )
       )}
     </Box>
   );
