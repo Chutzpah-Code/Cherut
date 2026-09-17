@@ -119,7 +119,10 @@ function ResponsiveDashboard({
       {/* Mobile-only backdrop behind the sidebar drawer — Mantine's AppShell
           has no built-in overlay, so the main content otherwise shows through
           solid and unobscured while the drawer is open. Sits just under the
-          navbar's z-index (100) so the drawer itself stays fully opaque. */}
+          navbar's z-index (100) so the drawer itself stays fully opaque.
+          touchAction: 'none' blocks touch-drag scroll on the area it covers,
+          not just clicks — pointer-events alone doesn't stop iOS momentum
+          scroll gestures. */}
       <Box
         hiddenFrom="sm"
         onClick={closeMobile}
@@ -128,16 +131,18 @@ function ResponsiveDashboard({
           position: 'fixed',
           inset: 0,
           zIndex: 99,
-          background: 'rgba(241, 245, 249, 0.5)',
+          background: 'rgba(15, 23, 42, 0.28)',
           backdropFilter: 'blur(6px)',
           WebkitBackdropFilter: 'blur(6px)',
           opacity: mobileOpened ? 1 : 0,
+          visibility: mobileOpened ? 'visible' : 'hidden',
           pointerEvents: mobileOpened ? 'auto' : 'none',
-          transition: 'opacity 200ms ease',
+          touchAction: 'none',
+          transition: 'opacity 200ms ease, visibility 200ms ease',
         }}
       />
 
-      <AppShell.Main style={{ background: colors.background }}>
+      <AppShell.Main style={{ background: colors.background, overflow: mobileOpened ? 'hidden' : undefined }}>
         {children}
       </AppShell.Main>
 

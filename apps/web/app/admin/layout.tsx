@@ -286,17 +286,19 @@ export default function AdminLayout({
           position: 'fixed',
           inset: 0,
           zIndex: 99,
-          background: 'rgba(241, 245, 249, 0.5)',
+          background: 'rgba(15, 23, 42, 0.28)',
           backdropFilter: 'blur(6px)',
           WebkitBackdropFilter: 'blur(6px)',
           opacity: opened ? 1 : 0,
+          visibility: opened ? 'visible' : 'hidden',
           pointerEvents: opened ? 'auto' : 'none',
-          transition: 'opacity 200ms ease',
+          touchAction: 'none',
+          transition: 'opacity 200ms ease, visibility 200ms ease',
         }}
       />
 
       {/* Conteúdo principal */}
-      <AppShell.Main style={{ background: colors.background }}>
+      <AppShell.Main style={{ background: colors.background, overflow: opened ? 'hidden' : undefined }}>
         {children}
       </AppShell.Main>
     </AppShell>
