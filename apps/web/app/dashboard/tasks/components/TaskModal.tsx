@@ -17,6 +17,7 @@ import {
   Tooltip,
   SegmentedControl,
   Progress,
+  Popover,
 } from '@mantine/core';
 import { DateInput, TimeInput } from '@mantine/dates';
 import { useMediaQuery } from '@mantine/hooks';
@@ -607,6 +608,7 @@ interface DueDatePillsProps {
 
 function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePillsProps) {
   const timeInputRef = useRef<HTMLInputElement>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const today = useMemo(() => localISODate(new Date()), []);
   const tomorrow = useMemo(() => {
     const d = new Date();
@@ -617,6 +619,9 @@ function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePills
   const isToday = value === today;
   const isTomorrow = value === tomorrow;
   const isCustom = !!value && !isToday && !isTomorrow;
+  const customLabel = isCustom && value
+    ? new Date(value + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : null;
 
   const pillStyle = (active: boolean): React.CSSProperties => ({
     fontSize: 12,
@@ -629,58 +634,42 @@ function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePills
     cursor: 'pointer',
   });
 
+  const clearDate = () => {
+    onChange(undefined);
+    onTimeChange(undefined);
+  };
+
   return (
     <Stack gap={7}>
       <Text style={fieldLabelStyle}>Due date</Text>
-      {isCustom ? (
-        <Group gap={6} align="center">
-          <DateInput
-            value={new Date(value + 'T00:00:00')}
-            onChange={(date) => {
-              const d = date as unknown as Date | null;
-              if (d) onChange(localISODate(d));
-            }}
-            valueFormat="MMM D, YYYY"
-            size="xs"
-            w={150}
-            styles={{
-              input: {
-                ...pillStyle(true),
-                textAlign: 'center',
-                height: 'auto',
-                minHeight: 0,
-              },
-            }}
-          />
-          <ActionIcon size="sm" variant="subtle" color="gray" onClick={() => { onChange(undefined); onTimeChange(undefined); }}>
+      <Group gap={6} wrap="wrap" align="center">
+        <Box style={pillStyle(isToday)} onClick={() => onChange(today)}>Today</Box>
+        <Box style={pillStyle(isTomorrow)} onClick={() => onChange(tomorrow)}>Tomorrow</Box>
+        <Popover opened={pickerOpen} onChange={setPickerOpen} position="bottom-start" withinPortal shadow="md">
+          <Popover.Target>
+            <Box style={pillStyle(isCustom)} onClick={() => setPickerOpen((o) => !o)}>
+              {customLabel ?? 'Pick'}
+            </Box>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <DateInput
+              value={value ? new Date(value + 'T00:00:00') : null}
+              onChange={(date) => {
+                const d = date as unknown as Date | null;
+                if (d) {
+                  onChange(localISODate(d));
+                  setPickerOpen(false);
+                }
+              }}
+            />
+          </Popover.Dropdown>
+        </Popover>
+        {value && (
+          <ActionIcon size="sm" variant="subtle" color="gray" aria-label="Clear due date" onClick={clearDate}>
             <X size={14} />
           </ActionIcon>
-        </Group>
-      ) : (
-        <Group gap={6} wrap="wrap" align="center">
-          <Box style={pillStyle(isToday)} onClick={() => onChange(today)}>Today</Box>
-          <Box style={pillStyle(isTomorrow)} onClick={() => onChange(tomorrow)}>Tomorrow</Box>
-          <DateInput
-            value={null}
-            onChange={(date) => {
-              const d = date as unknown as Date | null;
-              if (d) onChange(localISODate(d));
-            }}
-            placeholder="Pick"
-            valueFormat="MMM D"
-            size="xs"
-            w={72}
-            styles={{
-              input: {
-                ...pillStyle(false),
-                textAlign: 'center',
-                height: 'auto',
-                minHeight: 0,
-              },
-            }}
-          />
-        </Group>
-      )}
+        )}
+      </Group>
 
       {value && (
         <TimeInput
