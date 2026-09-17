@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Box, Group, Stack, Text, Title } from '@mantine/core';
+import { Box, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { useTasks } from '@/hooks/useTasks';
 import { useTodayHabits, useHabitConsistency } from '@/hooks/useHabits';
 import { useNetWorth } from '@/hooks/useFinance';
@@ -34,7 +34,7 @@ function Tile({ label, value, sub, tone }: { label: string; value: string; sub?:
     <Box
       style={{
         background: '#F8FAFC', border: '1px solid #E8EBF0', borderRadius: 6,
-        padding: '11px 16px', minWidth: 138, flex: '1 1 0',
+        padding: '11px 16px', minWidth: 130, minHeight: 76, height: '100%', boxSizing: 'border-box',
       }}
     >
       <Text style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#64748B' }}>
@@ -110,7 +110,7 @@ export function StatusStrip() {
         {isLoading ? (
           <TilesSkeleton count={4} />
         ) : (
-          <Group gap={10} wrap="wrap" style={{ overflowX: 'auto', flexWrap: 'nowrap' }}>
+          <SimpleGrid cols={{ base: 2, sm: 4 }} spacing={10} style={{ width: '100%' }}>
             <Tile
               label="Overdue"
               value={String(overdueCount)}
@@ -128,7 +128,7 @@ export function StatusStrip() {
               value={fmtCompact(netWorth?.netWorth ?? 0, netWorth?.displayCurrency ?? currency)}
               sub={netWorth?.monthChangePct != null ? `${netWorth.monthChangePct >= 0 ? '+' : ''}${netWorth.monthChangePct.toFixed(1)}% this month` : undefined}
             />
-          </Group>
+          </SimpleGrid>
         )}
       </Group>
     </Box>
