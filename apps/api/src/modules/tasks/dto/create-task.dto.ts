@@ -106,6 +106,12 @@ export class CreateTaskDto {
   @IsOptional()
   dueDate?: string;
 
+  // Optional time-of-day appended to dueDate for display (HH:mm)
+  @IsString()
+  @Matches(/^\d{2}:\d{2}$/, { message: 'dueTime must be HH:mm' })
+  @IsOptional()
+  dueTime?: string;
+
   // Pomodoro estimation (number of 25-min sessions)
   @IsNumber()
   @Min(0)

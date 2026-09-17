@@ -531,6 +531,7 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
       {selectedTask && (
         <TaskModal
           task={selectedTask}
+          columnName={columns?.find((c) => c.tasks.some((t) => t.id === selectedTask.id))?.name}
           opened={modalOpened}
           onClose={() => { setModalOpened(false); setSelectedTask(null); }}
           onSave={(id, dto: UpdateTaskDto) => updateTask.mutate({ id, dto })}

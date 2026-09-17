@@ -193,6 +193,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
       {selectedTask && (
         <TaskModal
           task={selectedTask}
+          columnName={kanbanColumns.find((c) => c.tasks.some((t) => t.id === selectedTask.id))?.name}
           opened={modalOpened}
           onClose={() => { setModalOpened(false); setSelectedTask(null); }}
           onSave={(id, dto: UpdateTaskDto) => updateMutation.mutate({ id, dto })}

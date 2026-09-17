@@ -34,6 +34,7 @@ export interface Task {
   status: 'todo' | 'in_progress' | 'done';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
+  dueTime?: string;
   estimatedPomodoros?: number;
   checklist?: ChecklistItem[];
   timeTracking?: TimeTrackingEntry[];
@@ -62,6 +63,7 @@ export interface CreateTaskDto {
   priority?: 'low' | 'medium' | 'high' | 'urgent';
   order?: number;
   dueDate?: string;
+  dueTime?: string;
   estimatedPomodoros?: number;
   checklist?: ChecklistItem[];
   tags?: string[];
@@ -81,6 +83,7 @@ export interface UpdateTaskDto {
   status?: 'todo' | 'in_progress' | 'done';
   priority?: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
+  dueTime?: string;
   estimatedPomodoros?: number;
   checklist?: ChecklistItem[];
   tags?: string[];
