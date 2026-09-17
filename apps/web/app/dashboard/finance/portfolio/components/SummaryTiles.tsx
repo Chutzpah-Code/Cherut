@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Group, Text } from '@mantine/core';
+import { Box, Group, SimpleGrid, Text } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { useBills } from '@/hooks/useBills';
 import { useNetWorth, useUpcomingBillsAndStatements } from '@/hooks/useFinance';
 import { useFinanceCurrency } from '../../currency-context';
@@ -32,6 +33,7 @@ function Tile({ label, value, valueColor }: { label: string; value: string; valu
 }
 
 export function SummaryTiles() {
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const { displayCurrency } = useFinanceCurrency();
   const { data: items = [] } = useUpcomingBillsAndStatements(90);
   const { data: bills = [] } = useBills();
@@ -46,8 +48,8 @@ export function SummaryTiles() {
     .filter((b) => b.isActive && b.type === 'expense')
     .reduce((s, b) => s + monthlyEquivalent(b), 0);
 
-  return (
-    <Group gap={10} wrap="nowrap" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 2 }}>
+  const tiles = (
+    <>
       <Tile label="Due in 7 days" value={fmtCurrency(due7.reduce((s, o) => s + o.amount, 0), displayCurrency)} />
       <Tile
         label="Overdue"
@@ -56,6 +58,18 @@ export function SummaryTiles() {
       />
       <Tile label="Committed / mo" value={fmtCurrency(committed, displayCurrency)} />
       <Tile label="Net worth" value={fmtCurrency(netWorth?.netWorth ?? 0, displayCurrency)} />
+    </>
+  );
+
+  // Mobile: fixed 2-column grid, no horizontal scroll. Desktop is left
+  // exactly as it was — a nowrap scrolling row — untouched.
+  if (isMobile) {
+    return <SimpleGrid cols={2} spacing={10}>{tiles}</SimpleGrid>;
+  }
+
+  return (
+    <Group gap={10} wrap="nowrap" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 2 }}>
+      {tiles}
     </Group>
   );
 }

@@ -5,7 +5,7 @@ import {
   Box, Group, Stack, Text, Modal, Select, NumberInput, Button,
   ActionIcon, Collapse, Badge, UnstyledButton,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { Pencil, Trash2, Archive, ArchiveRestore } from 'lucide-react';
 import {
   useFinanceAccounts, useUpdateAccount, useDeleteAccount,
@@ -32,6 +32,19 @@ function fmtBalance(value: number, currency?: string) {
 }
 
 const ROW_GRID = 'minmax(0,1fr) 88px 126px 104px';
+// Mobile: the desktop column widths (88 + 126 + 104 = 318px, plus gaps)
+// don't leave room for the name column at 375-428px viewports — it gets
+// squeezed to ~0 and the (untruncated) name text visually spills onto the
+// type chip. Narrower fixed columns on mobile, text truncation below as
+// a safety net for any remaining long names.
+const ROW_GRID_MOBILE = 'minmax(0,1fr) 58px 84px 100px';
+
+const nameTextStyle: React.CSSProperties = {
+  fontSize: 14.5, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+};
+const subTextStyle: React.CSSProperties = {
+  fontSize: 12, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+};
 
 const TYPE_LABEL: Record<AccountType, string> = {
   checking: 'CHECKING', wallet: 'WALLET', savings: 'SAVINGS', credit: 'CREDIT', other: 'OTHER',
@@ -42,7 +55,8 @@ function TypeChip({ type }: { type: AccountType }) {
   return (
     <Text style={{
       fontSize: 10.5, fontWeight: 700, letterSpacing: '0.08em', textAlign: 'center',
-      borderRadius: 4, padding: '3px 0',
+      borderRadius: 4, padding: '3px 2px',
+      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       color: isCredit ? '#1D4ED8' : '#334155',
       background: isCredit ? '#E4EBFD' : '#F1F5F9',
     }}>
@@ -143,6 +157,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
   account: FinanceAccount; accounts: FinanceAccount[];
   onEdit: () => void; onArchive: () => void; onDelete: () => void;
 }) {
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const [expanded, setExpanded] = useState(false);
   const [payModal, { open: openPay, close: closePay }] = useDisclosure();
   const [selectedStatement, setSelectedStatement] = useState<FinanceStatement | null>(null);
@@ -169,14 +184,14 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
           }
         }}
         style={{
-          display: 'grid', gridTemplateColumns: ROW_GRID, alignItems: 'center',
-          gap: 12, padding: '11px 12px', borderRadius: 6, background: '#F8FAFC', cursor: 'pointer',
+          display: 'grid', gridTemplateColumns: isMobile ? ROW_GRID_MOBILE : ROW_GRID, alignItems: 'center',
+          gap: isMobile ? 8 : 12, padding: '11px 12px', borderRadius: 6, background: '#F8FAFC', cursor: 'pointer',
         }}
       >
         <Box style={{ minWidth: 0 }}>
-          <Text style={{ fontSize: 14.5, fontWeight: 600 }}>{account.name}</Text>
+          <Text style={nameTextStyle}>{account.name}</Text>
           {current && (
-            <Text style={{ fontSize: 12, color: '#64748B' }}>
+            <Text style={subTextStyle}>
               Closes {fmtDate(current.periodEnd)} · due {fmtDate(current.dueDate)}
             </Text>
           )}
@@ -195,6 +210,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
         <Text style={{
           fontSize: 15, fontWeight: 700, textAlign: 'right', fontVariantNumeric: 'tabular-nums',
           color: (account.balance ?? 0) < 0 ? '#B91C1C' : '#0F172A',
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {fmtBalance(account.balance ?? 0, account.currency)}
         </Text>
@@ -252,11 +268,15 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
 function CashAccountRow({ account, onEdit, onArchive, onDelete }: {
   account: FinanceAccount; onEdit: () => void; onArchive: () => void; onDelete: () => void;
 }) {
+  const isMobile = useMediaQuery('(max-width: 767px)');
   return (
-    <Box style={{ display: 'grid', gridTemplateColumns: ROW_GRID, alignItems: 'center', gap: 12, padding: '11px 12px', borderRadius: 6 }}>
+    <Box style={{
+      display: 'grid', gridTemplateColumns: isMobile ? ROW_GRID_MOBILE : ROW_GRID, alignItems: 'center',
+      gap: isMobile ? 8 : 12, padding: '11px 12px', borderRadius: 6,
+    }}>
       <Box style={{ minWidth: 0 }}>
-        <Text style={{ fontSize: 14.5, fontWeight: 600 }}>{account.name}</Text>
-        <Text style={{ fontSize: 12, color: '#64748B' }}>
+        <Text style={nameTextStyle}>{account.name}</Text>
+        <Text style={subTextStyle}>
           {account.type.charAt(0).toUpperCase() + account.type.slice(1)} · {account.currency}
         </Text>
       </Box>
@@ -264,6 +284,7 @@ function CashAccountRow({ account, onEdit, onArchive, onDelete }: {
       <Text style={{
         fontSize: 15, fontWeight: 700, textAlign: 'right', fontVariantNumeric: 'tabular-nums',
         color: (account.balance ?? 0) < 0 ? '#B91C1C' : '#0F172A',
+        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
         {fmtBalance(account.balance ?? 0, account.currency)}
       </Text>
