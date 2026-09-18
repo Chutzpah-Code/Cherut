@@ -1210,7 +1210,6 @@
   },
   "dashboardHeader": {
     "darkModeSoon": "Dark mode coming soon",
-    "helpAndInstructions": "Help and instructions",
     "notifications": "Notifications",
     "notificationsUnread": "Notifications ({count} unread)",
     "active": "Active",

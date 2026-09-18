@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslations } from 'next-intl';
-import { Bell, Moon, Sun, Sparkles, HelpCircle } from 'lucide-react';
+import { Bell, Moon } from 'lucide-react';
 import { Group, Burger, Text, ActionIcon, Avatar, Box, useMantineColorScheme, useComputedColorScheme, Badge, Stack, Indicator, Tooltip } from '@mantine/core';
 import { CherutLockup } from '@/components/ui/CherutLockup';
 import { useEffect, useState } from 'react';
@@ -14,10 +14,9 @@ import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
 interface HeaderProps {
   mobileOpened: boolean;
   toggleMobile: () => void;
-  onOpenWelcome?: () => void;
 }
 
-export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: HeaderProps) {
+export default function Header({ mobileOpened, toggleMobile }: HeaderProps) {
   const t = useTranslations('dashboardHeader');
   const { user } = useAuth();
   const { setColorScheme } = useMantineColorScheme();
@@ -110,23 +109,6 @@ export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: He
               </ActionIcon>
             </Tooltip>
           </Box>
-        )}
-
-        {mounted && onOpenWelcome && (
-          <ActionIcon
-            variant="subtle"
-            size="lg"
-            radius="xl"
-            onClick={onOpenWelcome}
-            title={t('helpAndInstructions')}
-            style={{
-              transition: 'all 0.3s ease',
-              minWidth: '44px',
-              minHeight: '44px',
-            }}
-          >
-            <HelpCircle size={20} style={{ color: 'var(--mantine-color-gray-6)' }} />
-          </ActionIcon>
         )}
 
         <NotificationCenter

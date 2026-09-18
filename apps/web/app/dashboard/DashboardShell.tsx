@@ -8,8 +8,6 @@ import { AppShell, Burger, Group, Loader, Center, Box } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
-import WelcomeModal from '@/components/ui/WelcomeModal';
-import { useWelcomeModal } from '@/hooks/useWelcomeModal';
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
@@ -21,7 +19,6 @@ export function DashboardShell({
   const { user, loading, backendAuthenticated, isAdmin } = useAuth();
   const router = useRouter();
   const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] = useDisclosure();
-  const { isOpen: isWelcomeOpen, openModal: openWelcome, closeModal: closeWelcome } = useWelcomeModal();
 
   // Usar hook de redirecionamento automático
   useAdminRedirect();
@@ -63,10 +60,7 @@ export function DashboardShell({
       <ResponsiveDashboard
         mobileOpened={mobileOpened}
         toggleMobile={toggleMobile}
-        openWelcome={openWelcome}
         closeMobile={closeMobile}
-        isWelcomeOpen={isWelcomeOpen}
-        closeWelcome={closeWelcome}
       >
         {children}
       </ResponsiveDashboard>
@@ -78,18 +72,12 @@ function ResponsiveDashboard({
   children,
   mobileOpened,
   toggleMobile,
-  openWelcome,
   closeMobile,
-  isWelcomeOpen,
-  closeWelcome,
 }: {
   children: React.ReactNode;
   mobileOpened: boolean;
   toggleMobile: () => void;
-  openWelcome: () => void;
   closeMobile: () => void;
-  isWelcomeOpen: boolean;
-  closeWelcome: () => void;
 }) {
   const getSidebarCollapsed = () => ({ mobile: !mobileOpened, desktop: false });
   const colors = useThemeColors();
@@ -108,7 +96,6 @@ function ResponsiveDashboard({
         <Header
           mobileOpened={mobileOpened}
           toggleMobile={toggleMobile}
-          onOpenWelcome={openWelcome}
         />
       </AppShell.Header>
 
@@ -155,11 +142,6 @@ function ResponsiveDashboard({
       <AppShell.Main style={{ background: colors.background, overflow: mobileOpened ? 'hidden' : undefined }}>
         {children}
       </AppShell.Main>
-
-      <WelcomeModal
-        opened={isWelcomeOpen}
-        onClose={closeWelcome}
-      />
     </AppShell>
   );
 }
