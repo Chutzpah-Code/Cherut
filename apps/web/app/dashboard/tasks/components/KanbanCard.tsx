@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Text, Group, Stack, Badge, Tooltip, ActionIcon } from '@mantine/core';
 import { Clock, Archive, Edit2, RefreshCw } from 'lucide-react';
 import { Task } from '@/lib/api/services/tasks';
@@ -15,6 +16,7 @@ interface KanbanCardProps {
 }
 
 export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComplete, onEdit }: KanbanCardProps) {
+  const t = useTranslations('tasks.kanbanCard');
   const [isHovered, setIsHovered] = useState(false);
   const [isTouchDevice] = useState(() => typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches);
   const colors = useThemeColors();
@@ -77,7 +79,7 @@ export const KanbanCard = memo(function KanbanCard({ task, onClick, onToggleComp
                 color: colors.text.secondary,
               }}
             >
-              Archived
+              {t('archived')}
             </Badge>
           </Group>
         )}

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Modal, Stack, TextInput, Textarea, Button, Group, Divider, Text, Box, ScrollArea, Badge, Grid } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { Habit, HabitLog } from '@/lib/api/services/habits';
@@ -83,6 +84,7 @@ export function HabitModal({
   onDayClick,
   isSaving,
 }: HabitModalProps) {
+  const t = useTranslations('habits.modal');
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [startDateValue, setStartDateValue] = React.useState<Date | null>(null);
@@ -109,7 +111,7 @@ export function HabitModal({
 
   const stats = calculateStats(logs);
   const categoryColor = habit.category === 'good' ? 'green' : 'red';
-  const categoryLabel = habit.category === 'good' ? 'Good Habit' : 'Bad Habit';
+  const categoryLabel = habit.category === 'good' ? t('goodHabit') : t('badHabit');
 
   // Calculate total days from start date to due date
   const getTotalDays = () => {
@@ -157,7 +159,7 @@ export function HabitModal({
                 color: '#000000',
               }}
             >
-              Edit Habit
+              {t('editHabit')}
             </Text>
             <Badge
               radius={40}
@@ -209,16 +211,16 @@ export function HabitModal({
         <Stack gap="md">
           {/* Form */}
           <TextInput
-            label="Title"
-            placeholder="Habit name"
+            label={t('titleLabel')}
+            placeholder={t('titlePlaceholder')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
           />
 
           <Textarea
-            label="Description"
-            placeholder="Describe your habit..."
+            label={t('description')}
+            placeholder={t('descriptionPlaceholder')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
@@ -227,9 +229,9 @@ export function HabitModal({
           <Grid grow>
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <DateInput
-                label="Start Date"
-                description="When did you start this habit?"
-                placeholder="Select start date"
+                label={t('startDate')}
+                description={t('startDateDesc')}
+                placeholder={t('startDatePlaceholder')}
                 value={startDateValue}
                 onChange={setStartDateValue}
                 clearable
@@ -237,9 +239,9 @@ export function HabitModal({
             </Grid.Col>
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <DateInput
-                label="Due Date"
-                description="Target completion date for this habit"
-                placeholder="Select end date"
+                label={t('dueDate')}
+                description={t('dueDateDesc')}
+                placeholder={t('dueDatePlaceholder')}
                 value={dueDateValue}
                 onChange={setDueDateValue}
                 minDate={startDateValue || new Date()}
@@ -248,14 +250,14 @@ export function HabitModal({
             </Grid.Col>
           </Grid>
 
-          <Divider label="Statistics" labelPosition="center" />
+          <Divider label={t('statistics')} labelPosition="center" />
 
           {/* Progress Bar */}
           {stats.currentStreak < totalDays && (
             <Box p="sm" style={{ backgroundColor: 'var(--mantine-color-blue-0)', borderRadius: 8 }}>
               <Group justify="space-between" mb="xs">
-                <Text size="sm" fw={600}>Habit Challenge Progress</Text>
-                <Text size="sm" fw={700} c="blue">{stats.currentStreak}/{totalDays} days</Text>
+                <Text size="sm" fw={600}>{t('challengeProgress')}</Text>
+                <Text size="sm" fw={700} c="blue">{t('daysProgress', { done: stats.currentStreak, total: totalDays })}</Text>
               </Group>
               <Box style={{ width: '100%', height: 8, backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: 4, overflow: 'hidden' }}>
                 <Box
@@ -268,7 +270,7 @@ export function HabitModal({
                 />
               </Box>
               <Text size="xs" c="dimmed" mt="xs">
-                {totalDays - stats.currentStreak} days until goal completion!
+                {t('daysUntilGoal', { count: totalDays - stats.currentStreak })}
               </Text>
             </Box>
           )}
@@ -278,8 +280,8 @@ export function HabitModal({
               <Group>
                 <Text size="lg">🎉</Text>
                 <Box style={{ flex: 1 }}>
-                  <Text size="sm" fw={600} c="green">Goal Completed!</Text>
-                  <Text size="xs" c="dimmed">You&apos;ve reached your target! Keep it up!</Text>
+                  <Text size="sm" fw={600} c="green">{t('goalCompleted')}</Text>
+                  <Text size="xs" c="dimmed">{t('goalCompletedMsg')}</Text>
                 </Box>
               </Group>
             </Box>
@@ -293,7 +295,7 @@ export function HabitModal({
                   {stats.currentStreak}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Current Streak
+                  {t('currentStreak')}
                 </Text>
               </Box>
             </Grid.Col>
@@ -303,7 +305,7 @@ export function HabitModal({
                   {stats.bestStreak}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Best Streak
+                  {t('bestStreak')}
                 </Text>
               </Box>
             </Grid.Col>
@@ -313,13 +315,13 @@ export function HabitModal({
                   {stats.completionRate}%
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Completion Rate
+                  {t('completionRate')}
                 </Text>
               </Box>
             </Grid.Col>
           </Grid>
 
-          <Divider label="Complete History" labelPosition="center" />
+          <Divider label={t('completeHistory')} labelPosition="center" />
 
           {/* Streak completa */}
           <ScrollArea h={200} type="auto">
@@ -338,7 +340,7 @@ export function HabitModal({
           </ScrollArea>
 
           <Text size="xs" c="dimmed" ta="center">
-            Click on the squares to mark/unmark days
+            {t('clickToToggle')}
           </Text>
         </Stack>
       </Box>
@@ -369,7 +371,7 @@ export function HabitModal({
                   },
                 }}
               >
-                {habit.isActive === false ? 'Restore Habit' : 'Archive Habit'}
+                {habit.isActive === false ? t('restoreHabit') : t('archiveHabit')}
               </Button>
             </Grid.Col>
             <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -396,7 +398,7 @@ export function HabitModal({
                   },
                 }}
               >
-                Delete Habit
+                {t('deleteHabit')}
               </Button>
             </Grid.Col>
           </Grid>
@@ -426,7 +428,7 @@ export function HabitModal({
                   },
                 }}
               >
-                Cancel
+                {t('cancel')}
               </Button>
             </Grid.Col>
             <Grid.Col span={{ base: 6, sm: 'content' }}>
@@ -455,7 +457,7 @@ export function HabitModal({
                   },
                 }}
               >
-                Save Changes
+                {t('saveChanges')}
               </Button>
             </Grid.Col>
           </Grid>

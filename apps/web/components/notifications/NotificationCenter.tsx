@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Popover,
   Stack,
@@ -80,21 +81,34 @@ const getNotificationColor = (type: Notification['type']) => {
   }
 };
 
-const formatTimeAgo = (dateString: string) => {
+const formatTimeAgo = (
+  dateString: string,
+  locale: string,
+  t: (key: string, values?: Record<string, string | number>) => string,
+) => {
   const date = new Date(dateString);
   const now = new Date();
   const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
 
-  if (diffInMinutes < 1) return 'Just now';
-  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+  if (diffInMinutes < 1) return t('justNow');
+  if (diffInMinutes < 60) return t('minutesAgo', { count: diffInMinutes });
 
   const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) return `${diffInHours}h ago`;
+  if (diffInHours < 24) return t('hoursAgo', { count: diffInHours });
 
   const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 7) return `${diffInDays}d ago`;
+  if (diffInDays < 7) return t('daysAgo', { count: diffInDays });
 
-  return date.toLocaleDateString('en-US');
+  return date.toLocaleDateString(locale);
+};
+
+const TYPE_LABEL_KEY: Record<Notification['type'], string> = {
+  task: 'typeTask',
+  habit: 'typeHabit',
+  objective: 'typeObjective',
+  journal: 'typeJournal',
+  achievement: 'typeAchievement',
+  system: 'typeSystem',
 };
 
 export function NotificationCenter({
@@ -107,6 +121,8 @@ export function NotificationCenter({
   onClearAll,
   onNotificationClick,
 }: NotificationCenterProps) {
+  const t = useTranslations('notificationCenter');
+  const locale = useLocale();
   const [opened, { open, close }] = useDisclosure(false);
   const targetRef = useRef<HTMLDivElement>(null);
 
@@ -143,7 +159,7 @@ export function NotificationCenter({
             <Group gap="xs">
               <Bell size={18} />
               <Text fw={600} size="sm">
-                Notifications
+                {t('title')}
               </Text>
               {unreadCount > 0 && (
                 <Badge size="xs" color="red" variant="filled">
@@ -158,7 +174,7 @@ export function NotificationCenter({
                   size="sm"
                   variant="subtle"
                   onClick={onMarkAllAsRead}
-                  title="Mark all as read"
+                  title={t('markAllRead')}
                 >
                   <CheckCircle2 size={14} />
                 </ActionIcon>
@@ -167,7 +183,7 @@ export function NotificationCenter({
                 size="sm"
                 variant="subtle"
                 onClick={onClearAll}
-                title="Clear all notifications"
+                title={t('clearAll')}
                 color="red"
               >
                 <Trash2 size={14} />
@@ -183,10 +199,10 @@ export function NotificationCenter({
               <Stack align="center" gap="xs">
                 <Bell size={32} style={{ opacity: 0.5 }} />
                 <Text size="sm" c="dimmed" ta="center">
-                  No notifications yet
+                  {t('empty')}
                 </Text>
                 <Text size="xs" c="dimmed" ta="center">
-                  You'll see your updates here
+                  {t('emptyHint')}
                 </Text>
               </Stack>
             </Center>
@@ -240,10 +256,10 @@ export function NotificationCenter({
                             variant="light"
                             color={getNotificationColor(notification.type)}
                           >
-                            {notification.type}
+                            {t(TYPE_LABEL_KEY[notification.type])}
                           </Badge>
                           <Text size="xs" c="dimmed">
-                            {formatTimeAgo(notification.createdAt)}
+                            {formatTimeAgo(notification.createdAt, locale, t)}
                           </Text>
                         </Group>
                       </Stack>
@@ -281,7 +297,7 @@ export function NotificationCenter({
                     window.location.href = '/dashboard/profile';
                   }}
                 >
-                  Notification Settings
+                  {t('settings')}
                 </Button>
               </Group>
             </>

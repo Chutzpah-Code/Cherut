@@ -1,10 +1,12 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Box, UnstyledButton } from '@mantine/core';
 
 const OPTIONS = [30, 60, 90] as const;
 
 export function HorizonSwitcher({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const t = useTranslations('finance.horizonSwitcher');
   return (
     <Box style={{ display: 'flex', gap: 2, background: '#F1F5F9', borderRadius: 8, padding: 3 }}>
       {OPTIONS.map((h) => {
@@ -23,7 +25,7 @@ export function HorizonSwitcher({ value, onChange }: { value: number; onChange: 
               boxShadow: active ? '0 1px 2px rgba(15,23,42,.08)' : 'none',
             }}
           >
-            {h} days
+            {t('days', { n: h })}
           </UnstyledButton>
         );
       })}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Modal,
   Text,
@@ -19,6 +20,7 @@ import { modals } from '@mantine/modals';
 import { JournalEntry } from '@/lib/api/services/journal';
 import { useUpdateJournalEntry, useDeleteJournalEntry, useToggleJournalArchive } from '@/hooks/useJournal';
 import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface EntryModalProps {
   entry: JournalEntry;
@@ -27,6 +29,9 @@ interface EntryModalProps {
 }
 
 export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
+  const t = useTranslations('journal.entryModal');
+  const locale = useLocale();
+  const dateFnsLocale = locale === 'pt-BR' ? ptBR : undefined;
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(entry.title || '');
   const [editContent, setEditContent] = useState(entry.content);
@@ -36,28 +41,34 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
   const deleteMutation = useDeleteJournalEntry();
   const archiveMutation = useToggleJournalArchive();
 
-  const formattedCreatedAt = format(new Date(entry.createdAt), 'MMMM dd, yyyy \'at\' HH:mm');
-  const formattedUpdatedAt = format(new Date(entry.updatedAt), 'MMMM dd, yyyy \'at\' HH:mm');
+  const formattedCreatedAt = t('created', {
+    date: format(new Date(entry.createdAt), 'MMMM dd, yyyy', { locale: dateFnsLocale }),
+    time: format(new Date(entry.createdAt), 'HH:mm'),
+  });
+  const formattedUpdatedAt = t('lastUpdated', {
+    date: format(new Date(entry.updatedAt), 'MMMM dd, yyyy', { locale: dateFnsLocale }),
+    time: format(new Date(entry.updatedAt), 'HH:mm'),
+  });
   const wasUpdated = new Date(entry.updatedAt) > new Date(entry.createdAt);
 
   const handleSaveEdit = async () => {
     if (!editTitle.trim()) {
-      setError('Title cannot be empty.');
+      setError(t('errorTitleRequired'));
       return;
     }
 
     if (!editContent.trim()) {
-      setError('Content cannot be empty.');
+      setError(t('errorContentRequired'));
       return;
     }
 
     if (editTitle.length > 200) {
-      setError('Title is too long. Maximum 200 characters allowed.');
+      setError(t('errorTitleTooLong'));
       return;
     }
 
     if (editContent.length > 20000) {
-      setError('Content is too long. Maximum 20,000 characters allowed.');
+      setError(t('errorContentTooLong'));
       return;
     }
 
@@ -73,7 +84,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
       setIsEditing(false);
       onClose();
     } catch (error) {
-      setError('Failed to update entry. Please try again.');
+      setError(t('errorUpdateFailed'));
       console.error('Error updating journal entry:', error);
     }
   };
@@ -87,13 +98,13 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
 
   const handleDelete = () => {
     modals.openConfirmModal({
-      title: 'Delete Journal Entry',
+      title: t('deleteTitle'),
       children: (
         <Text size="sm">
-          Are you sure you want to delete this journal entry? This action cannot be undone.
+          {t('deleteBody')}
         </Text>
       ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      labels: { confirm: t('confirm'), cancel: t('cancelBtn') },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
@@ -127,7 +138,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
       title={
         <Group justify="space-between" w="100%" wrap="wrap">
           <Text fw={600} size="lg" lineClamp={1} style={{ flex: 1 }}>
-            {entry.title || 'Untitled Entry'}
+            {entry.title || t('untitled')}
           </Text>
           {!isEditing && (
             <Group gap="xs">
@@ -172,15 +183,15 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
               <Group gap="xs" align="center">
                 <Calendar size={16} />
                 <Text size="sm" c="dimmed">
-                  Created {formattedCreatedAt}
+                  {formattedCreatedAt}
                 </Text>
                 {wasUpdated && (
                   <>
                     <Badge size="sm" color="blue" variant="light">
-                      Edited
+                      {t('edited')}
                     </Badge>
                     <Text size="sm" c="dimmed">
-                      Last updated {formattedUpdatedAt}
+                      {formattedUpdatedAt}
                     </Text>
                   </>
                 )}
@@ -193,14 +204,14 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
               )}
 
               <TextInput
-                label="Title"
+                label={t('titleLabel')}
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 disabled={updateMutation.isPending}
               />
 
               <Textarea
-                label="Content"
+                label={t('contentLabel')}
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
                 minRows={10}
@@ -217,7 +228,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
           }}>
             <Group justify="space-between">
               <Text size="xs" c={characterCountColor}>
-                {characterCount.toLocaleString('en-US')} / 20,000 characters
+                {t('charCount', { count: characterCount.toLocaleString(locale) })}
               </Text>
               <Group>
                 <Button
@@ -226,7 +237,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
                   onClick={handleCancelEdit}
                   disabled={updateMutation.isPending}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
                 <Button
                   leftSection={<Save size={16} />}
@@ -235,7 +246,7 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
                   disabled={!editTitle?.trim() || !editContent.trim() || isOverLimit}
                   color="blue"
                 >
-                  Save Changes
+                  {t('saveChanges')}
                 </Button>
               </Group>
             </Group>
@@ -249,15 +260,15 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
               <Group gap="xs" align="center">
                 <Calendar size={16} />
                 <Text size="sm" c="dimmed">
-                  Created {formattedCreatedAt}
+                  {formattedCreatedAt}
                 </Text>
                 {wasUpdated && (
                   <>
                     <Badge size="sm" color="blue" variant="light">
-                      Edited
+                      {t('edited')}
                     </Badge>
                     <Text size="sm" c="dimmed">
-                      Last updated {formattedUpdatedAt}
+                      {formattedUpdatedAt}
                     </Text>
                   </>
                 )}
@@ -275,10 +286,10 @@ export function EntryModal({ entry, opened, onClose }: EntryModalProps) {
           }}>
             <Group justify="space-between" align="center">
               <Text size="xs" c="dimmed">
-                {entry.content.length.toLocaleString('en-US')} characters
+                {t('charCountPlain', { count: entry.content.length.toLocaleString(locale) })}
               </Text>
               <Button variant="light" onClick={onClose}>
-                Close
+                {t('close')}
               </Button>
             </Group>
           </Box>

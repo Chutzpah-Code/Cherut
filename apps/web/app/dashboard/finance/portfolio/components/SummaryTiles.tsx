@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, SimpleGrid, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { useBills } from '@/hooks/useBills';
@@ -33,6 +34,8 @@ function Tile({ label, value, valueColor }: { label: string; value: string; valu
 }
 
 export function SummaryTiles() {
+  const t = useTranslations('finance.summaryTiles');
+  const locale = useLocale();
   const isMobile = useMediaQuery('(max-width: 767px)');
   const { displayCurrency } = useFinanceCurrency();
   const { data: items = [] } = useUpcomingBillsAndStatements(90);
@@ -50,14 +53,14 @@ export function SummaryTiles() {
 
   const tiles = (
     <>
-      <Tile label="Due in 7 days" value={fmtCurrency(due7.reduce((s, o) => s + o.amount, 0), displayCurrency)} />
+      <Tile label={t('dueIn7Days')} value={fmtCurrency(due7.reduce((s, o) => s + o.amount, 0), locale, displayCurrency)} />
       <Tile
-        label="Overdue"
-        value={fmtCurrency(overdue.reduce((s, o) => s + o.amount, 0), displayCurrency)}
+        label={t('overdue')}
+        value={fmtCurrency(overdue.reduce((s, o) => s + o.amount, 0), locale, displayCurrency)}
         valueColor={overdue.length > 0 ? '#B91C1C' : undefined}
       />
-      <Tile label="Committed / mo" value={fmtCurrency(committed, displayCurrency)} />
-      <Tile label="Net worth" value={fmtCurrency(netWorth?.netWorth ?? 0, displayCurrency)} />
+      <Tile label={t('committedPerMonth')} value={fmtCurrency(committed, locale, displayCurrency)} />
+      <Tile label={t('netWorth')} value={fmtCurrency(netWorth?.netWorth ?? 0, locale, displayCurrency)} />
     </>
   );
 

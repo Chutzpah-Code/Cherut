@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { PageShell } from '@/components/shell/Shell';
 
 const BG      = '#07070D';
@@ -11,30 +12,35 @@ const ACCENT  = 'oklch(0.68 0.24 260)';
 const ACCENT_DIM = 'rgba(80,110,255,0.12)';
 const RULE    = 'rgba(255,255,255,0.08)';
 
-const entries = [
-  { version: 'v1.0', date: 'May 2026',      title: 'General Availability',    tag: 'Major',       items: ['Cherut is now publicly available — free tier, Pro and Lifetime plans live.', 'All core modules production-ready: Habits, Tasks, OKRs, Journal, Vision Board, Values, Life Areas.', 'Mobile web fully optimised; iOS and Android beta open to all paid plans.'] },
-  { version: 'v0.9', date: 'April 2026',     title: 'Finances module beta',    tag: 'Feature',     items: ['Budget tracking with categories and monthly targets.', 'Net worth snapshot with manual asset and liability entries.', 'Financial goals connected to your OKRs.'] },
-  { version: 'v0.8', date: 'March 2026',     title: 'Vision Board & Values',   tag: 'Feature',     items: ['Visual canvas to pin images, quotes and goals.', 'Values module: define your compass and surface misalignment in daily reviews.', 'Tasks and habits can now be linked to a specific value or dream.'] },
-  { version: 'v0.7', date: 'February 2026',  title: 'Google Calendar sync',    tag: 'Integration', items: ['Two-way sync with Google Calendar — tasks appear as events.', 'Calendar view inside Cherut shows your schedule alongside habit slots.', 'Conflict detection for scheduled tasks and time blocks.'] },
-  { version: 'v0.6', date: 'January 2026',   title: 'Journal',                 tag: 'Feature',     items: ['Structured daily journal with morning intention and evening reflection prompts.', 'Free-form notes with full-text search across all entries.', 'Gratitude log with weekly digest.'] },
-  { version: 'v0.5', date: 'December 2025',  title: 'OKR framework',           tag: 'Feature',     items: ['Set quarterly Objectives with up to 5 Key Results each.', 'Weekly check-in flow with confidence score and notes.', 'Progress visualisation with a compact timeline view.'] },
-  { version: 'v0.4', date: 'November 2025',  title: 'Life Areas & Dashboard',  tag: 'Improvement', items: ['Life Areas let you segment habits, tasks and goals into meaningful domains.', 'New Dashboard with stats, recent activity and quick-add shortcuts.', 'Consistent design language across all pages.'] },
-  { version: 'v0.3', date: 'October 2025',   title: 'Kanban boards',           tag: 'Feature',     items: ['Tasks now support multiple boards with customisable columns.', 'Drag-and-drop between columns and boards.', 'Board-level filters by assignee, label and due date.'] },
-  { version: 'v0.2', date: 'September 2025', title: 'Habits v2',               tag: 'Improvement', items: ['Habit streaks with intention-setting and daily reflection.', 'Flexible frequencies: daily, weekdays, custom days.', 'Archive and restore habits without losing history.'] },
-  { version: 'v0.1', date: 'August 2025',    title: 'First private beta',      tag: 'Launch',      items: ['Core habit tracking and basic task list — the first working prototype.', 'User accounts with email/password auth.', 'Feedback loop with the first 50 beta testers.'] },
+type TagKey = 'major' | 'feature' | 'integration' | 'improvement' | 'launch';
+
+const entryMeta: { version: string; tagKey: TagKey }[] = [
+  { version: 'v1.0', tagKey: 'major' },
+  { version: 'v0.9', tagKey: 'feature' },
+  { version: 'v0.8', tagKey: 'feature' },
+  { version: 'v0.7', tagKey: 'integration' },
+  { version: 'v0.6', tagKey: 'feature' },
+  { version: 'v0.5', tagKey: 'feature' },
+  { version: 'v0.4', tagKey: 'improvement' },
+  { version: 'v0.3', tagKey: 'feature' },
+  { version: 'v0.2', tagKey: 'improvement' },
+  { version: 'v0.1', tagKey: 'launch' },
 ];
 
-const tagColors: Record<string, { bg: string; color: string }> = {
-  Major:       { bg: TEXT,         color: BG },
-  Feature:     { bg: ACCENT_DIM,   color: ACCENT },
-  Integration: { bg: 'rgba(80,110,255,0.18)', color: ACCENT },
-  Improvement: { bg: SURF2,        color: MUTED },
-  Launch:      { bg: 'rgba(22,163,74,0.15)', color: '#4ade80' },
+const tagColors: Record<TagKey, { bg: string; color: string }> = {
+  major:       { bg: TEXT,         color: BG },
+  feature:     { bg: ACCENT_DIM,   color: ACCENT },
+  integration: { bg: 'rgba(80,110,255,0.18)', color: ACCENT },
+  improvement: { bg: SURF2,        color: MUTED },
+  launch:      { bg: 'rgba(22,163,74,0.15)', color: '#4ade80' },
 };
 
 export default function ChangelogPage() {
+  const t = useTranslations('changelogPage');
+  const entries = t.raw('entries') as { date: string; title: string; items: string[] }[];
+
   return (
-    <PageShell kicker="Changelog" title="What's new in Cherut" lead="All the improvements, week by week.">
+    <PageShell kicker={t('hero.kicker')} title={t('hero.title')} lead={t('hero.lead')}>
       <style>{`
         .cl-wrap { max-width: 760px; margin: 0 auto; padding: 48px 20px 80px; }
         .cl-entry { display: grid; grid-template-columns: 1fr; }
@@ -68,20 +74,22 @@ export default function ChangelogPage() {
       <div style={{ background: BG }}>
         <div className="cl-wrap">
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {entries.map((entry) => {
-              const tagStyle = tagColors[entry.tag] ?? tagColors.Improvement;
+            {entries.map((entry, i) => {
+              const meta = entryMeta[i];
+              const tagStyle = tagColors[meta.tagKey];
+              const tagLabel = t(`tags.${meta.tagKey}`);
               return (
-                <div key={entry.version} className="cl-entry">
+                <div key={meta.version} className="cl-entry">
                   <div className="cl-left">
-                    <span className="cl-left-version">{entry.version}</span>
+                    <span className="cl-left-version">{meta.version}</span>
                     <span className="cl-left-date">{entry.date}</span>
                   </div>
                   <div className="cl-right">
                     <div className="cl-dot" />
                     <div className="cl-meta">
-                      <span className="cl-version">{entry.version}</span>
+                      <span className="cl-version">{meta.version}</span>
                       <span className="cl-date">{entry.date}</span>
-                      <span className="cl-tag" style={{ background: tagStyle.bg, color: tagStyle.color }}>{entry.tag}</span>
+                      <span className="cl-tag" style={{ background: tagStyle.bg, color: tagStyle.color }}>{tagLabel}</span>
                     </div>
                     <div className="cl-title">{entry.title}</div>
                     <div className="cl-items">

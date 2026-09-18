@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, Stack, Text, Menu, ActionIcon, UnstyledButton } from '@mantine/core';
 import { MoreHorizontal } from 'lucide-react';
 import { useDeleteOccurrence, useSkipOccurrence } from '@/hooks/useBills';
@@ -19,12 +20,15 @@ const ROW_GRID = '52px minmax(0,1fr) 116px 114px 88px 40px';
 const VISIBLE_CAP = 6;
 
 export function UpcomingBills({ horizon }: { horizon: number }) {
+  const t = useTranslations('finance.upcomingBills');
+  const tc = useTranslations('finance.common');
+  const locale = useLocale();
   const { data: rawItems = [], isLoading } = useUpcomingBillsAndStatements(horizon);
   const { data: categories = [] } = useFinanceCategories();
   const deleteOccurrence = useDeleteOccurrence();
   const skipOccurrence = useSkipOccurrence();
   const { openCreate, openEdit } = useAddPanel();
-  const undoableDeleteOccurrence = useUndoableDelete((id: string) => deleteOccurrence.mutate(id), { label: 'Occurrence' });
+  const undoableDeleteOccurrence = useUndoableDelete((id: string) => deleteOccurrence.mutate(id), { label: tc('occurrence') });
 
   const [payTarget, setPayTarget] = useState<FinanceBillOccurrence | null>(null);
   const [payCardAccountId, setPayCardAccountId] = useState<string | null>(null);
@@ -48,26 +52,25 @@ export function UpcomingBills({ horizon }: { horizon: number }) {
   return (
     <Box>
       <Group justify="space-between" align="baseline" mb={4}>
-        <Text style={{ fontSize: 15, fontWeight: 700 }}>Upcoming bills</Text>
+        <Text style={{ fontSize: 15, fontWeight: 700 }}>{t('title')}</Text>
       </Group>
       <Text style={{ fontSize: 12.5, color: '#64748B', marginBottom: 14 }}>
-        Next {horizon} days · one row per occurrence — includes credit card statements · mark as paid inline
+        {t('subtitle', { horizon })}
       </Text>
 
       {isLoading ? (
         <RowsSkeleton rows={4} height={40} />
       ) : list.length === 0 ? (
         <Box style={{ border: '1px dashed #E2E5EB', borderRadius: 8, padding: 32, textAlign: 'center' }}>
-          <Text style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>No bills due in the next {horizon} days</Text>
+          <Text style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>{t('noBillsInNext', { horizon })}</Text>
           <Text style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>
-            Create a recurring rule once — rent, internet, subscriptions — and every occurrence shows up
-            here and in the projection.
+            {t('createRuleHint')}
           </Text>
           <UnstyledButton
             onClick={() => openCreate('bill')}
             style={{ display: 'inline-block', fontSize: 13.5, fontWeight: 600, color: '#FFFFFF', background: '#0052CC', borderRadius: 6, padding: '9px 16px', cursor: 'pointer' }}
           >
-            Add a bill rule
+            {t('addBillRule')}
           </UnstyledButton>
         </Box>
       ) : (
@@ -86,30 +89,30 @@ export function UpcomingBills({ horizon }: { horizon: number }) {
                   }}
                 >
                   <Text style={{ fontSize: 12, fontWeight: 700, color: overdue ? '#B91C1C' : dueToday ? '#1D4ED8' : '#64748B' }}>
-                    {fmtShortDate(occ.dueDate)}
+                    {fmtShortDate(occ.dueDate, locale)}
                   </Text>
                   <Text style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {occ.bill?.name ?? '—'}
                   </Text>
                   <Text style={{ fontSize: 12.5, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {occ.isStatement ? 'Credit card' : occ.bill ? categoryMap[occ.bill.categoryId ?? ''] ?? '' : ''}
+                    {occ.isStatement ? t('creditCard') : occ.bill ? categoryMap[occ.bill.categoryId ?? ''] ?? '' : ''}
                   </Text>
                   <Text style={{ fontSize: 14, fontWeight: 600, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
-                    {fmtCurrency(occ.amount)}
+                    {fmtCurrency(occ.amount, locale)}
                   </Text>
                   {overdue ? (
-                    <Text style={{ fontSize: 12, fontWeight: 700, color: '#B91C1C', textAlign: 'right' }}>OVERDUE</Text>
+                    <Text style={{ fontSize: 12, fontWeight: 700, color: '#B91C1C', textAlign: 'right' }}>{t('overdueBadge')}</Text>
                   ) : (
                     <UnstyledButton
                       onClick={() => handleMarkPaid(occ)}
                       style={{ fontSize: 12.5, fontWeight: 600, color: '#1D4ED8', textAlign: 'right', cursor: 'pointer' }}
                     >
-                      Mark paid
+                      {t('markPaid')}
                     </UnstyledButton>
                   )}
                   {occ.isStatement ? (
                     <Group gap={6} justify="flex-end">
-                      <ActionIcon size="sm" variant="subtle" color="gray" onClick={() => handleMarkPaid(occ)} aria-label="Pay statement">
+                      <ActionIcon size="sm" variant="subtle" color="gray" onClick={() => handleMarkPaid(occ)} aria-label={t('payStatementAria')}>
                         <MoreHorizontal size={15} />
                       </ActionIcon>
                     </Group>
@@ -119,11 +122,11 @@ export function UpcomingBills({ horizon }: { horizon: number }) {
                         <ActionIcon size="sm" variant="subtle" color="gray"><MoreHorizontal size={15} /></ActionIcon>
                       </Menu.Target>
                       <Menu.Dropdown>
-                        <Menu.Item onClick={() => handleMarkPaid(occ)}>Mark paid</Menu.Item>
-                        <Menu.Item onClick={() => setEditTarget(occ as unknown as FinanceBillOccurrence)}>Edit this occurrence</Menu.Item>
-                        <Menu.Item onClick={() => occ.bill && openEdit('bill', occ.bill)}>Edit rule</Menu.Item>
-                        <Menu.Item onClick={() => skipOccurrence.mutate(occ.id)}>Skip this occurrence</Menu.Item>
-                        <Menu.Item color="red" onClick={() => undoableDeleteOccurrence.remove(occ.id)}>Delete occurrence</Menu.Item>
+                        <Menu.Item onClick={() => handleMarkPaid(occ)}>{t('markPaid')}</Menu.Item>
+                        <Menu.Item onClick={() => setEditTarget(occ as unknown as FinanceBillOccurrence)}>{t('editThisOccurrence')}</Menu.Item>
+                        <Menu.Item onClick={() => occ.bill && openEdit('bill', occ.bill)}>{t('editRule')}</Menu.Item>
+                        <Menu.Item onClick={() => skipOccurrence.mutate(occ.id)}>{t('skipThisOccurrence')}</Menu.Item>
+                        <Menu.Item color="red" onClick={() => undoableDeleteOccurrence.remove(occ.id)}>{t('deleteOccurrence')}</Menu.Item>
                       </Menu.Dropdown>
                     </Menu>
                   )}
@@ -134,11 +137,11 @@ export function UpcomingBills({ horizon }: { horizon: number }) {
 
           <Group justify="space-between" pt="sm" mt="xs" style={{ borderTop: '1px solid #EFF1F5' }}>
             <Text style={{ fontSize: 12.5, color: '#64748B' }}>
-              {list.length} occurrence{list.length === 1 ? '' : 's'} · {fmtCurrency(total)} total
+              {t('occurrencesTotal', { count: list.length, total: fmtCurrency(total, locale) })}
             </Text>
             {list.length > VISIBLE_CAP && (
               <UnstyledButton onClick={() => setExpanded((v) => !v)} style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', cursor: 'pointer' }}>
-                {expanded ? 'Show less' : 'See all'}
+                {expanded ? t('showLess') : t('seeAll')}
               </UnstyledButton>
             )}
           </Group>

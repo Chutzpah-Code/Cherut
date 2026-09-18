@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Title,
   Text,
@@ -29,6 +30,7 @@ import {
 } from '@/hooks/useBoards';
 
 export default function TasksPage() {
+  const t = useTranslations('tasks.boardList');
   const [search, setSearch] = useState('');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newBoardName, setNewBoardName] = useState('');
@@ -97,10 +99,10 @@ export default function TasksPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            Tasks
+            {t('title')}
           </Title>
           <Text size="md" c="dimmed">
-            Organize your work across multiple boards
+            {t('subtitle')}
           </Text>
         </Box>
 
@@ -110,7 +112,7 @@ export default function TasksPage() {
           style={{ flexWrap: isMobile ? 'wrap' : 'nowrap', gap: 10 }}
         >
           <TextInput
-            placeholder="Search boards..."
+            placeholder={t('searchPlaceholder')}
             leftSection={<Search size={16} />}
             value={search}
             onChange={(e) => setSearch(e.currentTarget.value)}
@@ -124,7 +126,7 @@ export default function TasksPage() {
             fullWidth={isMobile}
             style={{ backgroundColor: '#4686FE', fontFamily: 'Inter, sans-serif' }}
           >
-            New board
+            {t('newBoard')}
           </Button>
         </Group>
 
@@ -164,7 +166,7 @@ export default function TasksPage() {
                 <Plus size={20} />
               </ActionIcon>
               <Text size="sm" fw={500} c="dimmed">
-                Create new board
+                {t('createNewBoard')}
               </Text>
             </Card>
           </SimpleGrid>
@@ -172,7 +174,7 @@ export default function TasksPage() {
 
         {!isLoading && filtered.length === 0 && (boards?.length ?? 0) > 0 && (
           <Text ta="center" c="dimmed" py="xl">
-            No boards found for &quot;{search}&quot;
+            {t('noResults', { search })}
           </Text>
         )}
       </Stack>
@@ -186,7 +188,7 @@ export default function TasksPage() {
         }}
         title={
           <Text fw={600} style={{ fontFamily: 'Inter Display, sans-serif' }}>
-            Create new board
+            {t('createNewBoard')}
           </Text>
         }
         radius="lg"
@@ -194,8 +196,8 @@ export default function TasksPage() {
       >
         <Stack>
           <TextInput
-            label="Board name"
-            placeholder="e.g. Work, Personal, Q2 Goals..."
+            label={t('boardNameLabel')}
+            placeholder={t('boardNamePlaceholder')}
             value={newBoardName}
             onChange={(e) => setNewBoardName(e.currentTarget.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
@@ -211,7 +213,7 @@ export default function TasksPage() {
                 setNewBoardName('');
               }}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               onClick={handleCreate}
@@ -219,7 +221,7 @@ export default function TasksPage() {
               disabled={!newBoardName.trim()}
               style={{ backgroundColor: '#4686FE' }}
             >
-              Create board
+              {t('createBoard')}
             </Button>
           </Group>
         </Stack>

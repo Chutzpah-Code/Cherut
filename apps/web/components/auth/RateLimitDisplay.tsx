@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Alert, Progress, Text, Group, Stack } from '@mantine/core';
 import { AlertTriangle, Clock, Shield } from 'lucide-react';
 import { RateLimitResult } from '@/lib/services/rateLimiter';
@@ -19,6 +20,7 @@ export function RateLimitDisplay({
   showProgress = true,
   compact = false,
 }: RateLimitDisplayProps) {
+  const t = useTranslations('rateLimitDisplay');
   // Use the timer from result directly (managed by useRateLimit hook)
   const timeRemaining = result.lockoutTimeRemaining;
 
@@ -66,12 +68,12 @@ export function RateLimitDisplay({
 
   const getTitle = (): string => {
     if (timeRemaining > 0) {
-      return 'Account Temporarily Locked';
+      return t('titleLocked');
     }
     if (result.attemptsRemaining <= 2) {
-      return 'Warning: Limited Attempts Remaining';
+      return t('titleWarning');
     }
-    return 'Security Notice';
+    return t('titleNotice');
   };
 
   const getProgressValue = (): number => {
@@ -99,19 +101,19 @@ export function RateLimitDisplay({
 
     if (timeRemaining > 0) {
       const nextLockoutWarning = result.lockoutLevel >= 2
-        ? ' Repeated failures will extend lockout time.'
-        : ' Next failure will result in a longer lockout.';
+        ? t('repeatedFailuresWarning')
+        : t('longerLockoutWarning');
 
-      return `Please wait ${formatTime(timeRemaining)} before trying again.${nextLockoutWarning}`;
+      return `${t('waitBeforeRetry', { time: formatTime(timeRemaining) })}${nextLockoutWarning}`;
     }
 
     if (result.attemptsRemaining <= 2 && result.attemptsRemaining > 0) {
-      const lockoutDuration = result.lockoutLevel === 0 ? '2 minutes' : '10 minutes';
-      return `${result.attemptsRemaining} attempt${result.attemptsRemaining > 1 ? 's' : ''} remaining before ${lockoutDuration} lockout.`;
+      const lockoutDuration = t('durationMinutes', { count: result.lockoutLevel === 0 ? 2 : 10 });
+      return t('attemptsRemainingBeforeLockout', { count: result.attemptsRemaining, duration: lockoutDuration });
     }
 
     if (result.totalAttempts > 0) {
-      return 'Too many failed attempts detected. Please try again carefully.';
+      return t('tooManyDetected');
     }
 
     return '';
@@ -123,7 +125,7 @@ export function RateLimitDisplay({
         {timeRemaining > 0 ? (
           <Group gap="xs" justify="center">
             <Clock size={14} />
-            <span>Locked for {formatTime(timeRemaining)}</span>
+            <span>{t('lockedForCompact', { time: formatTime(timeRemaining) })}</span>
           </Group>
         ) : (
           getDisplayMessage()
@@ -176,7 +178,7 @@ export function RateLimitDisplay({
               (result.totalAttempts > 0 || result.attemptsRemaining < 5) && (
                 <Group gap="sm" align="center">
                   <Text size="xs" c="dimmed" style={{ minWidth: '80px' }}>
-                    Attempts left:
+                    {t('attemptsLeftLabel')}
                   </Text>
                   <Progress
                     value={getProgressValue()}
@@ -196,7 +198,7 @@ export function RateLimitDisplay({
 
         {timeRemaining > 0 && (
           <Text size="xs" c="dimmed" ta="center">
-            This page will refresh automatically when the lockout expires.
+            {t('autoRefreshNotice')}
           </Text>
         )}
       </Stack>

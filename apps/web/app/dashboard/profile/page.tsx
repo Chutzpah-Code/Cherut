@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { notifications } from '@mantine/notifications';
 import { Save, Lock, Shield, Camera } from 'lucide-react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import {
@@ -35,6 +38,9 @@ import { getPasswordErrorMessage } from '@/lib/utils/auth-errors';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
 import { Surface } from '@/components/ui/Surface';
+import { locales, localeLabels, isLocale } from '@/i18n/locales';
+import { setLocaleCookie } from '@/i18n/client';
+import { getApiErrorCode } from '@/lib/utils/apiError';
 
 // ── Shared style constants ─────────────────────────────────────────────────────
 
@@ -63,6 +69,11 @@ export default function ProfilePage() {
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile();
   const updateMutation = useUpdateProfile();
+  const router = useRouter();
+  const t = useTranslations('profile.preferences');
+  const tp = useTranslations('profile.page');
+  const tErrors = useTranslations('errors');
+  const tAuthErrors = useTranslations('authErrors');
   const uploadAvatarMutation = useUploadAvatar();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [avatarHovered, setAvatarHovered] = useState(false);
@@ -135,11 +146,11 @@ export default function ProfilePage() {
       return;
     }
     if (passwordData.newPassword.length < 6) {
-      setPasswordError('Password must be at least 6 characters long');
+      setPasswordError(tp('passwordTooShort'));
       return;
     }
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError('New passwords do not match');
+      setPasswordError(tp('passwordMismatch'));
       return;
     }
 
@@ -155,7 +166,7 @@ export default function ProfilePage() {
       }, 2000);
     } catch (error: any) {
       passwordChangeRateLimit.recordFailure();
-      setPasswordError(getPasswordErrorMessage(error));
+      setPasswordError(getPasswordErrorMessage(error, tAuthErrors));
     } finally {
       setPasswordLoading(false);
     }
@@ -284,14 +295,14 @@ export default function ProfilePage() {
             marginBottom: 4,
           }}
         >
-          {formData.displayName || 'Your Name'}
+          {formData.displayName || tp('nameFallback')}
         </Text>
 
         <Text style={{ fontSize: 14, color: '#64748B' }}>{user?.email}</Text>
 
         {profile && !profile.displayName && (
           <Badge variant="light" color="blue" size="sm" mt={12} style={{ cursor: 'default' }}>
-            Add your name below
+            {tp('addNameBadge')}
           </Badge>
         )}
       </Box>
@@ -309,19 +320,19 @@ export default function ProfilePage() {
               shadow="none"
               style={{ border: '1px solid #E2E8F0', borderLeft: '3px solid #4686FE' }}
             >
-              <div style={SECTION_LABEL}>Personal Information</div>
+              <div style={SECTION_LABEL}>{tp('personalInformation')}</div>
               <Stack gap="md">
                 <TextInput
-                  label="Display Name"
-                  placeholder="Your full name"
+                  label={tp('displayName')}
+                  placeholder={tp('displayNamePlaceholder')}
                   value={formData.displayName}
                   onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                   radius={8}
                   styles={INPUT_STYLES}
                 />
                 <Textarea
-                  label="Bio"
-                  placeholder="Tell us about yourself..."
+                  label={tp('bio')}
+                  placeholder={tp('bioPlaceholder')}
                   value={formData.bio}
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                   rows={3}
@@ -339,12 +350,12 @@ export default function ProfilePage() {
               shadow="none"
               style={{ border: '1px solid #E2E8F0' }}
             >
-              <div style={SECTION_LABEL}>Regional Settings</div>
+              <div style={SECTION_LABEL}>{tp('regionalSettings')}</div>
               <Grid gutter="md">
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <Select
-                    label="Timezone"
-                    placeholder="Select timezone"
+                    label={t('timezone')}
+                    placeholder={tp('timezonePlaceholder')}
                     value={formData.timezone || null}
                     onChange={(value) => setFormData({ ...formData, timezone: value || '' })}
                     radius={8}
@@ -365,12 +376,30 @@ export default function ProfilePage() {
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <Select
-                    label="Language"
+                    label={t('language')}
                     value={formData.language}
-                    onChange={(value) => setFormData({ ...formData, language: value || 'en' })}
+                    onChange={(value) => {
+                      if (!value || !isLocale(value)) return;
+                      setFormData({ ...formData, language: value });
+                      setLocaleCookie(value);
+                      updateMutation.mutate(
+                        { language: value },
+                        {
+                          onSuccess: () => router.refresh(),
+                          onError: (error) => {
+                            const code = getApiErrorCode(error);
+                            const message =
+                              code === 'AUTH_UNAUTHORIZED' || code === 'VALIDATION_FAILED'
+                                ? tErrors(code)
+                                : tErrors('generic');
+                            notifications.show({ title: tp('error'), message, color: 'red' });
+                          },
+                        }
+                      );
+                    }}
                     radius={8}
                     styles={INPUT_STYLES}
-                    data={[{ value: 'en', label: 'English' }]}
+                    data={locales.map((l) => ({ value: l, label: localeLabels[l] }))}
                   />
                 </Grid.Col>
               </Grid>
@@ -384,25 +413,25 @@ export default function ProfilePage() {
               shadow="none"
               style={{ border: '1px solid #E2E8F0' }}
             >
-              <div style={SECTION_LABEL}>Preferences</div>
+              <div style={SECTION_LABEL}>{tp('preferencesTitle')}</div>
               <Stack gap="md">
-                <Tooltip label="Dark mode coming soon" position="top-start" withArrow>
+                <Tooltip label={tp('darkModeSoon')} position="top-start" withArrow>
                   <Select
-                    label="Theme"
+                    label={tp('theme')}
                     value={formData.preferences?.theme}
                     onChange={(value) => handleThemeChange(value as 'light' | 'dark')}
                     radius={8}
                     styles={INPUT_STYLES}
                     disabled
                     data={[
-                      { value: 'light', label: 'Light' },
-                      { value: 'dark', label: 'Dark' },
+                      { value: 'light', label: tp('themeLight') },
+                      { value: 'dark', label: tp('themeDark') },
                     ]}
                   />
                 </Tooltip>
 
                 <Select
-                  label="Week Starts On"
+                  label={tp('weekStartsOn')}
                   value={String(formData.preferences?.weekStartsOn ?? 0)}
                   onChange={(value) =>
                     setFormData({
@@ -416,14 +445,14 @@ export default function ProfilePage() {
                   radius={8}
                   styles={INPUT_STYLES}
                   data={[
-                    { value: '0', label: 'Sunday' },
-                    { value: '1', label: 'Monday' },
+                    { value: '0', label: tp('sunday') },
+                    { value: '1', label: tp('monday') },
                   ]}
                 />
 
                 <Select
-                  label="Currency"
-                  description="Used across Finance for balances, totals and projections"
+                  label={t('currency')}
+                  description={tp('currencyDesc')}
                   value={formData.preferences?.currency ?? 'USD'}
                   onChange={(value) =>
                     setFormData({
@@ -448,8 +477,8 @@ export default function ProfilePage() {
 
                 <Group justify="space-between" align="center" py={4}>
                   <Box>
-                    <Text size="sm" fw={500} c="#333333">Notifications</Text>
-                    <Text size="xs" c="dimmed">Enable or disable all notifications</Text>
+                    <Text size="sm" fw={500} c="#333333">{tp('notificationsLabel')}</Text>
+                    <Text size="xs" c="dimmed">{tp('notificationsDesc')}</Text>
                   </Box>
                   <Switch
                     checked={formData.preferences?.notifications === true}
@@ -482,12 +511,12 @@ export default function ProfilePage() {
                       fontWeight: 600,
                     }}
                   >
-                    {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+                    {updateMutation.isPending ? tp('saving') : tp('saveChanges')}
                   </Button>
 
                   {updateMutation.isSuccess && (
                     <Text size="sm" fw={500} style={{ color: '#16A34A' }}>
-                      Saved
+                      {tp('saved')}
                     </Text>
                   )}
                 </Group>
@@ -505,9 +534,9 @@ export default function ProfilePage() {
           shadow="none"
           style={{ border: '1px solid #E2E8F0' }}
         >
-          <div style={SECTION_LABEL}>Security</div>
+          <div style={SECTION_LABEL}>{tp('security')}</div>
           <Text size="sm" c="dimmed" mb="md">
-            Keep your account secure by updating your password regularly.
+            {tp('securityDesc')}
           </Text>
           <Button
             variant="outline"
@@ -522,7 +551,7 @@ export default function ProfilePage() {
               fontWeight: 500,
             }}
           >
-            Change Password
+            {tp('changePassword')}
           </Button>
         </Card>
       </Stack>
@@ -534,7 +563,7 @@ export default function ProfilePage() {
         title={
           <Group gap="xs">
             <Shield size={20} />
-            <Text fw={600} size="lg">Change Password</Text>
+            <Text fw={600} size="lg">{tp('changePassword')}</Text>
           </Group>
         }
         centered
@@ -547,11 +576,11 @@ export default function ProfilePage() {
         {passwordSuccess ? (
           <Alert
             icon={<CheckCircle size={20} />}
-            title="Password Changed Successfully!"
+            title={tp('passwordChangedTitle')}
             color="green"
             radius="md"
           >
-            Your password has been updated successfully.
+            {tp('passwordChangedBody')}
           </Alert>
         ) : (
           <form onSubmit={handlePasswordChange}>
@@ -563,18 +592,18 @@ export default function ProfilePage() {
               />
 
               {passwordError && (
-                <Alert icon={<AlertCircle size={20} />} title="Error" color="red" radius="md">
+                <Alert icon={<AlertCircle size={20} />} title={tp('error')} color="red" radius="md">
                   {passwordError}
                 </Alert>
               )}
 
               <Text size="sm" c="dimmed">
-                Enter your current password and choose a new one to secure your account.
+                {tp('enterPasswordsHint')}
               </Text>
 
               <PasswordInput
-                label="Current Password"
-                placeholder="Enter your current password"
+                label={tp('currentPassword')}
+                placeholder={tp('currentPasswordPlaceholder')}
                 value={passwordData.currentPassword}
                 onChange={(e) =>
                   setPasswordData({ ...passwordData, currentPassword: e.target.value })
@@ -586,21 +615,21 @@ export default function ProfilePage() {
               />
 
               <PasswordInput
-                label="New Password"
-                placeholder="Enter new password"
+                label={tp('newPassword')}
+                placeholder={tp('newPasswordPlaceholder')}
                 value={passwordData.newPassword}
                 onChange={(e) =>
                   setPasswordData({ ...passwordData, newPassword: e.target.value })
                 }
                 required
-                description="Must be at least 6 characters long"
+                description={tp('newPasswordDesc')}
                 radius={8}
                 styles={INPUT_STYLES}
               />
 
               <PasswordInput
-                label="Confirm New Password"
-                placeholder="Confirm new password"
+                label={tp('confirmNewPassword')}
+                placeholder={tp('confirmNewPasswordPlaceholder')}
                 value={passwordData.confirmPassword}
                 onChange={(e) =>
                   setPasswordData({ ...passwordData, confirmPassword: e.target.value })
@@ -624,7 +653,7 @@ export default function ProfilePage() {
                     minWidth: 110,
                   }}
                 >
-                  Cancel
+                  {tp('cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -639,7 +668,7 @@ export default function ProfilePage() {
                     minWidth: 110,
                   }}
                 >
-                  {passwordLoading ? 'Changing...' : 'Change Password'}
+                  {passwordLoading ? tp('changingPassword') : tp('changePassword')}
                 </Button>
               </Group>
             </Stack>

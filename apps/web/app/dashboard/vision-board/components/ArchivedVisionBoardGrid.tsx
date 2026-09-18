@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { SimpleGrid, Card, Text, Badge, Group, ActionIcon, Stack, Menu, Tooltip, Image } from '@mantine/core';
 import { MoreVertical, ArchiveRestore, Trash2, Eye } from 'lucide-react';
 import { VisionBoardItem } from '@/lib/api/services/vision-board';
@@ -13,6 +14,8 @@ interface ArchivedVisionBoardGridProps {
 }
 
 export function ArchivedVisionBoardGrid({ items, onUnarchive, onDelete, onView }: ArchivedVisionBoardGridProps) {
+  const t = useTranslations('visionBoard.archivedGrid');
+  const td = useTranslations('visionBoard.dueDateBadge');
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   const getDueDateBadge = (dueDate?: string) => {
@@ -24,15 +27,15 @@ export function ArchivedVisionBoardGrid({ items, onUnarchive, onDelete, onView }
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) {
-      return <Badge color="red" variant="filled" size="sm">Overdue</Badge>;
+      return <Badge color="red" variant="filled" size="sm">{td('overdue')}</Badge>;
     } else if (diffDays === 0) {
-      return <Badge color="orange" variant="filled" size="sm">Today</Badge>;
+      return <Badge color="orange" variant="filled" size="sm">{td('today')}</Badge>;
     } else if (diffDays <= 7) {
-      return <Badge color="yellow" variant="filled" size="sm">{diffDays} days left</Badge>;
+      return <Badge color="yellow" variant="filled" size="sm">{td('daysLeft', { count: diffDays })}</Badge>;
     } else if (diffDays <= 30) {
-      return <Badge color="cyan" variant="filled" size="sm">{diffDays} days</Badge>;
+      return <Badge color="cyan" variant="filled" size="sm">{td('days', { count: diffDays })}</Badge>;
     } else {
-      return <Badge color="violet" variant="filled" size="sm">{diffDays} days</Badge>;
+      return <Badge color="violet" variant="filled" size="sm">{td('days', { count: diffDays })}</Badge>;
     }
   };
 
@@ -55,7 +58,7 @@ export function ArchivedVisionBoardGrid({ items, onUnarchive, onDelete, onView }
                 color: '#666666',
               }}
             >
-              No archived vision board items
+              {t('emptyTitle')}
             </Text>
             <Text
               size="sm"
@@ -69,7 +72,7 @@ export function ArchivedVisionBoardGrid({ items, onUnarchive, onDelete, onView }
                 lineHeight: '1.5',
               }}
             >
-              Archived items will appear here when you archive vision board items.
+              {t('emptyHint')}
             </Text>
           </Stack>
         </Card>
@@ -153,13 +156,13 @@ export function ArchivedVisionBoardGrid({ items, onUnarchive, onDelete, onView }
                     leftSection={<Eye size={16} />}
                     onClick={() => onView(item)}
                   >
-                    View Details
+                    {t('viewDetails')}
                   </Menu.Item>
                   <Menu.Item
                     leftSection={<ArchiveRestore size={16} />}
                     onClick={() => onUnarchive(item)}
                   >
-                    Unarchive
+                    {t('unarchive')}
                   </Menu.Item>
                   <Menu.Divider />
                   <Menu.Item
@@ -167,7 +170,7 @@ export function ArchivedVisionBoardGrid({ items, onUnarchive, onDelete, onView }
                     color="red"
                     onClick={() => onDelete(item.id)}
                   >
-                    Delete Permanently
+                    {t('deletePermanently')}
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
@@ -245,7 +248,7 @@ export function ArchivedVisionBoardGrid({ items, onUnarchive, onDelete, onView }
               fontWeight: 500,
               fontFamily: 'Inter, sans-serif',
             }}>
-              Archived
+              {t('archivedLabel')}
             </div>
           </Card>
         ))}

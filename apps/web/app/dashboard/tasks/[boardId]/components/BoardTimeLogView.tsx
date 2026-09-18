@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Box, Stack, Group, Text, Select, Button, ActionIcon, Loader, Center, TextInput,
 } from '@mantine/core';
@@ -59,13 +60,12 @@ function todayStr(): string {
   return toLocalDate(new Date().toISOString());
 }
 
-function dayLabel(d: string): string {
+function dayLabel(d: string, todayLabel: string, yesterdayLabel: string, locale: string): string {
   const today = todayStr();
   const yesterday = toLocalDate(new Date(Date.now() - 86400000).toISOString());
-  if (d === today) return 'Today';
-  if (d === yesterday) return 'Yesterday';
-  const [y, mo, da] = d.split('-');
-  return `${mo}/${da}/${y}`;
+  if (d === today) return todayLabel;
+  if (d === yesterday) return yesterdayLabel;
+  return new Date(d + 'T00:00:00').toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 // ── types ─────────────────────────────────────────────────────────────────────
@@ -93,6 +93,7 @@ interface TimerBarProps {
 }
 
 function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProps) {
+  const t = useTranslations('tasks.timeLog');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [liveElapsed, setLiveElapsed] = useState(0);
   const startMutation = useStartTimeTracking();
@@ -132,7 +133,7 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
         <>
           <Group gap={8} style={{ flex: 1 }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4686FE', flexShrink: 0 }} />
-            <Text size="sm" fw={600} style={{ color: '#0F172A' }}>Running</Text>
+            <Text size="sm" fw={600} style={{ color: '#0F172A' }}>{t('running')}</Text>
             <Text size="sm" c="dimmed">—</Text>
             <Text size="sm" fw={500} style={{ color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 260 }}>
               {activeTask?.title}
@@ -148,13 +149,13 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
             onClick={handleStop}
             loading={stopMutation.isPending}
           >
-            Stop
+            {t('stop')}
           </Button>
         </>
       ) : (
         <>
           <Select
-            placeholder="Select task..."
+            placeholder={t('selectTask')}
             data={tasks.map(t => ({ value: t.id, label: t.title }))}
             value={selectedTaskId}
             onChange={setSelectedTaskId}
@@ -168,14 +169,17 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
           </Text>
           <Button
             leftSection={<Play size={14} />}
-            style={{ backgroundColor: '#4686FE' }}
-            styles={{ root: { '&[data-disabled]': { backgroundColor: '#4686FE', color: '#fff', opacity: 1, cursor: 'not-allowed' } } }}
+            style={
+              selectedTaskId
+                ? { backgroundColor: '#4686FE' }
+                : { backgroundColor: '#4686FE', color: '#fff', opacity: 1, cursor: 'not-allowed' }
+            }
             size="sm"
             onClick={handleStart}
             disabled={!selectedTaskId}
             loading={startMutation.isPending}
           >
-            Start
+            {t('start')}
           </Button>
           <Button
             leftSection={<Plus size={14} />}
@@ -184,7 +188,7 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
             size="sm"
             onClick={onShowManual}
           >
-            Manual
+            {t('manual')}
           </Button>
         </>
       )}
@@ -200,6 +204,7 @@ interface ManualEntryFormProps {
 }
 
 function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
+  const t = useTranslations('tasks.timeLog');
   const [taskId, setTaskId] = useState<string | null>(null);
   const [date, setDate] = useState(todayStr());
   const [startTime, setStartTime] = useState('');
@@ -221,9 +226,9 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
     <Box style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 10, padding: '14px 16px' }}>
       <Group gap={10} wrap="wrap" align="flex-end">
         <Select
-          label="Task"
-          placeholder="Select..."
-          data={tasks.map(t => ({ value: t.id, label: t.title }))}
+          label={t('taskLabel')}
+          placeholder={t('selectPlaceholder')}
+          data={tasks.map(task => ({ value: task.id, label: task.title }))}
           value={taskId}
           onChange={setTaskId}
           searchable
@@ -231,7 +236,7 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
           style={{ flex: 1, minWidth: 180 }}
         />
         <TextInput
-          label="Date"
+          label={t('date')}
           type="date"
           value={date}
           onChange={e => setDate(e.target.value)}
@@ -239,7 +244,7 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
           style={{ width: 140 }}
         />
         <TextInput
-          label="Start"
+          label={t('startLabel')}
           type="time"
           value={startTime}
           onChange={e => setStartTime(e.target.value)}
@@ -247,7 +252,7 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
           style={{ width: 110 }}
         />
         <TextInput
-          label="End"
+          label={t('endLabel')}
           type="time"
           value={endTime}
           onChange={e => setEndTime(e.target.value)}
@@ -256,10 +261,10 @@ function ManualEntryForm({ tasks, onClose }: ManualEntryFormProps) {
         />
         <Group gap={6} style={{ paddingBottom: 2 }}>
           <Button size="sm" color="blue" onClick={handleSave} disabled={!isValid} loading={addMutation.isPending}>
-            Save
+            {t('save')}
           </Button>
           <Button size="sm" variant="subtle" color="gray" onClick={onClose}>
-            Cancel
+            {t('cancel')}
           </Button>
         </Group>
       </Group>
@@ -362,6 +367,8 @@ interface BoardTimeLogViewProps {
 }
 
 export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
+  const t = useTranslations('tasks.timeLog');
+  const locale = useLocale();
   const { data: columns, isLoading } = useBoardKanban(boardId);
   const [showManual, setShowManual] = useState(false);
   const [filterFrom, setFilterFrom] = useState('');
@@ -454,7 +461,7 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
         <Group gap="sm" align="flex-end">
           <TextInput
             type="date"
-            label="From"
+            label={t('from')}
             size="xs"
             value={filterFrom}
             onChange={e => setFilterFrom(e.currentTarget.value)}
@@ -462,7 +469,7 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
           />
           <TextInput
             type="date"
-            label="To"
+            label={t('to')}
             size="xs"
             value={filterTo}
             onChange={e => setFilterTo(e.currentTarget.value)}
@@ -470,7 +477,7 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
           />
           {(filterFrom || filterTo) && (
             <Button size="xs" variant="subtle" color="gray" onClick={() => { setFilterFrom(''); setFilterTo(''); }}>
-              Clear
+              {t('clear')}
             </Button>
           )}
         </Group>
@@ -479,8 +486,8 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
           <Center h={300}>
             <Stack align="center" gap={8}>
               <Clock size={32} color="#94A3B8" />
-              <Text size="sm" c="dimmed">No time logged on this board.</Text>
-              <Text size="xs" c="dimmed">Use the timer above to get started.</Text>
+              <Text size="sm" c="dimmed">{t('noTimeLogged')}</Text>
+              <Text size="xs" c="dimmed">{t('useTimerHint')}</Text>
             </Stack>
           </Center>
         ) : (
@@ -489,7 +496,7 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
               <>
                 <Box style={{ padding: '8px 20px', background: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
                   <Text size="xs" fw={700} c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                    Running now
+                    {t('runningNow')}
                   </Text>
                 </Box>
                 <Box
@@ -509,9 +516,9 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
                 <React.Fragment key={day}>
                   <Box style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 20px', background: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
                     <Text size="xs" fw={700} c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {dayLabel(day)}
+                      {dayLabel(day, t('today'), t('yesterday'), locale)}
                     </Text>
-                    <Text size="xs" fw={600} c="dimmed">Total: {fmtHuman(dayTotal)}</Text>
+                    <Text size="xs" fw={600} c="dimmed">{t('total', { duration: fmtHuman(dayTotal) })}</Text>
                   </Box>
                   {entries.map((fe, i) => (
                     <TimeEntryRow

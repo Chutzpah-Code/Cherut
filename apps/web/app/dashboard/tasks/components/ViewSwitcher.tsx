@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Box, Group, Text, UnstyledButton, Tooltip } from '@mantine/core';
 import { LayoutGrid, Calendar as CalendarIcon, Clock } from 'lucide-react';
 
@@ -10,13 +11,15 @@ interface ViewSwitcherProps {
   onViewChange: (view: TaskView) => void;
 }
 
-const VIEWS = [
-  { id: 'kanban' as TaskView, label: 'Board', icon: LayoutGrid, comingSoon: false },
-  { id: 'calendar' as TaskView, label: 'Calendar', icon: CalendarIcon, comingSoon: false },
-  { id: 'timetracker' as TaskView, label: 'Time', icon: Clock, comingSoon: false },
-];
-
 export function ViewSwitcher({ currentView, onViewChange }: ViewSwitcherProps) {
+  const t = useTranslations('tasks.viewSwitcher');
+
+  const VIEWS = [
+    { id: 'kanban' as TaskView, label: t('board'), icon: LayoutGrid, comingSoon: false },
+    { id: 'calendar' as TaskView, label: t('calendar'), icon: CalendarIcon, comingSoon: false },
+    { id: 'timetracker' as TaskView, label: t('time'), icon: Clock, comingSoon: false },
+  ];
+
   return (
     <Box
       className="scroll-x-hidden"
@@ -72,7 +75,7 @@ export function ViewSwitcher({ currentView, onViewChange }: ViewSwitcherProps) {
           );
 
           return comingSoon ? (
-            <Tooltip key={id} label="Coming soon" position="top" withArrow>
+            <Tooltip key={id} label={t('comingSoon')} position="top" withArrow>
               <span>{btn}</span>
             </Tooltip>
           ) : (

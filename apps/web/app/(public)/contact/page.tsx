@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { PageShell } from '@/components/shell/Shell';
 
 const BG      = '#07070D';
@@ -12,9 +13,10 @@ const ACCENT  = 'oklch(0.68 0.24 260)';
 const ACCENT_DIM = 'rgba(80,110,255,0.12)';
 const RULE    = 'rgba(255,255,255,0.08)';
 
-const subjects = ['General question', 'Feature request', 'Bug report', 'Press inquiry', 'Partnership', 'Other'];
-
 export default function ContactPage() {
+  const t = useTranslations('contactPage');
+  const subjects = t.raw('subjects') as string[];
+
   const [name, setName]       = useState('');
   const [email, setEmail]     = useState('');
   const [subject, setSubject] = useState('');
@@ -24,7 +26,7 @@ export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); setSubmitted(true); };
 
   return (
-    <PageShell kicker="Contact" title="Let's talk" lead="Question, idea, or just want to say hi?">
+    <PageShell kicker={t('hero.kicker')} title={t('hero.title')} lead={t('hero.lead')}>
       <style>{`
         .ct-wrap { max-width: 1100px; margin: 0 auto; padding: 48px 20px 80px; }
         .ct-grid { display: grid; grid-template-columns: 1fr; gap: 32px; }
@@ -56,54 +58,54 @@ export default function ContactPage() {
               {submitted ? (
                 <div className="ct-form-box ct-success">
                   <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: TEXT, marginBottom: 8 }}>Message sent!</div>
-                  <p style={{ fontSize: 15, color: MUTED, margin: 0, maxWidth: 340, marginLeft: 'auto', marginRight: 'auto' }}>We'll get back to you within a day or two. Thanks for reaching out.</p>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: TEXT, marginBottom: 8 }}>{t('successTitle')}</div>
+                  <p style={{ fontSize: 15, color: MUTED, margin: 0, maxWidth: 340, marginLeft: 'auto', marginRight: 'auto' }}>{t('successBody')}</p>
                 </div>
               ) : (
                 <form className="ct-form-box" onSubmit={handleSubmit}>
-                  <h2 style={{ fontSize: 20, fontWeight: 700, color: TEXT, margin: 0, letterSpacing: '-0.015em' }}>Send us a message</h2>
+                  <h2 style={{ fontSize: 20, fontWeight: 700, color: TEXT, margin: 0, letterSpacing: '-0.015em' }}>{t('formTitle')}</h2>
                   <div className="ct-form-row">
                     <div className="ct-field">
-                      <label className="ct-label" htmlFor="ct-name">Name</label>
-                      <input id="ct-name" className="ct-input" type="text" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} required />
+                      <label className="ct-label" htmlFor="ct-name">{t('nameLabel')}</label>
+                      <input id="ct-name" className="ct-input" type="text" placeholder={t('namePlaceholder')} value={name} onChange={e => setName(e.target.value)} required />
                     </div>
                     <div className="ct-field">
-                      <label className="ct-label" htmlFor="ct-email">Email</label>
-                      <input id="ct-email" className="ct-input" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
+                      <label className="ct-label" htmlFor="ct-email">{t('emailLabel')}</label>
+                      <input id="ct-email" className="ct-input" type="email" placeholder={t('emailPlaceholder')} value={email} onChange={e => setEmail(e.target.value)} required />
                     </div>
                   </div>
                   <div className="ct-field">
-                    <label className="ct-label" htmlFor="ct-subject">Subject</label>
+                    <label className="ct-label" htmlFor="ct-subject">{t('subjectLabel')}</label>
                     <select id="ct-subject" className="ct-input ct-select" value={subject} onChange={e => setSubject(e.target.value)} required>
-                      <option value="">Select a topic…</option>
+                      <option value="">{t('subjectPlaceholder')}</option>
                       {subjects.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                   <div className="ct-field">
-                    <label className="ct-label" htmlFor="ct-message">Message</label>
-                    <textarea id="ct-message" className="ct-input ct-textarea" placeholder="Tell us what's on your mind…" value={message} onChange={e => setMessage(e.target.value)} required />
+                    <label className="ct-label" htmlFor="ct-message">{t('messageLabel')}</label>
+                    <textarea id="ct-message" className="ct-input ct-textarea" placeholder={t('messagePlaceholder')} value={message} onChange={e => setMessage(e.target.value)} required />
                   </div>
-                  <button type="submit" className="ct-submit">Send message →</button>
+                  <button type="submit" className="ct-submit">{t('submit')} →</button>
                 </form>
               )}
             </div>
 
             <div className="ct-sidebar">
               <div className="ct-info-card">
-                <div className="ct-info-title">Email</div>
+                <div className="ct-info-title">{t('sidebar.emailTitle')}</div>
                 <a href="mailto:hello@cherut.app" style={{ fontSize: 16, fontWeight: 600, color: ACCENT, display: 'block', marginBottom: 6 }}>hello@cherut.app</a>
-                <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.5 }}>For general inquiries and support.</p>
+                <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.5 }}>{t('sidebar.emailDesc')}</p>
               </div>
               <div className="ct-info-card">
-                <div className="ct-info-title">Response time</div>
-                <div style={{ fontSize: 16, fontWeight: 600, color: TEXT, marginBottom: 6 }}>Within 1–2 business days</div>
-                <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.5 }}>We read every message. No ticket queues, no bots.</p>
+                <div className="ct-info-title">{t('sidebar.responseTitle')}</div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: TEXT, marginBottom: 6 }}>{t('sidebar.responseValue')}</div>
+                <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.5 }}>{t('sidebar.responseDesc')}</p>
               </div>
               <div className="ct-info-card">
-                <div className="ct-info-title">Community</div>
-                <p style={{ fontSize: 14, color: MUTED, margin: '0 0 12px', lineHeight: 1.5 }}>For feature requests and discussion, join the community.</p>
+                <div className="ct-info-title">{t('sidebar.communityTitle')}</div>
+                <p style={{ fontSize: 14, color: MUTED, margin: '0 0 12px', lineHeight: 1.5 }}>{t('sidebar.communityDesc')}</p>
                 <a href="https://t.me/+MxfNsOTcN-Y5MmYx" target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 600, color: ACCENT, padding: '10px 16px', background: ACCENT_DIM, borderRadius: 999, display: 'inline-block', border: `1px solid rgba(80,110,255,0.3)` }}>
-                  Open community →
+                  {t('sidebar.communityCta')} →
                 </a>
               </div>
             </div>

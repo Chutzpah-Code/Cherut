@@ -14,19 +14,14 @@ export function monthlyEquivalent(bill: Pick<FinanceBill, 'frequency' | 'amount'
   }
 }
 
-export const FREQUENCY_LABEL: Record<string, string> = {
-  weekly: 'Weekly', biweekly: 'Biweekly', monthly: 'Monthly', bimonthly: 'Bimonthly',
-  quarterly: 'Quarterly', semiannual: 'Semiannual', annual: 'Annual', custom: 'Custom',
-};
-
-export function fmtCurrency(value: number, currency?: string) {
+export function fmtCurrency(value: number, locale: string, currency?: string) {
   try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency ?? 'USD' }).format(value);
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: currency ?? 'USD' }).format(value);
   } catch {
     return `${currency ?? ''} ${value.toFixed(2)}`;
   }
 }
 
-export function fmtShortDate(iso: string) {
-  return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+export function fmtShortDate(iso: string, locale: string) {
+  return new Date(iso + 'T00:00:00').toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 }

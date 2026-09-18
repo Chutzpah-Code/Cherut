@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Box, Group, Stack, Title, UnstyledButton, Select, ActionIcon, Tooltip } from '@mantine/core';
 import { Plus, Download } from 'lucide-react';
 import { useFinanceCurrency } from '../currency-context';
@@ -9,14 +10,14 @@ import { useAddPanel } from '../add-panel-context';
 import { useFinanceOverview, useExportBackup } from '@/hooks/useFinance';
 import { useFinanceShortcuts } from '../useFinanceShortcuts';
 
-const TABS = [
-  { href: '/dashboard/finance', label: 'Money' },
-  { href: '/dashboard/finance/portfolio', label: 'Bills & Portfolio' },
-];
-
 const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'BRL', 'JPY', 'ARS'];
 
 function PageSwitcher({ pathname, fullWidth }: { pathname: string; fullWidth?: boolean }) {
+  const t = useTranslations('finance.header');
+  const TABS = [
+    { href: '/dashboard/finance', label: t('tabMoney') },
+    { href: '/dashboard/finance/portfolio', label: t('tabBillsPortfolio') },
+  ];
   return (
     <Box style={{ display: 'flex', gap: 2, background: '#F1F5F9', borderRadius: 8, padding: 3, width: fullWidth ? '100%' : undefined }}>
       {TABS.map((tab) => {
@@ -49,6 +50,7 @@ function PageSwitcher({ pathname, fullWidth }: { pathname: string; fullWidth?: b
 }
 
 export function FinanceHeader() {
+  const t = useTranslations('finance.header');
   const pathname = usePathname();
   const { displayCurrency, setDisplayCurrency } = useFinanceCurrency();
   const { data: overview } = useFinanceOverview(undefined, displayCurrency);
@@ -88,13 +90,13 @@ export function FinanceHeader() {
   );
 
   const exportButton = (
-    <Tooltip label="Export full backup (JSON)">
+    <Tooltip label={t('exportBackup')}>
       <ActionIcon
         variant="default"
         size="lg"
         onClick={handleExportBackup}
         loading={exportBackup.isPending}
-        aria-label="Export full backup"
+        aria-label={t('exportBackup')}
       >
         <Download size={15} />
       </ActionIcon>
@@ -106,7 +108,7 @@ export function FinanceHeader() {
       {/* ≥768px: everything in one row */}
       <Group justify="space-between" align="center" wrap="wrap" gap="sm" mb="lg" visibleFrom="sm">
         <Title order={1} style={{ fontSize: 24, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.015em' }}>
-          Finance
+          {t('title')}
         </Title>
         <Group gap="xs" wrap="wrap" className="finance-no-print">
           <PageSwitcher pathname={pathname} />
@@ -119,7 +121,7 @@ export function FinanceHeader() {
               color: '#FFFFFF', background: '#0052CC', borderRadius: 6, padding: '9px 14px',
             }}
           >
-            <Plus size={15} /> Add
+            <Plus size={15} /> {t('add')}
           </UnstyledButton>
         </Group>
       </Group>
@@ -128,7 +130,7 @@ export function FinanceHeader() {
       <Stack gap="sm" mb="lg" hiddenFrom="sm">
         <Group justify="space-between" align="center">
           <Title order={1} style={{ fontSize: 20, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.015em' }}>
-            Finance
+            {t('title')}
           </Title>
           <Group gap="xs" className="finance-no-print">
             {currencySelect}
@@ -142,7 +144,7 @@ export function FinanceHeader() {
         hiddenFrom="sm"
         className="finance-no-print"
         onClick={() => openCreate('transaction')}
-        aria-label="Add"
+        aria-label={t('add')}
         radius="xl"
         size={56}
         style={{

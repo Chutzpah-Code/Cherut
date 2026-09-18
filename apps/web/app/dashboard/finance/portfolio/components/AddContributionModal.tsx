@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Modal, Stack, Group, Text, NumberInput, TextInput, Button } from '@mantine/core';
 import { useCreateInvestmentEntry } from '@/hooks/useFinance';
 import { FinanceInvestment } from '@/lib/api/services/finance';
@@ -15,6 +16,8 @@ export function AddContributionModal({
   investment: FinanceInvestment | null;
   onClose: () => void;
 }) {
+  const t = useTranslations('finance.addContribution');
+  const tc = useTranslations('finance.common');
   const createEntry = useCreateInvestmentEntry();
   const [amount, setAmount] = useState<number | string>('');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
@@ -30,23 +33,23 @@ export function AddContributionModal({
   };
 
   return (
-    <Modal opened={!!investment} onClose={onClose} title={`Add contribution — ${investment?.name ?? ''}`} centered size="sm">
+    <Modal opened={!!investment} onClose={onClose} title={t('title', { name: investment?.name ?? '' })} centered size="sm">
       <Stack gap="sm">
         <Text size="xs" c="dimmed">
-          Increases this asset&apos;s current value and, if it has a linked account, withdraws the amount from it.
+          {t('hint')}
         </Text>
         <NumberInput
-          label={`Amount (${investment?.currency ?? 'USD'})`}
+          label={t('amount', { currency: investment?.currency ?? 'USD' })}
           min={0.01}
           decimalScale={2}
           value={amount}
           onChange={setAmount}
         />
-        <TextInput label="Date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <TextInput label={t('date')} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         <Group justify="flex-end" mt="xs">
-          <Button variant="default" onClick={onClose}>Cancel</Button>
+          <Button variant="default" onClick={onClose}>{tc('cancel')}</Button>
           <Button onClick={handleSubmit} loading={createEntry.isPending} disabled={isNaN(parsedAmount) || parsedAmount <= 0} style={{ backgroundColor: '#0052CC' }}>
-            Add contribution
+            {t('addContribution')}
           </Button>
         </Group>
       </Stack>

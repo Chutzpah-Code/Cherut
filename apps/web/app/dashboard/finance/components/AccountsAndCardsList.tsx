@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Box, Group, Stack, Text, Modal, Select, NumberInput, Button,
   ActionIcon, Collapse, Badge, UnstyledButton,
@@ -15,20 +16,20 @@ import { FinanceAccount, FinanceStatement, AccountType } from '@/lib/api/service
 import { useAddPanel } from '../add-panel-context';
 import { RowsSkeleton } from './skeletons';
 
-function fmt(value: number, currency?: string) {
+function fmt(value: number, locale: string, currency?: string) {
   try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency ?? 'USD' }).format(value);
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: currency ?? 'USD' }).format(value);
   } catch {
     return `${currency ?? ''} ${value.toFixed(2)}`;
   }
 }
-function fmtDate(iso: string) {
-  return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+function fmtDate(iso: string, locale: string) {
+  return new Date(iso + 'T00:00:00').toLocaleDateString(locale, { day: 'numeric', month: 'short' });
 }
-function fmtBalance(value: number, currency?: string) {
+function fmtBalance(value: number, locale: string, currency?: string) {
   return (value ?? 0) < 0
-    ? `−${fmt(Math.abs(value), currency)}`
-    : fmt(value, currency);
+    ? `−${fmt(Math.abs(value), locale, currency)}`
+    : fmt(value, locale, currency);
 }
 
 const ROW_GRID = 'minmax(0,1fr) 88px 126px 104px';
@@ -46,11 +47,11 @@ const subTextStyle: React.CSSProperties = {
   fontSize: 12, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
 };
 
-const TYPE_LABEL: Record<AccountType, string> = {
-  checking: 'CHECKING', wallet: 'WALLET', savings: 'SAVINGS', credit: 'CREDIT', other: 'OTHER',
-};
-
 function TypeChip({ type }: { type: AccountType }) {
+  const t = useTranslations('finance.accountsAndCards');
+  const TYPE_LABEL: Record<AccountType, string> = {
+    checking: t('typeChecking'), wallet: t('typeWallet'), savings: t('typeSavings'), credit: t('typeCredit'), other: t('typeOther'),
+  };
   const isCredit = type === 'credit';
   return (
     <Text style={{
@@ -60,7 +61,7 @@ function TypeChip({ type }: { type: AccountType }) {
       color: isCredit ? '#1D4ED8' : '#334155',
       background: isCredit ? '#E4EBFD' : '#F1F5F9',
     }}>
-      {TYPE_LABEL[type]}
+      {TYPE_LABEL[type].toUpperCase()}
     </Text>
   );
 }
@@ -68,15 +69,16 @@ function TypeChip({ type }: { type: AccountType }) {
 function RowActions({ onEdit, onArchive, onDelete, archived }: {
   onEdit: () => void; onArchive: () => void; onDelete: () => void; archived?: boolean;
 }) {
+  const t = useTranslations('finance.accountsAndCards');
   return (
     <Group gap={6} wrap="nowrap" justify="flex-end">
-      <ActionIcon size="sm" variant="subtle" color="blue" onClick={onEdit} aria-label="Edit account">
+      <ActionIcon size="sm" variant="subtle" color="blue" onClick={onEdit} aria-label={t('editAccount')}>
         <Pencil size={13} />
       </ActionIcon>
-      <ActionIcon size="sm" variant="subtle" color="gray" onClick={onArchive} aria-label={archived ? 'Unarchive account' : 'Archive account'}>
+      <ActionIcon size="sm" variant="subtle" color="gray" onClick={onArchive} aria-label={archived ? t('unarchiveAccount') : t('archiveAccount')}>
         {archived ? <ArchiveRestore size={13} /> : <Archive size={13} />}
       </ActionIcon>
-      <ActionIcon size="sm" variant="subtle" color="red" onClick={onDelete} aria-label="Delete account">
+      <ActionIcon size="sm" variant="subtle" color="red" onClick={onDelete} aria-label={t('deleteAccount')}>
         <Trash2 size={13} />
       </ActionIcon>
     </Group>
@@ -88,6 +90,8 @@ function PayStatementModal({
 }: {
   opened: boolean; onClose: () => void; statement: FinanceStatement; cardAccount: FinanceAccount; accounts: FinanceAccount[];
 }) {
+  const t = useTranslations('finance.accountsAndCards');
+  const locale = useLocale();
   const payStatement = usePayStatement();
   const [fromAccountId, setFromAccountId] = useState<string | null>(null);
   const [amount, setAmount] = useState<number | string>(statement.total);
@@ -106,7 +110,7 @@ function PayStatementModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      title="Pay statement"
+      title={t('payStatement')}
       centered
       styles={{
         content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
@@ -116,20 +120,20 @@ function PayStatementModal({
       <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
         <Stack gap="sm">
           <Box style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
-            <Text size="xs" c="dimmed">Statement total</Text>
-            <Text size="xl" fw={700} c="green.7">{fmt(statement.total, cardAccount.currency)}</Text>
-            <Text size="xs" c="dimmed">Due: {fmtDate(statement.dueDate)}</Text>
+            <Text size="xs" c="dimmed">{t('statementTotal')}</Text>
+            <Text size="xl" fw={700} c="green.7">{fmt(statement.total, locale, cardAccount.currency)}</Text>
+            <Text size="xs" c="dimmed">{t('due', { date: fmtDate(statement.dueDate, locale) })}</Text>
           </Box>
           <Select
-            label="Pay from"
-            placeholder="Select account"
+            label={t('payFrom')}
+            placeholder={t('selectAccount')}
             required
-            data={cashAccounts.map((a) => ({ value: a.id, label: `${a.name} — ${fmt(a.balance, a.currency)}` }))}
+            data={cashAccounts.map((a) => ({ value: a.id, label: `${a.name} — ${fmt(a.balance, locale, a.currency)}` }))}
             value={fromAccountId}
             onChange={setFromAccountId}
           />
           <NumberInput
-            label="Amount"
+            label={t('amount')}
             min={0.01}
             decimalScale={2}
             value={amount}
@@ -146,7 +150,7 @@ function PayStatementModal({
           color="green"
           style={{ width: '100%' }}
         >
-          Confirm payment
+          {t('confirmPayment')}
         </Button>
       </Box>
     </Modal>
@@ -157,6 +161,8 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
   account: FinanceAccount; accounts: FinanceAccount[];
   onEdit: () => void; onArchive: () => void; onDelete: () => void;
 }) {
+  const t = useTranslations('finance.accountsAndCards');
+  const locale = useLocale();
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [expanded, setExpanded] = useState(false);
   const [payModal, { open: openPay, close: closePay }] = useDisclosure();
@@ -192,7 +198,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
           <Text style={nameTextStyle}>{account.name}</Text>
           {current && (
             <Text style={subTextStyle}>
-              Closes {fmtDate(current.periodEnd)} · due {fmtDate(current.dueDate)}
+              {t('closesAndDue', { closeDate: fmtDate(current.periodEnd, locale), dueDate: fmtDate(current.dueDate, locale) })}
             </Text>
           )}
           {limit > 0 && (
@@ -201,7 +207,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
                 <Box style={{ width: `${utilization}%`, height: '100%', background: '#9DB8F2' }} />
               </Box>
               <Text style={{ fontSize: 11.5, color: '#64748B', whiteSpace: 'nowrap' }}>
-                {utilization.toFixed(0)}% of {fmt(limit, account.currency)}
+                {t('ofLimit', { pct: utilization.toFixed(0), limit: fmt(limit, locale, account.currency) })}
               </Text>
             </Group>
           )}
@@ -212,7 +218,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
           color: (account.balance ?? 0) < 0 ? '#B91C1C' : '#0F172A',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
-          {fmtBalance(account.balance ?? 0, account.currency)}
+          {fmtBalance(account.balance ?? 0, locale, account.currency)}
         </Text>
         <Box onClick={(e) => e.stopPropagation()}>
           <RowActions onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} archived={account.archived} />
@@ -224,31 +230,31 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
           {current && (
             <Group justify="space-between" mb="sm">
               <Box>
-                <Text size="xs" c="dimmed">Current statement</Text>
-                <Text size="lg" fw={700}>{fmt(current.total, account.currency)}</Text>
+                <Text size="xs" c="dimmed">{t('currentStatement')}</Text>
+                <Text size="lg" fw={700}>{fmt(current.total, locale, account.currency)}</Text>
               </Box>
               <Button size="xs" variant="light" onClick={() => closeStatement.mutate(account.id)} loading={closeStatement.isPending}>
-                Close statement
+                {t('closeStatement')}
               </Button>
             </Group>
           )}
           {statements.length > 0 && (
             <Stack gap={6}>
-              <Text size="xs" fw={600} c="dimmed">Statement history</Text>
+              <Text size="xs" fw={600} c="dimmed">{t('statementHistory')}</Text>
               {(statements as FinanceStatement[]).map((stmt) => (
                 <Group key={stmt.id} justify="space-between" style={{ border: '1px solid #E2E8F0', borderRadius: 8, padding: '10px 14px' }}>
                   <Box>
                     <Group gap={6}>
-                      <Text size="xs" c="dimmed">{fmtDate(stmt.periodEnd)}</Text>
+                      <Text size="xs" c="dimmed">{fmtDate(stmt.periodEnd, locale)}</Text>
                       <Badge size="xs" color={stmt.status === 'paid' ? 'green' : stmt.status === 'closed' ? 'orange' : 'blue'} variant="light">
-                        {stmt.status}
+                        {stmt.status === 'paid' ? t('statementPaid') : stmt.status === 'closed' ? t('statementClosed') : t('statementOpen')}
                       </Badge>
                     </Group>
-                    <Text size="sm" fw={600}>{fmt(stmt.total, account.currency)}</Text>
+                    <Text size="sm" fw={600}>{fmt(stmt.total, locale, account.currency)}</Text>
                   </Box>
                   {stmt.status === 'closed' && (
                     <Button size="xs" color="green" variant="light" onClick={() => { setSelectedStatement(stmt); openPay(); }}>
-                      Pay
+                      {t('pay')}
                     </Button>
                   )}
                 </Group>
@@ -265,9 +271,15 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
   );
 }
 
+const ACCOUNT_TYPE_KEY: Record<AccountType, string> = {
+  checking: 'typeChecking', wallet: 'typeWallet', savings: 'typeSavings', credit: 'typeCredit', other: 'typeOther',
+};
+
 function CashAccountRow({ account, onEdit, onArchive, onDelete }: {
   account: FinanceAccount; onEdit: () => void; onArchive: () => void; onDelete: () => void;
 }) {
+  const t = useTranslations('finance.accountsAndCards');
+  const locale = useLocale();
   const isMobile = useMediaQuery('(max-width: 767px)');
   return (
     <Box style={{
@@ -277,7 +289,7 @@ function CashAccountRow({ account, onEdit, onArchive, onDelete }: {
       <Box style={{ minWidth: 0 }}>
         <Text style={nameTextStyle}>{account.name}</Text>
         <Text style={subTextStyle}>
-          {account.type.charAt(0).toUpperCase() + account.type.slice(1)} · {account.currency}
+          {t(ACCOUNT_TYPE_KEY[account.type])} · {account.currency}
         </Text>
       </Box>
       <TypeChip type={account.type} />
@@ -286,7 +298,7 @@ function CashAccountRow({ account, onEdit, onArchive, onDelete }: {
         color: (account.balance ?? 0) < 0 ? '#B91C1C' : '#0F172A',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
-        {fmtBalance(account.balance ?? 0, account.currency)}
+        {fmtBalance(account.balance ?? 0, locale, account.currency)}
       </Text>
       <RowActions onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} archived={account.archived} />
     </Box>
@@ -300,6 +312,8 @@ const ADD_ROW_STYLE: React.CSSProperties = {
 };
 
 export function AccountsAndCardsList() {
+  const t = useTranslations('finance.accountsAndCards');
+  const tc = useTranslations('finance.common');
   const { data: accounts = [], isLoading } = useFinanceAccounts();
   const updateAccount = useUpdateAccount();
   const deleteAccount = useDeleteAccount();
@@ -321,16 +335,16 @@ export function AccountsAndCardsList() {
     <Box>
       <Group justify="space-between" align="baseline" mb="md">
         <Text style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#64748B' }}>
-          Accounts &amp; cards
+          {t('title')}
         </Text>
         <UnstyledButton onClick={() => openCreate('account')} style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', cursor: 'pointer' }}>
-          Add account
+          {t('addAccount')}
         </UnstyledButton>
       </Group>
 
       {list.length === 0 ? (
         <UnstyledButton onClick={() => openCreate('account')} style={ADD_ROW_STYLE}>
-          + Add a credit card or account
+          {t('addAccountEmpty')}
         </UnstyledButton>
       ) : (
         <Stack gap={4}>
@@ -354,19 +368,18 @@ export function AccountsAndCardsList() {
             />
           ))}
           <UnstyledButton onClick={() => openCreate('account')} style={{ ...ADD_ROW_STYLE, marginTop: 6, fontSize: 12.5, padding: 10 }}>
-            + Add a credit card or account
+            {t('addAccountEmpty')}
           </UnstyledButton>
         </Stack>
       )}
 
-      <Modal opened={!!deletingAccount} onClose={() => setDeletingAccount(null)} title="Delete account?" centered size="sm">
+      <Modal opened={!!deletingAccount} onClose={() => setDeletingAccount(null)} title={t('deleteAccountTitle')} centered size="sm">
         <Stack gap="md">
           <Text size="sm">
-            Deleting <strong>{deletingAccount?.name}</strong> permanently removes the account and all
-            transactions linked to it. This cannot be undone — archive it instead if you want to keep the history.
+            {t('deleteAccountBody', { name: deletingAccount?.name ?? '' })}
           </Text>
           <Group justify="flex-end" gap="sm">
-            <Button variant="default" size="sm" onClick={() => setDeletingAccount(null)}>Cancel</Button>
+            <Button variant="default" size="sm" onClick={() => setDeletingAccount(null)}>{tc('cancel')}</Button>
             <Button
               color="red"
               size="sm"
@@ -376,7 +389,7 @@ export function AccountsAndCardsList() {
                 deleteAccount.mutate(deletingAccount.id, { onSuccess: () => setDeletingAccount(null) });
               }}
             >
-              Delete everything
+              {t('deleteEverything')}
             </Button>
           </Group>
         </Stack>

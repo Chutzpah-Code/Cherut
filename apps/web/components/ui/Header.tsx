@@ -1,302 +1,151 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  Container,
-  Group,
-  Button,
-  Stack,
-  Box,
-  Divider,
-} from '@mantine/core';
-import {
-  Menu,
-  X,
-} from 'lucide-react';
-import CherutLogo from '@/components/ui/CherutLogo';
-import { useClientNavigation } from '@/hooks/useClientNavigation';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { PublicLocaleSwitcher } from '@/i18n/PublicLocaleSwitcher';
 
-export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { navigate } = useClientNavigation();
+// Dark theme tokens — mirrors the local copies in app/page.tsx and
+// components/shell/Shell.tsx (this codebase duplicates these per-file
+// rather than sharing one export; not something this change fixes).
+const BG = '#07070D';
+const SURF = '#0F0F1B';
+const TEXT = '#EDEEF6';
+const MUTED = 'rgba(237,238,246,0.46)';
+const RULE = 'rgba(255,255,255,0.08)';
+
+interface PublicHeaderProps {
+  // 'home': in-page anchors (#features) — for the landing page itself.
+  // 'page': cross-page anchors (/#features) — for every other public page.
+  variant?: 'home' | 'page';
+}
+
+export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
+  const t = useTranslations('publicHeader');
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const prefix = variant === 'home' ? '#' : '/#';
+  const navItems: [string, string][] = [
+    [`${prefix}features`, t('features')],
+    [`${prefix}how`, t('method')],
+    [`${prefix}pricing`, t('pricing')],
+    ['/about', t('about')],
+  ];
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
-    <Box
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000,
-        background: 'rgba(255, 255, 255, 0.98)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid #CCCCCC',
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      }}
-    >
-      <Container size="lg">
-        <Group justify="space-between" h={100}>
-          {/* Logo */}
-          <Group style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
-            <CherutLogo size={100} />
-          </Group>
+    <>
+      <style jsx global>{`
+        .ph-nav-inner { max-width: 1280px; margin: 0 auto; padding: 18px 32px; display: flex; align-items: center; gap: 32px; }
+        .ph-nav-links { display: flex; gap: 28px; margin-left: 24px; font-size: 14px; font-weight: 500; }
+        .ph-nav-links a { transition: color .12s; color: ${MUTED}; }
+        .ph-nav-links a:hover { color: ${TEXT}; }
+        .ph-nav-ctas { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+        .ph-cta-primary { transition: opacity .12s, transform .1s; }
+        .ph-cta-primary:hover { opacity: .87; transform: translateY(-1px); }
+        .ph-cta-ghost { transition: background .15s, color .15s, border-color .15s; }
+        .ph-cta-ghost:hover { background: ${TEXT}; color: ${BG}; border-color: ${TEXT}; }
+        .ph-hamburger { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; margin-left: auto; color: ${TEXT}; }
+        .ph-hamburger:hover { background: ${SURF}; }
+        .ph-mobile-menu { display: none; flex-direction: column; background: ${SURF}; border-top: 1px solid ${RULE}; padding: 8px 0 16px; }
+        .ph-mobile-menu.open { display: flex; }
+        .ph-mobile-link { padding: 14px 24px; font-size: 16px; font-weight: 500; color: ${TEXT}; display: block; transition: background .1s; }
+        .ph-mobile-link:hover { background: ${SURF}; }
+        .ph-mobile-ctas { display: flex; gap: 10px; padding: 12px 24px 4px; flex-wrap: wrap; align-items: center; }
 
-          {/* Desktop Navigation Links */}
-          <Group gap="xl" visibleFrom="md">
-            <Button
-              variant="subtle"
-              onClick={() => navigate('/about')}
-              style={{
-                color: '#333333',
-                fontWeight: 500,
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    background: 'rgba(70, 134, 254, 0.08)',
-                    color: '#4686FE',
-                  },
-                },
-              }}
-            >
-              About
-            </Button>
-            <Button
-              variant="subtle"
-              onClick={() => navigate('/#pricing')}
-              style={{
-                color: '#333333',
-                fontWeight: 500,
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    background: 'rgba(70, 134, 254, 0.08)',
-                    color: '#4686FE',
-                  },
-                },
-              }}
-            >
-              Pricing
-            </Button>
-            <Button
-              variant="subtle"
-              onClick={() => navigate('/#testimonials')}
-              style={{
-                color: '#333333',
-                fontWeight: 500,
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    background: 'rgba(70, 134, 254, 0.08)',
-                    color: '#4686FE',
-                  },
-                },
-              }}
-            >
-              Testimonials
-            </Button>
-            <Button
-              variant="subtle"
-              component="a"
-              href="https://t.me/+MxfNsOTcN-Y5MmYx"
-              target="_blank"
-              style={{
-                color: '#333333',
-                fontWeight: 500,
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    background: 'rgba(70, 134, 254, 0.08)',
-                    color: '#4686FE',
-                  },
-                },
-              }}
-            >
-              Community
-            </Button>
-          </Group>
+        @media (max-width: 1023px) {
+          .ph-nav-inner { padding: 16px 24px; gap: 20px; }
+          .ph-nav-links { gap: 20px; }
+        }
+        @media (max-width: 767px) {
+          .ph-nav-links { display: none; }
+          .ph-nav-ctas { display: none; }
+          .ph-hamburger { display: flex; }
+          .ph-nav-inner { padding: 14px 20px; }
+        }
+      `}</style>
 
-          {/* Desktop Auth Buttons */}
-          <Group gap="md" visibleFrom="md">
-            <Button
-              variant="subtle"
-              onClick={() => navigate('/auth/login')}
-              style={{
-                color: '#333333',
-                fontWeight: 600,
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    background: 'rgba(70, 134, 254, 0.08)',
-                    color: '#4686FE',
-                  },
-                },
-              }}
-            >
-              Login
-            </Button>
-            <Button
-              radius={8}
-              onClick={() => navigate('/auth/register')}
-              style={{
-                background: '#4686FE',
-                color: 'white',
-                fontWeight: 600,
-                padding: '8px 20px',
-                transition: 'all 0.2s ease',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-                border: 'none',
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    background: '#3366E5',
-                  },
-                },
-              }}
-            >
-              Sign Up
-            </Button>
-          </Group>
+      <nav style={{
+        position: 'sticky', top: 0, zIndex: 100,
+        background: scrolled ? 'rgba(7,7,13,0.88)' : 'transparent',
+        backdropFilter: scrolled ? 'saturate(160%) blur(16px)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'saturate(160%) blur(16px)' : 'none',
+        borderBottom: `1px solid ${scrolled ? RULE : 'transparent'}`,
+        transition: 'background .25s, border-color .25s',
+      }}>
+        <div className="ph-nav-inner">
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+            <svg viewBox="0 0 64 64" width={24} height={24} fill="none" aria-hidden="true">
+              <circle cx="32" cy="32" r="23.8" stroke={TEXT} strokeWidth="8.4" />
+              <circle cx="32" cy="32" r="7" fill={TEXT} />
+            </svg>
+            <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 19, letterSpacing: '-0.025em', color: TEXT }}>Cherut</span>
+          </Link>
 
-          {/* Mobile Menu Button */}
-          <Button
-            variant="subtle"
-            hiddenFrom="md"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{
-              color: '#374151',
-              padding: '8px',
-            }}
+          <div className="ph-nav-links">
+            {navItems.map(([href, label]) => (
+              <Link key={label} href={href}>{label}</Link>
+            ))}
+          </div>
+
+          <div className="ph-nav-ctas">
+            <PublicLocaleSwitcher color={MUTED} />
+            <Link href="/auth/login" style={{ fontSize: 14, color: MUTED, fontWeight: 500, padding: '8px 12px' }}>{t('login')}</Link>
+            <Link
+              href="/auth/register"
+              className="ph-cta-primary"
+              style={{ fontSize: 14, fontWeight: 700, padding: '10px 20px', background: TEXT, color: BG, borderRadius: 999, letterSpacing: '-0.01em' }}
+            >
+              {t('startBuilding')}
+            </Link>
+          </div>
+
+          <button
+            className="ph-hamburger"
+            aria-label={menuOpen ? t('closeMenu') : t('openMenu')}
+            onClick={() => setMenuOpen((v) => !v)}
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </Button>
-        </Group>
-      </Container>
+            {menuOpen
+              ? <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+              : <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+            }
+          </button>
+        </div>
 
-      {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
-        <Box
-          hiddenFrom="md"
-          style={{
-            background: 'rgba(255, 255, 255, 0.98)',
-            borderTop: '1px solid #CCCCCC',
-            padding: '20px 0',
-          }}
-        >
-          <Container size="lg">
-            <Stack gap="md">
-              {/* Mobile Navigation Links */}
-              <Button
-                variant="subtle"
-                onClick={() => { navigate('/about'); setMobileMenuOpen(false); }}
-                style={{
-                  color: '#333333',
-                  fontWeight: 500,
-                  justifyContent: 'flex-start',
-                  height: '48px',
-                  fontFamily: 'Inter, sans-serif',
-                }}
-                fullWidth
-              >
-                About
-              </Button>
-              <Button
-                variant="subtle"
-                onClick={() => { navigate('/#pricing'); setMobileMenuOpen(false); }}
-                style={{
-                  color: '#333333',
-                  fontWeight: 500,
-                  justifyContent: 'flex-start',
-                  height: '48px',
-                  fontFamily: 'Inter, sans-serif',
-                }}
-                fullWidth
-              >
-                Pricing
-              </Button>
-              <Button
-                variant="subtle"
-                onClick={() => { navigate('/#testimonials'); setMobileMenuOpen(false); }}
-                style={{
-                  color: '#333333',
-                  fontWeight: 500,
-                  justifyContent: 'flex-start',
-                  height: '48px',
-                  fontFamily: 'Inter, sans-serif',
-                }}
-                fullWidth
-              >
-                Testimonials
-              </Button>
-              <Button
-                variant="subtle"
-                component="a"
-                href="https://t.me/+MxfNsOTcN-Y5MmYx"
-                target="_blank"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  color: '#333333',
-                  fontWeight: 500,
-                  justifyContent: 'flex-start',
-                  height: '48px',
-                  fontFamily: 'Inter, sans-serif',
-                }}
-                fullWidth
-              >
-                Community
-              </Button>
-
-              <Divider my="md" />
-
-              {/* Mobile Auth Buttons */}
-              <Button
-                variant="outline"
-                onClick={() => { navigate('/auth/login'); setMobileMenuOpen(false); }}
-                style={{
-                  borderColor: '#4686FE',
-                  color: '#4686FE',
-                  fontWeight: 600,
-                  height: '48px',
-                  fontFamily: 'Inter, sans-serif',
-                }}
-                fullWidth
-              >
-                Login
-              </Button>
-              <Button
-                radius={8}
-                onClick={() => { navigate('/auth/register'); setMobileMenuOpen(false); }}
-                style={{
-                  background: '#4686FE',
-                  color: 'white',
-                  fontWeight: 600,
-                  height: '48px',
-                  fontFamily: 'Inter, sans-serif',
-                  border: 'none',
-                }}
-                fullWidth
-              >
-                Sign Up
-              </Button>
-            </Stack>
-          </Container>
-        </Box>
-      )}
-    </Box>
+        <div className={`ph-mobile-menu${menuOpen ? ' open' : ''}`}>
+          {navItems.map(([href, label]) => (
+            <Link key={label} href={href} className="ph-mobile-link" onClick={closeMenu}>{label}</Link>
+          ))}
+          <div className="ph-mobile-ctas">
+            <PublicLocaleSwitcher color={TEXT} />
+            <Link href="/auth/login" className="ph-cta-ghost" style={{ fontSize: 14, fontWeight: 600, padding: '11px 20px', border: `1px solid ${RULE}`, borderRadius: 999, flex: 1, textAlign: 'center', color: TEXT }}>
+              {t('login')}
+            </Link>
+            <Link href="/auth/register" className="ph-cta-primary" style={{ fontSize: 14, fontWeight: 700, padding: '11px 20px', background: TEXT, color: BG, borderRadius: 999, flex: 1, textAlign: 'center' }}>
+              {t('startBuilding')}
+            </Link>
+          </div>
+        </div>
+      </nav>
+    </>
   );
 }
+
+// Keep a default export too, matching the original file's export shape in
+// case anything imports it as `import Header from '...'` in the future.
+export default PublicHeader;

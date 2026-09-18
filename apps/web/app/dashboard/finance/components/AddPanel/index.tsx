@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Drawer, Box, Group, Text, UnstyledButton, Button, Modal } from '@mantine/core';
 import { useAddPanel, AddEntityType } from '../../add-panel-context';
 import { TransactionForm } from './TransactionForm';
@@ -10,30 +11,31 @@ import { BudgetForm } from './BudgetForm';
 import { InvestmentForm } from './InvestmentForm';
 import type { AddSubformHandle } from './types';
 
-const CHIPS: { value: AddEntityType; label: string }[] = [
-  { value: 'transaction', label: 'Transaction' },
-  { value: 'account', label: 'Account' },
-  { value: 'card', label: 'Credit card' },
-  { value: 'bill', label: 'Bill rule' },
-  { value: 'budget', label: 'Budget' },
-  { value: 'investment', label: 'Investment' },
-];
-
-const SUBMIT_LABEL: Record<AddEntityType, { create: string; edit: string }> = {
-  transaction: { create: 'Add transaction', edit: 'Save transaction' },
-  account: { create: 'Create account', edit: 'Save account' },
-  card: { create: 'Create card', edit: 'Save card' },
-  bill: { create: 'Create bill rule', edit: 'Save bill rule' },
-  budget: { create: 'Create budget', edit: 'Save budget' },
-  investment: { create: 'Create investment', edit: 'Save investment' },
-};
-
 export function AddPanel() {
+  const t = useTranslations('finance.addPanel');
   const { state, openCreate, close } = useAddPanel();
   const formRef = useRef<AddSubformHandle>(null);
   const [valid, setValid] = useState(false);
   const [pending, setPending] = useState(false);
   const [confirmOpened, setConfirmOpened] = useState(false);
+
+  const CHIPS: { value: AddEntityType; label: string }[] = [
+    { value: 'transaction', label: t('chipTransaction') },
+    { value: 'account', label: t('chipAccount') },
+    { value: 'card', label: t('chipCard') },
+    { value: 'bill', label: t('chipBill') },
+    { value: 'budget', label: t('chipBudget') },
+    { value: 'investment', label: t('chipInvestment') },
+  ];
+
+  const SUBMIT_LABEL: Record<AddEntityType, { create: string; edit: string }> = {
+    transaction: { create: t('transactionCreate'), edit: t('transactionEdit') },
+    account: { create: t('accountCreate'), edit: t('accountEdit') },
+    card: { create: t('cardCreate'), edit: t('cardEdit') },
+    bill: { create: t('billCreate'), edit: t('billEdit') },
+    budget: { create: t('budgetCreate'), edit: t('budgetEdit') },
+    investment: { create: t('investmentCreate'), edit: t('investmentEdit') },
+  };
 
   const requestClose = () => {
     if (formRef.current?.isDirty()) {
@@ -85,7 +87,7 @@ export function AddPanel() {
         onClose={requestClose}
         position="right"
         size={404}
-        title={<Text fw={700} size="lg">Add</Text>}
+        title={<Text fw={700} size="lg">{t('title')}</Text>}
         styles={{
           content: { maxWidth: '100vw' },
           body: { padding: 0, height: 'calc(100% - 60px)', display: 'flex', flexDirection: 'column' },
@@ -94,7 +96,7 @@ export function AddPanel() {
         {state.mode === 'create' && (
           <Box px="md" pb="md" style={{ borderBottom: '1px solid #E2E5EB' }}>
             <Text style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#64748B', marginBottom: 10 }}>
-              What are you adding?
+              {t('whatAreYouAdding')}
             </Text>
             <Group gap={6} wrap="wrap">
               {CHIPS.map((chip) => {
@@ -129,18 +131,18 @@ export function AddPanel() {
             flexShrink: 0, display: 'flex', gap: 10,
           }}
         >
-          <Button variant="default" onClick={requestClose}>Cancel</Button>
+          <Button variant="default" onClick={requestClose}>{t('cancel')}</Button>
           <Button onClick={() => formRef.current?.submit()} loading={pending} disabled={!valid} style={{ flex: 1, backgroundColor: '#0052CC' }}>
             {label}
           </Button>
         </Box>
       </Drawer>
 
-      <Modal opened={confirmOpened} onClose={() => setConfirmOpened(false)} title="Discard changes?" centered size="sm">
-        <Text size="sm" mb="md">You have unsaved changes. Close anyway?</Text>
+      <Modal opened={confirmOpened} onClose={() => setConfirmOpened(false)} title={t('discardChangesTitle')} centered size="sm">
+        <Text size="sm" mb="md">{t('unsavedChanges')}</Text>
         <Group justify="flex-end">
-          <Button variant="default" onClick={() => setConfirmOpened(false)}>Keep editing</Button>
-          <Button color="red" onClick={forceClose}>Discard</Button>
+          <Button variant="default" onClick={() => setConfirmOpened(false)}>{t('keepEditing')}</Button>
+          <Button color="red" onClick={forceClose}>{t('discard')}</Button>
         </Group>
       </Modal>
     </>

@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Box, Group, Stack, Text } from '@mantine/core';
 import { useTasks } from '@/hooks/useTasks';
 import { RowsSkeleton } from './skeletons';
@@ -14,6 +15,7 @@ function localToday() {
 const LABEL: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: '#0F172A' };
 
 export function TasksDueList() {
+  const t = useTranslations('dashboard.tasksDue');
   const today = localToday();
   const { data: tasks = [], isLoading } = useTasks();
 
@@ -39,15 +41,15 @@ export function TasksDueList() {
   return (
     <Box id="tasks-due" style={{ padding: '24px 28px 26px' }}>
       <Group justify="space-between" align="baseline">
-        <Text style={LABEL}>Tasks due</Text>
-        <Link href="/dashboard/tasks" style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', textDecoration: 'none' }}>All tasks</Link>
+        <Text style={LABEL}>{t('title')}</Text>
+        <Link href="/dashboard/tasks" style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', textDecoration: 'none' }}>{t('allTasksLink')}</Link>
       </Group>
-      <Text style={{ fontSize: 12.5, color: '#64748B', margin: '4px 0 14px' }}>Sorted by how late they are</Text>
+      <Text style={{ fontSize: 12.5, color: '#64748B', margin: '4px 0 14px' }}>{t('subtitle')}</Text>
 
       {isLoading ? (
         <RowsSkeleton rows={4} />
       ) : due.length === 0 ? (
-        <Text size="sm" c="dimmed">Nothing due. Clear day.</Text>
+        <Text size="sm" c="dimmed">{t('empty')}</Text>
       ) : (
         <Stack gap={1}>
           {due.map((task) => {
@@ -68,7 +70,7 @@ export function TasksDueList() {
                   {task.title}
                 </Text>
                 <Text style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.06em', color: overdue ? '#B91C1C' : '#1D4ED8', whiteSpace: 'nowrap' }}>
-                  {overdue ? 'OVERDUE' : 'TODAY'}
+                  {overdue ? t('overdueBadge') : t('todayBadge')}
                 </Text>
               </Box>
             );
@@ -77,8 +79,8 @@ export function TasksDueList() {
       )}
 
       <Group justify="space-between" mt={14} pt={14} style={{ borderTop: '1px solid #EFF1F5' }}>
-        <Text style={{ fontSize: 12.5, color: '#64748B' }}>{due.length} of {totalOpen} open tasks</Text>
-        <Text style={{ fontSize: 12.5, color: '#64748B' }}>Oldest open: {oldestOpenDays} day{oldestOpenDays !== 1 ? 's' : ''}</Text>
+        <Text style={{ fontSize: 12.5, color: '#64748B' }}>{t('openTasks', { due: due.length, total: totalOpen })}</Text>
+        <Text style={{ fontSize: 12.5, color: '#64748B' }}>{t('oldestOpen', { count: oldestOpenDays })}</Text>
       </Group>
     </Box>
   );

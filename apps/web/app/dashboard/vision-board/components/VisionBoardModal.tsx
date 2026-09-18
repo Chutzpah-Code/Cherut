@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Modal,
   Stack,
@@ -45,6 +46,7 @@ export function VisionBoardModal({
   onUploadImage,
   isSaving,
 }: VisionBoardModalProps) {
+  const t = useTranslations('visionBoard.editModal');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [fullDescription, setFullDescription] = useState('');
@@ -81,7 +83,7 @@ export function VisionBoardModal({
     // Validar arquivo
     const validation = imageValidation.validateFile(file);
     if (!validation.valid) {
-      setUploadError(validation.error || 'Invalid file');
+      setUploadError(validation.error || t('invalidFile'));
       return;
     }
 
@@ -92,7 +94,7 @@ export function VisionBoardModal({
       setNewImageUrl(imageUrl);
     } catch (error) {
       console.error('Error uploading image:', error);
-      setUploadError('Failed to upload image. Please try again.');
+      setUploadError(t('uploadFailed'));
     } finally {
       setIsUploadingImage(false);
     }
@@ -110,7 +112,7 @@ export function VisionBoardModal({
         imageUrl: newImageUrl || undefined,
       });
     } catch (error: any) {
-      let errorMessage = 'Failed to save changes. Please try again.';
+      let errorMessage = t('saveFailed');
 
       if (error?.response?.data?.message) {
         errorMessage = error.response.data.message;
@@ -141,7 +143,7 @@ export function VisionBoardModal({
               color: '#000000',
             }}
           >
-            Edit Vision Board Item
+            {t('title')}
           </Text>
         }
         size="xl"
@@ -177,7 +179,7 @@ export function VisionBoardModal({
               color: '#000000',
             }}
           >
-            Image
+            {t('image')}
           </Text>
           <Box
             style={{
@@ -237,7 +239,7 @@ export function VisionBoardModal({
                   },
                 }}
               >
-                {isUploadingImage ? 'Uploading...' : 'Replace Image'}
+                {isUploadingImage ? t('uploading') : t('replaceImage')}
               </Button>
             )}
           </FileButton>
@@ -264,8 +266,8 @@ export function VisionBoardModal({
 
         {/* Form */}
         <TextInput
-          label="Title"
-          placeholder="E.g., Trip to Kyoto"
+          label={t('titleLabel')}
+          placeholder={t('titlePlaceholder')}
           value={title}
           onChange={(e) => {
             setTitle(e.target.value);
@@ -302,8 +304,8 @@ export function VisionBoardModal({
         />
 
         <Textarea
-          label="Short Description"
-          placeholder="Brief description (visible on card)"
+          label={t('shortDescription')}
+          placeholder={t('shortDescriptionPlaceholder')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={2}
@@ -335,8 +337,8 @@ export function VisionBoardModal({
         />
 
         <Textarea
-          label="Full Description"
-          placeholder="Detailed description (visible only in modal)"
+          label={t('fullDescription')}
+          placeholder={t('fullDescriptionPlaceholder')}
           value={fullDescription}
           onChange={(e) => setFullDescription(e.target.value)}
           rows={4}
@@ -368,9 +370,9 @@ export function VisionBoardModal({
         />
 
         <DateInput
-          label="Due Date"
-          description="Target completion date"
-          placeholder="Select date"
+          label={t('dueDate')}
+          description={t('dueDateDesc')}
+          placeholder={t('dueDatePlaceholder')}
           value={dueDateValue}
           onChange={setDueDateValue}
           clearable
@@ -453,7 +455,7 @@ export function VisionBoardModal({
                 },
               }}
             >
-              Delete
+              {t('delete')}
             </Button>
 
             <Group>
@@ -479,7 +481,7 @@ export function VisionBoardModal({
                   },
                 }}
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 onClick={handleSave}
@@ -503,7 +505,7 @@ export function VisionBoardModal({
                   },
                 }}
               >
-                Save Changes
+                {t('saveChanges')}
               </Button>
             </Group>
           </Group>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Modal, Stack, Group, Text, NumberInput, TextInput, Button } from '@mantine/core';
 import { useUpdateInvestment } from '@/hooks/useFinance';
 import { FinanceInvestment } from '@/lib/api/services/finance';
@@ -13,6 +14,8 @@ export function RevalueModal({
   investment: FinanceInvestment | null;
   onClose: () => void;
 }) {
+  const t = useTranslations('finance.revalue');
+  const tc = useTranslations('finance.common');
   const updateInvestment = useUpdateInvestment();
   const [currentValue, setCurrentValue] = useState<number | string>(0);
   const [valuedDate, setValuedDate] = useState(new Date().toISOString().slice(0, 10));
@@ -32,20 +35,20 @@ export function RevalueModal({
   };
 
   return (
-    <Modal opened={!!investment} onClose={onClose} title={`Revalue — ${investment?.name ?? ''}`} centered size="sm">
+    <Modal opened={!!investment} onClose={onClose} title={t('title', { name: investment?.name ?? '' })} centered size="sm">
       <Stack gap="sm">
         <NumberInput
-          label={`Current value (${investment?.currency ?? 'USD'})`}
+          label={t('currentValue', { currency: investment?.currency ?? 'USD' })}
           min={0}
           decimalScale={2}
           value={currentValue}
           onChange={setCurrentValue}
         />
-        <TextInput label="Valued on" type="date" value={valuedDate} onChange={(e) => setValuedDate(e.target.value)} />
+        <TextInput label={t('valuedOn')} type="date" value={valuedDate} onChange={(e) => setValuedDate(e.target.value)} />
         <Group justify="flex-end" mt="xs">
-          <Button variant="default" onClick={onClose}>Cancel</Button>
+          <Button variant="default" onClick={onClose}>{tc('cancel')}</Button>
           <Button onClick={handleSave} loading={updateInvestment.isPending} disabled={isNaN(parsedValue) || parsedValue < 0} style={{ backgroundColor: '#0052CC' }}>
-            Save
+            {tc('save')}
           </Button>
         </Group>
       </Stack>

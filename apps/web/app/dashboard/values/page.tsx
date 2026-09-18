@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Plus, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import {
   Title,
@@ -28,6 +29,7 @@ import { CreateValueDto, Value } from '@/lib/api/services/values';
 
 
 export default function ValuesPage() {
+  const t = useTranslations('values');
   const { data: values, isLoading } = useValues();
   const createMutation = useCreateValue();
   const updateMutation = useUpdateValue();
@@ -90,8 +92,8 @@ export default function ValuesPage() {
     // Validate required title
     if (!formData.title.trim()) {
       notifications.show({
-        title: 'Title Required',
-        message: 'Please provide a title for your value or cancel.',
+        title: t('titleRequiredToastTitle'),
+        message: t('titleRequiredToastMessage'),
         color: 'red',
       });
       return;
@@ -101,15 +103,15 @@ export default function ValuesPage() {
       if (editingValue) {
         await updateMutation.mutateAsync({ id: editingValue.id, dto: formData });
         notifications.show({
-          title: 'Value Updated',
-          message: 'Your value has been successfully updated.',
+          title: t('valueUpdatedTitle'),
+          message: t('valueUpdatedMessage'),
           color: 'green',
         });
       } else {
         await createMutation.mutateAsync(formData);
         notifications.show({
-          title: 'Value Created',
-          message: 'Your value has been successfully created.',
+          title: t('valueCreatedTitle'),
+          message: t('valueCreatedMessage'),
           color: 'green',
         });
       }
@@ -120,8 +122,8 @@ export default function ValuesPage() {
     } catch (error) {
       console.error('Error saving value:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to save value. Please try again.',
+        title: t('error'),
+        message: t('saveFailed'),
         color: 'red',
       });
     }
@@ -139,7 +141,7 @@ export default function ValuesPage() {
 
   const handleDelete = (id: string) => {
     modals.openConfirmModal({
-      title: 'Delete Value',
+      title: t('deleteTitle'),
       children: (
         <Text
           style={{
@@ -150,10 +152,10 @@ export default function ValuesPage() {
             lineHeight: '20px',
           }}
         >
-          Are you sure you want to delete this value? This action cannot be undone.
+          {t('deleteBody')}
         </Text>
       ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      labels: { confirm: t('delete'), cancel: t('cancel') },
       confirmProps: {
         color: 'red',
         style: {
@@ -165,15 +167,15 @@ export default function ValuesPage() {
         try {
           await deleteMutation.mutateAsync(id);
           notifications.show({
-            title: 'Value Deleted',
-            message: 'Your value has been successfully deleted.',
+            title: t('valueDeletedTitle'),
+            message: t('valueDeletedMessage'),
             color: 'green',
           });
         } catch (error) {
           console.error('Error deleting value:', error);
           notifications.show({
-            title: 'Error',
-            message: 'Failed to delete value. Please try again.',
+            title: t('error'),
+            message: t('deleteFailed'),
             color: 'red',
           });
         }
@@ -190,7 +192,7 @@ export default function ValuesPage() {
   const handleCancel = () => {
     if (formData.title.trim() && !editingValue) {
       modals.openConfirmModal({
-        title: 'Discard Changes',
+        title: t('discardChangesTitle'),
         children: (
           <Text
             style={{
@@ -201,10 +203,10 @@ export default function ValuesPage() {
               lineHeight: '20px',
             }}
           >
-            You have unsaved changes. Are you sure you want to cancel?
+            {t('discardChangesBody')}
           </Text>
         ),
-        labels: { confirm: 'Discard', cancel: 'Keep Editing' },
+        labels: { confirm: t('discard'), cancel: t('keepEditing') },
         confirmProps: {
           color: 'red',
           style: {
@@ -257,7 +259,7 @@ export default function ValuesPage() {
             letterSpacing: '-0.02em',
           }}
         >
-          Values
+          {t('title')}
         </Title>
         <Text
           style={{
@@ -268,7 +270,7 @@ export default function ValuesPage() {
             lineHeight: '24px',
           }}
         >
-          Define and align with your core personal values
+          {t('subtitle')}
         </Text>
       </Box>
 
@@ -296,7 +298,7 @@ export default function ValuesPage() {
             },
           }}
         >
-          New Value
+          {t('newValue')}
         </Button>
       </Box>
 
@@ -382,7 +384,7 @@ export default function ValuesPage() {
                             e.currentTarget.style.textDecoration = 'none';
                           }}
                         >
-                          {isExpanded ? 'Show less' : 'Show more'}
+                          {isExpanded ? t('showLess') : t('showMore')}
                         </button>
                       )}
                     </div>
@@ -416,7 +418,7 @@ export default function ValuesPage() {
                       fontWeight: 500,
                     }}
                   >
-                    Edit
+                    {t('edit')}
                   </Menu.Item>
                   <Menu.Item
                     leftSection={<Trash2 size={14} />}
@@ -428,7 +430,7 @@ export default function ValuesPage() {
                       fontWeight: 500,
                     }}
                   >
-                    Delete
+                    {t('delete')}
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
@@ -447,7 +449,7 @@ export default function ValuesPage() {
                     letterSpacing: '0.05em',
                   }}
                 >
-                  Reinforcing Behaviors
+                  {t('reinforcingBehaviors')}
                 </Text>
                 {(() => {
                   const isExpanded = expandedBehaviors.has(value.id);
@@ -492,7 +494,7 @@ export default function ValuesPage() {
                             e.currentTarget.style.textDecoration = 'none';
                           }}
                         >
-                          {isExpanded ? 'Show less' : 'Show more'}
+                          {isExpanded ? t('showLess') : t('showMore')}
                         </button>
                       )}
                     </div>
@@ -523,7 +525,7 @@ export default function ValuesPage() {
                 color: '#6B7280',
               }}
             >
-              No values defined yet
+              {t('emptyTitle')}
             </Text>
             <Text
               ta="center"
@@ -535,7 +537,7 @@ export default function ValuesPage() {
                 lineHeight: '20px',
               }}
             >
-              Start defining your core values to guide your decisions and actions
+              {t('emptyHint')}
             </Text>
             <Button
               leftSection={<Plus size={16} />}
@@ -552,7 +554,7 @@ export default function ValuesPage() {
                 padding: '0 24px',
               }}
             >
-              Create your first value
+              {t('createFirst')}
             </Button>
           </Stack>
         </Card>
@@ -571,7 +573,7 @@ export default function ValuesPage() {
               color: '#000000',
             }}
           >
-            {editingValue ? 'Edit Value' : 'New Value'}
+            {editingValue ? t('editValue') : t('newValue')}
           </Text>
         }
         size="md"
@@ -602,13 +604,13 @@ export default function ValuesPage() {
           <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
             <Stack gap="lg" py="xs">
               <TextInput
-                label="Title"
-                placeholder="e.g., Honesty, Growth, Family"
+                label={t('titleLabel')}
+                placeholder={t('titlePlaceholder')}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
                 withAsterisk
-                error={!formData.title.trim() && formData.title !== '' ? 'Title is required' : null}
+                error={!formData.title.trim() && formData.title !== '' ? t('titleRequired') : null}
                 size="md"
                 radius={8}
                 styles={{
@@ -642,8 +644,8 @@ export default function ValuesPage() {
               />
 
               <TextInput
-                label="Short Description"
-                placeholder="Brief description of this value..."
+                label={t('shortDescription')}
+                placeholder={t('shortDescriptionPlaceholder')}
                 value={formData.shortDescription}
                 onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
                 size="md"
@@ -675,8 +677,8 @@ export default function ValuesPage() {
               />
 
               <Textarea
-                label="Reinforcing Behaviors"
-                placeholder="Describe specific behaviors, actions, or practices that reinforce this value..."
+                label={t('reinforcingBehaviors')}
+                placeholder={t('behaviorsPlaceholder')}
                 value={formData.behaviors}
                 onChange={(e) => setFormData({ ...formData, behaviors: e.target.value })}
                 rows={4}
@@ -741,7 +743,7 @@ export default function ValuesPage() {
                   },
                 }}
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 type="submit"
@@ -764,7 +766,7 @@ export default function ValuesPage() {
                   },
                 }}
               >
-                {editingValue ? 'Update' : 'Create'}
+                {editingValue ? t('update') : t('create')}
               </Button>
             </Group>
           </Box>

@@ -1,6 +1,7 @@
 'use client';
 
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { Stack, Select, NumberInput, Switch, Text } from '@mantine/core';
 import { useFinanceCategories, useCreateBudget, useUpdateBudget } from '@/hooks/useFinance';
 import { CreateBudgetDto } from '@/lib/api/services/finance';
@@ -12,8 +13,8 @@ function currentMonth() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
-function monthOptions() {
-  const fmtDate = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' });
+function monthOptions(locale: string) {
+  const fmtDate = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' });
   const options: { value: string; label: string }[] = [];
   const now = new Date();
   for (let i = -12; i <= 12; i++) {
@@ -23,12 +24,14 @@ function monthOptions() {
   }
   return options;
 }
-const MONTH_OPTIONS = monthOptions();
 
 export const BudgetForm = forwardRef<AddSubformHandle, AddSubformProps>(function BudgetForm(
   { mode, entity, prefill, onDone, onValidChange, onPendingChange },
   ref,
 ) {
+  const t = useTranslations('finance.budgetForm');
+  const locale = useLocale();
+  const monthOpts = useMemo(() => monthOptions(locale), [locale]);
   const { data: categories = [] } = useFinanceCategories('expense');
   const createBudget = useCreateBudget();
   const updateBudget = useUpdateBudget();
@@ -68,30 +71,30 @@ export const BudgetForm = forwardRef<AddSubformHandle, AddSubformProps>(function
   return (
     <Stack gap="sm">
       <Select
-        label="Category"
-        placeholder="Select expense category"
+        label={t('category')}
+        placeholder={t('selectExpenseCategory')}
         data={categories.map((c: any) => ({ value: c.id, label: c.name }))}
         value={form.categoryId}
         onChange={(v) => setForm((f) => ({ ...f, categoryId: v ?? undefined }))}
       />
       <NumberInput
-        label={`Monthly amount (${form.currency ?? 'USD'})`}
+        label={t('monthlyAmount', { currency: form.currency ?? 'USD' })}
         min={0.01}
         decimalScale={2}
         value={form.amount ?? ''}
         onChange={(v) => setForm((f) => ({ ...f, amount: typeof v === 'number' ? v : undefined }))}
       />
-      <Select label="Currency" data={CURRENCIES} value={form.currency} onChange={(v) => setForm((f) => ({ ...f, currency: v ?? 'USD' }))} />
+      <Select label={t('currency')} data={CURRENCIES} value={form.currency} onChange={(v) => setForm((f) => ({ ...f, currency: v ?? 'USD' }))} />
       <Select
-        label="Starting month"
-        data={MONTH_OPTIONS}
+        label={t('startingMonth')}
+        data={monthOpts}
         value={form.month}
         onChange={(v) => setForm((f) => ({ ...f, month: v ?? currentMonth() }))}
         comboboxProps={{ withinPortal: true }}
       />
-      <Switch label="Repeat every month" checked={repeatMonthly} onChange={(e) => setRepeatMonthly(e.currentTarget.checked)} />
+      <Switch label={t('repeatMonthly')} checked={repeatMonthly} onChange={(e) => setRepeatMonthly(e.currentTarget.checked)} />
       <Text size="xs" c="dimmed" style={{ background: '#F8FAFC', border: '1px solid #E8EBF0', borderRadius: 6, padding: 12 }}>
-        Budgets live inside Spending by category on the Money page — there&apos;s no separate Budgets tab.
+        {t('hint')}
       </Text>
     </Stack>
   );

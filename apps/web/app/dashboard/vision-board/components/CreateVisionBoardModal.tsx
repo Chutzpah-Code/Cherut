@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Modal,
   Stack,
@@ -40,6 +41,7 @@ export function CreateVisionBoardModal({
   onUploadImage,
   isCreating,
 }: CreateVisionBoardModalProps) {
+  const t = useTranslations('visionBoard.createModal');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [fullDescription, setFullDescription] = useState('');
@@ -69,7 +71,7 @@ export function CreateVisionBoardModal({
     // Validar arquivo
     const validation = imageValidation.validateFile(file);
     if (!validation.valid) {
-      setUploadError(validation.error || 'Invalid file');
+      setUploadError(validation.error || t('invalidFile'));
       return;
     }
 
@@ -81,7 +83,7 @@ export function CreateVisionBoardModal({
       setImageUrl(url);
     } catch (error) {
       console.error('Error uploading image:', error);
-      setUploadError('Failed to upload image. Please try again.');
+      setUploadError(t('uploadFailed'));
       setImageFile(null);
     } finally {
       setIsUploadingImage(false);
@@ -94,12 +96,12 @@ export function CreateVisionBoardModal({
 
     // Frontend validation before making API call
     if (!title.trim()) {
-      setCreateError('Please enter a title');
+      setCreateError(t('titleRequired'));
       return;
     }
 
     if (!imageUrl) {
-      setCreateError('Please upload an image');
+      setCreateError(t('imageRequired'));
       return;
     }
 
@@ -114,7 +116,7 @@ export function CreateVisionBoardModal({
 
       resetForm();
     } catch (error: any) {
-      let errorMessage = 'Failed to create vision board item. Please try again.';
+      let errorMessage = t('createFailed');
 
       if (error?.response?.data?.message) {
         errorMessage = error.response.data.message;
@@ -148,7 +150,7 @@ export function CreateVisionBoardModal({
               color: '#000000',
             }}
           >
-            Add to Vision Board
+            {t('title')}
           </Text>
         }
         size="lg"
@@ -184,7 +186,7 @@ export function CreateVisionBoardModal({
               color: '#000000',
             }}
           >
-            Image <Text component="span" c="red">*</Text>
+            {t('image')} <Text component="span" c="red">*</Text>
           </Text>
 
           {!imageUrl ? (
@@ -227,7 +229,7 @@ export function CreateVisionBoardModal({
                           color: '#666666',
                         }}
                       >
-                        Uploading image...
+                        {t('uploadingImage')}
                       </Text>
                     </>
                   ) : (
@@ -242,7 +244,7 @@ export function CreateVisionBoardModal({
                           color: '#000000',
                         }}
                       >
-                        Click to upload image
+                        {t('clickToUpload')}
                       </Text>
                       <Text
                         mt="xs"
@@ -252,7 +254,7 @@ export function CreateVisionBoardModal({
                           color: '#666666',
                         }}
                       >
-                        PNG, JPG, JPEG, WEBP (max 1MB)
+                        {t('fileHint')}
                       </Text>
                     </>
                   )}
@@ -316,7 +318,7 @@ export function CreateVisionBoardModal({
                       },
                     }}
                   >
-                    Change Image
+                    {t('changeImage')}
                   </Button>
                 )}
               </FileButton>
@@ -345,8 +347,8 @@ export function CreateVisionBoardModal({
 
         {/* Form */}
         <TextInput
-          label="Title"
-          placeholder="E.g., Trip to Kyoto, Run a 5K, Read 20 Books"
+          label={t('titleLabel')}
+          placeholder={t('titlePlaceholder')}
           value={title}
           onChange={(e) => {
             setTitle(e.target.value);
@@ -384,8 +386,8 @@ export function CreateVisionBoardModal({
         />
 
         <Textarea
-          label="Short Description"
-          placeholder="Brief description (visible on card)"
+          label={t('shortDescription')}
+          placeholder={t('shortDescriptionPlaceholder')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={2}
@@ -417,8 +419,8 @@ export function CreateVisionBoardModal({
         />
 
         <Textarea
-          label="Full Description"
-          placeholder="Detailed description about your goal, why it's important, how you'll achieve it..."
+          label={t('fullDescription')}
+          placeholder={t('fullDescriptionPlaceholder')}
           value={fullDescription}
           onChange={(e) => setFullDescription(e.target.value)}
           rows={4}
@@ -450,9 +452,9 @@ export function CreateVisionBoardModal({
         />
 
         <DateInput
-          label="Due Date"
-          description="When do you want to achieve this?"
-          placeholder="Select date"
+          label={t('dueDate')}
+          description={t('dueDateDesc')}
+          placeholder={t('dueDatePlaceholder')}
           value={dueDateValue}
           onChange={setDueDateValue}
           clearable
@@ -535,7 +537,7 @@ export function CreateVisionBoardModal({
                 },
               }}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               onClick={handleCreate}
@@ -559,7 +561,7 @@ export function CreateVisionBoardModal({
                 },
               }}
             >
-              Add to Vision Board
+              {t('addToBoard')}
             </Button>
           </Group>
         </Box>

@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { Card, Text, Group, Badge, ActionIcon, Menu } from '@mantine/core';
 import { MoreVertical, Edit, Trash2, Calendar, Eye, ArchiveRestore } from 'lucide-react';
 import { JournalEntry } from '@/lib/api/services/journal';
 import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface EntryCardProps {
   entry: JournalEntry;
@@ -16,7 +18,10 @@ interface EntryCardProps {
 }
 
 export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false, onUnarchive }: EntryCardProps) {
-  const formattedDate = format(new Date(entry.createdAt), 'MMM dd, yyyy');
+  const t = useTranslations('journal.entryCard');
+  const locale = useLocale();
+  const dateFnsLocale = locale === 'pt-BR' ? ptBR : undefined;
+  const formattedDate = format(new Date(entry.createdAt), 'MMM dd, yyyy', { locale: dateFnsLocale });
   const formattedTime = format(new Date(entry.createdAt), 'HH:mm');
 
   // Get preview text (first 150 characters)
@@ -70,7 +75,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
             flex: 1,
           }}
         >
-          {entry.title || 'Untitled Entry'}
+          {entry.title || t('untitled')}
         </Text>
         {isArchived && (
           <Badge
@@ -86,7 +91,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
               color: '#6B7280',
             }}
           >
-            Archived
+            {t('archived')}
           </Badge>
         )}
       </Group>
@@ -104,7 +109,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
               color: '#666666',
             }}
           >
-            {formattedDate} at {formattedTime}
+            {t('createdAt', { date: formattedDate, time: formattedTime })}
           </Text>
           {wasUpdated && (
             <Badge
@@ -121,7 +126,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
                 },
               }}
             >
-              Edited
+              {t('edited')}
             </Badge>
           )}
         </Group>
@@ -149,7 +154,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
                       onClick();
                     }}
                   >
-                    View Details
+                    {t('viewDetails')}
                   </Menu.Item>
                   {onUnarchive && (
                     <Menu.Item
@@ -159,7 +164,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
                         onUnarchive(entry);
                       }}
                     >
-                      Unarchive
+                      {t('unarchive')}
                     </Menu.Item>
                   )}
                   {onDelete && (
@@ -173,7 +178,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
                           onDelete();
                         }}
                       >
-                        Delete Permanently
+                        {t('deletePermanently')}
                       </Menu.Item>
                     </>
                   )}
@@ -188,7 +193,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
                         onEdit();
                       }}
                     >
-                      Edit
+                      {t('edit')}
                     </Menu.Item>
                   )}
                   {onDelete && (
@@ -200,7 +205,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
                         onDelete();
                       }}
                     >
-                      Delete
+                      {t('delete')}
                     </Menu.Item>
                   )}
                 </>
@@ -236,7 +241,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
             color: '#666666',
           }}
         >
-          {entry.content.length.toLocaleString('en-US')} characters
+          {t('charCount', { count: entry.content.length.toLocaleString(locale) })}
         </Text>
         <Text
           size="xs"
@@ -248,7 +253,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
             color: '#4686FE',
           }}
         >
-          Click to read more
+          {t('clickToReadMore')}
         </Text>
       </Group>
       </Card>

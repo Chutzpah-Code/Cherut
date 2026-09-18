@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { Textarea, Button, Group, Paper, Text, Alert, Stack, TextInput } from '@mantine/core';
 import { useCreateJournalEntry } from '@/hooks/useJournal';
 
@@ -11,6 +12,8 @@ interface JournalEntryFormProps {
 }
 
 export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntryFormProps) {
+  const t = useTranslations('journal.entryForm');
+  const locale = useLocale();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
@@ -21,22 +24,22 @@ export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntr
     e.preventDefault();
 
     if (!title.trim()) {
-      setError('Please enter a title for your entry.');
+      setError(t('errorTitleRequired'));
       return;
     }
 
     if (!content.trim()) {
-      setError('Please write something before saving.');
+      setError(t('errorContentRequired'));
       return;
     }
 
     if (title.length > 200) {
-      setError('Title is too long. Maximum 200 characters allowed.');
+      setError(t('errorTitleTooLong'));
       return;
     }
 
     if (content.length > 20000) {
-      setError('Entry is too long. Maximum 20,000 characters allowed.');
+      setError(t('errorContentTooLong'));
       return;
     }
 
@@ -50,7 +53,7 @@ export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntr
       setContent('');
       onSuccess();
     } catch (error) {
-      setError('Failed to save entry. Please try again.');
+      setError(t('errorSaveFailed'));
       console.error('Error creating journal entry:', error);
     }
   };
@@ -64,7 +67,7 @@ export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntr
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <Text fw={600} size="lg">
-            New Journal Entry
+            {t('newEntry')}
           </Text>
 
           {error && (
@@ -74,8 +77,8 @@ export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntr
           )}
 
           <TextInput
-            label="Title"
-            placeholder="Enter a title for your journal entry..."
+            label={t('titleLabel')}
+            placeholder={t('titlePlaceholder')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -83,8 +86,8 @@ export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntr
           />
 
           <Textarea
-            label="Content"
-            placeholder="Write your thoughts here... What's on your mind today?"
+            label={t('contentLabel')}
+            placeholder={t('contentPlaceholder')}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             minRows={8}
@@ -96,7 +99,7 @@ export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntr
 
           <Stack gap="sm">
             <Text size="sm" c={characterCountColor} ta="center">
-              {characterCount.toLocaleString('en-US')} / 20,000 characters
+              {t('charCount', { count: characterCount.toLocaleString(locale) })}
             </Text>
 
             <Group gap="sm" grow justify="flex-end">
@@ -105,7 +108,7 @@ export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntr
                 onClick={onCancel}
                 disabled={isLoading || createMutation.isPending}
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 type="submit"
@@ -113,7 +116,7 @@ export function JournalEntryForm({ onSuccess, onCancel, isLoading }: JournalEntr
                 disabled={!title.trim() || !content.trim() || isOverLimit}
                 color="blue"
               >
-                Save Entry
+                {t('saveEntry')}
               </Button>
             </Group>
           </Stack>

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Modal,
   TextInput,
@@ -117,16 +118,21 @@ function formatHMFull(seconds: number): string {
   return `${hours}h ${String(minutes).padStart(2, '0')}m`;
 }
 
-function formatCreatedEdited(createdAt: string, updatedAt: string): string {
-  const created = new Date(createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+function formatCreatedEdited(
+  createdAt: string,
+  updatedAt: string,
+  locale: string,
+  t: (key: string, values?: Record<string, string | number>) => string,
+): string {
+  const created = new Date(createdAt).toLocaleDateString(locale, { month: 'short', day: 'numeric' });
   const editedMs = Date.now() - new Date(updatedAt).getTime();
   const editedMin = Math.floor(editedMs / 60000);
   let edited: string;
-  if (editedMin < 1) edited = 'just now';
-  else if (editedMin < 60) edited = `${editedMin}m ago`;
-  else if (editedMin < 1440) edited = `${Math.floor(editedMin / 60)}h ago`;
-  else edited = `${Math.floor(editedMin / 1440)}d ago`;
-  return `Created ${created} · edited ${edited}`;
+  if (editedMin < 1) edited = t('justNow');
+  else if (editedMin < 60) edited = t('minutesAgo', { count: editedMin });
+  else if (editedMin < 1440) edited = t('hoursAgo', { count: Math.floor(editedMin / 60) });
+  else edited = t('daysAgo', { count: Math.floor(editedMin / 1440) });
+  return t('createdEdited', { created, edited });
 }
 
 // ── small shared field styles ────────────────────────────────────────────────
@@ -189,6 +195,7 @@ function TimePanel({
   onStart,
   onStop,
 }: TimePanelProps) {
+  const t = useTranslations('tasks.taskModal');
   const done = Math.floor(totalTimeTracked / SESSION_SECONDS);
   const segmentCount = Math.max(estimatedPomodoros, done);
 
@@ -197,7 +204,7 @@ function TimePanel({
       <Group justify="space-between" align="center" gap="md" wrap="wrap">
         <Stack gap={3}>
           <Text style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: MUTED }}>
-            Time tracked
+            {t('timeTracked')}
           </Text>
           <Text
             style={{
@@ -217,7 +224,7 @@ function TimePanel({
             onClick={onStop}
             style={{ fontSize: 13, fontWeight: 600 }}
           >
-            Stop
+            {t('stop')}
           </Button>
         ) : (
           <Button
@@ -228,7 +235,7 @@ function TimePanel({
             style={{ backgroundColor: PRIMARY, fontSize: 13, fontWeight: 600 }}
             styles={{ root: { '&:hover': { backgroundColor: PRIMARY_HOVER } } }}
           >
-            Start
+            {t('start')}
           </Button>
         )}
       </Group>
@@ -244,18 +251,18 @@ function TimePanel({
       >
         <Stack gap={6}>
           <Text style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: MUTED }}>
-            Estimated pomodoros
+            {t('estimatedPomodoros')}
           </Text>
           <Group gap={10} wrap="wrap">
             <PomodoroStepper value={estimatedPomodoros} onChange={onEstimateChange} />
             <Text size="xs" style={{ color: MUTED }}>
-              {estimatedPomodoros === 0 ? 'No estimate' : `≈ ${formatHMFull(estimatedPomodoros * SESSION_SECONDS)} at 25m each`}
+              {estimatedPomodoros === 0 ? t('noEstimate') : t('approxAt25m', { duration: formatHMFull(estimatedPomodoros * SESSION_SECONDS) })}
             </Text>
           </Group>
         </Stack>
         <Stack gap={6} align="flex-end">
           <Text style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: MUTED }}>
-            Done
+            {t('done')}
           </Text>
           <Text size="sm" fw={700} style={{ fontVariantNumeric: 'tabular-nums' }}>
             {done} <Text component="span" fw={600} style={{ color: FAINT }}>/ {estimatedPomodoros}</Text>
@@ -303,6 +310,7 @@ interface OverLimitChoice {
 function ChecklistSection({
   items, newItemValue, onNewItemChange, onAddItem, onToggleItem, onRemoveItem, onEditItem, onAddItems,
 }: ChecklistSectionProps) {
+  const t = useTranslations('tasks.taskModal');
   const completed = items.filter((i) => i.completed).length;
   const total = items.length;
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -392,7 +400,7 @@ function ChecklistSection({
   return (
     <Stack gap={10}>
       <Group justify="space-between" align="baseline">
-        <Text style={fieldLabelStyle}>Checklist</Text>
+        <Text style={fieldLabelStyle}>{t('checklist')}</Text>
         {total > 0 && (
           <Text size="xs" fw={600} style={{ color: MUTED, fontVariantNumeric: 'tabular-nums' }}>
             {completed} / {total}
@@ -464,7 +472,7 @@ function ChecklistSection({
             value={bulkText}
             onChange={(e) => setBulkText(e.target.value)}
             onPaste={handleBulkPaste}
-            placeholder="Paste or type multiple items, one per line…"
+            placeholder={t('bulkPlaceholder')}
             autosize
             minRows={4}
             maxRows={10}
@@ -474,11 +482,11 @@ function ChecklistSection({
           />
           <Group justify="space-between" align="center" wrap="wrap">
             <Text size="xs" c="dimmed">
-              {bulkLines.length} item{bulkLines.length !== 1 ? 's' : ''} detected
+              {t('itemsDetected', { count: bulkLines.length })}
             </Text>
             <Group gap={8}>
               <Button size="xs" radius={6} variant="default" onClick={closeBulk} style={{ color: SECONDARY, borderColor: BORDER }}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 size="xs"
@@ -487,7 +495,7 @@ function ChecklistSection({
                 onClick={() => commitBulk(bulkLines)}
                 style={{ backgroundColor: PRIMARY, fontWeight: 600 }}
               >
-                Add {bulkLines.length} item{bulkLines.length !== 1 ? 's' : ''}
+                {t('addItems', { count: bulkLines.length })}
               </Button>
             </Group>
           </Group>
@@ -495,7 +503,7 @@ function ChecklistSection({
       ) : (
         <Group gap={8}>
           <TextInput
-            placeholder="Add an item"
+            placeholder={t('addAnItem')}
             value={newItemValue}
             onChange={(e) => onNewItemChange(e.target.value)}
             onKeyDown={(e) => {
@@ -518,7 +526,7 @@ function ChecklistSection({
             disabled={!newItemValue.trim()}
             style={{ fontSize: 13, fontWeight: 600, color: SECONDARY, borderColor: BORDER }}
           >
-            Add item
+            {t('addItem')}
           </Button>
           <Button
             size="sm"
@@ -528,7 +536,7 @@ function ChecklistSection({
             onClick={() => setBulkOpen(true)}
             style={{ fontSize: 13, fontWeight: 600, color: SECONDARY, borderColor: BORDER }}
           >
-            Bulk add
+            {t('bulkAdd')}
           </Button>
         </Group>
       )}
@@ -536,13 +544,13 @@ function ChecklistSection({
       <Modal
         opened={!!pasteChoice}
         onClose={() => setPasteChoice(null)}
-        title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>Multiple items detected</Text>}
+        title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>{t('multipleItemsDetected')}</Text>}
         centered
         size="sm"
       >
         <Stack gap="md">
           <Text size="sm" style={{ color: MUTED }}>
-            Found {pasteChoice?.lines.length} lines in what you pasted. Add each line as its own checklist item, or keep it as a single item?
+            {t('foundLines', { count: pasteChoice?.lines.length ?? 0 })}
           </Text>
           <Group justify="flex-end" gap="sm">
             <Button
@@ -552,7 +560,7 @@ function ChecklistSection({
                 setPasteChoice(null);
               }}
             >
-              Add as one item
+              {t('addAsOneItem')}
             </Button>
             <Button
               style={{ backgroundColor: PRIMARY }}
@@ -561,7 +569,7 @@ function ChecklistSection({
                 setPasteChoice(null);
               }}
             >
-              Split into {pasteChoice?.lines.length} items
+              {t('splitInto', { count: pasteChoice?.lines.length ?? 0 })}
             </Button>
           </Group>
         </Stack>
@@ -570,26 +578,25 @@ function ChecklistSection({
       <Modal
         opened={!!overLimit}
         onClose={() => setOverLimit(null)}
-        title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>Some items are too long</Text>}
+        title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>{t('someItemsTooLong')}</Text>}
         centered
         size="sm"
       >
         <Stack gap="md">
           <Text size="sm" style={{ color: MUTED }}>
-            {overLimit?.overLong.length} item{overLimit && overLimit.overLong.length !== 1 ? 's' : ''} over the {CHECKLIST_ITEM_MAX_LENGTH}-character limit.
-            Nothing has been added yet — choose how to handle {overLimit && overLimit.overLong.length !== 1 ? 'them' : 'it'}:
+            {t('overCharLimit', { count: overLimit?.overLong.length ?? 0, limit: CHECKLIST_ITEM_MAX_LENGTH })}
           </Text>
           <Stack gap={6}>
             {overLimit && overLimit.valid.length > 0 && (
               <Button variant="default" onClick={resolveOverLimitAddValidOnly}>
-                Add the {overLimit.valid.length} valid item{overLimit.valid.length !== 1 ? 's' : ''} only
+                {t('addValidOnly', { count: overLimit.valid.length })}
               </Button>
             )}
             <Button style={{ backgroundColor: PRIMARY }} onClick={resolveOverLimitAutoSplit}>
-              Auto-split the long item{overLimit && overLimit.overLong.length !== 1 ? 's' : ''}
+              {t('autoSplit', { count: overLimit?.overLong.length ?? 0 })}
             </Button>
             <Button variant="subtle" color="gray" onClick={() => setOverLimit(null)}>
-              Cancel
+              {t('cancel')}
             </Button>
           </Stack>
         </Stack>
@@ -607,6 +614,8 @@ interface DueDatePillsProps {
 }
 
 function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePillsProps) {
+  const t = useTranslations('tasks.taskModal');
+  const locale = useLocale();
   const timeInputRef = useRef<HTMLInputElement>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const today = useMemo(() => localISODate(new Date()), []);
@@ -620,7 +629,7 @@ function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePills
   const isTomorrow = value === tomorrow;
   const isCustom = !!value && !isToday && !isTomorrow;
   const customLabel = isCustom && value
-    ? new Date(value + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    ? new Date(value + 'T00:00:00').toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })
     : null;
 
   const pillStyle = (active: boolean): React.CSSProperties => ({
@@ -641,14 +650,14 @@ function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePills
 
   return (
     <Stack gap={7}>
-      <Text style={fieldLabelStyle}>Due date</Text>
+      <Text style={fieldLabelStyle}>{t('dueDate')}</Text>
       <Group gap={6} wrap="wrap" align="center">
-        <Box style={pillStyle(isToday)} onClick={() => onChange(today)}>Today</Box>
-        <Box style={pillStyle(isTomorrow)} onClick={() => onChange(tomorrow)}>Tomorrow</Box>
+        <Box style={pillStyle(isToday)} onClick={() => onChange(today)}>{t('today')}</Box>
+        <Box style={pillStyle(isTomorrow)} onClick={() => onChange(tomorrow)}>{t('tomorrow')}</Box>
         <Popover opened={pickerOpen} onChange={setPickerOpen} position="bottom-start" withinPortal shadow="md">
           <Popover.Target>
             <Box style={pillStyle(isCustom)} onClick={() => setPickerOpen((o) => !o)}>
-              {customLabel ?? 'Pick'}
+              {customLabel ?? t('pick')}
             </Box>
           </Popover.Target>
           <Popover.Dropdown>
@@ -665,7 +674,7 @@ function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePills
           </Popover.Dropdown>
         </Popover>
         {value && (
-          <ActionIcon size="sm" variant="subtle" color="gray" aria-label="Clear due date" onClick={clearDate}>
+          <ActionIcon size="sm" variant="subtle" color="gray" aria-label={t('clearDueDate')} onClick={clearDate}>
             <X size={14} />
           </ActionIcon>
         )}
@@ -678,7 +687,7 @@ function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePills
           onChange={(e) => onTimeChange(e.currentTarget.value || undefined)}
           size="xs"
           radius={6}
-          placeholder="Optional time"
+          placeholder={t('optionalTime')}
           style={{ width: 130 }}
           styles={{ input: { fontSize: 12.5, borderColor: BORDER } }}
           rightSection={
@@ -686,7 +695,7 @@ function DueDatePills({ value, timeValue, onChange, onTimeChange }: DueDatePills
               variant="subtle"
               color="gray"
               size="xs"
-              aria-label="Pick time"
+              aria-label={t('pickTime')}
               onClick={() => (timeInputRef.current as any)?.showPicker?.()}
             >
               <Clock size={13} color={MUTED} />
@@ -725,6 +734,8 @@ export function TaskModal({
   onStopTimeTracking,
   onToggleChecklistItem,
 }: TaskModalProps) {
+  const t = useTranslations('tasks.taskModal');
+  const locale = useLocale();
   const { data: lifeAreas } = useLifeAreas();
   const { data: allObjectives } = useObjectives(undefined);
   const { data: allKeyResults } = useKeyResults(undefined);
@@ -791,7 +802,7 @@ export function TaskModal({
     onSave(currentTask.id, formData);
     onClose();
     notifications.show({
-      title: 'Task updated',
+      title: t('taskUpdated'),
       message: formData.title || currentTask.title,
       color: 'green',
       autoClose: 2500,
@@ -831,13 +842,13 @@ export function TaskModal({
 
   const handleDeleteClick = () => {
     modals.openConfirmModal({
-      title: 'Delete task',
+      title: t('deleteTask'),
       children: (
         <Text style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#666666', lineHeight: '20px' }}>
-          Are you sure you want to delete &quot;{currentTask.title}&quot;? This action cannot be undone.
+          {t('deleteConfirm', { title: currentTask.title })}
         </Text>
       ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      labels: { confirm: t('confirm'), cancel: t('cancel') },
       confirmProps: { color: 'red', style: { fontFamily: 'Inter, sans-serif', fontWeight: 600 } },
       onConfirm: () => {
         onDelete(currentTask.id);
@@ -857,7 +868,7 @@ export function TaskModal({
       title={
         <Stack gap={6} style={{ minWidth: 0 }}>
           <Text style={{ fontFamily: 'Inter Display, sans-serif', fontSize: 17, fontWeight: 700, color: INK }}>
-            Edit task
+            {t('editTask')}
           </Text>
           <Group gap={8} wrap="wrap">
             {columnName && (
@@ -866,7 +877,7 @@ export function TaskModal({
               </Box>
             )}
             <Text style={{ fontSize: 11.5, color: MUTED }}>
-              {formatCreatedEdited(currentTask.createdAt, currentTask.updatedAt)}
+              {formatCreatedEdited(currentTask.createdAt, currentTask.updatedAt, locale, t)}
             </Text>
           </Group>
         </Stack>
@@ -907,9 +918,9 @@ export function TaskModal({
             }}
           >
             <Stack gap={7}>
-              <Text style={fieldLabelStyle}>Title</Text>
+              <Text style={fieldLabelStyle}>{t('titleLabel')}</Text>
               <TextInput
-                placeholder="Task title"
+                placeholder={t('titlePlaceholder')}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
@@ -920,9 +931,9 @@ export function TaskModal({
             </Stack>
 
             <Stack gap={7}>
-              <Text style={fieldLabelStyle}>Description</Text>
+              <Text style={fieldLabelStyle}>{t('descriptionLabel')}</Text>
               <Textarea
-                placeholder="Task description"
+                placeholder={t('descriptionPlaceholder')}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 minRows={3}
@@ -969,20 +980,20 @@ export function TaskModal({
             }}
           >
             <Text style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: MUTED }}>
-              Details
+              {t('details')}
             </Text>
 
             <Stack gap={7}>
-              <Text style={fieldLabelStyle}>Priority</Text>
+              <Text style={fieldLabelStyle}>{t('priority')}</Text>
               <SegmentedControl
                 fullWidth
                 value={formData.priority ?? 'medium'}
                 onChange={(v) => setFormData({ ...formData, priority: v as Task['priority'] })}
                 data={[
-                  { value: 'low', label: 'Low' },
-                  { value: 'medium', label: 'Medium' },
-                  { value: 'high', label: 'High' },
-                  { value: 'urgent', label: 'Urgent' },
+                  { value: 'low', label: t('priorityLow') },
+                  { value: 'medium', label: t('priorityMedium') },
+                  { value: 'high', label: t('priorityHigh') },
+                  { value: 'urgent', label: t('priorityUrgent') },
                 ]}
                 radius={7}
                 styles={{
@@ -1002,8 +1013,8 @@ export function TaskModal({
 
             <Stack gap={7}>
               <Select
-                label="Life area"
-                placeholder="Select life area"
+                label={t('lifeArea')}
+                placeholder={t('selectLifeArea')}
                 value={formData.lifeAreaId}
                 onChange={(value) => setFormData({ ...formData, lifeAreaId: value || undefined, objectiveId: undefined, keyResultId: undefined })}
                 data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
@@ -1016,8 +1027,8 @@ export function TaskModal({
 
             <Stack gap={7}>
               <Select
-                label="Objective"
-                placeholder="Not linked"
+                label={t('objective')}
+                placeholder={t('notLinked')}
                 value={formData.objectiveId}
                 onChange={(value) => setFormData({ ...formData, objectiveId: value || undefined, keyResultId: undefined })}
                 data={filteredObjectives?.map((obj) => ({ value: obj.id, label: obj.title })) || []}
@@ -1027,14 +1038,14 @@ export function TaskModal({
                 styles={selectStyles}
               />
               <Text style={{ fontSize: 11.5, color: MUTED, lineHeight: 1.4 }}>
-                Link an objective to unlock its key results below.
+                {t('linkObjectiveHint')}
               </Text>
             </Stack>
 
             <Stack gap={7}>
-              <Text style={{ ...fieldLabelStyle, color: formData.objectiveId ? SECONDARY : FAINT }}>Key result</Text>
+              <Text style={{ ...fieldLabelStyle, color: formData.objectiveId ? SECONDARY : FAINT }}>{t('keyResult')}</Text>
               <Select
-                placeholder={formData.objectiveId ? 'Link to key result' : 'Pick an objective first'}
+                placeholder={formData.objectiveId ? t('linkToKeyResult') : t('pickObjectiveFirst')}
                 value={formData.keyResultId}
                 onChange={(value) => setFormData({ ...formData, keyResultId: value || undefined })}
                 data={filteredKeyResults?.map((kr) => ({ value: kr.id, label: kr.title })) || []}
@@ -1054,9 +1065,9 @@ export function TaskModal({
               <Stack gap={2} style={{ minWidth: 0 }}>
                 <Group gap={6}>
                   <RefreshCw size={13} color={MUTED} />
-                  <Text style={fieldLabelStyle}>Recurring</Text>
+                  <Text style={fieldLabelStyle}>{t('recurring')}</Text>
                 </Group>
-                <Text style={{ fontSize: 11.5, color: MUTED }}>{formData.isRecurring ? 'On' : 'Off'}</Text>
+                <Text style={{ fontSize: 11.5, color: MUTED }}>{formData.isRecurring ? t('on') : t('off')}</Text>
               </Stack>
               <Switch
                 checked={!!formData.isRecurring}
@@ -1078,7 +1089,7 @@ export function TaskModal({
             {formData.isRecurring && (
               <Stack gap="sm" style={{ padding: 12, background: SUBTLE, borderRadius: 8, border: `1px solid ${HAIRLINE}` }}>
                 <Select
-                  label="Frequency"
+                  label={t('frequency')}
                   size="xs"
                   value={formData.recurringConfig?.frequency ?? 'daily'}
                   onChange={(v) => setFormData({
@@ -1086,14 +1097,14 @@ export function TaskModal({
                     recurringConfig: { ...(formData.recurringConfig ?? { startDate: '', endDate: '' }), frequency: v as RecurringConfig['frequency'] },
                   })}
                   data={[
-                    { value: 'daily', label: 'Daily' },
-                    { value: 'weekly', label: 'Weekly' },
-                    { value: 'monthly', label: 'Monthly' },
+                    { value: 'daily', label: t('daily') },
+                    { value: 'weekly', label: t('weekly') },
+                    { value: 'monthly', label: t('monthly') },
                   ]}
                   styles={selectStyles}
                 />
                 <TextInput
-                  label="Start date"
+                  label={t('startDate')}
                   type="date"
                   size="xs"
                   value={formData.recurringConfig?.startDate ?? ''}
@@ -1104,7 +1115,7 @@ export function TaskModal({
                   styles={{ label: fieldLabelStyle }}
                 />
                 <TextInput
-                  label="End date"
+                  label={t('endDate')}
                   type="date"
                   size="xs"
                   value={formData.recurringConfig?.endDate ?? ''}
@@ -1124,7 +1135,7 @@ export function TaskModal({
                   return (
                     <Stack gap="xs">
                       <Group justify="space-between">
-                        <Text size="xs" fw={600} c="dimmed">{done}/{total} days complete</Text>
+                        <Text size="xs" fw={600} c="dimmed">{t('daysComplete', { done, total })}</Text>
                         <Text size="xs" c="dimmed">{pct}%</Text>
                       </Group>
                       <Progress value={pct} size="sm" radius={4} color={PRIMARY} />
@@ -1163,13 +1174,13 @@ export function TaskModal({
                 style={{ fontSize: 13, fontWeight: 600, color: SECONDARY, cursor: 'pointer' }}
                 onClick={() => onArchive(currentTask.id)}
               >
-                {currentTask.archived ? 'Unarchive task' : 'Archive task'}
+                {currentTask.archived ? t('unarchiveTask') : t('archiveTask')}
               </Text>
               <Text
                 style={{ fontSize: 13, fontWeight: 600, color: DANGER, cursor: 'pointer' }}
                 onClick={handleDeleteClick}
               >
-                Delete task
+                {t('deleteTask')}
               </Text>
             </Stack>
           </Box>
@@ -1193,7 +1204,7 @@ export function TaskModal({
             fullWidth={isPhone}
             style={{ fontSize: 13.5, fontWeight: 600, color: SECONDARY, borderColor: BORDER, height: 40 }}
           >
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleSave}
@@ -1203,7 +1214,7 @@ export function TaskModal({
             style={{ backgroundColor: PRIMARY, fontSize: 13.5, fontWeight: 600, height: 40 }}
             styles={{ root: { '&:hover': { backgroundColor: PRIMARY_HOVER } } }}
           >
-            Save changes
+            {t('saveChanges')}
           </Button>
         </Group>
       </Box>

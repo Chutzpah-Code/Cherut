@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Group, Text, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 
@@ -18,10 +19,11 @@ export function useUndoableDelete<T extends string = string>(
   deleteFn: (id: T) => void,
   opts?: { label?: string; delayMs?: number },
 ) {
+  const t = useTranslations('finance.common');
   const [pendingIds, setPendingIds] = useState<Set<T>>(new Set());
   const timers = useRef(new Map<T, ReturnType<typeof setTimeout>>());
   const delay = opts?.delayMs ?? 5000;
-  const label = opts?.label ?? 'Item';
+  const label = opts?.label ?? t('item');
 
   const undo = useCallback((id: T) => {
     const timer = timers.current.get(id);
@@ -58,8 +60,8 @@ export function useUndoableDelete<T extends string = string>(
       color: 'gray',
       message: (
         <Group justify="space-between" wrap="nowrap" gap="sm">
-          <Text size="sm">{label} deleted</Text>
-          <Button size="xs" variant="white" onClick={() => undo(id)}>Undo</Button>
+          <Text size="sm">{t('itemDeleted', { label })}</Text>
+          <Button size="xs" variant="white" onClick={() => undo(id)}>{t('undo')}</Button>
         </Group>
       ),
     });

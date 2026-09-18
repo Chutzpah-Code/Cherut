@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { useQueryClient, QueryClient } from '@tanstack/react-query';
 import { Notification } from '@/components/notifications/NotificationCenter';
 import { NotificationService } from '@/lib/services/notificationService';
@@ -46,6 +47,7 @@ function readCachedList<T extends { id: string }>(
 }
 
 export function useNotifications(): UseNotificationsReturn {
+  const t = useTranslations('notificationService');
   const queryClient = useQueryClient();
 
   const [dismissed, setDismissed] = useState<string[]>(() => {
@@ -94,14 +96,14 @@ export function useNotifications(): UseNotificationsReturn {
       objectives,
       visionBoardItems,
       habitLogs,
-    });
+    }, t);
 
     return generated
       .filter((n) => NotificationService.shouldShowNotification(n, dismissed))
       .map((n) => ({ ...n, read: readIds.has(n.id) }));
   // cacheTick drives reactivity; eslint doesn't see it as a dep
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryClient, cacheTick, dismissed, readIds]);
+  }, [queryClient, cacheTick, dismissed, readIds, t]);
 
   const unreadCount = useMemo(
     () => notifications.filter((n) => !n.read).length,

@@ -1,12 +1,13 @@
 'use client';
 
+import { useTranslations, useLocale } from 'next-intl';
 import { Group, Box, Text, Badge, ActionIcon } from '@mantine/core';
 import { ArrowUpCircle, ArrowDownCircle, Pencil, Trash2 } from 'lucide-react';
 import { FinanceTransaction } from '@/lib/api/services/finance';
 
-function fmt(value: number, currency?: string) {
+function fmt(value: number, locale: string, currency?: string) {
   try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency ?? 'USD' }).format(value);
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: currency ?? 'USD' }).format(value);
   } catch {
     return `${currency ?? ''} ${value.toFixed(2)}`;
   }
@@ -18,6 +19,8 @@ export function TransactionRow({ tx, currency, categoryName, accountName, onDele
   tx: FinanceTransaction; currency?: string; categoryName?: string; accountName?: string;
   onDelete?: () => void; onEdit?: () => void;
 }) {
+  const t = useTranslations('finance.transactionRow');
+  const locale = useLocale();
   const isIncome = tx.type === 'income';
   const isOrphaned = !!tx.accountId && !accountName;
   return (
@@ -33,18 +36,18 @@ export function TransactionRow({ tx, currency, categoryName, accountName, onDele
           <Group gap={4} wrap="nowrap">
             {isOrphaned && (
               <Badge size="xs" variant="light" color="orange" style={{ textTransform: 'none', flexShrink: 0 }}>
-                Deleted account
+                {t('deletedAccount')}
               </Badge>
             )}
             <Text size="xs" c="dimmed" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {categoryName ? `${categoryName} · ` : 'Uncategorized · '}{tx.date}
+              {categoryName ? `${categoryName} · ` : `${t('uncategorized')} · `}{tx.date}
             </Text>
           </Group>
         </Box>
       </Group>
       <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
         <Text fw={600} size="sm" style={{ color: isIncome ? '#2e7d32' : '#c62828', whiteSpace: 'nowrap' }}>
-          {isIncome ? '+' : '-'}{fmt(tx.amount, currency)}
+          {isIncome ? '+' : '-'}{fmt(tx.amount, locale, currency)}
         </Text>
         {onEdit && (
           <ActionIcon size="md" variant="subtle" color="blue" onClick={onEdit}>

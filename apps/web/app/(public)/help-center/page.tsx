@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { PageShell } from '@/components/shell/Shell';
 
 const BG      = '#07070D';
@@ -12,40 +13,17 @@ const ACCENT  = 'oklch(0.68 0.24 260)';
 const ACCENT_DIM = 'rgba(80,110,255,0.12)';
 const RULE    = 'rgba(255,255,255,0.08)';
 
-const categories = [
-  { icon: '◐', title: 'Getting started', articles: [
-    { title: 'What is Cherut?', body: 'Cherut is a personal operating system that connects your habits, tasks, OKRs, journal and vision board in one place. Start by setting up your Life Areas and creating your first Objective.' },
-    { title: 'Setting up your account', body: 'After signing up, you will be guided through a short onboarding flow. Pick the modules you want active — you can turn others on later from Settings.' },
-    { title: 'Choosing your first module', body: 'Not sure where to start? Most people begin with Habits or Tasks. Once you have a rhythm, add OKRs to give your daily actions a direction.' },
-  ]},
-  { icon: '◇', title: 'Habits', articles: [
-    { title: 'Creating a habit', body: 'Go to Habits → New Habit. Set a name, frequency (daily, weekdays, or custom days), and optionally link it to a Life Area or OKR.' },
-    { title: 'How streaks work', body: 'A streak increments each day you complete a habit. Missing a day breaks the streak, but your completion history is always preserved.' },
-    { title: 'Archiving vs deleting', body: 'Archive a habit to pause it without losing history. Delete only when you want to remove all records permanently.' },
-  ]},
-  { icon: '◯', title: 'Tasks & Boards', articles: [
-    { title: 'Creating a board', body: 'Go to Tasks and click "New Board". Give it a name and optionally assign it to a Life Area. Boards have columns you can rename and reorder.' },
-    { title: 'Moving tasks between columns', body: 'Drag a task card to any column, or open the task and change its status from the dropdown.' },
-    { title: 'Linking tasks to OKRs', body: 'Inside any task, use the "Linked OKR" field to connect it to a Key Result. Progress is reflected in your OKR view.' },
-  ]},
-  { icon: '✦', title: 'OKRs', articles: [
-    { title: 'What are OKRs?', body: 'OKRs (Objectives and Key Results) are a goal-setting framework. An Objective is an ambitious qualitative goal; Key Results are measurable outcomes that indicate you have reached it.' },
-    { title: 'Setting your first OKR', body: 'Go to OKRs → New Objective. Write a clear, inspiring objective for the quarter. Then add 1–5 Key Results with numeric targets.' },
-    { title: 'Weekly check-ins', body: 'Every week, open each Key Result and update the current value. Add a confidence score and a short note. Cherut tracks the trend over time.' },
-  ]},
-  { icon: '◈', title: 'Account & billing', articles: [
-    { title: 'Changing your plan', body: 'Go to Settings → Billing to upgrade, downgrade or cancel your plan. Changes take effect at the end of your current billing period.' },
-    { title: 'Exporting your data', body: 'Go to Settings → Data → Export. Your habits, tasks, OKRs, journal and all other data are exported as a single JSON file.' },
-    { title: 'Deleting your account', body: 'Go to Settings → Account → Delete account. This permanently removes all your data. It cannot be undone. Export first if you want a copy.' },
-  ]},
-];
+const categoryIcons = ['◐', '◇', '◯', '✦', '◈'];
 
 export default function HelpCenterPage() {
+  const t = useTranslations('helpCenterPage');
+  const categories = t.raw('categories') as { title: string; articles: { title: string; body: string }[] }[];
+
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
   const toggle = (key: string) => setOpenMap(prev => ({ ...prev, [key]: !prev[key] }));
 
   return (
-    <PageShell kicker="Help Center" title="How can we help?" lead="Guides, answers and everything you need to get the most out of Cherut.">
+    <PageShell kicker={t('hero.kicker')} title={t('hero.title')} lead={t('hero.lead')}>
       <style>{`
         .hc-wrap { max-width: 860px; margin: 0 auto; padding: 48px 20px 80px; display: flex; flex-direction: column; gap: 32px; }
         .hc-category { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 16px; overflow: hidden; }
@@ -65,10 +43,10 @@ export default function HelpCenterPage() {
 
       <div style={{ background: BG }}>
         <div className="hc-wrap">
-          {categories.map((cat) => (
+          {categories.map((cat, ci) => (
             <div key={cat.title} className="hc-category">
               <div className="hc-cat-head">
-                <div className="hc-cat-icon">{cat.icon}</div>
+                <div className="hc-cat-icon">{categoryIcons[ci % categoryIcons.length]}</div>
                 <h2 className="hc-cat-title">{cat.title}</h2>
               </div>
               <div>
@@ -90,9 +68,9 @@ export default function HelpCenterPage() {
           ))}
 
           <div className="hc-cta">
-            <p style={{ fontSize: 16, color: MUTED, margin: '0 0 16px', lineHeight: 1.55 }}>Did not find what you were looking for?</p>
+            <p style={{ fontSize: 16, color: MUTED, margin: '0 0 16px', lineHeight: 1.55 }}>{t('notFound')}</p>
             <a href="/contact" style={{ display: 'inline-block', background: TEXT, color: BG, fontSize: 14, fontWeight: 700, padding: '12px 22px', borderRadius: 999 }}>
-              Contact us →
+              {t('contactCta')} →
             </a>
           </div>
         </div>

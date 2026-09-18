@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { loginUser, resetPassword } from '@/lib/firebase/auth';
 import { useAuth } from '@/contexts/AuthContext';
 import { getLoginErrorMessage, getAuthErrorMessage } from '@/lib/utils/auth-errors';
 import { useLoginRateLimit } from '@/hooks/useRateLimit';
 import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
 import { Modal } from '@mantine/core';
-import { CMark } from '@/components/shell/Shell';
 
 const BG      = '#07070D';
 const SURF    = '#0F0F1B';
@@ -21,6 +21,10 @@ const RULE    = 'rgba(255,255,255,0.08)';
 const GRID    = 'rgba(255,255,255,0.04)';
 
 export default function LoginPage() {
+  const t = useTranslations('loginPage');
+  const tc = useTranslations('authCommon');
+  const tErr = useTranslations('authErrors');
+
   const [email, setEmail]                     = useState('');
   const [password, setPassword]               = useState('');
   const [showPassword, setShowPassword]       = useState(false);
@@ -48,7 +52,7 @@ export default function LoginPage() {
       await loginRateLimit.handleLoginAttempt(async () => { await loginUser(email, password); });
       router.push('/dashboard');
     } catch (err: any) {
-      setError(getLoginErrorMessage(err));
+      setError(getLoginErrorMessage(err, tErr));
     } finally {
       setLoading(false);
     }
@@ -62,7 +66,7 @@ export default function LoginPage() {
       await resetPassword(resetEmail);
       setResetSuccess(true);
     } catch (err: any) {
-      setResetError(getAuthErrorMessage(err));
+      setResetError(getAuthErrorMessage(err, tErr));
     } finally {
       setResetLoading(false);
     }
@@ -79,7 +83,7 @@ export default function LoginPage() {
   return (
     <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', position: 'relative', fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600;700&family=Sora:wght@700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
         html { background: ${BG} !important; color-scheme: dark !important; }
         body { background: ${BG} !important; }
@@ -125,15 +129,16 @@ export default function LoginPage() {
       <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 28 }}>
 
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: TEXT }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', background: ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CMark size={40} color={BG} />
-            </div>
-            <span style={{ fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 800, fontSize: 24, letterSpacing: '0.02em', textTransform: 'uppercase' }}>Cherut</span>
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: TEXT }}>
+            <svg viewBox="0 0 64 64" width={34} height={34} fill="none" aria-hidden="true">
+              <circle cx="32" cy="32" r="27" stroke={TEXT} strokeWidth="5.6" />
+              <circle cx="32" cy="32" r="5.6" fill={TEXT} />
+            </svg>
+            <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 26, letterSpacing: '-0.025em', color: TEXT }}>Cherut</span>
           </a>
           <div>
-            <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '0 0 6px', color: TEXT }}>Welcome back</h1>
-            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>Sign in to continue your journey</p>
+            <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '0 0 6px', color: TEXT }}>{t('title')}</h1>
+            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>{t('subtitle')}</p>
           </div>
         </div>
 
@@ -144,43 +149,43 @@ export default function LoginPage() {
             {error && <div className="auth-error">{error}</div>}
 
             <div>
-              <label className="auth-label" htmlFor="login-email">Email</label>
-              <input id="login-email" className="auth-input" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+              <label className="auth-label" htmlFor="login-email">{tc('emailLabel')}</label>
+              <input id="login-email" className="auth-input" type="email" placeholder={tc('emailPlaceholder')} value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
             </div>
 
             <div>
-              <label className="auth-label" htmlFor="login-password">Password</label>
+              <label className="auth-label" htmlFor="login-password">{t('passwordLabel')}</label>
               <div className="auth-pw-wrap">
                 <input id="login-password" className="auth-input" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" />
-                <button type="button" className="auth-pw-toggle" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? 'Hide password' : 'Show password'}>
-                  {showPassword ? 'Hide' : 'Show'}
+                <button type="button" className="auth-pw-toggle" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? tc('hidePasswordAria') : tc('showPasswordAria')}>
+                  {showPassword ? tc('hide') : tc('show')}
                 </button>
               </div>
             </div>
 
             <button type="submit" className="auth-btn" disabled={loading}>
-              {loading ? 'Signing in…' : <>Sign in <span>→</span></>}
+              {loading ? t('signingIn') : <>{t('signIn')} <span>→</span></>}
             </button>
 
             <button type="button" onClick={() => setResetModalOpened(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: ACCENT, fontWeight: 600, fontFamily: 'inherit', textAlign: 'center', padding: 0 }}>
-              Forgot your password?
+              {t('forgotPassword')}
             </button>
           </form>
         </div>
 
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>
-            Don't have an account?{' '}
-            <a href="/auth/register" className="auth-link">Sign up</a>
+            {t('noAccount')}{' '}
+            <a href="/auth/register" className="auth-link">{t('signUp')}</a>
           </p>
-          <a href="/" style={{ fontSize: 13, color: MUTED, textDecoration: 'none' }}>← Back to home</a>
+          <a href="/" style={{ fontSize: 13, color: MUTED, textDecoration: 'none' }}>{tc('backToHome')}</a>
         </div>
       </div>
 
       <Modal
         opened={resetModalOpened}
         onClose={handleResetModalClose}
-        title={<span style={{ fontWeight: 700, fontSize: 18, color: TEXT, fontFamily: 'inherit', letterSpacing: '-0.01em' }}>Reset password</span>}
+        title={<span style={{ fontWeight: 700, fontSize: 18, color: TEXT, fontFamily: 'inherit', letterSpacing: '-0.01em' }}>{t('resetModal.title')}</span>}
         centered
         radius={16}
         styles={{
@@ -193,26 +198,26 @@ export default function LoginPage() {
         {resetSuccess ? (
           <div style={{ textAlign: 'center', padding: '16px 0 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ fontSize: 32 }}>✓</div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: TEXT }}>Email sent!</div>
-            <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.55 }}>Check your inbox (and spam folder) for reset instructions.</p>
-            <button onClick={handleResetModalClose} className="auth-btn" style={{ marginTop: 8 }}>Got it</button>
+            <div style={{ fontSize: 17, fontWeight: 700, color: TEXT }}>{t('resetModal.emailSentTitle')}</div>
+            <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.55 }}>{t('resetModal.emailSentBody')}</p>
+            <button onClick={handleResetModalClose} className="auth-btn" style={{ marginTop: 8 }}>{t('resetModal.gotIt')}</button>
           </div>
         ) : (
           <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {resetError && <div className="auth-error">{resetError}</div>}
             <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.55 }}>
-              Enter your email address and we'll send you a link to reset your password.
+              {t('resetModal.prompt')}
             </p>
             <div>
-              <label className="auth-label" htmlFor="reset-email">Email</label>
-              <input id="reset-email" className="auth-input" type="email" placeholder="you@example.com" value={resetEmail} onChange={e => setResetEmail(e.target.value)} required />
+              <label className="auth-label" htmlFor="reset-email">{tc('emailLabel')}</label>
+              <input id="reset-email" className="auth-input" type="email" placeholder={tc('emailPlaceholder')} value={resetEmail} onChange={e => setResetEmail(e.target.value)} required />
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button type="button" onClick={handleResetModalClose} style={{ padding: '11px 20px', background: SURF, border: `1px solid ${RULE}`, borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: TEXT }}>
-                Cancel
+                {t('resetModal.cancel')}
               </button>
               <button type="submit" disabled={resetLoading} style={{ padding: '11px 20px', background: TEXT, color: BG, border: 'none', borderRadius: 999, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: resetLoading ? 0.5 : 1 }}>
-                {resetLoading ? 'Sending…' : 'Send reset link'}
+                {resetLoading ? t('resetModal.sending') : t('resetModal.sendResetLink')}
               </button>
             </div>
           </form>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, use, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Stack, Group, Title, ActionIcon, TextInput, Loader } from '@mantine/core';
 import { ArrowLeft, Check, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -13,6 +14,7 @@ import { Surface } from '@/components/ui/Surface';
 
 export default function BoardDetailPage({ params }: { params: Promise<{ boardId: string }> }) {
   const { boardId } = use(params);
+  const t = useTranslations('tasks.boardPage');
   const router = useRouter();
   const [currentView, setCurrentView] = useState<TaskView>('kanban');
   const [isEditingName, setIsEditingName] = useState(false);
@@ -110,7 +112,7 @@ export default function BoardDetailPage({ params }: { params: Promise<{ boardId:
               setIsEditingName(true);
             }}
           >
-            {displayName || 'Board'}
+            {displayName || t('fallbackTitle')}
           </Title>
         )}
       </Group>

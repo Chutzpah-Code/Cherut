@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useCallback, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -30,6 +31,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
+  const t = useTranslations('tasks.calendar');
   const { data: columns, isLoading } = useBoardKanban(boardId);
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
@@ -90,7 +92,7 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
   if (!columns || columns.flatMap((c) => c.tasks).length === 0) {
     return (
       <Center h={400}>
-        <Text size="sm" c="dimmed">No tasks in this board yet.</Text>
+        <Text size="sm" c="dimmed">{t('noTasks')}</Text>
       </Center>
     );
   }
@@ -99,7 +101,7 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
   if (tasksWithDates.length === 0) {
     return (
       <Center h={400}>
-        <Text size="sm" c="dimmed">No tasks have a due date yet. Add a due date to a task to see it here.</Text>
+        <Text size="sm" c="dimmed">{t('noDueDates')}</Text>
       </Center>
     );
   }

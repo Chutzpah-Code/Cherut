@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { registerUser } from '@/lib/firebase/auth';
 import apiClient from '@/lib/api/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { getRegistrationErrorMessage } from '@/lib/utils/auth-errors';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
-import { CMark } from '@/components/shell/Shell';
 
 const BG      = '#07070D';
 const SURF    = '#0F0F1B';
@@ -21,6 +21,10 @@ const RULE    = 'rgba(255,255,255,0.08)';
 const GRID    = 'rgba(255,255,255,0.04)';
 
 export default function RegisterPage() {
+  const t = useTranslations('registerPage');
+  const tc = useTranslations('authCommon');
+  const tErr = useTranslations('authErrors');
+
   const [email, setEmail]                       = useState('');
   const [password, setPassword]                 = useState('');
   const [confirmPassword, setConfirmPassword]   = useState('');
@@ -40,8 +44,8 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     if (!registerRateLimit.canSubmit) { setError(registerRateLimit.warningMessage); return; }
-    if (password !== confirmPassword) { setError('Passwords do not match'); return; }
-    if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
+    if (password !== confirmPassword) { setError(t('passwordMismatch')); return; }
+    if (password.length < 6) { setError(t('passwordTooShort')); return; }
     setLoading(true);
     try {
       const firebaseUser = await registerUser(email, password);
@@ -51,7 +55,7 @@ export default function RegisterPage() {
       router.push('/dashboard');
     } catch (err: any) {
       registerRateLimit.recordFailure();
-      setError(getRegistrationErrorMessage(err));
+      setError(getRegistrationErrorMessage(err, tErr));
     } finally {
       setLoading(false);
     }
@@ -60,7 +64,7 @@ export default function RegisterPage() {
   return (
     <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', position: 'relative', fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600;700&family=Sora:wght@700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
         html { background: ${BG} !important; color-scheme: dark !important; }
         body { background: ${BG} !important; }
@@ -106,15 +110,16 @@ export default function RegisterPage() {
       <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 28 }}>
 
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: TEXT }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', background: ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CMark size={40} color={BG} />
-            </div>
-            <span style={{ fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 800, fontSize: 24, letterSpacing: '0.02em', textTransform: 'uppercase' }}>Cherut</span>
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: TEXT }}>
+            <svg viewBox="0 0 64 64" width={34} height={34} fill="none" aria-hidden="true">
+              <circle cx="32" cy="32" r="27" stroke={TEXT} strokeWidth="5.6" />
+              <circle cx="32" cy="32" r="5.6" fill={TEXT} />
+            </svg>
+            <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 26, letterSpacing: '-0.025em', color: TEXT }}>Cherut</span>
           </a>
           <div>
-            <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '0 0 6px', color: TEXT }}>Create your account</h1>
-            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>Start building your system today</p>
+            <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '0 0 6px', color: TEXT }}>{t('title')}</h1>
+            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>{t('subtitle')}</p>
           </div>
         </div>
 
@@ -125,42 +130,42 @@ export default function RegisterPage() {
             {error && <div className="auth-error">{error}</div>}
 
             <div>
-              <label className="auth-label" htmlFor="reg-email">Email</label>
-              <input id="reg-email" className="auth-input" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+              <label className="auth-label" htmlFor="reg-email">{tc('emailLabel')}</label>
+              <input id="reg-email" className="auth-input" type="email" placeholder={tc('emailPlaceholder')} value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
             </div>
 
             <div>
-              <label className="auth-label" htmlFor="reg-password">Password</label>
+              <label className="auth-label" htmlFor="reg-password">{t('passwordLabel')}</label>
               <div className="auth-pw-wrap">
                 <input id="reg-password" className="auth-input" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" />
-                <button type="button" className="auth-pw-toggle" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? 'Hide password' : 'Show password'}>
-                  {showPassword ? 'Hide' : 'Show'}
+                <button type="button" className="auth-pw-toggle" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? tc('hidePasswordAria') : tc('showPasswordAria')}>
+                  {showPassword ? tc('hide') : tc('show')}
                 </button>
               </div>
             </div>
 
             <div>
-              <label className="auth-label" htmlFor="reg-confirm">Confirm password</label>
+              <label className="auth-label" htmlFor="reg-confirm">{t('confirmPasswordLabel')}</label>
               <div className="auth-pw-wrap">
                 <input id="reg-confirm" className="auth-input" type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required autoComplete="new-password" />
-                <button type="button" className="auth-pw-toggle" onClick={() => setShowConfirm(v => !v)} aria-label={showConfirm ? 'Hide password' : 'Show password'}>
-                  {showConfirm ? 'Hide' : 'Show'}
+                <button type="button" className="auth-pw-toggle" onClick={() => setShowConfirm(v => !v)} aria-label={showConfirm ? tc('hidePasswordAria') : tc('showPasswordAria')}>
+                  {showConfirm ? tc('hide') : tc('show')}
                 </button>
               </div>
             </div>
 
             <button type="submit" className="auth-btn" disabled={loading}>
-              {loading ? 'Creating account…' : <>Create account <span>→</span></>}
+              {loading ? t('creatingAccount') : <>{t('createAccount')} <span>→</span></>}
             </button>
           </form>
         </div>
 
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>
-            Already have an account?{' '}
-            <a href="/auth/login" className="auth-link">Sign in</a>
+            {t('alreadyHaveAccount')}{' '}
+            <a href="/auth/login" className="auth-link">{t('signIn')}</a>
           </p>
-          <a href="/" style={{ fontSize: 13, color: MUTED, textDecoration: 'none' }}>← Back to home</a>
+          <a href="/" style={{ fontSize: 13, color: MUTED, textDecoration: 'none' }}>{tc('backToHome')}</a>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Plus, Search, Calendar, X } from 'lucide-react';
 import {
   Title,
@@ -27,6 +28,7 @@ import { JournalFilter, JournalFilterType } from './components/JournalFilter';
 import { JournalEntry } from '@/lib/api/services/journal';
 
 export default function JournalPage() {
+  const t = useTranslations('journal.page');
   const [currentFilter, setCurrentFilter] = useState<JournalFilterType>('active');
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -151,7 +153,7 @@ export default function JournalPage() {
               color: '#000000',
             }}
           >
-            Journal
+            {t('title')}
           </Title>
           <Text
             c="dimmed"
@@ -163,7 +165,7 @@ export default function JournalPage() {
               color: '#666666',
             }}
           >
-            Personal space for daily reflections and thoughts. Write freely without limits.
+            {t('subtitle')}
           </Text>
         </Box>
 
@@ -191,7 +193,7 @@ export default function JournalPage() {
               },
             }}
           >
-            New Entry
+            {t('newEntry')}
           </Button>
         </Box>
 
@@ -208,7 +210,7 @@ export default function JournalPage() {
           <Stack gap="sm">
             <Group gap="xs" wrap="wrap">
               <TextInput
-                placeholder="Search by title... (press Enter to search)"
+                placeholder={t('searchPlaceholder')}
                 leftSection={<Search size={16} />}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
@@ -239,14 +241,14 @@ export default function JournalPage() {
                   },
                 }}
               >
-                Search
+                {t('search')}
               </Button>
               {searchTerm && (
                 <ActionIcon
                   variant="light"
                   color="gray"
                   onClick={clearSearch}
-                  title="Clear search"
+                  title={t('clearSearchAria')}
                 >
                   <X size={16} />
                 </ActionIcon>
@@ -256,7 +258,7 @@ export default function JournalPage() {
             <Group gap="xs" wrap="wrap">
               <DatePickerInput
                 type="range"
-                placeholder="Filter by date range"
+                placeholder={t('dateRangePlaceholder')}
                 leftSection={<Calendar size={16} />}
                 value={dateRange}
                 onChange={setDateRange}
@@ -269,7 +271,7 @@ export default function JournalPage() {
                   variant="light"
                   color="gray"
                   onClick={clearFilters}
-                  title="Clear date filter"
+                  title={t('clearDateAria')}
                 >
                   <X size={16} />
                 </ActionIcon>
@@ -318,14 +320,14 @@ export default function JournalPage() {
           <Center>
             <Stack align="center" gap="sm">
               <Text style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: 500, color: '#6B7280' }}>
-                {currentFilter === 'archived' ? 'No archived entries' : 'No entries found'}
+                {currentFilter === 'archived' ? t('noArchivedEntries') : t('noEntriesFound')}
               </Text>
               <Text style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', fontWeight: 400, color: '#6B7280', lineHeight: '20px', maxWidth: 400 }}>
                 {currentFilter === 'archived'
-                  ? 'Journal entries you archive will appear here. You can unarchive them at any time.'
+                  ? t('archivedHint')
                   : searchTerm || dateRange[0] || dateRange[1]
-                    ? `No entries found matching your filters${searchTerm ? ` for "${searchTerm}"` : ''}. Try adjusting your search criteria.`
-                    : "You haven't written any journal entries yet. Click 'New Entry' to start writing!"}
+                    ? t('noResultsHint', { searchSuffix: searchTerm ? t('searchSuffix', { search: searchTerm }) : '' })
+                    : t('emptyHint')}
               </Text>
             </Stack>
           </Center>

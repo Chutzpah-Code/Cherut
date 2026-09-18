@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { RateLimitService, RateLimitResult } from '@/lib/services/rateLimiter';
 import { getClientId } from '@/lib/utils/clientFingerprint';
 import { DebugLogger } from '@/lib/utils/debug';
@@ -42,6 +43,7 @@ export function useRateLimit({
   autoCheck = true,
   clientIdOverride,
 }: UseRateLimitOptions): UseRateLimitReturn {
+  const t = useTranslations('rateLimiter');
 
   const [result, setResult] = useState<RateLimitResult>({
     allowed: true,
@@ -130,10 +132,10 @@ export function useRateLimit({
       return rateLimiter.getMessage({
         ...result,
         lockoutTimeRemaining: timeRemaining,
-      });
+      }, t);
     }
-    return rateLimiter.getMessage(result);
-  }, [result, timeRemaining, rateLimiter, isBlocked]);
+    return rateLimiter.getMessage(result, t);
+  }, [result, timeRemaining, rateLimiter, isBlocked, t]);
 
   const formattedTimeRemaining = useMemo(() => {
     if (timeRemaining <= 0) return '';

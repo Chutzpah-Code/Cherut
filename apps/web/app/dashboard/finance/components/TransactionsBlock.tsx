@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Box, Group, Stack, Text, Select, TextInput, NumberInput, Button, Checkbox,
   Center, Modal, Menu, ActionIcon, UnstyledButton,
@@ -25,8 +26,8 @@ function localToday() {
 function currentMonth() {
   return localToday().slice(0, 7);
 }
-function monthOptions() {
-  const fmtDate = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' });
+function monthOptions(locale: string) {
+  const fmtDate = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' });
   const options: { value: string; label: string }[] = [];
   const now = new Date();
   for (let i = -12; i <= 1; i++) {
@@ -36,16 +37,20 @@ function monthOptions() {
   }
   return options.reverse();
 }
-const MONTH_OPTIONS = monthOptions();
 
-function dayLabel(dateStr: string) {
+function dayLabel(
+  dateStr: string,
+  locale: string,
+  t: (key: string, values?: Record<string, string>) => string,
+) {
   const today = localToday();
   const y = new Date(today + 'T00:00:00');
   y.setDate(y.getDate() - 1);
   const yesterday = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}`;
-  if (dateStr === today) return `Today · ${new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-  if (dateStr === yesterday) return `Yesterday · ${new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const shortDate = new Date(dateStr + 'T00:00:00').toLocaleDateString(locale, { month: 'short', day: 'numeric' });
+  if (dateStr === today) return t('today', { date: shortDate });
+  if (dateStr === yesterday) return t('yesterday', { date: shortDate });
+  return shortDate;
 }
 
 function exportTransactionsCsv(
@@ -77,6 +82,7 @@ function exportTransactionsCsv(
 function ChangeAccountModal({
   opened, onClose, tx, accounts,
 }: { opened: boolean; onClose: () => void; tx: FinanceTransaction | null; accounts: FinanceAccount[] }) {
+  const t = useTranslations('finance.transactionsBlock');
   const updateTx = useUpdateTransaction();
   const [accountId, setAccountId] = useState<string | null>(null);
 
@@ -88,16 +94,16 @@ function ChangeAccountModal({
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Change account" centered size="sm">
+    <Modal opened={opened} onClose={onClose} title={t('changeAccount')} centered size="sm">
       <Stack gap="sm">
         <Select
-          label="Account"
+          label={t('account')}
           data={accounts.map((a) => ({ value: a.id, label: `${a.name} (${a.currency})` }))}
           value={accountId}
           onChange={setAccountId}
         />
         <Button onClick={handleSave} loading={updateTx.isPending} disabled={!accountId} style={{ backgroundColor: '#0052CC' }}>
-          Save
+          {t('save')}
         </Button>
       </Stack>
     </Modal>
@@ -105,6 +111,9 @@ function ChangeAccountModal({
 }
 
 export function TransactionsBlock() {
+  const t = useTranslations('finance.transactionsBlock');
+  const tc = useTranslations('finance.common');
+  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -134,6 +143,8 @@ export function TransactionsBlock() {
   const accountMap = useMemo(() => Object.fromEntries((accounts as FinanceAccount[]).map((a) => [a.id, a])), [accounts]);
   const categoryMap = useMemo(() => Object.fromEntries(categories.map((c: any) => [c.id, c])), [categories]);
 
+  const monthOpts = useMemo(() => monthOptions(locale), [locale]);
+
   const pagedParams = useMemo(() => ({
     month,
     accountId: accountFilter ?? undefined,
@@ -149,7 +160,7 @@ export function TransactionsBlock() {
   const uploadReceipt = useUploadReceipt();
   const updateTx = useUpdateTransaction();
   const deleteSingleTx = useDeleteTransaction();
-  const undoableDeleteTx = useUndoableDelete((id: string) => deleteSingleTx.mutate(id), { label: 'Transaction' });
+  const undoableDeleteTx = useUndoableDelete((id: string) => deleteSingleTx.mutate(id), { label: tc('transaction') });
 
   // Quick-add row
   const [quickType, setQuickType] = useState<'expense' | 'income'>('expense');
@@ -264,11 +275,11 @@ export function TransactionsBlock() {
       <input ref={fileInputRef} type="file" accept="image/*,application/pdf" style={{ display: 'none' }} onChange={handleFileSelected} />
 
       <Group justify="space-between" align="center" mb="md" wrap="wrap" gap="sm">
-        <Text style={{ fontSize: 15, fontWeight: 700 }}>Transactions</Text>
+        <Text style={{ fontSize: 15, fontWeight: 700 }}>{t('title')}</Text>
         <Group gap={8} wrap="wrap">
           <TextInput
             size="xs"
-            placeholder="Search description"
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ minWidth: 170 }}
@@ -276,7 +287,7 @@ export function TransactionsBlock() {
           />
           <Select
             size="xs"
-            placeholder="All accounts"
+            placeholder={t('allAccounts')}
             data={(accounts as FinanceAccount[]).map((a) => ({ value: a.id, label: a.name }))}
             value={accountFilter}
             onChange={setAccountFilter}
@@ -285,8 +296,8 @@ export function TransactionsBlock() {
           />
           <Select
             size="xs"
-            placeholder="All categories"
-            data={[{ value: 'uncategorized', label: 'Uncategorized' }, ...categories.map((c: any) => ({ value: c.id, label: c.name }))]}
+            placeholder={t('allCategories')}
+            data={[{ value: 'uncategorized', label: t('uncategorized') }, ...categories.map((c: any) => ({ value: c.id, label: c.name }))]}
             value={categoryFilter}
             onChange={setCategoryFilter}
             clearable
@@ -294,7 +305,7 @@ export function TransactionsBlock() {
           />
           <Select
             size="xs"
-            data={MONTH_OPTIONS}
+            data={monthOpts}
             value={month}
             onChange={(v) => v && setMonth(v)}
             comboboxProps={{ withinPortal: true }}
@@ -307,7 +318,7 @@ export function TransactionsBlock() {
             onClick={() => exportTransactionsCsv(items, accountMap, categoryMap, `transactions-${month}.csv`)}
             disabled={items.length === 0}
           >
-            Export
+            {t('export')}
           </Button>
         </Group>
       </Group>
@@ -321,7 +332,7 @@ export function TransactionsBlock() {
           borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 13.5, color: '#94A3B8', textAlign: 'left',
         }}
       >
-        Quick add
+        {t('quickAdd')}
       </UnstyledButton>
       <Box visibleFrom="sm" style={{ background: '#F8FAFC', border: '1px solid #E8EBF0', borderRadius: 8, padding: 12, marginBottom: 16 }}>
         <Group gap={8} wrap="wrap" align="flex-end">
@@ -349,15 +360,15 @@ export function TransactionsBlock() {
           </Box>
           <TextInput
             size="xs"
-            placeholder="Quick add — description"
+            placeholder={t('quickAddDescription')}
             value={quickDescription}
             onChange={(e) => setQuickDescription(e.target.value)}
             style={{ flex: '1 1 160px', minWidth: 0 }}
           />
           <Select
             size="xs"
-            placeholder="Category"
-            data={[{ value: 'uncategorized', label: 'Uncategorized' }, ...categories.map((c: any) => ({ value: c.id, label: c.name }))]}
+            placeholder={t('category')}
+            data={[{ value: 'uncategorized', label: t('uncategorized') }, ...categories.map((c: any) => ({ value: c.id, label: c.name }))]}
             value={quickCategoryId ?? null}
             onChange={(v) => setQuickCategoryId(v === 'uncategorized' ? undefined : (v ?? undefined))}
             clearable
@@ -380,10 +391,10 @@ export function TransactionsBlock() {
             style={{ width: 110 }}
           />
           <Button size="xs" onClick={handleQuickSave} loading={createTx.isPending} disabled={!quickAccountId || !quickParsedAmount} style={{ backgroundColor: '#0052CC' }}>
-            Save
+            {t('save')}
           </Button>
           <UnstyledButton onClick={openMoreFields} style={{ fontSize: 12.5, fontWeight: 600, color: '#1D4ED8', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-            More fields
+            {t('moreFields')}
           </UnstyledButton>
         </Group>
       </Box>
@@ -391,23 +402,23 @@ export function TransactionsBlock() {
       {/* Bulk action bar */}
       {selected.size > 0 && (
         <Group justify="space-between" mb="sm" p="xs" style={{ background: '#EFF6FF', border: '1px solid #DBEAFE', borderRadius: 8 }}>
-          <Text size="sm" fw={600}>{selected.size} selected</Text>
+          <Text size="sm" fw={600}>{t('selected', { count: selected.size })}</Text>
           <Group gap="xs">
             <Select
               size="xs"
-              placeholder="Recategorize to…"
-              data={[{ value: 'uncategorized', label: 'Uncategorized' }, ...categories.map((c: any) => ({ value: c.id, label: c.name }))]}
+              placeholder={t('recategorizeTo')}
+              data={[{ value: 'uncategorized', label: t('uncategorized') }, ...categories.map((c: any) => ({ value: c.id, label: c.name }))]}
               value={recategorizeTarget}
               onChange={setRecategorizeTarget}
               style={{ width: 160 }}
             />
             <Button size="xs" variant="light" onClick={handleBulkRecategorize} loading={recategorizeTx.isPending} disabled={!recategorizeTarget}>
-              Apply
+              {t('apply')}
             </Button>
             <Button size="xs" color="red" variant="light" onClick={handleBulkDelete} loading={deleteTx.isPending}>
-              Delete
+              {t('delete')}
             </Button>
-            <Button size="xs" variant="subtle" color="gray" onClick={clearSelection}>Clear</Button>
+            <Button size="xs" variant="subtle" color="gray" onClick={clearSelection}>{t('clear')}</Button>
           </Group>
         </Group>
       )}
@@ -415,13 +426,13 @@ export function TransactionsBlock() {
       {isLoading ? (
         <RowsSkeleton rows={5} height={48} />
       ) : items.length === 0 ? (
-        <Center py="xl"><Text c="dimmed" size="sm">No transactions found for this filter.</Text></Center>
+        <Center py="xl"><Text c="dimmed" size="sm">{t('noTransactions')}</Text></Center>
       ) : (
         <Stack gap="md">
           {groups.map(([date, txs]) => (
             <Box key={date}>
               <Text style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#64748B', marginBottom: 8 }}>
-                {dayLabel(date)}
+                {dayLabel(date, locale, t)}
               </Text>
               <Stack gap={6}>
                 {txs.map((tx) => (
@@ -442,16 +453,16 @@ export function TransactionsBlock() {
                         <ActionIcon size="md" variant="subtle" color="gray"><MoreHorizontal size={16} /></ActionIcon>
                       </Menu.Target>
                       <Menu.Dropdown>
-                        <Menu.Item leftSection={<Copy size={14} />} onClick={() => openDuplicate(tx)}>Duplicate</Menu.Item>
-                        <Menu.Item leftSection={<ArrowLeftRight size={14} />} onClick={() => setChangeAccountTx(tx)}>Change account</Menu.Item>
+                        <Menu.Item leftSection={<Copy size={14} />} onClick={() => openDuplicate(tx)}>{t('duplicate')}</Menu.Item>
+                        <Menu.Item leftSection={<ArrowLeftRight size={14} />} onClick={() => setChangeAccountTx(tx)}>{t('changeAccount')}</Menu.Item>
                         <Menu.Item leftSection={<Paperclip size={14} />} onClick={() => handleAttachReceiptClick(tx)}>
-                          {tx.attachmentUrl ? 'Replace receipt' : 'Attach receipt'}
+                          {tx.attachmentUrl ? t('replaceReceipt') : t('attachReceipt')}
                         </Menu.Item>
                         <Menu.Item
                           leftSection={<Download size={14} />}
                           onClick={() => exportTransactionsCsv([tx], accountMap, categoryMap, `transaction-${tx.id}.csv`)}
                         >
-                          Export
+                          {t('export')}
                         </Menu.Item>
                       </Menu.Dropdown>
                     </Menu>
@@ -462,10 +473,10 @@ export function TransactionsBlock() {
           ))}
 
           <Group justify="space-between" pt="md" mt="xs" style={{ borderTop: '1px solid #EFF1F5' }}>
-            <Text size="xs" c="dimmed">Showing {items.length} of {data?.total ?? items.length} transactions in {month}</Text>
+            <Text size="xs" c="dimmed">{t('showing', { shown: items.length, total: data?.total ?? items.length, month })}</Text>
             {data?.hasMore && (
               <UnstyledButton onClick={() => setLimit((l) => l + 20)} style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', cursor: 'pointer' }}>
-                Load more
+                {t('loadMore')}
               </UnstyledButton>
             )}
           </Group>

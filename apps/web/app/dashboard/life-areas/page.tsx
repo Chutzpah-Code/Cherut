@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Plus, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import {
   Title,
@@ -25,6 +26,7 @@ import { Surface } from '@/components/ui/Surface';
 import { CreateLifeAreaDto, LifeArea } from '@/lib/api/services/lifeAreas';
 
 export default function LifeAreasPage() {
+  const t = useTranslations('lifeAreas');
   const { data: lifeAreas, isLoading } = useLifeAreas();
   const createMutation = useCreateLifeArea();
   const updateMutation = useUpdateLifeArea();
@@ -87,7 +89,7 @@ export default function LifeAreasPage() {
 
   const handleDelete = (id: string) => {
     modals.openConfirmModal({
-      title: 'Delete Life Area',
+      title: t('deleteTitle'),
       children: (
         <Text
           style={{
@@ -98,10 +100,10 @@ export default function LifeAreasPage() {
             lineHeight: '20px',
           }}
         >
-          Are you sure you want to delete this life area? This action cannot be undone.
+          {t('deleteBody')}
         </Text>
       ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      labels: { confirm: t('delete'), cancel: t('cancel') },
       confirmProps: {
         color: 'red',
         style: {
@@ -157,7 +159,7 @@ export default function LifeAreasPage() {
             letterSpacing: '-0.02em',
           }}
         >
-          Life Areas
+          {t('title')}
         </Title>
         <Text
           style={{
@@ -168,7 +170,7 @@ export default function LifeAreasPage() {
             lineHeight: '24px',
           }}
         >
-          Manage the key areas of your life
+          {t('subtitle')}
         </Text>
       </Box>
 
@@ -196,7 +198,7 @@ export default function LifeAreasPage() {
             },
           }}
         >
-          New Life Area
+          {t('newLifeArea')}
         </Button>
       </Box>
 
@@ -282,7 +284,7 @@ export default function LifeAreasPage() {
                             e.currentTarget.style.textDecoration = 'none';
                           }}
                         >
-                          {isExpanded ? 'Show less' : 'Show more'}
+                          {isExpanded ? t('showLess') : t('showMore')}
                         </button>
                       )}
                     </div>
@@ -316,7 +318,7 @@ export default function LifeAreasPage() {
                       fontWeight: 500,
                     }}
                   >
-                    Edit
+                    {t('edit')}
                   </Menu.Item>
                   <Menu.Item
                     leftSection={<Trash2 size={14} />}
@@ -328,7 +330,7 @@ export default function LifeAreasPage() {
                       fontWeight: 500,
                     }}
                   >
-                    Delete
+                    {t('delete')}
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
@@ -356,7 +358,7 @@ export default function LifeAreasPage() {
                 color: '#6B7280',
               }}
             >
-              No life areas yet
+              {t('emptyTitle')}
             </Text>
             <Text
               style={{
@@ -368,7 +370,7 @@ export default function LifeAreasPage() {
                 marginBottom: '8px',
               }}
             >
-              Life areas help you organize and focus on the key aspects of your personal and professional development.
+              {t('emptyHint')}
             </Text>
             <Button
               leftSection={<Plus size={16} />}
@@ -385,7 +387,7 @@ export default function LifeAreasPage() {
                 padding: '0 24px',
               }}
             >
-              Create your first life area
+              {t('createFirst')}
             </Button>
           </Stack>
         </Card>
@@ -407,7 +409,7 @@ export default function LifeAreasPage() {
               color: '#000000',
             }}
           >
-            {editingArea ? 'Edit Life Area' : 'New Life Area'}
+            {editingArea ? t('editLifeArea') : t('newLifeArea')}
           </Text>
         }
         size="md"
@@ -437,8 +439,8 @@ export default function LifeAreasPage() {
           <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
             <Stack gap="lg" py="xs">
               <TextInput
-                label="Name"
-                placeholder="e.g., Health & Fitness"
+                label={t('nameLabel')}
+                placeholder={t('namePlaceholder')}
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
@@ -472,8 +474,8 @@ export default function LifeAreasPage() {
               />
 
               <Textarea
-                label="Description"
-                placeholder="Describe this life area..."
+                label={t('description')}
+                placeholder={t('descriptionPlaceholder')}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
@@ -539,7 +541,7 @@ export default function LifeAreasPage() {
                   },
                 }}
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 type="submit"
@@ -562,7 +564,7 @@ export default function LifeAreasPage() {
                   },
                 }}
               >
-                {editingArea ? 'Update' : 'Create'}
+                {editingArea ? t('update') : t('create')}
               </Button>
             </Group>
           </Box>

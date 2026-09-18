@@ -2,12 +2,14 @@
 
 import { useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, Stack, Text, Menu, ActionIcon, UnstyledButton } from '@mantine/core';
 import { MoreHorizontal, Copy, Download, History, RefreshCw, PiggyBank } from 'lucide-react';
 import { useFinanceInvestments, useInvestmentsSummary, useDeleteInvestment, useFinanceAccounts } from '@/hooks/useFinance';
 import { useFinanceCurrency } from '../../currency-context';
 import { useAddPanel } from '../../add-panel-context';
 import { ASSET_CLASSES, ASSET_CLASS_ORDER, AssetClass } from '@/lib/finance/asset-classes';
+import { getAssetClassLabel, getAssetTypeLabel } from '@/lib/finance/asset-classes-i18n';
 import { FinanceInvestment } from '@/lib/api/services/finance';
 import { fmtCurrency } from './billUtils';
 import { UpdateValuationsModal } from './UpdateValuationsModal';
@@ -25,24 +27,28 @@ const CLASS_RAMP: Record<AssetClass, string> = {
 const PRIMARY_CLASSES: AssetClass[] = ['financial', 'realEstate', 'vehicles'];
 const ROW_GRID = 'minmax(0,1fr) 176px 148px 84px 104px';
 
-function detailText(inv: FinanceInvestment): string {
+function detailText(
+  inv: FinanceInvestment,
+  locale: string,
+  t: (key: string, values?: Record<string, string | number>) => string,
+): string {
   switch (inv.assetClass) {
     case 'realEstate':
-      return [inv.area ? `${inv.area} m²` : null, inv.acquiredDate ? `owned since ${inv.acquiredDate.slice(0, 4)}` : null]
+      return [inv.area ? t('detailArea', { area: inv.area }) : null, inv.acquiredDate ? t('detailOwnedSince', { year: inv.acquiredDate.slice(0, 4) }) : null]
         .filter(Boolean).join(' · ') || '—';
     case 'vehicles':
     case 'equipment':
-      return [inv.year ? String(inv.year) : null, inv.referenceTable ? `${inv.referenceTable} valuation` : null]
+      return [inv.year ? String(inv.year) : null, inv.referenceTable ? t('detailValuation', { table: inv.referenceTable }) : null]
         .filter(Boolean).join(' · ') || '—';
     case 'metals':
     case 'currency':
       return [inv.quantity ? String(inv.quantity) : null, inv.unit].filter(Boolean).join(' ') || '—';
     case 'business':
-      return [inv.interestReturn, inv.endsOn ? `due ${inv.endsOn}` : null].filter(Boolean).join(' · ') || '—';
+      return [inv.interestReturn, inv.endsOn ? t('detailDue', { date: inv.endsOn }) : null].filter(Boolean).join(' · ') || '—';
     case 'digital':
-      return inv.monthlyRevenue ? `${fmtCurrency(inv.monthlyRevenue, inv.currency)}/mo revenue` : '—';
+      return inv.monthlyRevenue ? t('detailMonthlyRevenue', { amount: fmtCurrency(inv.monthlyRevenue, locale, inv.currency) }) : '—';
     default:
-      return inv.acquiredDate ? `Acquired ${inv.acquiredDate}` : '—';
+      return inv.acquiredDate ? t('detailAcquired', { date: inv.acquiredDate }) : '—';
   }
 }
 
@@ -54,6 +60,9 @@ function changePct(inv: FinanceInvestment): number | null {
 const VALID_CLASSES = new Set(ASSET_CLASS_ORDER as string[]);
 
 export function PortfolioSection() {
+  const t = useTranslations('finance.portfolioSection');
+  const tc = useTranslations('finance.common');
+  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -63,7 +72,7 @@ export function PortfolioSection() {
   const { data: summary } = useInvestmentsSummary(displayCurrency);
   const { data: accounts = [] } = useFinanceAccounts();
   const deleteInvestment = useDeleteInvestment();
-  const undoableDeleteInvestment = useUndoableDelete((id: string) => deleteInvestment.mutate(id), { label: 'Asset' });
+  const undoableDeleteInvestment = useUndoableDelete((id: string) => deleteInvestment.mutate(id), { label: tc('asset') });
   const { openCreate, openEdit } = useAddPanel();
 
   const classParam = searchParams.get('class');
@@ -111,26 +120,26 @@ export function PortfolioSection() {
     <Box>
       <Group justify="space-between" align="baseline" wrap="wrap" gap="md">
         <Box>
-          <Text style={{ fontSize: 15, fontWeight: 700 }}>Portfolio</Text>
+          <Text style={{ fontSize: 15, fontWeight: 700 }}>{t('title')}</Text>
           {summary && (
             <Text style={{ fontSize: 12.5, color: '#64748B', marginTop: 4 }}>
-              {summary.assetCount} asset{summary.assetCount === 1 ? '' : 's'} across {summary.classes.length} class{summary.classes.length === 1 ? '' : 'es'} · {fmtCurrency(summary.totalValue, displayCurrency)}
+              {t('summary', { assetCount: summary.assetCount, classCount: summary.classes.length, total: fmtCurrency(summary.totalValue, locale, displayCurrency) })}
             </Text>
           )}
         </Box>
         <UnstyledButton onClick={() => openCreate('investment')} style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', cursor: 'pointer' }}>
-          Add asset
+          {t('addAsset')}
         </UnstyledButton>
       </Group>
 
       {list.length === 0 ? (
         <Box style={{ border: '1px dashed #E2E5EB', borderRadius: 8, padding: 28, textAlign: 'center', marginTop: 16 }}>
-          <Text style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>No assets yet</Text>
+          <Text style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>{t('noAssets')}</Text>
           <Text style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>
-            Track anything you own — investments, property, vehicles, business stakes and more.
+            {t('trackHint')}
           </Text>
           <UnstyledButton onClick={() => openCreate('investment')} style={{ display: 'inline-block', fontSize: 13, fontWeight: 600, color: '#1D4ED8', cursor: 'pointer' }}>
-            Add your first asset
+            {t('addFirstAsset')}
           </UnstyledButton>
         </Box>
       ) : (
@@ -146,8 +155,8 @@ export function PortfolioSection() {
                 {summary.classes.map((c) => (
                   <Group key={c.assetClass} gap={9} wrap="nowrap">
                     <Box style={{ width: 10, height: 10, borderRadius: 2, background: CLASS_RAMP[c.assetClass as AssetClass], flexShrink: 0 }} />
-                    <Text style={{ flex: 1, minWidth: 0, fontSize: 12.5 }}>{c.label}</Text>
-                    <Text style={{ fontSize: 12.5, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{fmtCurrency(c.value, displayCurrency)}</Text>
+                    <Text style={{ flex: 1, minWidth: 0, fontSize: 12.5 }}>{getAssetClassLabel(c.assetClass as AssetClass, c.label, locale)}</Text>
+                    <Text style={{ fontSize: 12.5, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{fmtCurrency(c.value, locale, displayCurrency)}</Text>
                     <Text style={{ fontSize: 12, color: '#64748B', width: 42, textAlign: 'right' }}>{c.pct.toFixed(1)}%</Text>
                   </Group>
                 ))}
@@ -157,17 +166,17 @@ export function PortfolioSection() {
 
           <Group justify="space-between" wrap="wrap" gap={10} style={{ padding: '18px 0 6px' }}>
             <Group gap={6} wrap="nowrap" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 2 }}>
-              <ClassChip label="All assets" active={filter === 'all'} onClick={() => setFilter('all')} />
+              <ClassChip label={t('allAssets')} active={filter === 'all'} onClick={() => setFilter('all')} />
               {ASSET_CLASS_ORDER.filter((c) => byClass.has(c)).map((c) => (
-                <ClassChip key={c} label={ASSET_CLASSES[c].label} active={filter === c} onClick={() => setFilter(c)} />
+                <ClassChip key={c} label={getAssetClassLabel(c, ASSET_CLASSES[c].label, locale)} active={filter === c} onClick={() => setFilter(c)} />
               ))}
             </Group>
             <Group gap={6} wrap="nowrap" style={{ flexShrink: 0 }}>
               <UnstyledButton onClick={() => exportAll(list)} style={{ fontSize: 12.5, fontWeight: 600, color: '#334155', border: '1px solid #E2E5EB', borderRadius: 6, padding: '7px 12px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                Export all
+                {t('exportAll')}
               </UnstyledButton>
               <UnstyledButton onClick={() => setValuationsOpened(true)} style={{ fontSize: 12.5, fontWeight: 600, color: '#334155', border: '1px solid #E2E5EB', borderRadius: 6, padding: '7px 12px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                Update valuations
+                {t('updateValuations')}
               </UnstyledButton>
             </Group>
           </Group>
@@ -180,12 +189,12 @@ export function PortfolioSection() {
                 <Box style={{ display: 'grid', gridTemplateColumns: ROW_GRID, alignItems: 'baseline', gap: 14, padding: '18px 12px 8px' }}>
                   <Group gap={10} align="baseline">
                     <Text style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: '#334155' }}>
-                      {ASSET_CLASSES[c as AssetClass].label}
+                      {getAssetClassLabel(c as AssetClass, ASSET_CLASSES[c as AssetClass].label, locale)}
                     </Text>
-                    <Text style={{ fontSize: 11.5, fontWeight: 600, color: '#64748B' }}>{assets.length} asset{assets.length === 1 ? '' : 's'}</Text>
+                    <Text style={{ fontSize: 11.5, fontWeight: 600, color: '#64748B' }}>{t('assetCount', { count: assets.length })}</Text>
                   </Group>
                   <Box />
-                  <Text style={{ fontSize: 12.5, fontWeight: 700, textAlign: 'right', color: '#334155' }}>{fmtCurrency(classValue, displayCurrency)}</Text>
+                  <Text style={{ fontSize: 12.5, fontWeight: 700, textAlign: 'right', color: '#334155' }}>{fmtCurrency(classValue, locale, displayCurrency)}</Text>
                   <Box /><Box />
                 </Box>
                 {assets.map((inv) => {
@@ -195,12 +204,12 @@ export function PortfolioSection() {
                       <Box style={{ minWidth: 0 }}>
                         <Text style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.name}</Text>
                         <Text style={{ fontSize: 12, color: '#64748B' }}>
-                          {inv.assetType}{inv.linkedAccountId && accountMap[inv.linkedAccountId] ? ` · ${accountMap[inv.linkedAccountId].name}` : ''}
+                          {getAssetTypeLabel(inv.assetType, locale)}{inv.linkedAccountId && accountMap[inv.linkedAccountId] ? ` · ${accountMap[inv.linkedAccountId].name}` : ''}
                         </Text>
                       </Box>
-                      <Text style={{ fontSize: 12.5, color: '#64748B' }}>{detailText(inv)}</Text>
+                      <Text style={{ fontSize: 12.5, color: '#64748B' }}>{detailText(inv, locale, t)}</Text>
                       <Text style={{ fontSize: 14, fontWeight: 600, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
-                        {fmtCurrency(inv.currentValue, inv.currency)}
+                        {fmtCurrency(inv.currentValue, locale, inv.currency)}
                       </Text>
                       <Text style={{
                         fontSize: 12.5, fontWeight: 700, textAlign: 'right', fontVariantNumeric: 'tabular-nums',
@@ -214,15 +223,15 @@ export function PortfolioSection() {
                             <ActionIcon size="sm" variant="subtle" color="gray"><MoreHorizontal size={15} /></ActionIcon>
                           </Menu.Target>
                           <Menu.Dropdown>
-                            <Menu.Item onClick={() => openEdit('investment', inv)}>Edit</Menu.Item>
-                            <Menu.Item leftSection={<RefreshCw size={14} />} onClick={() => setRevalueTarget(inv)}>Revalue</Menu.Item>
+                            <Menu.Item onClick={() => openEdit('investment', inv)}>{t('edit')}</Menu.Item>
+                            <Menu.Item leftSection={<RefreshCw size={14} />} onClick={() => setRevalueTarget(inv)}>{t('revalue')}</Menu.Item>
                             {inv.assetClass === 'financial' && (
-                              <Menu.Item leftSection={<PiggyBank size={14} />} onClick={() => setContributionTarget(inv)}>Add contribution</Menu.Item>
+                              <Menu.Item leftSection={<PiggyBank size={14} />} onClick={() => setContributionTarget(inv)}>{t('addContribution')}</Menu.Item>
                             )}
-                            <Menu.Item leftSection={<History size={14} />} onClick={() => setHistoryTarget(inv)}>Valuation history</Menu.Item>
-                            <Menu.Item leftSection={<Copy size={14} />} onClick={() => openCreate('investment', { ...inv, name: `${inv.name} (copy)`, id: undefined })}>Duplicate</Menu.Item>
-                            <Menu.Item leftSection={<Download size={14} />} onClick={() => exportOne(inv)}>Export</Menu.Item>
-                            <Menu.Item color="red" onClick={() => undoableDeleteInvestment.remove(inv.id)}>Delete</Menu.Item>
+                            <Menu.Item leftSection={<History size={14} />} onClick={() => setHistoryTarget(inv)}>{t('valuationHistory')}</Menu.Item>
+                            <Menu.Item leftSection={<Copy size={14} />} onClick={() => openCreate('investment', { ...inv, name: `${inv.name} (copy)`, id: undefined })}>{t('duplicate')}</Menu.Item>
+                            <Menu.Item leftSection={<Download size={14} />} onClick={() => exportOne(inv)}>{t('export')}</Menu.Item>
+                            <Menu.Item color="red" onClick={() => undoableDeleteInvestment.remove(inv.id)}>{t('delete')}</Menu.Item>
                           </Menu.Dropdown>
                         </Menu>
                       </Group>
@@ -238,7 +247,7 @@ export function PortfolioSection() {
               onClick={() => setExpanded(true)}
               style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 20, padding: 12, border: '1px solid #E2E5EB', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1D4ED8' }}
             >
-              Load more — {hiddenCount} more class{hiddenCount === 1 ? '' : 'es'} ▾
+              {t('loadMore', { count: hiddenCount })}
             </UnstyledButton>
           )}
           {filter === 'all' && expanded && classesPresent.length > PRIMARY_CLASSES.length && (
@@ -246,7 +255,7 @@ export function PortfolioSection() {
               onClick={() => setExpanded(false)}
               style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 20, padding: 12, border: '1px solid #E2E5EB', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#334155' }}
             >
-              Show less ▴
+              {t('showLess')}
             </UnstyledButton>
           )}
         </>

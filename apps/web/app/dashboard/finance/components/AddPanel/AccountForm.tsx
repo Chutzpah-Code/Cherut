@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Stack, Group, TextInput, Select, NumberInput, Text, UnstyledButton } from '@mantine/core';
 import { useCreateAccount, useUpdateAccount } from '@/hooks/useFinance';
 import { CreateAccountDto } from '@/lib/api/services/finance';
@@ -15,17 +16,17 @@ const CURRENCIES = [
   { value: 'ARS', label: 'ARS — Peso' },
 ];
 
-const ACCOUNT_TYPES = [
-  { value: 'checking', label: 'Checking' },
-  { value: 'wallet', label: 'Wallet' },
-  { value: 'savings', label: 'Savings' },
-  { value: 'credit', label: 'Credit' },
-];
-
 export const AccountForm = forwardRef<AddSubformHandle, AddSubformProps & { forcedType?: 'credit' }>(function AccountForm(
   { mode, entity, onDone, onValidChange, onPendingChange, forcedType },
   ref,
 ) {
+  const t = useTranslations('finance.accountForm');
+  const ACCOUNT_TYPES = [
+    { value: 'checking', label: t('typeChecking') },
+    { value: 'wallet', label: t('typeWallet') },
+    { value: 'savings', label: t('typeSavings') },
+    { value: 'credit', label: t('typeCredit') },
+  ];
   const createAccount = useCreateAccount();
   const updateAccount = useUpdateAccount();
 
@@ -67,34 +68,34 @@ export const AccountForm = forwardRef<AddSubformHandle, AddSubformProps & { forc
   return (
     <Stack gap="sm">
       <TextInput
-        label="Name"
-        placeholder={forcedType === 'credit' ? 'e.g. Nubank' : 'e.g. Main Checking'}
+        label={t('name')}
+        placeholder={forcedType === 'credit' ? t('namePlaceholderCard') : t('namePlaceholderAccount')}
         value={form.name ?? ''}
         onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
       />
       {!forcedType && (
         <Stack gap={7}>
-          <Text size="xs" fw={600} c="#334155">Type</Text>
+          <Text size="xs" fw={600} c="#334155">{t('type')}</Text>
           <Group gap={6} wrap="wrap">
-            {ACCOUNT_TYPES.map((t) => (
+            {ACCOUNT_TYPES.map((opt) => (
               <UnstyledButton
-                key={t.value}
-                onClick={() => setForm((f) => ({ ...f, type: t.value as any }))}
+                key={opt.value}
+                onClick={() => setForm((f) => ({ ...f, type: opt.value as any }))}
                 style={{
                   fontSize: 12.5, fontWeight: 600, padding: '8px 12px', borderRadius: 6,
-                  color: form.type === t.value ? '#1D4ED8' : '#334155',
-                  background: form.type === t.value ? '#E4EBFD' : '#F1F5F9',
+                  color: form.type === opt.value ? '#1D4ED8' : '#334155',
+                  background: form.type === opt.value ? '#E4EBFD' : '#F1F5F9',
                 }}
               >
-                {t.label}
+                {opt.label}
               </UnstyledButton>
             ))}
           </Group>
         </Stack>
       )}
-      <Select label="Currency" data={CURRENCIES} value={form.currency} onChange={(v) => setForm((f) => ({ ...f, currency: v ?? 'USD' }))} />
+      <Select label={t('currency')} data={CURRENCIES} value={form.currency} onChange={(v) => setForm((f) => ({ ...f, currency: v ?? 'USD' }))} />
       <NumberInput
-        label={`${mode === 'edit' ? 'Balance' : 'Initial balance'} (${form.currency ?? 'USD'})`}
+        label={mode === 'edit' ? t('balance', { currency: form.currency ?? 'USD' }) : t('initialBalance', { currency: form.currency ?? 'USD' })}
         value={form.balance}
         onChange={(v) => setForm((f) => ({ ...f, balance: typeof v === 'number' ? v : 0 }))}
         decimalScale={2}
@@ -102,28 +103,26 @@ export const AccountForm = forwardRef<AddSubformHandle, AddSubformProps & { forc
       {isCredit && (
         <>
           <Text size="xs" c="dimmed" style={{ background: '#F8FAFC', border: '1px solid #E8EBF0', borderRadius: 6, padding: 12 }}>
-            {forcedType
-              ? 'A credit card is an account of type Credit — not a separate entity.'
-              : 'Choosing Credit adds the limit, closing day and due day fields — no separate Cards page.'}
+            {forcedType ? t('creditNoteForced') : t('creditNoteGeneral')}
           </Text>
           <NumberInput
-            label={`Credit limit (${form.currency ?? 'USD'})`}
+            label={t('creditLimit', { currency: form.currency ?? 'USD' })}
             min={0}
             decimalScale={2}
             value={form.creditLimit ?? ''}
             onChange={(v) => setForm((f) => ({ ...f, creditLimit: typeof v === 'number' ? v : undefined }))}
           />
           <NumberInput
-            label="Statement closing day"
-            description="Day of month the billing cycle closes (1–28)"
+            label={t('statementClosingDay')}
+            description={t('statementClosingDayDesc')}
             min={1}
             max={28}
             value={form.statementClosingDay ?? ''}
             onChange={(v) => setForm((f) => ({ ...f, statementClosingDay: typeof v === 'number' ? v : undefined }))}
           />
           <NumberInput
-            label="Payment due day"
-            description="Day of month payment is due (1–28)"
+            label={t('paymentDueDay')}
+            description={t('paymentDueDayDesc')}
             min={1}
             max={28}
             value={form.statementDueDay ?? ''}

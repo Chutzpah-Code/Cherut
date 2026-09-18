@@ -8,6 +8,8 @@
  * - Automatic cleanup of expired entries
  */
 
+export type RateLimiterTranslate = (key: string, values?: Record<string, string | number>) => string;
+
 export interface RateLimitEntry {
   attempts: number;
   lastAttempt: number;
@@ -131,33 +133,33 @@ export class RateLimitService {
     this.saveEntry(entry);
   }
 
-  getMessage(result: RateLimitResult): string {
+  getMessage(result: RateLimitResult, t: RateLimiterTranslate): string {
     if (result.lockoutTimeRemaining > 0) {
       const minutes = Math.floor(result.lockoutTimeRemaining / 60);
       const seconds = result.lockoutTimeRemaining % 60;
 
       let timeStr: string;
       if (minutes > 0) {
-        timeStr = `${minutes} minute${minutes > 1 ? 's' : ''}`;
+        timeStr = t('minutesUnit', { count: minutes });
         if (seconds > 0) {
-          timeStr += ` ${seconds} second${seconds > 1 ? 's' : ''}`;
+          timeStr += ` ${t('secondsUnit', { count: seconds })}`;
         }
       } else {
-        timeStr = `${seconds} second${seconds > 1 ? 's' : ''}`;
+        timeStr = t('secondsUnit', { count: seconds });
       }
 
       if (result.lockoutLevel === 1) {
-        return `Too many failed attempts. Please wait ${timeStr} before trying again.`;
+        return t('lockedWait', { time: timeStr });
       } else {
-        return `Account temporarily locked for ${timeStr}. Repeated failures will extend lockout time.`;
+        return t('accountLocked', { time: timeStr });
       }
     }
 
     if (result.attemptsRemaining <= 2 && result.attemptsRemaining > 0) {
       if (result.lockoutLevel === 0) {
-        return `${result.attemptsRemaining} attempt${result.attemptsRemaining > 1 ? 's' : ''} remaining before temporary lockout.`;
+        return t('attemptsRemaining', { count: result.attemptsRemaining });
       } else {
-        return `${result.attemptsRemaining} attempt${result.attemptsRemaining > 1 ? 's' : ''} remaining. Next failure will result in a ${this.config.extendedLockoutMinutes}-minute lockout.`;
+        return t('attemptsRemainingExtended', { count: result.attemptsRemaining, minutes: this.config.extendedLockoutMinutes });
       }
     }
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, Tooltip, UnstyledButton } from '@mantine/core';
 import { HabitLog } from '@/lib/api/services/habits';
 
@@ -14,7 +15,7 @@ interface StreakVisualizerProps {
   habitDueDate?: string; // Data alvo de conclusão do hábito
 }
 
-function formatDateLabel(dateStr: string): string {
+function formatDateLabel(dateStr: string, locale: string, todayLabel: string, yesterdayLabel: string): string {
   const date = new Date(dateStr + 'T00:00:00');
   const today = new Date();
   const yesterday = new Date(today);
@@ -24,11 +25,11 @@ function formatDateLabel(dateStr: string): string {
   const todayOnly = today.toISOString().split('T')[0];
   const yesterdayOnly = yesterday.toISOString().split('T')[0];
 
-  if (dateOnly === todayOnly) return 'Today';
-  if (dateOnly === yesterdayOnly) return 'Yesterday';
+  if (dateOnly === todayOnly) return todayLabel;
+  if (dateOnly === yesterdayOnly) return yesterdayLabel;
 
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  return `${weekDays[date.getDay()]} ${date.getDate()}/${date.getMonth() + 1}`;
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(date);
+  return `${weekday} ${date.getDate()}/${date.getMonth() + 1}`;
 }
 
 export function StreakVisualizer({
@@ -41,6 +42,8 @@ export function StreakVisualizer({
   habitCreatedAt,
   habitDueDate,
 }: StreakVisualizerProps) {
+  const t = useTranslations('habits.streak');
+  const locale = useLocale();
   const days = getAllDaysSinceStart(logs, habitStartDate, habitCreatedAt, habitDueDate);
 
   const isCompleted = (date: string): boolean => {
@@ -78,7 +81,11 @@ export function StreakVisualizer({
         return (
           <Tooltip
             key={date}
-            label={`Day ${dayNumber} - ${formatDateLabel(date)} - ${completed ? 'Completed' : 'Not completed'}`}
+            label={t('dayTooltip', {
+              n: dayNumber,
+              date: formatDateLabel(date, locale, t('today'), t('yesterday')),
+              status: completed ? t('completed') : t('notCompleted'),
+            })}
             position="top"
             withArrow
           >

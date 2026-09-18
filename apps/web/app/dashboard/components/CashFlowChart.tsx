@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Box, Group, Text } from '@mantine/core';
 import { useCashFlow } from '@/hooks/useFinance';
 import { ChartSkeleton } from './skeletons';
@@ -9,6 +10,7 @@ import { ChartSkeleton } from './skeletons';
 const LABEL: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: '#0F172A' };
 
 export function CashFlowChart() {
+  const t = useTranslations('dashboard.cashFlow');
   const [currency] = useState<string>(() => {
     try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
   });
@@ -20,20 +22,20 @@ export function CashFlowChart() {
   return (
     <Box style={{ padding: '24px 28px 26px' }}>
       <Group justify="space-between" align="baseline">
-        <Text style={LABEL}>Cash flow</Text>
-        <Link href="/dashboard/finance" style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', textDecoration: 'none' }}>Finance</Link>
+        <Text style={LABEL}>{t('title')}</Text>
+        <Link href="/dashboard/finance" style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', textDecoration: 'none' }}>{t('financeLink')}</Link>
       </Group>
-      <Text style={{ fontSize: 12.5, color: '#64748B', margin: '4px 0 18px' }}>From transactions · income vs expenses · 6 months</Text>
+      <Text style={{ fontSize: 12.5, color: '#64748B', margin: '4px 0 18px' }}>{t('subtitle')}</Text>
 
       {isLoading ? (
         <ChartSkeleton height={96} />
       ) : !hasData ? (
-        <Text size="sm" c="dimmed">No transactions in the last 6 months.</Text>
+        <Text size="sm" c="dimmed">{t('empty')}</Text>
       ) : (
         <>
           <Box
             role="img"
-            aria-label={`Cash flow over the last 6 months, positive in ${data?.positiveMonths ?? 0} of ${months.length} months`}
+            aria-label={t('ariaLabel', { positive: data?.positiveMonths ?? 0, total: months.length })}
             style={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 96, paddingBottom: 8, borderBottom: '1px solid #E2E5EB' }}
           >
             {months.map((m, i) => {
@@ -56,14 +58,14 @@ export function CashFlowChart() {
           <Group align="center" gap={16} mt={16} pt={14} style={{ borderTop: '1px solid #EFF1F5' }}>
             <Group gap={7}>
               <Box style={{ width: 10, height: 10, borderRadius: 2, background: '#C2D2F6' }} />
-              <Text style={{ fontSize: 12.5, color: '#64748B' }}>Income</Text>
+              <Text style={{ fontSize: 12.5, color: '#64748B' }}>{t('income')}</Text>
             </Group>
             <Group gap={7}>
               <Box style={{ width: 10, height: 10, borderRadius: 2, background: '#E1E6EC' }} />
-              <Text style={{ fontSize: 12.5, color: '#64748B' }}>Expenses</Text>
+              <Text style={{ fontSize: 12.5, color: '#64748B' }}>{t('expenses')}</Text>
             </Group>
             <Box style={{ flex: 1 }} />
-            <Text style={{ fontSize: 12.5, fontWeight: 600, color: '#64748B' }}>Positive {data?.positiveMonths ?? 0} of {months.length}</Text>
+            <Text style={{ fontSize: 12.5, fontWeight: 600, color: '#64748B' }}>{t('positive', { positive: data?.positiveMonths ?? 0, total: months.length })}</Text>
           </Group>
         </>
       )}

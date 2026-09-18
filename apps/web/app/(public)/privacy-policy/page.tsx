@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { PageShell } from '@/components/shell/Shell';
 
 const BG      = '#07070D';
@@ -11,17 +12,14 @@ const ACCENT  = 'oklch(0.68 0.24 260)';
 const ACCENT_DIM = 'rgba(80,110,255,0.12)';
 const RULE    = 'rgba(255,255,255,0.08)';
 
-const sections = [
-  { icon: '◐', title: 'What we collect', items: ['Your email address and name when you sign up.', 'Usage data: which features you use and when, to improve the product.', 'Content you create: habits, tasks, journal entries, OKRs. Stored encrypted.', 'Device and browser type for debugging and performance.'] },
-  { icon: '◇', title: "What we don't do", items: ['We do not sell your data — ever. Not to advertisers, not to data brokers.', 'We do not show you ads. There are no ad networks in Cherut.', 'We do not use your journal, habits or goals to train AI models.', 'We do not share your personal data with third parties without your consent.'] },
-  { icon: '◯', title: 'How we store it', items: ['Data is stored on Firebase (Google Cloud) with encryption at rest and in transit.', 'Backups run daily and are retained for 30 days.', 'We use industry-standard TLS for all data in transit.', 'Access to production data is restricted to core team members.'] },
-  { icon: '◈', title: 'Your rights', items: ['Export: you can download all your data as JSON at any time from Settings.', 'Delete: you can permanently delete your account and all associated data.', 'Correction: you can update or correct any personal information you have provided.', 'Portability: your exported data is in open formats, not locked in.'] },
-  { icon: '✦', title: 'Contact', items: ['Questions about this policy? Email us at privacy@cherut.app', 'We aim to respond to all privacy inquiries within 5 business days.', 'For urgent data deletion requests, include "URGENT" in your subject line.'] },
-];
+const sectionIcons = ['◐', '◇', '◯', '◈', '✦'];
 
 export default function PrivacyPolicyPage() {
+  const t = useTranslations('privacyPolicyPage');
+  const sections = t.raw('sections') as { title: string; items: string[] }[];
+
   return (
-    <PageShell kicker="Privacy" title="Your privacy is not a footnote." lead="Plain language. No surprises. Last updated May 2026.">
+    <PageShell kicker={t('hero.kicker')} title={t('hero.title')} lead={t('hero.lead')}>
       <style>{`
         .pp-wrap { max-width: 800px; margin: 0 auto; padding: 48px 20px 80px; display: flex; flex-direction: column; gap: 16px; }
         .pp-card { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 14px; padding: 24px; }
@@ -39,12 +37,12 @@ export default function PrivacyPolicyPage() {
       <div style={{ background: BG }}>
         <div className="pp-wrap">
           <div className="pp-notice">
-            This is a plain-language summary of our privacy practices. It is designed to be readable, not exhaustive. For the full legal text, contact us at privacy@cherut.app
+            {t('notice')}
           </div>
-          {sections.map((s) => (
+          {sections.map((s, i) => (
             <div key={s.title} className="pp-card">
               <div className="pp-card-head">
-                <div className="pp-icon">{s.icon}</div>
+                <div className="pp-icon">{sectionIcons[i % sectionIcons.length]}</div>
                 <h2 className="pp-card-title">{s.title}</h2>
               </div>
               <ul className="pp-list">

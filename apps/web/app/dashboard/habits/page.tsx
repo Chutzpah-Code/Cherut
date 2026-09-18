@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
 import {
   Title,
@@ -33,6 +34,7 @@ import { HabitColumn } from './components/HabitColumn';
 import { habitsApi } from '@/lib/api/services/habits';
 
 export default function HabitsPage() {
+  const t = useTranslations('habits.page');
   const [currentFilter, setCurrentFilter] = useState<HabitsFilterType>('active');
   const colors = useThemeColors();
 
@@ -160,13 +162,13 @@ export default function HabitsPage() {
 
   const handleDelete = (habitId: string) => {
     modals.openConfirmModal({
-      title: 'Delete Habit',
+      title: t('deleteHabitTitle'),
       children: (
         <Text size="sm">
-          Are you sure you want to delete this habit? This action cannot be undone.
+          {t('deleteHabitBody')}
         </Text>
       ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      labels: { confirm: t('delete'), cancel: t('cancel') },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
@@ -192,13 +194,13 @@ export default function HabitsPage() {
 
   const handlePermanentDelete = (habitId: string) => {
     modals.openConfirmModal({
-      title: 'Delete Habit Permanently',
+      title: t('deleteForeverTitle'),
       children: (
         <Text size="sm">
-          Are you sure you want to permanently delete this habit? This will completely remove the habit and all its data. This action cannot be undone.
+          {t('deleteForeverBody')}
         </Text>
       ),
-      labels: { confirm: 'Delete Permanently', cancel: 'Cancel' },
+      labels: { confirm: t('deleteForever'), cancel: t('cancel') },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
@@ -294,7 +296,7 @@ export default function HabitsPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            Habit Tracker
+            {t('title')}
           </Title>
           <Text
             style={{
@@ -305,7 +307,7 @@ export default function HabitsPage() {
               lineHeight: '24px',
             }}
           >
-            Track your daily habits and build consistency
+            {t('subtitle')}
           </Text>
         </Box>
 
@@ -329,7 +331,7 @@ export default function HabitsPage() {
           <>
             {/* Archived Good Habits Column */}
             <HabitColumn
-              title="Archived Good Habits"
+              title={t('archivedGoodTitle')}
               habits={goodArchivedHabits}
               habitLogs={habitLogs}
               onAddHabit={() => {}}
@@ -338,13 +340,13 @@ export default function HabitsPage() {
               onUnarchive={handleUnarchive}
               isArchived={true}
               addButtonText=""
-              emptyStateTitle="No archived good habits yet"
-              emptyStateMessage="No good habits have been archived yet."
+              emptyStateTitle={t('archivedGoodEmpty')}
+              emptyStateMessage={t('archivedGoodEmptyMsg')}
             />
 
             {/* Archived Bad Habits Column */}
             <HabitColumn
-              title="Archived Bad Habits"
+              title={t('archivedBadTitle')}
               habits={badArchivedHabits}
               habitLogs={habitLogs}
               onAddHabit={() => {}}
@@ -353,38 +355,38 @@ export default function HabitsPage() {
               onUnarchive={handleUnarchive}
               isArchived={true}
               addButtonText=""
-              emptyStateTitle="No archived bad habits yet"
-              emptyStateMessage="No bad habits have been archived yet."
+              emptyStateTitle={t('archivedBadEmpty')}
+              emptyStateMessage={t('archivedBadEmptyMsg')}
             />
           </>
         ) : (
           <>
             {/* Good Habits Column */}
             <HabitColumn
-              title="Good Habits to Start"
+              title={t('goodTitle')}
               habits={goodHabits}
               habitLogs={habitLogs}
               onAddHabit={() => handleOpenCreateModal('good')}
               onEdit={handleEdit}
               onDayClick={handleDayClick}
               isArchived={false}
-              addButtonText="Add Good Habit"
-              emptyStateTitle="No good habits yet"
-              emptyStateMessage="Start by adding positive habits you want to implement in your routine!"
+              addButtonText={t('addGood')}
+              emptyStateTitle={t('goodEmpty')}
+              emptyStateMessage={t('goodEmptyMsg')}
             />
 
             {/* Bad Habits Column */}
             <HabitColumn
-              title="Habits to Eliminate"
+              title={t('badTitle')}
               habits={badHabits}
               habitLogs={habitLogs}
               onAddHabit={() => handleOpenCreateModal('bad')}
               onEdit={handleEdit}
               onDayClick={handleDayClick}
               isArchived={false}
-              addButtonText="Add Bad Habit"
-              emptyStateTitle="No bad habits yet"
-              emptyStateMessage="Add negative habits you want to eliminate from your life!"
+              addButtonText={t('addBad')}
+              emptyStateTitle={t('badEmpty')}
+              emptyStateMessage={t('badEmptyMsg')}
             />
           </>
         )}
@@ -405,7 +407,7 @@ export default function HabitsPage() {
               color: colors.text.primary,
             }}
           >
-            {creatingCategory === 'good' ? 'New Good Habit' : 'New Bad Habit'}
+            {creatingCategory === 'good' ? t('newGoodHabit') : t('newBadHabit')}
           </Text>
         }
         size="md"
@@ -442,7 +444,7 @@ export default function HabitsPage() {
               <Alert
                 variant="light"
                 color="blue"
-                title="21-Day Challenge"
+                title={t('challengeTitle')}
                 radius={12}
                 styles={{
                   root: {
@@ -466,12 +468,11 @@ export default function HabitsPage() {
                   },
                 }}
               >
-                Research shows it takes <strong>21 days</strong> of consistent practice to form a new habit.
-                Stay committed and track your progress daily!
+                {t('challengeMessage')}
               </Alert>
               <Select
-                label="Life Area"
-                placeholder="Select an area"
+                label={t('lifeArea')}
+                placeholder={t('selectArea')}
                 value={formData.lifeAreaId}
                 onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
                 data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
@@ -480,8 +481,8 @@ export default function HabitsPage() {
               />
 
               <TextInput
-                label="Title"
-                placeholder="E.g., Morning meditation"
+                label={t('titleLabel')}
+                placeholder={t('titlePlaceholder')}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
@@ -489,8 +490,8 @@ export default function HabitsPage() {
               />
 
               <Textarea
-                label="Description"
-                placeholder="Describe this habit..."
+                label={t('description')}
+                placeholder={t('descriptionPlaceholder')}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
@@ -499,9 +500,9 @@ export default function HabitsPage() {
               <Grid grow>
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <DateInput
-                    label="Start Date"
-                    description="When do you want to start this habit?"
-                    placeholder="Select start date"
+                    label={t('startDate')}
+                    description={t('startDateDesc')}
+                    placeholder={t('startDatePlaceholder')}
                     value={startDateValue}
                     onChange={(date) => {
                       setStartDateValue(date);
@@ -516,9 +517,9 @@ export default function HabitsPage() {
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <DateInput
-                    label="Due Date"
-                    description="Set your target completion date (21-day challenge)"
-                    placeholder="Select end date"
+                    label={t('dueDate')}
+                    description={t('dueDateDesc')}
+                    placeholder={t('dueDatePlaceholder')}
                     value={dueDateValue}
                     onChange={(date) => {
                       setDueDateValue(date);
@@ -558,7 +559,7 @@ export default function HabitsPage() {
                   },
                 }}
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 type="submit"
@@ -583,7 +584,7 @@ export default function HabitsPage() {
                   },
                 }}
               >
-                Create Habit
+                {t('createHabit')}
               </Button>
             </Group>
           </Box>

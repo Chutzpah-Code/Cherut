@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Plus, Edit2, Trash2, Target, TrendingUp, CheckCircle2, Circle, X, Archive, ArchiveRestore, ChevronDown, ChevronUp, MoreVertical } from 'lucide-react';
 import {
   Title,
@@ -65,6 +66,8 @@ interface KeyResultFormData {
 }
 
 export default function ObjectivesPage() {
+  const t = useTranslations('objectives');
+  const tn = useTranslations('objectives.notifications');
 
   const { data: objectives, isLoading, error } = useObjectives();
   const { data: lifeAreas } = useLifeAreas();
@@ -111,8 +114,8 @@ export default function ObjectivesPage() {
 
     if (!formData.title || !formData.lifeAreaId) {
       notifications.show({
-        title: 'Error',
-        message: 'Please fill in all required fields',
+        title: tn('error'),
+        message: tn('fillRequiredFields'),
         color: 'red',
       });
       return;
@@ -233,20 +236,20 @@ export default function ObjectivesPage() {
         // Show notification based on Key Results update results
         if (updateResults.errors === 0) {
           notifications.show({
-            title: 'Success',
-            message: 'Objective and all Key Results updated successfully!',
+            title: tn('success'),
+            message: tn('objectiveAndKrUpdated'),
             color: 'green',
           });
         } else if (updateResults.success > 0) {
           notifications.show({
-            title: 'Partial Success',
-            message: `Objective updated successfully! ${updateResults.success} Key Results updated, ${updateResults.errors} failed.`,
+            title: tn('partialSuccess'),
+            message: tn('partialKrUpdate', { success: updateResults.success, errors: updateResults.errors }),
             color: 'yellow',
           });
         } else {
           notifications.show({
-            title: 'Warning',
-            message: 'Objective updated successfully, but all Key Results failed to update.',
+            title: tn('warning'),
+            message: tn('allKrUpdateFailed'),
             color: 'orange',
           });
         }
@@ -272,8 +275,8 @@ export default function ObjectivesPage() {
 
         // For creation, always show success since creation includes KRs
         notifications.show({
-          title: 'Success',
-          message: 'Objective created successfully!',
+          title: tn('success'),
+          message: tn('objectiveCreated'),
           color: 'green',
         });
       }
@@ -284,7 +287,7 @@ export default function ObjectivesPage() {
       console.error('Error saving objective:', error);
 
       // Extract error message from API response
-      let errorMessage = 'Failed to save objective';
+      let errorMessage = tn('saveFailed');
       if (error?.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error?.message) {
@@ -292,7 +295,7 @@ export default function ObjectivesPage() {
       }
 
       notifications.show({
-        title: 'Error',
+        title: tn('error'),
         message: errorMessage,
         color: 'red',
       });
@@ -351,7 +354,7 @@ export default function ObjectivesPage() {
 
   const handleDeleteObjective = (objective: Objective) => {
     modals.openConfirmModal({
-      title: 'Delete Objective',
+      title: t('deleteObjectiveTitle'),
       children: (
         <Text
           style={{
@@ -362,10 +365,10 @@ export default function ObjectivesPage() {
             lineHeight: '20px',
           }}
         >
-          Are you sure you want to delete "<strong>{objective.title}</strong>"? This action cannot be undone.
+          {t('deleteObjectiveBody', { title: objective.title })}
         </Text>
       ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      labels: { confirm: t('delete'), cancel: t('cancel') },
       confirmProps: {
         color: 'red',
         style: {
@@ -377,15 +380,15 @@ export default function ObjectivesPage() {
         try {
           await deleteMutation.mutateAsync(objective.id);
           notifications.show({
-            title: 'Success',
-            message: 'Objective deleted successfully',
+            title: tn('success'),
+            message: tn('objectiveDeleted'),
             color: 'green',
           });
         } catch (error) {
           console.error('Error deleting objective:', error);
           notifications.show({
-            title: 'Error',
-            message: 'Failed to delete objective',
+            title: tn('error'),
+            message: tn('deleteFailed'),
             color: 'red',
           });
         }
@@ -400,15 +403,15 @@ export default function ObjectivesPage() {
         keyResultId: keyResult.id,
       });
       notifications.show({
-        title: 'Success',
-        message: `Key result ${keyResult.isCompleted ? 'marked as incomplete' : 'completed'}`,
+        title: tn('success'),
+        message: keyResult.isCompleted ? tn('krMarkedIncomplete') : tn('krMarkedCompleted'),
         color: 'green',
       });
     } catch (error) {
       console.error('Error toggling key result:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to update key result',
+        title: tn('error'),
+        message: tn('krUpdateFailed'),
         color: 'red',
       });
     }
@@ -418,15 +421,15 @@ export default function ObjectivesPage() {
     try {
       await toggleObjectiveCompletionMutation.mutateAsync(objective.id);
       notifications.show({
-        title: 'Success',
-        message: `Objective ${objective.status === 'completed' ? 'marked as active' : 'completed'}`,
+        title: tn('success'),
+        message: objective.status === 'completed' ? tn('objectiveMarkedActive') : tn('objectiveMarkedCompleted'),
         color: 'green',
       });
     } catch (error) {
       console.error('Error toggling objective:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to update objective',
+        title: tn('error'),
+        message: tn('objectiveUpdateFailed'),
         color: 'red',
       });
     }
@@ -436,15 +439,15 @@ export default function ObjectivesPage() {
     try {
       await archiveMutation.mutateAsync(objective.id);
       notifications.show({
-        title: 'Success',
-        message: 'Objective archived successfully',
+        title: tn('success'),
+        message: tn('objectiveArchived'),
         color: 'green',
       });
     } catch (error) {
       console.error('Error archiving objective:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to archive objective',
+        title: tn('error'),
+        message: tn('archiveFailed'),
         color: 'red',
       });
     }
@@ -454,15 +457,15 @@ export default function ObjectivesPage() {
     try {
       await unarchiveMutation.mutateAsync(objective.id);
       notifications.show({
-        title: 'Success',
-        message: 'Objective unarchived successfully',
+        title: tn('success'),
+        message: tn('objectiveUnarchived'),
         color: 'green',
       });
     } catch (error) {
       console.error('Error unarchiving objective:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to unarchive objective',
+        title: tn('error'),
+        message: tn('unarchiveFailed'),
         color: 'red',
       });
     }
@@ -554,7 +557,7 @@ export default function ObjectivesPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            Objectives & Key Results
+            {t('title')}
           </Title>
           <Text
             style={{
@@ -565,7 +568,7 @@ export default function ObjectivesPage() {
               lineHeight: '24px',
             }}
           >
-            Define and track your strategic goals using the OKR methodology
+            {t('subtitle')}
           </Text>
         </Box>
 
@@ -593,7 +596,7 @@ export default function ObjectivesPage() {
               },
             }}
           >
-            Create Objective
+            {t('createObjective')}
           </Button>
         </Box>
 
@@ -636,7 +639,7 @@ export default function ObjectivesPage() {
                 },
               }}
             >
-              Active
+              {t('active')}
             </Button>
             <Button
               onClick={() => setViewFilter('archived')}
@@ -666,7 +669,7 @@ export default function ObjectivesPage() {
                 },
               }}
             >
-              Archived
+              {t('archived')}
             </Button>
             <Button
               onClick={() => setViewFilter('all')}
@@ -696,7 +699,7 @@ export default function ObjectivesPage() {
                 },
               }}
             >
-              All
+              {t('all')}
             </Button>
           </Group>
           <Text
@@ -707,7 +710,7 @@ export default function ObjectivesPage() {
               color: '#6D6D6D',
             }}
           >
-            {filteredObjectives?.length || 0} objective{(filteredObjectives?.length || 0) !== 1 ? 's' : ''}
+            {t('objectiveCount', { count: filteredObjectives?.length || 0 })}
           </Text>
         </Group>
       </Stack>
@@ -734,7 +737,7 @@ export default function ObjectivesPage() {
                     color: '#6B7280',
                   }}
                 >
-                  {viewFilter === 'archived' ? 'No archived objectives' : viewFilter === 'active' ? 'No active objectives' : 'No objectives yet'}
+                  {viewFilter === 'archived' ? t('noArchivedObjectives') : viewFilter === 'active' ? t('noActiveObjectives') : t('noObjectivesYet')}
                 </Text>
                 <Text
                   mb="md"
@@ -747,10 +750,10 @@ export default function ObjectivesPage() {
                   }}
                 >
                   {viewFilter === 'archived'
-                    ? 'No objectives have been archived yet'
+                    ? t('noArchivedHint')
                     : viewFilter === 'active'
-                    ? 'All your objectives are archived. Create a new one or unarchive existing ones.'
-                    : 'Create your first objective to start tracking your progress towards your goals'
+                    ? t('noActiveHint')
+                    : t('emptyHint')
                   }
                 </Text>
                 {viewFilter !== 'archived' && (
@@ -775,7 +778,7 @@ export default function ObjectivesPage() {
                       },
                     }}
                   >
-                    Create Your First Objective
+                    {t('createFirstObjective')}
                   </Button>
                 )}
               </div>
@@ -831,11 +834,11 @@ export default function ObjectivesPage() {
                           }
                           size="sm"
                         >
-                          {objective.status}
+                          {objective.status === 'completed' ? t('statusCompleted') : objective.status === 'cancelled' ? t('statusCancelled') : t('statusActive')}
                         </Badge>
                         {objective.isArchived && (
                           <Badge color="gray" variant="outline" size="sm">
-                            archived
+                            {t('archived')}
                           </Badge>
                         )}
                       </Group>
@@ -862,7 +865,7 @@ export default function ObjectivesPage() {
                                 fontSize: 12, fontWeight: 500, color: '#4686FE', marginTop: 2,
                               }}
                             >
-                              See more
+                              {t('seeMore')}
                             </button>
                           )}
                         </Box>
@@ -881,14 +884,14 @@ export default function ObjectivesPage() {
                         leftSection={objective.status === 'completed' ? <CheckCircle2 size={16} /> : <Circle size={16} />}
                         onClick={() => handleToggleObjective(objective)}
                       >
-                        {objective.status === 'completed' ? 'Mark as Active' : 'Mark as Completed'}
+                        {objective.status === 'completed' ? t('markAsActive') : t('markAsCompleted')}
                       </Menu.Item>
 
                       <Menu.Item
                         leftSection={<Edit2 size={16} />}
                         onClick={() => handleEditObjective(objective)}
                       >
-                        Edit Objective
+                        {t('editObjective')}
                       </Menu.Item>
 
                       <Menu.Divider />
@@ -897,7 +900,7 @@ export default function ObjectivesPage() {
                         leftSection={objective.isArchived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
                         onClick={() => objective.isArchived ? handleUnarchiveObjective(objective) : handleArchiveObjective(objective)}
                       >
-                        {objective.isArchived ? 'Unarchive' : 'Archive'}
+                        {objective.isArchived ? t('unarchive') : t('archive')}
                       </Menu.Item>
 
                       <Menu.Divider />
@@ -907,7 +910,7 @@ export default function ObjectivesPage() {
                         leftSection={<Trash2 size={16} />}
                         onClick={() => handleDeleteObjective(objective)}
                       >
-                        Delete
+                        {t('delete')}
                       </Menu.Item>
                     </Menu.Dropdown>
                   </Menu>
@@ -923,7 +926,7 @@ export default function ObjectivesPage() {
                         color: '#333333',
                       }}
                     >
-                      Progress
+                      {t('progress')}
                     </Text>
                     <Text
                       style={{
@@ -950,7 +953,7 @@ export default function ObjectivesPage() {
                           color: '#333333',
                         }}
                       >
-                        Key Results ({objective.keyResults.length})
+                        {t('keyResultsCount', { count: objective.keyResults.length })}
                       </Text>
                       {objective.keyResults.length > 3 && (
                         <ActionIcon
@@ -1005,7 +1008,7 @@ export default function ObjectivesPage() {
                                     color: '#666666',
                                   }}
                                 >
-                                  Progress: {kr.currentValue || 0}/{kr.targetValue || 0} {kr.unit || ''} ({(kr.completionPercentage || 0).toFixed(0)}%)
+                                  {t('keyResultProgress', { current: kr.currentValue || 0, target: kr.targetValue || 0, unit: kr.unit || '', pct: (kr.completionPercentage || 0).toFixed(0) })}
                                 </Text>
                               </Group>
                             </Box>
@@ -1030,7 +1033,7 @@ export default function ObjectivesPage() {
                             color: '#666666',
                           }}
                         >
-                          +{objective.keyResults.length - 3} more
+                          {t('moreCount', { count: objective.keyResults.length - 3 })}
                         </Text>
                       )}
                     </Stack>
@@ -1054,7 +1057,7 @@ export default function ObjectivesPage() {
               color: '#000000',
             }}
           >
-            {editingObjective ? 'Edit Objective' : 'Create New Objective'}
+            {editingObjective ? t('editObjectiveTitle') : t('createNewObjective')}
           </Text>
         }
         size="lg"
@@ -1081,8 +1084,8 @@ export default function ObjectivesPage() {
           <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
           <Stack gap="lg">
             <TextInput
-              label="Title"
-              placeholder="Enter objective title"
+              label={t('titleLabel')}
+              placeholder={t('titlePlaceholder')}
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -1115,8 +1118,8 @@ export default function ObjectivesPage() {
             />
 
             <Textarea
-              label="Description"
-              placeholder="Describe your objective"
+              label={t('description')}
+              placeholder={t('descriptionPlaceholder')}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
@@ -1147,8 +1150,8 @@ export default function ObjectivesPage() {
             />
 
             <Select
-              label="Life Area"
-              placeholder="Select a life area"
+              label={t('lifeArea')}
+              placeholder={t('selectLifeArea')}
               required
               data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
               value={formData.lifeAreaId}
@@ -1185,8 +1188,8 @@ export default function ObjectivesPage() {
               <Grid grow>
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <DateInput
-                    label="Start Date"
-                    placeholder="Select start date"
+                    label={t('startDate')}
+                    placeholder={t('startDatePlaceholder')}
                     value={formData.startDate && !isNaN(formData.startDate.getTime()) ? formData.startDate : new Date()}
                     onChange={(value) => setFormData({ ...formData, startDate: value || new Date() })}
                     required
@@ -1194,8 +1197,8 @@ export default function ObjectivesPage() {
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <DateInput
-                    label="End Date"
-                    placeholder="Select end date"
+                    label={t('endDate')}
+                    placeholder={t('endDatePlaceholder')}
                     value={formData.endDate && !isNaN(formData.endDate.getTime()) ? formData.endDate : new Date()}
                     onChange={(value) => setFormData({ ...formData, endDate: value || new Date() })}
                     required
@@ -1216,7 +1219,7 @@ export default function ObjectivesPage() {
                     color: '#000000',
                   }}
                 >
-                  Key Results
+                  {t('keyResults')}
                 </Text>
                 <Button
                   variant="outline"
@@ -1248,7 +1251,7 @@ export default function ObjectivesPage() {
                   <Paper key={index} p="md" withBorder>
                     <Group justify="space-between" align="center" mb="sm">
                       <Text size="sm" fw={500}>
-                        Key Result {index + 1}
+                        {t('keyResultN', { n: index + 1 })}
                       </Text>
                       <ActionIcon
                         variant="light"
@@ -1262,59 +1265,59 @@ export default function ObjectivesPage() {
 
                     <Stack gap="sm">
                       <TextInput
-                        label="What do you want to achieve?"
-                        placeholder="e.g., Increase monthly active users"
+                        label={t('krTitleLabel')}
+                        placeholder={t('krTitlePlaceholder')}
                         value={kr.title}
                         onChange={(e) => updateKeyResult(index, 'title', e.target.value)}
                         size="sm"
                         required
-                        description="A specific, measurable outcome you want to achieve"
+                        description={t('krTitleDesc')}
                       />
                       <Textarea
-                        label="Additional details (optional)"
-                        placeholder="e.g., Focus on improving user engagement through new features"
+                        label={t('krDetailsLabel')}
+                        placeholder={t('krDetailsPlaceholder')}
                         value={kr.description}
                         onChange={(e) => updateKeyResult(index, 'description', e.target.value)}
                         size="sm"
                         rows={2}
-                        description="Any extra context or details about this key result"
+                        description={t('krDetailsDesc')}
                       />
 
-                      <Text size="sm" fw={500} mt="xs" mb="xs">Measurement</Text>
+                      <Text size="sm" fw={500} mt="xs" mb="xs">{t('measurement')}</Text>
                       <Stack gap="sm">
                         <Grid grow>
                           <Grid.Col span={{ base: 12, sm: 4 }}>
                             <NumberInput
-                              label="Target Goal"
+                              label={t('targetGoal')}
                               placeholder="1000"
                               value={kr.targetValue}
                               onChange={(value) => updateKeyResult(index, 'targetValue', value || 0)}
                               size="sm"
                               min={0}
                               required
-                              description="What number do you want to reach?"
+                              description={t('targetGoalDesc')}
                             />
                           </Grid.Col>
                           <Grid.Col span={{ base: 12, sm: 4 }}>
                             <NumberInput
-                              label="Current Progress"
+                              label={t('currentProgress')}
                               placeholder="250"
                               value={kr.currentValue}
                               onChange={(value) => updateKeyResult(index, 'currentValue', value || 0)}
                               size="sm"
                               min={0}
-                              description="Where are you now?"
+                              description={t('currentProgressDesc')}
                             />
                           </Grid.Col>
                           <Grid.Col span={{ base: 12, sm: 4 }}>
                             <TextInput
-                              label="Unit of Measure"
-                              placeholder="users"
+                              label={t('unitOfMeasure')}
+                              placeholder={t('unitPlaceholder')}
                               value={kr.unit}
                               onChange={(e) => updateKeyResult(index, 'unit', e.target.value)}
                               size="sm"
                               required
-                              description="How will you measure it? (users, %, $, etc.)"
+                              description={t('unitDesc')}
                             />
                           </Grid.Col>
                         </Grid>
@@ -1323,7 +1326,7 @@ export default function ObjectivesPage() {
                       {kr.targetValue > 0 && kr.currentValue >= 0 && (
                         <Box mt="xs" p="xs" style={{ backgroundColor: '#f8f9fa', borderRadius: 4 }}>
                           <Group justify="space-between" align="center" mb="xs">
-                            <Text size="xs" c="dimmed">Progress Preview:</Text>
+                            <Text size="xs" c="dimmed">{t('progressPreview')}</Text>
                             {kr.id && (
                               <ActionIcon
                                 size="xs"
@@ -1346,8 +1349,7 @@ export default function ObjectivesPage() {
                               style={{ flex: 1 }}
                             />
                             <Text size="xs" fw={500}>
-                              {kr.currentValue} / {kr.targetValue} {kr.unit}
-                              ({Math.min(Math.round((kr.currentValue / kr.targetValue) * 100), 100)}%)
+                              {t('krProgressValue', { current: kr.currentValue, target: kr.targetValue, unit: kr.unit, pct: Math.min(Math.round((kr.currentValue / kr.targetValue) * 100), 100) })}
                             </Text>
                           </Group>
                         </Box>
@@ -1367,7 +1369,7 @@ export default function ObjectivesPage() {
                       color: '#666666',
                     }}
                   >
-                    No key results added yet. Click the + button to add some.
+                    {t('noKeyResultsYet')}
                   </Text>
                 )}
               </Stack>
@@ -1401,7 +1403,7 @@ export default function ObjectivesPage() {
                     },
                   }}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </Grid.Col>
               <Grid.Col span={{ base: 6, sm: 'content' }}>
@@ -1427,7 +1429,7 @@ export default function ObjectivesPage() {
                     },
                   }}
                 >
-                  {editingObjective ? 'Update' : 'Create'} Objective
+                  {editingObjective ? t('updateObjective') : t('createObjectiveBtn')}
                 </Button>
               </Grid.Col>
             </Grid>

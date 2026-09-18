@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Group, Stack, Text, ActionIcon, Badge, Box, ScrollArea, Menu } from '@mantine/core';
 import { Edit2, Flame, MoreVertical, ArchiveRestore, Eye } from 'lucide-react';
 import { Habit, HabitLog } from '@/lib/api/services/habits';
@@ -46,6 +47,7 @@ function calculateCurrentStreak(logs: HabitLog[]): number {
 }
 
 export function HabitCard({ habit, logs, onEdit, onDayClick, isArchived = false, onUnarchive }: HabitCardProps) {
+  const t = useTranslations('habits.card');
   const currentStreak = calculateCurrentStreak(logs);
 
   return (
@@ -99,7 +101,7 @@ export function HabitCard({ habit, logs, onEdit, onDayClick, isArchived = false,
                     border: 'none',
                   }}
                 >
-                  Archived
+                  {t('archived')}
                 </Badge>
               )}
               {currentStreak > 0 && (
@@ -116,7 +118,7 @@ export function HabitCard({ habit, logs, onEdit, onDayClick, isArchived = false,
                     border: 'none',
                   }}
                 >
-                  {currentStreak} {currentStreak === 1 ? 'day' : 'days'}
+                  {t('days', { count: currentStreak })}
                 </Badge>
               )}
             </Group>
@@ -165,14 +167,14 @@ export function HabitCard({ habit, logs, onEdit, onDayClick, isArchived = false,
                   leftSection={<Eye size={16} />}
                   onClick={() => onEdit(habit)}
                 >
-                  View Details
+                  {t('viewDetails')}
                 </Menu.Item>
                 {onUnarchive && (
                   <Menu.Item
                     leftSection={<ArchiveRestore size={16} />}
                     onClick={() => onUnarchive(habit)}
                   >
-                    Unarchive
+                    {t('unarchive')}
                   </Menu.Item>
                 )}
               </Menu.Dropdown>

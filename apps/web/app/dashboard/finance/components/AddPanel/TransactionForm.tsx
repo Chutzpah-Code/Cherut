@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Switch } from '@mantine/core';
 import { useFinanceAccounts, useFinanceCategories, useCreateTransaction, useUpdateTransaction } from '@/hooks/useFinance';
 import { useCreateBill } from '@/hooks/useBills';
@@ -12,6 +13,7 @@ export const TransactionForm = forwardRef<AddSubformHandle, AddSubformProps>(fun
   { mode, entity, prefill, onDone, onValidChange, onPendingChange },
   ref,
 ) {
+  const t = useTranslations('finance.transactionForm');
   const { data: accounts = [] } = useFinanceAccounts();
   const { data: categories = [] } = useFinanceCategories();
   const createTx = useCreateTransaction();
@@ -67,7 +69,7 @@ export const TransactionForm = forwardRef<AddSubformHandle, AddSubformProps>(fun
           if (makeRecurring && form.accountId && form.categoryId && form.amount && form.date) {
             const day = Number(form.date.slice(8, 10)) || 1;
             createBill.mutate({
-              name: form.description || 'Recurring transaction',
+              name: form.description || t('recurringTransactionDefaultName'),
               accountId: form.accountId,
               categoryId: form.categoryId,
               amount: form.amount,
@@ -101,7 +103,7 @@ export const TransactionForm = forwardRef<AddSubformHandle, AddSubformProps>(fun
       {mode === 'create' && (
         <Switch
           mt="sm"
-          label="Make it recurring"
+          label={t('makeRecurring')}
           checked={makeRecurring}
           onChange={(e) => setMakeRecurring(e.currentTarget.checked)}
         />

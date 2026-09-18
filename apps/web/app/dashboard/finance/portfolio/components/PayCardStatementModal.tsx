@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { Modal, Stack, Group, Text, Box, Select, NumberInput, Button, Center, Loader } from '@mantine/core';
 import { useFinanceAccounts, useCloseStatement, usePayStatement } from '@/hooks/useFinance';
 import { FinanceAccount, FinanceStatement } from '@/lib/api/services/finance';
@@ -16,6 +17,9 @@ export function PayCardStatementModal({
   onClose: () => void;
   accountId: string | null;
 }) {
+  const t = useTranslations('finance.payCardStatement');
+  const tc = useTranslations('finance.common');
+  const locale = useLocale();
   const { data: accounts = [] } = useFinanceAccounts();
   const closeStatement = useCloseStatement();
   const payStatement = usePayStatement();
@@ -57,7 +61,7 @@ export function PayCardStatementModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      title={cardAccount ? `Pay ${cardAccount.name} statement` : 'Pay statement'}
+      title={cardAccount ? t('title', { name: cardAccount.name }) : t('titleGeneric')}
       centered
       styles={{
         content: { display: 'flex', flexDirection: 'column', maxHeight: '85dvh', overflow: 'hidden' },
@@ -70,19 +74,19 @@ export function PayCardStatementModal({
         ) : (
           <Stack gap="sm">
             <Box style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
-              <Text size="xs" c="dimmed">Statement total</Text>
-              <Text size="xl" fw={700} c="green.7">{fmtCurrency(statement.total, cardAccount?.currency)}</Text>
+              <Text size="xs" c="dimmed">{t('statementTotal')}</Text>
+              <Text size="xl" fw={700} c="green.7">{fmtCurrency(statement.total, locale, cardAccount?.currency)}</Text>
             </Box>
             <Select
-              label="Pay from"
-              placeholder="Select account"
+              label={t('payFrom')}
+              placeholder={t('selectAccount')}
               required
-              data={cashAccounts.map((a) => ({ value: a.id, label: `${a.name} — ${fmtCurrency(a.balance, a.currency)}` }))}
+              data={cashAccounts.map((a) => ({ value: a.id, label: `${a.name} — ${fmtCurrency(a.balance, locale, a.currency)}` }))}
               value={fromAccountId}
               onChange={setFromAccountId}
             />
             <NumberInput
-              label="Amount"
+              label={t('amount')}
               min={0.01}
               decimalScale={2}
               value={amount}
@@ -94,14 +98,14 @@ export function PayCardStatementModal({
       </Box>
       <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
         <Group justify="flex-end">
-          <Button variant="default" onClick={onClose}>Cancel</Button>
+          <Button variant="default" onClick={onClose}>{tc('cancel')}</Button>
           <Button
             onClick={handlePay}
             loading={payStatement.isPending}
             disabled={!statement || !fromAccountId || isNaN(parsedAmount) || parsedAmount <= 0}
             color="green"
           >
-            Confirm payment
+            {t('confirmPayment')}
           </Button>
         </Group>
       </Box>

@@ -2,14 +2,16 @@
  * Utility function to convert Firebase authentication errors into user-friendly messages
  * This helps maintain security while providing helpful feedback to users
  */
-export function getAuthErrorMessage(error: any): string {
+export type AuthErrorTranslate = (key: string, values?: Record<string, string | number>) => string;
+
+export function getAuthErrorMessage(error: any, t: AuthErrorTranslate): string {
   // Check for rate limit errors first (these are custom errors from our rate limiter)
   if (typeof error === 'string' && error.includes('attempt')) {
     return error; // Return rate limit messages as-is since they're already user-friendly
   }
 
   if (typeof error === 'object' && error.isRateLimit) {
-    return error.message || 'Too many attempts. Please wait before trying again.';
+    return error.message || t('rateLimitDefault');
   }
   // Handle cases where error might be a string or an object
   const errorCode = typeof error === 'object' ? error.code : error;
@@ -23,42 +25,42 @@ export function getAuthErrorMessage(error: any): string {
       case 'auth/wrong-password':
       case 'auth/invalid-email':
       case 'auth/invalid-credential':
-        return 'Invalid email or password. Please check your credentials and try again.';
+        return t('invalidCredentials');
 
       case 'auth/too-many-requests':
-        return 'Too many failed attempts. Please wait a few minutes before trying again.';
+        return t('tooManyRequests');
 
       case 'auth/user-disabled':
-        return 'This account has been temporarily disabled. Please contact support for assistance.';
+        return t('accountDisabled');
 
       // Registration errors
       case 'auth/email-already-in-use':
-        return 'An account with this email address already exists. Please try signing in instead.';
+        return t('emailInUse');
 
       case 'auth/weak-password':
-        return 'Password must be at least 6 characters long. Please choose a stronger password.';
+        return t('weakPassword');
 
       // Password reset errors
       case 'auth/invalid-action-code':
       case 'auth/expired-action-code':
-        return 'This password reset link has expired or is invalid. Please request a new one.';
+        return t('resetLinkExpired');
 
       // Network and configuration errors
       case 'auth/network-request-failed':
-        return 'Network error. Please check your internet connection and try again.';
+        return t('networkError');
 
       case 'auth/app-deleted':
       case 'auth/app-not-authorized':
-        return 'Service temporarily unavailable. Please try again later.';
+        return t('serviceUnavailable');
 
       // Re-authentication errors
       case 'auth/requires-recent-login':
-        return 'For security, please sign out and sign back in before making this change.';
+        return t('requiresRecentLogin');
 
       // Default for other auth errors
       default:
         if (errorCode.startsWith('auth/')) {
-          return 'Authentication failed. Please try again or contact support if the problem persists.';
+          return t('authFailedGeneric');
         }
     }
   }
@@ -68,30 +70,30 @@ export function getAuthErrorMessage(error: any): string {
     const message = errorMessage.toLowerCase();
 
     if (message.includes('firebase') || message.includes('auth/')) {
-      return 'Authentication error. Please try again or contact support if the problem persists.';
+      return t('authErrorGeneric');
     }
 
     if (message.includes('network') || message.includes('connection')) {
-      return 'Network error. Please check your internet connection and try again.';
+      return t('networkError');
     }
 
     if (message.includes('password') && message.includes('weak')) {
-      return 'Password must be at least 6 characters long. Please choose a stronger password.';
+      return t('weakPassword');
     }
 
     if (message.includes('email') && (message.includes('invalid') || message.includes('format'))) {
-      return 'Please enter a valid email address.';
+      return t('invalidEmailFormat');
     }
   }
 
   // Fallback for any unknown errors
-  return 'Something went wrong. Please try again or contact support if the problem persists.';
+  return t('genericError');
 }
 
 /**
  * Utility function specifically for login/signin errors
  */
-export function getLoginErrorMessage(error: any): string {
+export function getLoginErrorMessage(error: any, t: AuthErrorTranslate): string {
   const errorCode = typeof error === 'object' ? error.code : error;
 
   switch (errorCode) {
@@ -99,71 +101,71 @@ export function getLoginErrorMessage(error: any): string {
     case 'auth/wrong-password':
     case 'auth/invalid-email':
     case 'auth/invalid-credential':
-      return 'Invalid email or password. Please check your credentials.';
+      return t('loginInvalidCredentials');
 
     case 'auth/too-many-requests':
-      return 'Too many login attempts. Please wait a few minutes and try again.';
+      return t('loginTooManyAttempts');
 
     default:
-      return getAuthErrorMessage(error);
+      return getAuthErrorMessage(error, t);
   }
 }
 
 /**
  * Utility function specifically for registration errors
  */
-export function getRegistrationErrorMessage(error: any): string {
+export function getRegistrationErrorMessage(error: any, t: AuthErrorTranslate): string {
   const errorCode = typeof error === 'object' ? error.code : error;
 
   switch (errorCode) {
     case 'auth/email-already-in-use':
-      return 'This email is already registered. Please sign in or use a different email.';
+      return t('registerEmailInUse');
 
     case 'auth/weak-password':
-      return 'Password must be at least 6 characters long.';
+      return t('registerWeakPassword');
 
     case 'auth/invalid-email':
-      return 'Please enter a valid email address.';
+      return t('registerInvalidEmail');
 
     default:
-      return getAuthErrorMessage(error);
+      return getAuthErrorMessage(error, t);
   }
 }
 
 /**
  * Utility function specifically for password change/reset errors
  */
-export function getPasswordErrorMessage(error: any): string {
+export function getPasswordErrorMessage(error: any, t: AuthErrorTranslate): string {
   // Check for rate limit errors first
   if (typeof error === 'string' && error.includes('attempt')) {
     return error;
   }
 
   if (typeof error === 'object' && error.isRateLimit) {
-    return error.message || 'Too many attempts. Please wait before trying again.';
+    return error.message || t('rateLimitDefault');
   }
 
   const errorCode = typeof error === 'object' ? error.code : error;
 
   switch (errorCode) {
     case 'auth/wrong-password':
-      return 'Current password is incorrect. Please try again.';
+      return t('passwordWrongCurrent');
 
     case 'auth/weak-password':
-      return 'New password must be at least 6 characters long.';
+      return t('passwordWeakNew');
 
     case 'auth/requires-recent-login':
-      return 'For security, please sign out and sign back in before changing your password.';
+      return t('passwordRequiresRecentLogin');
 
     case 'auth/too-many-requests':
-      return 'Too many attempts. Please wait a few minutes before trying again.';
+      return t('passwordTooManyAttempts');
 
     case 'auth/invalid-action-code':
     case 'auth/expired-action-code':
-      return 'Password reset link has expired. Please request a new one.';
+      return t('passwordResetLinkExpired');
 
     default:
-      return getAuthErrorMessage(error);
+      return getAuthErrorMessage(error, t);
   }
 }
 

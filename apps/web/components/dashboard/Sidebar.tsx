@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   LayoutDashboard,
   Target,
@@ -23,48 +24,40 @@ import { logoutUser } from '@/lib/firebase/auth';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Finance', href: '/dashboard/finance', icon: Wallet },
-  { name: 'Vision Board', href: '/dashboard/vision-board', icon: Sparkles },
-  { name: 'Life Areas', href: '/dashboard/life-areas', icon: TrendingUp },
-  { name: 'Values', href: '/dashboard/values', icon: Heart },
-  { name: 'Objectives', href: '/dashboard/objectives', icon: Target },
-  { name: 'Tasks', href: '/dashboard/tasks', icon: CheckSquare },
-  { name: 'Habits', href: '/dashboard/habits', icon: Calendar },
-  { name: 'Journal', href: '/dashboard/journal', icon: BookOpen },
-  { name: 'Profile', href: '/dashboard/profile', icon: User },
-];
-
-const comingSoonItems = [
-  {
-    name: 'Reports',
-    href: '#',
-    icon: BarChart3,
-    description: 'Analytics dashboards showing your evolution and progress insights'
-  },
-  {
-    name: 'CherutOS',
-    href: '#',
-    icon: Bot,
-    description: 'AI-powered personal assistant for conscious decision making'
-  },
-];
-
 interface SidebarProps {
   onClose: () => void;
 }
 
 export default function Sidebar({ onClose }: SidebarProps) {
+  const t = useTranslations('sidebar');
   const pathname = usePathname();
   const router = useRouter();
   const { screenSize } = useSidebar();
   const colors = useThemeColors();
 
+  const navigation = [
+    { name: t('dashboard'), href: '/dashboard', icon: LayoutDashboard },
+    { name: t('finance'), href: '/dashboard/finance', icon: Wallet },
+    { name: t('visionBoard'), href: '/dashboard/vision-board', icon: Sparkles },
+    { name: t('lifeAreas'), href: '/dashboard/life-areas', icon: TrendingUp },
+    { name: t('values'), href: '/dashboard/values', icon: Heart },
+    { name: t('objectives'), href: '/dashboard/objectives', icon: Target },
+    { name: t('tasks'), href: '/dashboard/tasks', icon: CheckSquare },
+    { name: t('habits'), href: '/dashboard/habits', icon: Calendar },
+    { name: t('journal'), href: '/dashboard/journal', icon: BookOpen },
+    { name: t('profile'), href: '/dashboard/profile', icon: User },
+  ];
+
+  const comingSoonItems = [
+    { name: t('reports'), href: '#', icon: BarChart3 },
+    { name: t('cherutOS'), href: '#', icon: Bot },
+  ];
+
   useEffect(() => {
     navigation.forEach((item) => {
       router.prefetch(item.href);
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   const handleLogout = async () => {
@@ -337,7 +330,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
               return (
                 <Tooltip
                   key={item.name}
-                  label={`${item.name} (Coming Soon)`}
+                  label={t('comingSoon', { name: item.name })}
                   position="right"
                   withArrow
                   offset={8}
@@ -365,7 +358,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           </Stack>
 
           <Tooltip
-            label="Logout"
+            label={t('logout')}
             position="right"
             withArrow
             offset={8}

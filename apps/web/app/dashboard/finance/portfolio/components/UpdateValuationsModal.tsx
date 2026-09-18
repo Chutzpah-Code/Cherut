@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Modal, Stack, Group, Text, Box, NumberInput, TextInput, Button } from '@mantine/core';
 import { useBulkUpdateValuations } from '@/hooks/useFinance';
 import { FinanceInvestment } from '@/lib/api/services/finance';
@@ -16,6 +17,8 @@ export function UpdateValuationsModal({
   onClose: () => void;
   investments: FinanceInvestment[];
 }) {
+  const t = useTranslations('finance.updateValuations');
+  const tc = useTranslations('finance.common');
   const bulkUpdate = useBulkUpdateValuations();
   const [values, setValues] = useState<Record<string, { currentValue: number; valuedDate: string }>>({});
 
@@ -35,7 +38,7 @@ export function UpdateValuationsModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      title="Update valuations"
+      title={t('title')}
       centered
       size="lg"
       styles={{
@@ -45,7 +48,7 @@ export function UpdateValuationsModal({
     >
       <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
         <Text size="xs" c="dimmed" mb="sm">
-          Manual assets keep their last manual value until you update it here.
+          {t('hint')}
         </Text>
         <Stack gap="xs">
           {investments.map((inv) => (
@@ -73,9 +76,9 @@ export function UpdateValuationsModal({
       </Box>
       <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
         <Group justify="flex-end">
-          <Button variant="default" onClick={onClose}>Cancel</Button>
+          <Button variant="default" onClick={onClose}>{tc('cancel')}</Button>
           <Button onClick={handleSubmit} loading={bulkUpdate.isPending} style={{ backgroundColor: '#0052CC' }}>
-            Save valuations
+            {t('saveValuations')}
           </Button>
         </Group>
       </Box>

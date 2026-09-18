@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations, useLocale } from 'next-intl';
 import { Modal, Stack, Box, Group, Text, Center, Loader, Button } from '@mantine/core';
 import { Archive, AlertCircle } from 'lucide-react';
 import { useArchivedTasksByBoard } from '@/hooks/useTasks';
@@ -12,11 +13,13 @@ interface ArchivedTasksModalProps {
   onSelectTask: (task: Task) => void;
 }
 
-function formatUpdatedAt(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+function formatUpdatedAt(iso: string, locale: string): string {
+  return new Date(iso).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 export function ArchivedTasksModal({ boardId, opened, onClose, onSelectTask }: ArchivedTasksModalProps) {
+  const t = useTranslations('tasks.archivedTasks');
+  const locale = useLocale();
   const { data: tasks, isLoading, isError, error, refetch, isFetching } = useArchivedTasksByBoard(boardId, opened);
   const sorted = [...(tasks ?? [])].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 
@@ -24,7 +27,7 @@ export function ArchivedTasksModal({ boardId, opened, onClose, onSelectTask }: A
     <Modal
       opened={opened}
       onClose={onClose}
-      title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>Archived tasks</Text>}
+      title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>{t('title')}</Text>}
       size="lg"
       radius="lg"
     >
@@ -36,14 +39,14 @@ export function ArchivedTasksModal({ boardId, opened, onClose, onSelectTask }: A
         <Center py="xl">
           <Stack align="center" gap={4}>
             <AlertCircle size={28} color="#B91C1C" />
-            <Text size="sm" fw={500} c="red">Couldn't load archived tasks</Text>
+            <Text size="sm" fw={500} c="red">{t('loadError')}</Text>
             <Text size="xs" c="dimmed" ta="center" maw={320}>
               {(error as any)?.response?.status
-                ? `Server responded with ${(error as any).response.status}.`
-                : (error as any)?.message || 'Something went wrong.'}
+                ? t('serverError', { status: (error as any).response.status })
+                : (error as any)?.message || t('genericError')}
             </Text>
             <Button size="xs" variant="light" mt={6} loading={isFetching} onClick={() => refetch()}>
-              Try again
+              {t('tryAgain')}
             </Button>
           </Stack>
         </Center>
@@ -51,8 +54,8 @@ export function ArchivedTasksModal({ boardId, opened, onClose, onSelectTask }: A
         <Center py="xl">
           <Stack align="center" gap={4}>
             <Archive size={28} color="#94A3B8" />
-            <Text size="sm" c="dimmed">No archived tasks</Text>
-            <Text size="xs" c="dimmed">Tasks you archive from this board will show up here.</Text>
+            <Text size="sm" c="dimmed">{t('empty')}</Text>
+            <Text size="xs" c="dimmed">{t('emptyHint')}</Text>
           </Stack>
         </Center>
       ) : (
@@ -73,7 +76,7 @@ export function ArchivedTasksModal({ boardId, opened, onClose, onSelectTask }: A
                   {task.title}
                 </Text>
                 <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
-                  {formatUpdatedAt(task.updatedAt)}
+                  {formatUpdatedAt(task.updatedAt, locale)}
                 </Text>
               </Group>
             </Box>

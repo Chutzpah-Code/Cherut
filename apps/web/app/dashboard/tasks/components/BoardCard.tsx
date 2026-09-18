@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Card,
   Text,
@@ -40,6 +41,7 @@ interface BoardCardProps {
 }
 
 export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCardProps) {
+  const t = useTranslations('tasks.boardCard');
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
@@ -115,7 +117,7 @@ export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCar
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Item leftSection={<Edit2 size={14} />} onClick={openRename}>
-                  Rename
+                  {t('rename')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<Palette size={14} />}
@@ -124,7 +126,7 @@ export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCar
                     setColorOpen(true);
                   }}
                 >
-                  Color
+                  {t('color')}
                 </Menu.Item>
                 <Menu.Divider />
                 <Menu.Item
@@ -135,7 +137,7 @@ export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCar
                     onDelete(board.id);
                   }}
                 >
-                  Delete
+                  {t('delete')}
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -160,7 +162,7 @@ export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCar
         onClose={() => setRenameOpen(false)}
         title={
           <Text fw={600} style={{ fontFamily: 'Inter Display, sans-serif' }}>
-            Rename board
+            {t('renameBoard')}
           </Text>
         }
         radius="lg"
@@ -170,7 +172,7 @@ export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCar
       >
         <Stack gap="md">
           <TextInput
-            label="Board name"
+            label={t('boardNameLabel')}
             value={renameValue}
             onChange={(e) => setRenameValue(e.currentTarget.value)}
             onKeyDown={(e) => {
@@ -182,14 +184,14 @@ export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCar
           />
           <Group justify="flex-end">
             <Button variant="subtle" color="gray" onClick={() => setRenameOpen(false)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               onClick={submitRename}
               disabled={!renameValue.trim() || renameValue.trim() === board.name}
               style={{ backgroundColor: '#4686FE' }}
             >
-              Save
+              {t('save')}
             </Button>
           </Group>
         </Stack>
@@ -200,7 +202,7 @@ export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCar
         onClose={() => setColorOpen(false)}
         title={
           <Text fw={600} style={{ fontFamily: 'Inter Display, sans-serif' }}>
-            Board color
+            {t('boardColor')}
           </Text>
         }
         radius="lg"
@@ -214,7 +216,7 @@ export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCar
             return (
               <ActionIcon
                 key={index}
-                aria-label={`Board color ${index + 1}`}
+                aria-label={t('colorAriaLabel', { index: index + 1 })}
                 onClick={() => {
                   onColorChange(board.id, index);
                   setColorOpen(false);

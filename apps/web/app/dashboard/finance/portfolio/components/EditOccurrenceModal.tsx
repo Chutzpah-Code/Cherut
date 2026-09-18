@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Modal, Stack, Group, Text, Button, NumberInput, TextInput } from '@mantine/core';
 import { useUpdateOccurrence } from '@/hooks/useBills';
 import { FinanceBillOccurrence } from '@/lib/api/services/bills';
@@ -13,6 +14,8 @@ export function EditOccurrenceModal({
   occurrence: FinanceBillOccurrence | null;
   onClose: () => void;
 }) {
+  const t = useTranslations('finance.editOccurrence');
+  const tc = useTranslations('finance.common');
   const updateOccurrence = useUpdateOccurrence();
   const [amount, setAmount] = useState<number | string>(0);
   const [dueDate, setDueDate] = useState('');
@@ -32,17 +35,17 @@ export function EditOccurrenceModal({
   };
 
   return (
-    <Modal opened={!!occurrence} onClose={onClose} title={`Edit occurrence — ${occurrence?.bill?.name ?? ''}`} centered size="sm">
+    <Modal opened={!!occurrence} onClose={onClose} title={t('title', { name: occurrence?.bill?.name ?? '' })} centered size="sm">
       <Stack gap="sm">
         <Text size="xs" c="dimmed">
-          Changes here apply only to this occurrence — the recurring rule stays the same.
+          {t('hint')}
         </Text>
-        <NumberInput label="Amount" min={0.01} decimalScale={2} value={amount} onChange={setAmount} />
-        <TextInput label="Due date" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+        <NumberInput label={t('amount')} min={0.01} decimalScale={2} value={amount} onChange={setAmount} />
+        <TextInput label={t('dueDate')} type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
         <Group justify="flex-end" mt="xs">
-          <Button variant="default" onClick={onClose}>Cancel</Button>
+          <Button variant="default" onClick={onClose}>{tc('cancel')}</Button>
           <Button onClick={handleSave} loading={updateOccurrence.isPending} disabled={isNaN(parsedAmount) || parsedAmount <= 0 || !dueDate} style={{ backgroundColor: '#0052CC' }}>
-            Save
+            {tc('save')}
           </Button>
         </Group>
       </Stack>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Box, Button, Group, Center, Loader, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { Plus, Settings2, Archive } from 'lucide-react';
@@ -27,6 +28,7 @@ interface BoardKanbanViewProps {
 }
 
 export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
+  const t = useTranslations('tasks.kanbanView');
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalOpened, setModalOpened] = useState(false);
@@ -77,7 +79,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
     return (
       <Center py="xl">
         <Stack align="center" gap="md">
-          <Text c="dimmed" size="sm">No lists yet. Create your first list to get started.</Text>
+          <Text c="dimmed" size="sm">{t('noLists')}</Text>
           <Button
             leftSection={<Plus size={16} />}
             onClick={handleAddColumn}
@@ -85,7 +87,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
             radius={10}
             style={{ backgroundColor: '#4686FE' }}
           >
-            Add a list
+            {t('addList')}
           </Button>
         </Stack>
       </Center>
@@ -110,7 +112,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           size="sm"
           style={{ color: '#42526E', backgroundColor: '#F4F5F7', fontWeight: 500 }}
         >
-          Manage Board
+          {t('manageBoard')}
         </Button>
         <Button
           variant="subtle"
@@ -121,7 +123,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           size="sm"
           style={{ color: '#6B778C', fontWeight: 500 }}
         >
-          Add another list
+          {t('addAnotherList')}
         </Button>
         <Button
           variant="subtle"
@@ -131,7 +133,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           size="sm"
           style={{ color: '#6B778C', fontWeight: 500 }}
         >
-          Archived tasks
+          {t('archivedTasksLink')}
         </Button>
       </Group>
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { confirmPasswordReset } from '@/lib/firebase/auth';
 import { getPasswordErrorMessage } from '@/lib/utils/auth-errors';
 import { useRateLimit } from '@/hooks/useRateLimit';
@@ -19,6 +20,10 @@ const RULE    = 'rgba(255,255,255,0.08)';
 const GRID    = 'rgba(255,255,255,0.04)';
 
 function ResetPasswordPageContent() {
+  const t = useTranslations('resetPasswordPage');
+  const tc = useTranslations('authCommon');
+  const tErr = useTranslations('authErrors');
+
   const [password, setPassword]               = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword]       = useState(false);
@@ -37,21 +42,21 @@ function ResetPasswordPageContent() {
 
   useEffect(() => {
     if (!oobCode) {
-      setError('Invalid or missing reset code');
+      setError(t('missingCode'));
       setValidatingCode(false);
       return;
     }
     setValidatingCode(false);
     setIsValidCode(true);
-  }, [oobCode]);
+  }, [oobCode, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!passwordResetRateLimit.canSubmit) { setError(passwordResetRateLimit.warningMessage); return; }
-    if (password.length < 6) { setError('Password must be at least 6 characters long'); return; }
-    if (password !== confirmPassword) { setError('Passwords do not match'); return; }
-    if (!oobCode) { setError('Invalid reset code'); return; }
+    if (password.length < 6) { setError(t('passwordTooShort')); return; }
+    if (password !== confirmPassword) { setError(t('passwordMismatch')); return; }
+    if (!oobCode) { setError(t('invalidCode')); return; }
     setLoading(true);
     try {
       await confirmPasswordReset(oobCode, password);
@@ -59,7 +64,7 @@ function ResetPasswordPageContent() {
       setSuccess(true);
     } catch (err: any) {
       passwordResetRateLimit.recordFailure();
-      setError(getPasswordErrorMessage(err));
+      setError(getPasswordErrorMessage(err, tErr));
     } finally {
       setLoading(false);
     }
@@ -105,7 +110,7 @@ function ResetPasswordPageContent() {
   if (validatingCode) {
     return (
       <Shell>
-        <div style={{ textAlign: 'center', color: MUTED, fontSize: 16 }}>Validating reset code…</div>
+        <div style={{ textAlign: 'center', color: MUTED, fontSize: 16 }}>{t('validatingCode')}</div>
       </Shell>
     );
   }
@@ -115,12 +120,12 @@ function ResetPasswordPageContent() {
       <Shell>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'center' }}>
           <div>
-            <h1 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 36, fontWeight: 800, color: TEXT, margin: '0 0 8px', lineHeight: 1 }}>Invalid link</h1>
-            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>This reset link is invalid or has expired.</p>
+            <h1 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 36, fontWeight: 800, color: TEXT, margin: '0 0 8px', lineHeight: 1 }}>{t('invalidLinkTitle')}</h1>
+            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>{t('invalidLinkSubtitle')}</p>
           </div>
           <div style={{ background: SURF2, border: `1px solid ${RULE}`, borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div className="rp-error">The password reset link is invalid or has expired. Please request a new one.</div>
-            <Link href="/auth/login" className="rp-btn-ghost" style={{ textAlign: 'center' }}>← Back to login</Link>
+            <div className="rp-error">{t('invalidLinkError')}</div>
+            <Link href="/auth/login" className="rp-btn-ghost" style={{ textAlign: 'center' }}>{t('backToLogin')}</Link>
           </div>
         </div>
       </Shell>
@@ -132,12 +137,12 @@ function ResetPasswordPageContent() {
       <Shell>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'center' }}>
           <div>
-            <h1 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 36, fontWeight: 800, color: TEXT, margin: '0 0 8px', lineHeight: 1 }}>Password reset</h1>
-            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>You're good to go.</p>
+            <h1 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 36, fontWeight: 800, color: TEXT, margin: '0 0 8px', lineHeight: 1 }}>{t('successTitle')}</h1>
+            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>{t('successSubtitle')}</p>
           </div>
           <div style={{ background: SURF2, border: `1px solid ${RULE}`, borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div className="rp-success-box">✓ Your password has been updated. You can now sign in with your new password.</div>
-            <Link href="/auth/login" className="rp-btn" style={{ textAlign: 'center', display: 'block' }}>Sign in →</Link>
+            <div className="rp-success-box">{t('successBox')}</div>
+            <Link href="/auth/login" className="rp-btn" style={{ textAlign: 'center', display: 'block' }}>{t('signIn')} →</Link>
           </div>
         </div>
       </Shell>
@@ -148,8 +153,8 @@ function ResetPasswordPageContent() {
     <Shell>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
         <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '0 0 6px', color: TEXT }}>Reset your password</h1>
-          <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>Enter your new password below</p>
+          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '0 0 6px', color: TEXT }}>{t('title')}</h1>
+          <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>{t('subtitle')}</p>
         </div>
 
         <div style={{ background: SURF2, border: `1px solid ${RULE}`, borderRadius: 16, padding: 28 }}>
@@ -158,25 +163,25 @@ function ResetPasswordPageContent() {
             {error && <div className="rp-error">{error}</div>}
 
             <div>
-              <label className="rp-label" htmlFor="rp-password">New password</label>
+              <label className="rp-label" htmlFor="rp-password">{t('newPasswordLabel')}</label>
               <div className="rp-pw-wrap">
                 <input id="rp-password" className="rp-input" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" />
-                <button type="button" className="rp-pw-toggle" onClick={() => setShowPassword(v => !v)}>{showPassword ? 'Hide' : 'Show'}</button>
+                <button type="button" className="rp-pw-toggle" onClick={() => setShowPassword(v => !v)}>{showPassword ? tc('hide') : tc('show')}</button>
               </div>
             </div>
 
             <div>
-              <label className="rp-label" htmlFor="rp-confirm">Confirm new password</label>
+              <label className="rp-label" htmlFor="rp-confirm">{t('confirmNewPasswordLabel')}</label>
               <div className="rp-pw-wrap">
                 <input id="rp-confirm" className="rp-input" type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required autoComplete="new-password" />
-                <button type="button" className="rp-pw-toggle" onClick={() => setShowConfirm(v => !v)}>{showConfirm ? 'Hide' : 'Show'}</button>
+                <button type="button" className="rp-pw-toggle" onClick={() => setShowConfirm(v => !v)}>{showConfirm ? tc('hide') : tc('show')}</button>
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: 10 }}>
-              <Link href="/auth/login" className="rp-btn-ghost" style={{ flex: 1, textAlign: 'center' }}>Cancel</Link>
+              <Link href="/auth/login" className="rp-btn-ghost" style={{ flex: 1, textAlign: 'center' }}>{t('cancel')}</Link>
               <button type="submit" className="rp-btn" disabled={loading} style={{ flex: 2 }}>
-                {loading ? 'Resetting…' : 'Reset password →'}
+                {loading ? t('resetting') : `${t('resetButton')} →`}
               </button>
             </div>
           </form>
@@ -187,10 +192,11 @@ function ResetPasswordPageContent() {
 }
 
 export default function ResetPasswordPage() {
+  const t = useTranslations('resetPasswordPage');
   return (
     <Suspense fallback={
       <div style={{ minHeight: '100vh', background: '#07070D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui', color: 'rgba(237,238,246,0.46)', fontSize: 16 }}>
-        Loading…
+        {t('loadingFallback')}
       </div>
     }>
       <ResetPasswordPageContent />

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Box, Group, Stack, Text } from '@mantine/core';
 import { useHabitConsistency, useTodayHabits } from '@/hooks/useHabits';
 import { RowsSkeleton } from './skeletons';
@@ -13,6 +14,7 @@ function localToday() {
 const LABEL: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: '#0F172A' };
 
 export function HabitConsistencyChart() {
+  const t = useTranslations('dashboard.habitConsistency');
   const { data, isLoading } = useHabitConsistency(13);
   const { data: todayHabits = [] } = useTodayHabits(localToday());
   const habits = data?.habits ?? [];
@@ -21,17 +23,17 @@ export function HabitConsistencyChart() {
   return (
     <Box style={{ padding: '24px 28px 26px' }}>
       <Group justify="space-between" align="baseline">
-        <Text style={LABEL}>Habit consistency</Text>
-        <Link href="/dashboard/habits" style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', textDecoration: 'none' }}>Habits</Link>
+        <Text style={LABEL}>{t('title')}</Text>
+        <Link href="/dashboard/habits" style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', textDecoration: 'none' }}>{t('habitsLink')}</Link>
       </Group>
       <Text style={{ fontSize: 12.5, color: '#64748B', margin: '4px 0 18px' }}>
-        From habit logs · last 13 days{data?.overallPct != null ? ` · ${data.overallPct}% overall` : ''}
+        {data?.overallPct != null ? t('subtitleOverall', { pct: data.overallPct }) : t('subtitle')}
       </Text>
 
       {isLoading ? (
         <RowsSkeleton rows={4} height={22} />
       ) : habits.length === 0 ? (
-        <Text size="sm" c="dimmed">No active habits.</Text>
+        <Text size="sm" c="dimmed">{t('empty')}</Text>
       ) : (
         <>
           <Stack gap={13}>
@@ -48,7 +50,7 @@ export function HabitConsistencyChart() {
                 <Group
                   gap={3}
                   role="img"
-                  aria-label={`${habit.title}: ${habit.pct != null ? `${habit.pct}% logged` : 'not scheduled'} over the last 13 days`}
+                  aria-label={habit.pct != null ? t('ariaLabelLogged', { habit: habit.title, pct: habit.pct }) : t('ariaLabelUnscheduled', { habit: habit.title })}
                 >
                   {habit.days.map((logged, i) => (
                     <Box
@@ -69,15 +71,15 @@ export function HabitConsistencyChart() {
           <Group align="center" gap={16} mt={18} pt={14} style={{ borderTop: '1px solid #EFF1F5' }}>
             <Group gap={7}>
               <Box style={{ width: 10, height: 10, borderRadius: 3, background: '#9DB8F2' }} />
-              <Text style={{ fontSize: 12.5, color: '#64748B' }}>Logged</Text>
+              <Text style={{ fontSize: 12.5, color: '#64748B' }}>{t('logged')}</Text>
             </Group>
             <Group gap={7}>
               <Box style={{ width: 10, height: 10, borderRadius: 3, background: '#EDF1F6' }} />
-              <Text style={{ fontSize: 12.5, color: '#64748B' }}>Missed</Text>
+              <Text style={{ fontSize: 12.5, color: '#64748B' }}>{t('missed')}</Text>
             </Group>
             <Box style={{ flex: 1 }} />
             <Text style={{ fontSize: 12.5, fontWeight: 600, color: '#64748B' }}>
-              {loggedToday} of {todayHabits.length} logged today
+              {t('loggedToday', { logged: loggedToday, total: todayHabits.length })}
             </Text>
           </Group>
         </>

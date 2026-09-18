@@ -1,22 +1,12 @@
 'use client';
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Stack, Group, TextInput, Select, NumberInput, Switch } from '@mantine/core';
 import { useFinanceAccounts, useFinanceCategories } from '@/hooks/useFinance';
 import { useCreateBill, useUpdateBill } from '@/hooks/useBills';
 import { CreateBillDto, BillFrequency } from '@/lib/api/services/bills';
 import type { AddSubformHandle, AddSubformProps } from './types';
-
-const FREQUENCY_OPTIONS: { value: BillFrequency; label: string }[] = [
-  { value: 'weekly', label: 'Weekly' },
-  { value: 'biweekly', label: 'Biweekly' },
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'bimonthly', label: 'Bimonthly' },
-  { value: 'quarterly', label: 'Quarterly' },
-  { value: 'semiannual', label: 'Semiannual' },
-  { value: 'annual', label: 'Annual' },
-  { value: 'custom', label: 'Custom interval' },
-];
 
 const EMPTY: Partial<CreateBillDto> = {
   type: 'expense', frequency: 'monthly', dueDay: 1, interval: 30,
@@ -27,6 +17,18 @@ export const BillRuleForm = forwardRef<AddSubformHandle, AddSubformProps>(functi
   { mode, entity, onDone, onValidChange, onPendingChange },
   ref,
 ) {
+  const t = useTranslations('finance.billRuleForm');
+  const tc = useTranslations('finance.common');
+  const FREQUENCY_OPTIONS: { value: BillFrequency; label: string }[] = [
+    { value: 'weekly', label: tc('freqWeekly') },
+    { value: 'biweekly', label: tc('freqBiweekly') },
+    { value: 'monthly', label: tc('freqMonthly') },
+    { value: 'bimonthly', label: tc('freqBimonthly') },
+    { value: 'quarterly', label: tc('freqQuarterly') },
+    { value: 'semiannual', label: tc('freqSemiannual') },
+    { value: 'annual', label: tc('freqAnnual') },
+    { value: 'custom', label: t('freqCustomInterval') },
+  ];
   const { data: accounts = [] } = useFinanceAccounts();
   const { data: categories = [] } = useFinanceCategories();
   const createBill = useCreateBill();
@@ -72,11 +74,11 @@ export const BillRuleForm = forwardRef<AddSubformHandle, AddSubformProps>(functi
 
   return (
     <Stack gap="sm">
-      <TextInput label="Name" placeholder="e.g. Rent, Netflix, Salary" value={form.name ?? ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+      <TextInput label={t('name')} placeholder={t('namePlaceholder')} value={form.name ?? ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
       <Group grow>
-        <NumberInput label="Amount" min={0.01} decimalScale={2} value={form.amount ?? ''} onChange={(v) => setForm((f) => ({ ...f, amount: typeof v === 'number' ? v : undefined }))} />
+        <NumberInput label={t('amount')} min={0.01} decimalScale={2} value={form.amount ?? ''} onChange={(v) => setForm((f) => ({ ...f, amount: typeof v === 'number' ? v : undefined }))} />
         <Select
-          label="Frequency"
+          label={t('frequency')}
           data={FREQUENCY_OPTIONS}
           value={form.frequency}
           onChange={(v) => setForm((f) => ({ ...f, frequency: (v as BillFrequency) ?? 'monthly' }))}
@@ -84,15 +86,15 @@ export const BillRuleForm = forwardRef<AddSubformHandle, AddSubformProps>(functi
       </Group>
       <Group grow>
         <Select
-          label="Account"
-          placeholder="Select account"
+          label={t('account')}
+          placeholder={t('selectAccount')}
           data={(accounts as any[]).map((a) => ({ value: a.id, label: a.name }))}
           value={form.accountId}
           onChange={(v) => setForm((f) => ({ ...f, accountId: v ?? undefined }))}
         />
         <Select
-          label="Category"
-          placeholder="Select category"
+          label={t('category')}
+          placeholder={t('selectCategory')}
           data={categoryOptions}
           value={form.categoryId}
           onChange={(v) => setForm((f) => ({ ...f, categoryId: v ?? undefined }))}
@@ -100,22 +102,22 @@ export const BillRuleForm = forwardRef<AddSubformHandle, AddSubformProps>(functi
       </Group>
       <Group grow>
         <Select
-          label="Type"
-          data={[{ value: 'expense', label: 'Expense' }, { value: 'income', label: 'Income' }]}
+          label={t('type')}
+          data={[{ value: 'expense', label: t('expense') }, { value: 'income', label: t('income') }]}
           value={form.type}
           onChange={(v) => setForm((f) => ({ ...f, type: (v as any) ?? 'expense', categoryId: undefined }))}
         />
         {form.frequency === 'custom' ? (
-          <NumberInput label="Repeats every (days)" min={1} value={form.interval ?? 30} onChange={(v) => setForm((f) => ({ ...f, interval: Number(v) || 1 }))} />
+          <NumberInput label={t('repeatsEveryDays')} min={1} value={form.interval ?? 30} onChange={(v) => setForm((f) => ({ ...f, interval: Number(v) || 1 }))} />
         ) : (
-          <NumberInput label="Due day" description="Day of month (1–28)" min={1} max={28} value={form.dueDay ?? 1} onChange={(v) => setForm((f) => ({ ...f, dueDay: Number(v) || 1 }))} />
+          <NumberInput label={t('dueDay')} description={t('dueDayDesc')} min={1} max={28} value={form.dueDay ?? 1} onChange={(v) => setForm((f) => ({ ...f, dueDay: Number(v) || 1 }))} />
         )}
       </Group>
       <Group grow>
-        <TextInput label="Starts" type="date" value={form.startDate ?? ''} onChange={(e) => setForm((f) => ({ ...f, startDate: e.target.value }))} />
-        <TextInput label="Ends (optional)" type="date" value={form.endDate ?? ''} onChange={(e) => setForm((f) => ({ ...f, endDate: e.target.value || undefined }))} />
+        <TextInput label={t('starts')} type="date" value={form.startDate ?? ''} onChange={(e) => setForm((f) => ({ ...f, startDate: e.target.value }))} />
+        <TextInput label={t('endsOptional')} type="date" value={form.endDate ?? ''} onChange={(e) => setForm((f) => ({ ...f, endDate: e.target.value || undefined }))} />
       </Group>
-      <Switch label="Active" checked={form.isActive ?? true} onChange={(e) => setForm((f) => ({ ...f, isActive: e.currentTarget.checked }))} />
+      <Switch label={t('active')} checked={form.isActive ?? true} onChange={(e) => setForm((f) => ({ ...f, isActive: e.currentTarget.checked }))} />
     </Stack>
   );
 });

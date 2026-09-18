@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Card, Box, Text, Badge, Group, Image, ActionIcon, Menu } from '@mantine/core';
 import { MoreVertical, Archive, Trash2, Eye, Edit } from 'lucide-react';
 import { VisionBoardItem } from '@/lib/api/services/vision-board';
@@ -14,6 +15,8 @@ interface VisionBoardCardProps {
 }
 
 export function VisionBoardCard({ item, onClick, onEdit, onArchive, onDelete }: VisionBoardCardProps) {
+  const t = useTranslations('visionBoard.card');
+  const td = useTranslations('visionBoard.dueDateBadge');
   const [hoveredCard, setHoveredCard] = useState(false);
   // Calcular se está próximo do due date
   const getDueDateBadge = () => {
@@ -25,16 +28,16 @@ export function VisionBoardCard({ item, onClick, onEdit, onArchive, onDelete }: 
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) {
-      return <Badge color="red" variant="filled">Overdue</Badge>;
+      return <Badge color="red" variant="filled">{td('overdue')}</Badge>;
     } else if (diffDays === 0) {
-      return <Badge color="orange" variant="filled">Today</Badge>;
+      return <Badge color="orange" variant="filled">{td('today')}</Badge>;
     } else if (diffDays <= 7) {
-      return <Badge color="yellow" variant="filled">{diffDays} days left</Badge>;
+      return <Badge color="yellow" variant="filled">{td('daysLeft', { count: diffDays })}</Badge>;
     } else if (diffDays <= 30) {
-      return <Badge color="cyan" variant="filled">{diffDays} days</Badge>;
+      return <Badge color="cyan" variant="filled">{td('days', { count: diffDays })}</Badge>;
     } else {
       // Always show days count, even after 30 days
-      return <Badge color="violet" variant="filled">{diffDays} days</Badge>;
+      return <Badge color="violet" variant="filled">{td('days', { count: diffDays })}</Badge>;
     }
   };
 
@@ -119,7 +122,7 @@ export function VisionBoardCard({ item, onClick, onEdit, onArchive, onDelete }: 
                   onClick();
                 }}
               >
-                View Details
+                {t('viewDetails')}
               </Menu.Item>
               {onEdit && (
                 <Menu.Item
@@ -129,7 +132,7 @@ export function VisionBoardCard({ item, onClick, onEdit, onArchive, onDelete }: 
                     onEdit(item);
                   }}
                 >
-                  Edit
+                  {t('edit')}
                 </Menu.Item>
               )}
               {onArchive && (
@@ -140,7 +143,7 @@ export function VisionBoardCard({ item, onClick, onEdit, onArchive, onDelete }: 
                     onArchive(item);
                   }}
                 >
-                  Archive
+                  {t('archive')}
                 </Menu.Item>
               )}
               {onDelete && (
@@ -154,7 +157,7 @@ export function VisionBoardCard({ item, onClick, onEdit, onArchive, onDelete }: 
                       onDelete(item.id);
                     }}
                   >
-                    Delete
+                    {t('delete')}
                   </Menu.Item>
                 </>
               )}

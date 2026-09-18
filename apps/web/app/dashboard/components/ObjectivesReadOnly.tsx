@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Box, Group, Progress, Stack, Text, ActionIcon } from '@mantine/core';
 import { ChevronRight } from 'lucide-react';
 import { useObjectives } from '@/hooks/useObjectives';
@@ -27,6 +28,7 @@ function quarterChip(startDate?: string, endDate?: string): string | null {
 }
 
 function ObjectiveCard({ objective }: { objective: any }) {
+  const t = useTranslations('dashboard.objectives');
   const [expanded, setExpanded] = useState(false);
   const keyResults = objective.keyResults ?? [];
   const visibleKRs = keyResults.slice(0, KR_VISIBLE);
@@ -46,7 +48,7 @@ function ObjectiveCard({ objective }: { objective: any }) {
           size="xs"
           variant="subtle"
           color="gray"
-          aria-label={expanded ? 'Collapse key results' : 'Expand key results'}
+          aria-label={expanded ? t('collapse') : t('expand')}
           style={{ flexShrink: 0, color: '#94A3B8', transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s ease' }}
         >
           <ChevronRight size={14} />
@@ -63,7 +65,7 @@ function ObjectiveCard({ objective }: { objective: any }) {
 
       {expanded && (
         keyResults.length === 0 ? (
-          <Text style={{ fontSize: 12.5, color: '#64748B', marginTop: 14 }}>No key results defined yet</Text>
+          <Text style={{ fontSize: 12.5, color: '#64748B', marginTop: 14 }}>{t('noKeyResults')}</Text>
         ) : (
           <Stack gap={10} mt={14}>
             {visibleKRs.map((kr: any) => {
@@ -88,7 +90,7 @@ function ObjectiveCard({ objective }: { objective: any }) {
                 </Box>
               );
             })}
-            {remaining > 0 && <Text style={{ fontSize: 12.5, color: '#64748B' }}>{remaining} more key result{remaining !== 1 ? 's' : ''}</Text>}
+            {remaining > 0 && <Text style={{ fontSize: 12.5, color: '#64748B' }}>{t('moreKeyResults', { count: remaining })}</Text>}
           </Stack>
         )
       )}
@@ -97,6 +99,7 @@ function ObjectiveCard({ objective }: { objective: any }) {
 }
 
 export function ObjectivesReadOnly() {
+  const t = useTranslations('dashboard.objectives');
   const { data: objectives = [], isLoading } = useObjectives();
 
   const active = useMemo(
@@ -120,28 +123,28 @@ export function ObjectivesReadOnly() {
   return (
     <Box id="objectives" style={{ padding: '24px 28px 26px' }}>
       <Group justify="space-between" align="baseline">
-        <Text style={LABEL}>Objectives &amp; key results</Text>
-        <Link href="/dashboard/objectives" style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', textDecoration: 'none' }}>All objectives</Link>
+        <Text style={LABEL}>{t('title')}</Text>
+        <Link href="/dashboard/objectives" style={{ fontSize: 13, fontWeight: 600, color: '#1D4ED8', textDecoration: 'none' }}>{t('allObjectivesLink')}</Link>
       </Group>
       <Text style={{ fontSize: 12.5, color: '#64748B', margin: '4px 0 14px' }}>
         {active.length > 0
-          ? `${active.length} objective${active.length !== 1 ? 's' : ''} · ${totalKRs} key result${totalKRs !== 1 ? 's' : ''} · ${completeKRs} of ${totalKRs} complete`
-          : 'No objectives yet'}
+          ? t('summary', { objectives: active.length, krs: totalKRs, complete: completeKRs })
+          : t('empty')}
       </Text>
 
       {isLoading ? (
         <RowsSkeleton rows={3} height={90} />
       ) : active.length === 0 ? (
         <Stack gap={6}>
-          <Text size="sm" c="dimmed">No objectives yet.</Text>
-          <Link href="/dashboard/objectives" style={{ fontSize: 13, fontWeight: 500, color: '#1D4ED8', textDecoration: 'none' }}>Create an objective →</Link>
+          <Text size="sm" c="dimmed">{t('empty')}</Text>
+          <Link href="/dashboard/objectives" style={{ fontSize: 13, fontWeight: 500, color: '#1D4ED8', textDecoration: 'none' }}>{t('emptyAction')}</Link>
         </Stack>
       ) : (
         <Stack gap={10}>
           {visibleObjectives.map((objective) => <ObjectiveCard key={objective.id} objective={objective} />)}
           {remainingObjectives > 0 && (
             <Link href="/dashboard/objectives" style={{ fontSize: 12.5, fontWeight: 500, color: '#1D4ED8', textDecoration: 'none' }}>
-              +{remainingObjectives} more objective{remainingObjectives !== 1 ? 's' : ''}
+              {t('moreObjectives', { count: remainingObjectives })}
             </Link>
           )}
         </Stack>

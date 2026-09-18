@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Box, Group, Text, Progress } from '@mantine/core';
 import { HabitLog } from '@/lib/api/services/habits';
 
@@ -82,6 +83,7 @@ function calculateStats(logs: HabitLog[], habitStartDate?: string, habitCreatedA
 }
 
 export function HabitSummary({ logs, habitStartDate, habitCreatedAt, habitDueDate }: HabitSummaryProps) {
+  const t = useTranslations('habits.summary');
   const stats = calculateStats(logs, habitStartDate, habitCreatedAt, habitDueDate);
 
   return (
@@ -109,7 +111,7 @@ export function HabitSummary({ logs, habitStartDate, habitCreatedAt, habitDueDat
             color: '#666666',
           }}
         >
-          {stats.completedDays}/{stats.totalDays} days ({stats.completionRate}%)
+          {t('daysProgress', { completed: stats.completedDays, total: stats.totalDays, pct: stats.completionRate })}
         </Text>
         {stats.bestStreak > 0 && (
           <Text
@@ -120,7 +122,7 @@ export function HabitSummary({ logs, habitStartDate, habitCreatedAt, habitDueDat
               color: '#666666',
             }}
           >
-            Best: {stats.bestStreak} {stats.bestStreak === 1 ? 'day' : 'days'}
+            {t('best', { count: stats.bestStreak })}
           </Text>
         )}
       </Group>

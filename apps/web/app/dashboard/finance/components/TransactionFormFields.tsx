@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Stack, Group, Text, Select, NumberInput, TextInput, Textarea, Button } from '@mantine/core';
 import { AlertTriangle } from 'lucide-react';
 import { CreateTransactionDto, FinanceAccount } from '@/lib/api/services/finance';
@@ -26,16 +27,17 @@ export function TransactionFormFields({
   submitLabel: string;
   hideSubmit?: boolean;
 }) {
+  const t = useTranslations('finance.transactionForm');
   if (accounts.length === 0) {
     return (
       <Stack gap="md" py="sm">
         <Group gap="sm" p="sm" style={{ background: '#fff8f0', borderRadius: 8, border: '1px solid #fed7aa' }}>
           <AlertTriangle size={15} color="#c2410c" style={{ flexShrink: 0 }} />
           <Text size="sm" style={{ color: '#9a3412' }}>
-            You need to create an <strong>account</strong> before adding transactions.
+            {t('needAccount')}
           </Text>
         </Group>
-        <Text size="xs" c="dimmed">Add an account from the Money page first.</Text>
+        <Text size="xs" c="dimmed">{t('addAccountFirst')}</Text>
       </Stack>
     );
   }
@@ -43,29 +45,29 @@ export function TransactionFormFields({
   return (
     <Stack gap="sm">
       <Select
-        label="Type"
-        data={[{ value: 'income', label: 'Income' }, { value: 'expense', label: 'Expense' }]}
+        label={t('type')}
+        data={[{ value: 'income', label: t('income') }, { value: 'expense', label: t('expense') }]}
         value={form.type}
         onChange={(v) => setForm((f) => ({ ...f, type: v as any }))}
       />
       <Select
-        label="Account"
+        label={t('account')}
         data={accounts.map((a) => ({ value: a.id, label: `${a.name} (${a.currency})` }))}
         value={form.accountId}
         onChange={onAccountChange}
-        placeholder="Select account"
+        placeholder={t('selectAccount')}
         required
       />
       <Select
-        label="Category"
+        label={t('category')}
         data={categories.map((c: any) => ({ value: c.id, label: c.name }))}
         value={form.categoryId}
         onChange={(v) => setForm((f) => ({ ...f, categoryId: v ?? undefined }))}
-        placeholder="Uncategorized"
+        placeholder={t('uncategorized')}
         clearable
       />
       <NumberInput
-        label={`Amount (${formCurrency})`}
+        label={t('amount', { currency: formCurrency })}
         min={0}
         decimalScale={2}
         value={form.amount}
@@ -73,20 +75,20 @@ export function TransactionFormFields({
         leftSection={<Text size="xs" c="dimmed" fw={600}>{formCurrency}</Text>}
       />
       <TextInput
-        label="Date"
+        label={t('date')}
         type="date"
         value={form.date}
         onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
       />
       <TextInput
-        label="Description"
-        placeholder="Optional"
+        label={t('description')}
+        placeholder={t('optional')}
         value={form.description ?? ''}
         onChange={(e) => setForm((f) => ({ ...f, description: e.target.value || undefined }))}
       />
       <Textarea
-        label="Notes"
-        placeholder="Optional"
+        label={t('notes')}
+        placeholder={t('optional')}
         autosize
         minRows={2}
         maxRows={5}

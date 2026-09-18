@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Text, Badge, Stack, Button, TextInput, ActionIcon, Group, ScrollArea } from '@mantine/core';
 import { Plus, X } from 'lucide-react';
 import { Task } from '@/lib/api/services/tasks';
@@ -26,6 +27,7 @@ export function KanbanList({
   onToggleComplete,
   onEditTask,
 }: KanbanListProps) {
+  const t = useTranslations('tasks.kanbanList');
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [newCardTitle, setNewCardTitle] = useState('');
 
@@ -87,7 +89,7 @@ export function KanbanList({
           {tasks.length === 0 ? (
             !isAddingCard && (
               <Text c="dimmed" size="xs" ta="center" py="xl" style={{ color: '#97A0AF' }}>
-                No tasks
+                {t('noTasks')}
               </Text>
             )
           ) : (
@@ -126,14 +128,14 @@ export function KanbanList({
             },
           }}
         >
-          Add a card
+          {t('addCardButton')}
         </Button>
       )}
 
       {onAddTask && isAddingCard && (
         <Stack gap={6} mt="sm">
           <TextInput
-            placeholder="Card title..."
+            placeholder={t('cardTitlePlaceholder')}
             value={newCardTitle}
             onChange={(e) => setNewCardTitle(e.currentTarget.value)}
             autoFocus
@@ -165,7 +167,7 @@ export function KanbanList({
                 }
               }}
             >
-              Add card
+              {t('addCard')}
             </Button>
             <ActionIcon
               size="sm"

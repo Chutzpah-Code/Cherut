@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { PageShell } from '@/components/shell/Shell';
 
 const BG      = '#07070D';
@@ -11,25 +12,23 @@ const ACCENT  = 'oklch(0.68 0.24 260)';
 const ACCENT_DIM = 'rgba(80,110,255,0.12)';
 const RULE    = 'rgba(255,255,255,0.08)';
 
-const steps = [
-  { n: '01', icon: '◈', title: 'Complete your profile',    time: '5 min',  body: 'Upload a photo, set your timezone, choose notification settings and define your working hours for better task planning.' },
-  { n: '02', icon: '◇', title: 'Define your core values',  time: '10 min', body: 'Navigate to Values and choose 3–5 principles that guide your decisions. Write a short description for each and rank them. These become your compass.' },
-  { n: '03', icon: '◐', title: 'Set up your life areas',   time: '8 min',  body: 'Create 4–6 life domains (Health, Career, Finance, Relationships…). Write a vision statement for each and set priority levels.' },
-  { n: '04', icon: '◯', title: 'Create your first OKRs',   time: '15 min', body: 'Start with 1–2 objectives per life area. Write inspiring, qualitative objectives, then add 2–4 measurable key results with specific deadlines.' },
-  { n: '05', icon: '◆', title: 'Build success habits',     time: '10 min', body: 'Create 3–5 keystone habits that support multiple objectives. Start small, set specific triggers, and link habits to your life areas and OKRs.' },
-  { n: '06', icon: '✦', title: 'Plan your first week',     time: '12 min', body: 'Break key results into specific tasks. Schedule focused work blocks for the most important tasks. Plan habit execution times throughout the week.' },
-  { n: '07', icon: '□', title: 'Set up tracking & reviews', time: '8 min', body: 'Configure your dashboard, schedule daily check-ins (5 min) and weekly reviews (30 min). Enable analytics to understand performance patterns.' },
-];
-
-const tips = [
-  { title: 'Start small, think big', body: "Consistent small wins beat ambitious failures. Build momentum early — the system compounds when you actually use it." },
-  { title: 'Weekly reviews are non-negotiable', body: "Schedule 30 minutes every Sunday. Celebrate wins, analyze obstacles, adjust plans. This single habit is what separates drifters from executors." },
-  { title: 'Connect everything to values', body: "When goals align with your core values, motivation becomes automatic. Always ask: why does this matter to me?" },
+const stepMeta = [
+  { n: '01', icon: '◈' },
+  { n: '02', icon: '◇' },
+  { n: '03', icon: '◐' },
+  { n: '04', icon: '◯' },
+  { n: '05', icon: '◆' },
+  { n: '06', icon: '✦' },
+  { n: '07', icon: '□' },
 ];
 
 export default function GettingStarted() {
+  const t = useTranslations('gettingStartedPage');
+  const steps = t.raw('steps') as { time: string; title: string; body: string }[];
+  const tips = t.raw('tips') as { title: string; body: string }[];
+
   return (
-    <PageShell kicker="Getting Started" title="Set up your system in 30 minutes" lead="A step-by-step guide to get ALL IN ALL THE TIME from day one.">
+    <PageShell kicker={t('hero.kicker')} title={t('hero.title')} lead={t('hero.lead')}>
       <style>{`
         .gs-wrap  { max-width: 860px; margin: 0 auto; padding: 48px 20px 80px; }
         .gs-steps { display: flex; flex-direction: column; gap: 0; }
@@ -53,15 +52,15 @@ export default function GettingStarted() {
       <div style={{ background: BG }}>
         <div className="gs-wrap">
           <div style={{ marginBottom: 48 }}>
-            <span style={{ fontSize: 11, color: ACCENT, letterSpacing: '.14em', textTransform: 'uppercase', fontWeight: 700, padding: '5px 13px', borderRadius: 999, border: `1px solid rgba(80,110,255,0.4)`, background: ACCENT_DIM, display: 'inline-block', marginBottom: 16 }}>Onboarding checklist</span>
-            <h2 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 800, lineHeight: 0.96, color: TEXT, margin: 0 }}>Seven steps. Thirty minutes. One system.</h2>
+            <span style={{ fontSize: 11, color: ACCENT, letterSpacing: '.14em', textTransform: 'uppercase', fontWeight: 700, padding: '5px 13px', borderRadius: 999, border: `1px solid rgba(80,110,255,0.4)`, background: ACCENT_DIM, display: 'inline-block', marginBottom: 16 }}>{t('checklistKicker')}</span>
+            <h2 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 800, lineHeight: 0.96, color: TEXT, margin: 0 }}>{t('checklistHeading')}</h2>
           </div>
 
           <div className="gs-steps">
-            {steps.map((s) => (
-              <div key={s.n} className="gs-step">
+            {steps.map((s, i) => (
+              <div key={stepMeta[i].n} className="gs-step">
                 <div className="gs-left">
-                  <div className="gs-num">{s.n}</div>
+                  <div className="gs-num">{stepMeta[i].n}</div>
                   <div className="gs-line" />
                 </div>
                 <div className="gs-right">
@@ -74,20 +73,20 @@ export default function GettingStarted() {
           </div>
 
           <div className="gs-tips">
-            {tips.map((t) => (
-              <div key={t.title} className="gs-tip">
-                <div style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 16, fontWeight: 700, color: TEXT, marginBottom: 8 }}>{t.title}</div>
-                <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.6, margin: 0 }}>{t.body}</p>
+            {tips.map((tip) => (
+              <div key={tip.title} className="gs-tip">
+                <div style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 16, fontWeight: 700, color: TEXT, marginBottom: 8 }}>{tip.title}</div>
+                <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.6, margin: 0 }}>{tip.body}</p>
               </div>
             ))}
           </div>
 
           <div className="gs-cta">
-            <h3 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 32, fontWeight: 800, color: TEXT, margin: '0 0 12px', lineHeight: 0.96 }}>Ready to begin?</h3>
-            <p style={{ fontSize: 16, color: MUTED, margin: '0 0 24px', lineHeight: 1.5 }}>The system is only as powerful as your commitment to using it.</p>
+            <h3 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 32, fontWeight: 800, color: TEXT, margin: '0 0 12px', lineHeight: 0.96 }}>{t('ctaHeading')}</h3>
+            <p style={{ fontSize: 16, color: MUTED, margin: '0 0 24px', lineHeight: 1.5 }}>{t('ctaSub')}</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <a href="/auth/register" style={{ background: TEXT, color: BG, fontSize: 14, fontWeight: 700, padding: '12px 24px', borderRadius: 999, display: 'inline-block' }}>Start building →</a>
-              <a href="/help-center"   style={{ background: 'transparent', color: TEXT, fontSize: 14, fontWeight: 500, padding: '12px 24px', borderRadius: 999, border: `1px solid ${RULE}`, display: 'inline-block' }}>Help center</a>
+              <a href="/auth/register" style={{ background: TEXT, color: BG, fontSize: 14, fontWeight: 700, padding: '12px 24px', borderRadius: 999, display: 'inline-block' }}>{t('ctaStart')} →</a>
+              <a href="/help-center"   style={{ background: 'transparent', color: TEXT, fontSize: 14, fontWeight: 500, padding: '12px 24px', borderRadius: 999, border: `1px solid ${RULE}`, display: 'inline-block' }}>{t('ctaHelp')}</a>
             </div>
           </div>
         </div>

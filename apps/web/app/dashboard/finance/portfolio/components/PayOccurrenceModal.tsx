@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Modal, Stack, Group, Text, Box, TextInput, Select, NumberInput, Button } from '@mantine/core';
 import { useFinanceAccounts } from '@/hooks/useFinance';
 import { usePayOccurrence } from '@/hooks/useBills';
@@ -13,6 +14,8 @@ export function PayOccurrenceModal({
   opened: boolean;
   onClose: () => void;
 }) {
+  const t = useTranslations('finance.payOccurrence');
+  const tc = useTranslations('finance.common');
   const today = new Date().toISOString().slice(0, 10);
   const { data: accounts = [] } = useFinanceAccounts();
   const payMutation = usePayOccurrence();
@@ -47,7 +50,7 @@ export function PayOccurrenceModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      title={`Pay — ${occurrence?.bill?.name ?? ''}`}
+      title={t('title', { name: occurrence?.bill?.name ?? '' })}
       size="sm"
       centered
       styles={{
@@ -58,8 +61,8 @@ export function PayOccurrenceModal({
       <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
         <Stack gap="sm">
           <Select
-            label="Account"
-            placeholder="Select account"
+            label={t('account')}
+            placeholder={t('selectAccount')}
             data={(accounts as any[]).map((a) => ({ value: a.id, label: `${a.name} (${a.currency ?? 'USD'})` }))}
             value={accountId}
             onChange={(v) => {
@@ -69,7 +72,7 @@ export function PayOccurrenceModal({
             required
           />
           <NumberInput
-            label="Amount"
+            label={t('amount')}
             min={0.01}
             decimalScale={2}
             value={amount}
@@ -77,15 +80,15 @@ export function PayOccurrenceModal({
             leftSection={<Text size="xs" fw={600}>{currency}</Text>}
             required
           />
-          <TextInput label="Payment date" type="date" value={paidAt} onChange={(e) => setPaidAt(e.target.value)} required />
-          <TextInput label="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
+          <TextInput label={t('paymentDate')} type="date" value={paidAt} onChange={(e) => setPaidAt(e.target.value)} required />
+          <TextInput label={t('notesOptional')} value={notes} onChange={(e) => setNotes(e.target.value)} />
         </Stack>
       </Box>
       <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
         <Group justify="flex-end">
-          <Button variant="default" onClick={onClose}>Cancel</Button>
+          <Button variant="default" onClick={onClose}>{tc('cancel')}</Button>
           <Button onClick={handlePay} loading={payMutation.isPending} disabled={!accountId || amount <= 0} style={{ backgroundColor: '#0052CC' }}>
-            Confirm payment
+            {t('confirmPayment')}
           </Button>
         </Group>
       </Box>

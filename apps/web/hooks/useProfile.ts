@@ -1,9 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { profileApi, CreateProfileDto, UpdateProfileDto } from '@/lib/api/services/profile';
 
-export const useProfile = () => {
+export const useProfile = (enabled: boolean = true) => {
   return useQuery({
     queryKey: ['profile'],
+    enabled,
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {

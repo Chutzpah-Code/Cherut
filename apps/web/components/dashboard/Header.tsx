@@ -1,8 +1,10 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslations } from 'next-intl';
 import { Bell, Moon, Sun, Sparkles, HelpCircle } from 'lucide-react';
 import { Group, Burger, Text, ActionIcon, Avatar, Box, useMantineColorScheme, useComputedColorScheme, Badge, Stack, Indicator, Tooltip } from '@mantine/core';
+import { CherutLockup } from '@/components/ui/CherutLockup';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
@@ -16,11 +18,11 @@ interface HeaderProps {
 }
 
 export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: HeaderProps) {
+  const t = useTranslations('dashboardHeader');
   const { user } = useAuth();
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light');
   const [mounted, setMounted] = useState(false);
-  const [greeting, setGreeting] = useState('Welcome back');
   const router = useRouter();
 
   // Profile integration for theme sync
@@ -39,16 +41,6 @@ export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: He
 
   useEffect(() => {
     setMounted(true);
-    
-    // Define greeting based on time of day
-    const hour = new Date().getHours();
-    if (hour < 12) {
-      setGreeting('Good morning');
-    } else if (hour < 18) {
-      setGreeting('Good afternoon');
-    } else {
-      setGreeting('Good evening');
-    }
   }, []);
 
   // Dark mode functionality temporarily disabled
@@ -63,7 +55,7 @@ export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: He
       const raw = user.email.split('@')[0];
       name = raw.charAt(0).toUpperCase() + raw.slice(1);
     } else {
-      return 'there';
+      return t('there');
     }
     if (name.length <= MAX) return name;
     return name.slice(0, MAX).trimEnd() + '.';
@@ -75,15 +67,17 @@ export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: He
 
   return (
     <Group h="100%" px="md" justify="space-between">
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@700&family=Noto+Sans+Hebrew:wght@800&display=swap');`}</style>
       <Group gap="md">
         <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="lg" size="sm" />
+        <CherutLockup />
       </Group>
 
       <Group gap="xs">
         {mounted && (
           <Box visibleFrom="sm">
             <Tooltip
-              label="Dark mode coming soon"
+              label={t('darkModeSoon')}
               position="bottom"
               withArrow
               styles={{
@@ -103,7 +97,7 @@ export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: He
                 size="lg"
                 radius="xl"
                 disabled
-                title="Dark mode coming soon"
+                title={t('darkModeSoon')}
                 style={{
                   transition: 'all 0.3s ease',
                   opacity: 0.5,
@@ -124,7 +118,7 @@ export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: He
             size="lg"
             radius="xl"
             onClick={onOpenWelcome}
-            title="Help and instructions"
+            title={t('helpAndInstructions')}
             style={{
               transition: 'all 0.3s ease',
               minWidth: '44px',
@@ -154,7 +148,7 @@ export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: He
               variant="subtle"
               size="lg"
               radius="xl"
-              title={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ''}`}
+              title={unreadCount > 0 ? t('notificationsUnread', { count: unreadCount }) : t('notifications')}
               style={{
                 transition: 'all 0.2s ease',
                 minWidth: '44px',
@@ -189,7 +183,7 @@ export default function Header({ mobileOpened, toggleMobile, onOpenWelcome }: He
                 {getDisplayName()}
               </Text>
               <Badge size="xs" variant="light" color="green">
-                Active
+                {t('active')}
               </Badge>
             </Stack>
           </Box>

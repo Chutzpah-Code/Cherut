@@ -14,24 +14,26 @@ export interface ActivityData {
   habitLogs?: HabitLog[];
 }
 
+type Translate = (key: string, values?: Record<string, string | number>) => string;
+
 export class NotificationService {
 
-  static generateNotifications(activityData: ActivityData): Notification[] {
+  static generateNotifications(activityData: ActivityData, t: Translate): Notification[] {
     const notifications: Notification[] = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     // Generate task notifications
-    notifications.push(...this.generateTaskNotifications(activityData.tasks, today));
+    notifications.push(...this.generateTaskNotifications(activityData.tasks, today, t));
 
     // Generate habit notifications
-    notifications.push(...this.generateHabitNotifications(activityData.habits, activityData.habitLogs || [], today));
+    notifications.push(...this.generateHabitNotifications(activityData.habits, activityData.habitLogs || [], today, t));
 
     // Generate objective notifications
-    notifications.push(...this.generateObjectiveNotifications(activityData.objectives, today));
+    notifications.push(...this.generateObjectiveNotifications(activityData.objectives, today, t));
 
     // Generate vision board notifications
-    notifications.push(...this.generateVisionBoardNotifications(activityData.visionBoardItems, today));
+    notifications.push(...this.generateVisionBoardNotifications(activityData.visionBoardItems, today, t));
 
     // Sort by priority and creation time (newest first)
     return notifications.sort((a, b) => {
@@ -47,7 +49,7 @@ export class NotificationService {
     });
   }
 
-  private static generateTaskNotifications(tasks: Task[], today: Date): Notification[] {
+  private static generateTaskNotifications(tasks: Task[], today: Date, t: Translate): Notification[] {
     const notifications: Notification[] = [];
 
     tasks.forEach(task => {
@@ -64,8 +66,8 @@ export class NotificationService {
       if (daysDiff < 0) {
         notifications.push({
           id: `task-overdue-${task.id}`,
-          title: 'Task Overdue',
-          message: `"${task.title}" was due ${Math.abs(daysDiff)} day${Math.abs(daysDiff) > 1 ? 's' : ''} ago`,
+          title: t('taskOverdueTitle'),
+          message: t('taskOverdueMsg', { title: task.title, count: Math.abs(daysDiff) }),
           type: 'task',
           read: false,
           createdAt: new Date().toISOString(),
@@ -76,8 +78,8 @@ export class NotificationService {
       else if (daysDiff === 0) {
         notifications.push({
           id: `task-due-today-${task.id}`,
-          title: 'Task Due Today',
-          message: `"${task.title}" is due today`,
+          title: t('taskDueTodayTitle'),
+          message: t('taskDueTodayMsg', { title: task.title }),
           type: 'task',
           read: false,
           createdAt: new Date().toISOString(),
@@ -88,8 +90,8 @@ export class NotificationService {
       else if (daysDiff === 1) {
         notifications.push({
           id: `task-due-tomorrow-${task.id}`,
-          title: 'Task Due Tomorrow',
-          message: `"${task.title}" is due tomorrow`,
+          title: t('taskDueTomorrowTitle'),
+          message: t('taskDueTomorrowMsg', { title: task.title }),
           type: 'task',
           read: false,
           createdAt: new Date().toISOString(),
@@ -101,7 +103,7 @@ export class NotificationService {
     return notifications;
   }
 
-  private static generateHabitNotifications(habits: Habit[], habitLogs: HabitLog[], today: Date): Notification[] {
+  private static generateHabitNotifications(habits: Habit[], habitLogs: HabitLog[], today: Date, t: Translate): Notification[] {
     const notifications: Notification[] = [];
     const todayStr = today.toISOString().split('T')[0];
 
@@ -132,8 +134,8 @@ export class NotificationService {
         if (shouldNotify) {
           notifications.push({
             id: `habit-daily-${habit.id}`,
-            title: 'Daily Habit Reminder',
-            message: `Time for your daily habit: "${habit.title}"`,
+            title: t('habitDailyTitle'),
+            message: t('habitDailyMsg', { title: habit.title }),
             type: 'habit',
             read: false,
             createdAt: new Date().toISOString(),
@@ -149,8 +151,8 @@ export class NotificationService {
         if (habit.weekDays.includes(currentDayOfWeek) && !todayLog) {
           notifications.push({
             id: `habit-weekly-${habit.id}`,
-            title: 'Weekly Habit Reminder',
-            message: `Don't forget your weekly habit: "${habit.title}"`,
+            title: t('habitWeeklyTitle'),
+            message: t('habitWeeklyMsg', { title: habit.title }),
             type: 'habit',
             read: false,
             createdAt: new Date().toISOString(),
@@ -164,8 +166,8 @@ export class NotificationService {
       if (milestones.includes(habit.streak) && todayLog) {
         notifications.push({
           id: `habit-streak-${habit.id}`,
-          title: 'Streak Milestone!',
-          message: `Amazing! You've maintained "${habit.title}" for ${habit.streak} days straight!`,
+          title: t('habitStreakTitle'),
+          message: t('habitStreakMsg', { title: habit.title, count: habit.streak }),
           type: 'achievement',
           read: false,
           createdAt: new Date().toISOString(),
@@ -177,7 +179,7 @@ export class NotificationService {
     return notifications;
   }
 
-  private static generateObjectiveNotifications(objectives: Objective[], today: Date): Notification[] {
+  private static generateObjectiveNotifications(objectives: Objective[], today: Date, t: Translate): Notification[] {
     const notifications: Notification[] = [];
 
     objectives.forEach(objective => {
@@ -192,8 +194,8 @@ export class NotificationService {
       if (daysDiff < 0) {
         notifications.push({
           id: `objective-overdue-${objective.id}`,
-          title: 'Objective Overdue',
-          message: `"${objective.title}" deadline passed ${Math.abs(daysDiff)} day${Math.abs(daysDiff) > 1 ? 's' : ''} ago`,
+          title: t('objectiveOverdueTitle'),
+          message: t('objectiveOverdueMsg', { title: objective.title, count: Math.abs(daysDiff) }),
           type: 'objective',
           read: false,
           createdAt: new Date().toISOString(),
@@ -204,8 +206,8 @@ export class NotificationService {
       else if (daysDiff <= 7 && daysDiff > 0) {
         notifications.push({
           id: `objective-deadline-${objective.id}`,
-          title: 'Objective Deadline Approaching',
-          message: `"${objective.title}" is due in ${daysDiff} day${daysDiff > 1 ? 's' : ''}`,
+          title: t('objectiveDeadlineTitle'),
+          message: t('objectiveDeadlineMsg', { title: objective.title, count: daysDiff }),
           type: 'objective',
           read: false,
           createdAt: new Date().toISOString(),
@@ -223,8 +225,8 @@ export class NotificationService {
       if (timeProgress > 0.5 && objective.progress < 25) {
         notifications.push({
           id: `objective-low-progress-${objective.id}`,
-          title: 'Objective Needs Attention',
-          message: `"${objective.title}" is behind schedule. Only ${objective.progress}% complete with ${Math.round((1 - timeProgress) * 100)}% time remaining`,
+          title: t('objectiveLowProgressTitle'),
+          message: t('objectiveLowProgressMsg', { title: objective.title, progress: objective.progress, remaining: Math.round((1 - timeProgress) * 100) }),
           type: 'system',
           read: false,
           createdAt: new Date().toISOString(),
@@ -236,7 +238,7 @@ export class NotificationService {
     return notifications;
   }
 
-  private static generateVisionBoardNotifications(visionBoardItems: VisionBoardItem[], today: Date): Notification[] {
+  private static generateVisionBoardNotifications(visionBoardItems: VisionBoardItem[], today: Date, t: Translate): Notification[] {
     const notifications: Notification[] = [];
 
     visionBoardItems.forEach(item => {
@@ -251,8 +253,8 @@ export class NotificationService {
       if (daysDiff < 0) {
         notifications.push({
           id: `vision-board-overdue-${item.id}`,
-          title: 'Vision Board Goal Overdue',
-          message: `Your vision board goal "${item.title}" deadline passed ${Math.abs(daysDiff)} day${Math.abs(daysDiff) > 1 ? 's' : ''} ago`,
+          title: t('visionOverdueTitle'),
+          message: t('visionOverdueMsg', { title: item.title, count: Math.abs(daysDiff) }),
           type: 'system',
           read: false,
           createdAt: new Date().toISOString(),
@@ -263,8 +265,8 @@ export class NotificationService {
       else if (daysDiff === 0) {
         notifications.push({
           id: `vision-board-due-today-${item.id}`,
-          title: 'Vision Board Goal Due Today',
-          message: `Your vision board goal "${item.title}" is due today. Time to make it happen!`,
+          title: t('visionDueTodayTitle'),
+          message: t('visionDueTodayMsg', { title: item.title }),
           type: 'achievement',
           read: false,
           createdAt: new Date().toISOString(),
@@ -275,8 +277,8 @@ export class NotificationService {
       else if (daysDiff === 1) {
         notifications.push({
           id: `vision-board-due-tomorrow-${item.id}`,
-          title: 'Vision Board Goal Due Tomorrow',
-          message: `Your vision board goal "${item.title}" is due tomorrow. Get ready to achieve it!`,
+          title: t('visionDueTomorrowTitle'),
+          message: t('visionDueTomorrowMsg', { title: item.title }),
           type: 'achievement',
           read: false,
           createdAt: new Date().toISOString(),
@@ -287,8 +289,8 @@ export class NotificationService {
       else if (daysDiff <= 7 && daysDiff > 1) {
         notifications.push({
           id: `vision-board-deadline-${item.id}`,
-          title: 'Vision Board Goal Deadline Approaching',
-          message: `Your vision board goal "${item.title}" is due in ${daysDiff} day${daysDiff > 1 ? 's' : ''}. Stay focused on your dreams!`,
+          title: t('visionDeadlineTitle'),
+          message: t('visionDeadlineMsg', { title: item.title, count: daysDiff }),
           type: 'achievement',
           read: false,
           createdAt: new Date().toISOString(),

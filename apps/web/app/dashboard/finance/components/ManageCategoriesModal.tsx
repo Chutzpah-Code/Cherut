@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Modal, Stack, Group, Text, Box, TextInput, Select, Badge, Button, ActionIcon, Center, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Plus, Pencil, Trash2, Check, X } from 'lucide-react';
@@ -13,11 +14,13 @@ import { useUndoableDelete } from '../useUndoableDelete';
 // No dedicated category page exists in the redesign — this modal fills that gap
 // minimally, reached from Spending by category's "Manage categories" link.
 export function ManageCategoriesModal({ opened, onClose }: { opened: boolean; onClose: () => void }) {
+  const t = useTranslations('finance.manageCategories');
+  const tc = useTranslations('finance.common');
   const { data: rawCategories = [], isLoading } = useFinanceCategories();
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
-  const undoableDeleteCategory = useUndoableDelete((id: string) => deleteCategory.mutate(id), { label: 'Category' });
+  const undoableDeleteCategory = useUndoableDelete((id: string) => deleteCategory.mutate(id), { label: tc('category') });
   const categories = (rawCategories as any[]).filter((c) => !undoableDeleteCategory.isPending(c.id));
 
   const [formOpened, { open: openForm, close: closeForm }] = useDisclosure();
@@ -43,18 +46,18 @@ export function ManageCategoriesModal({ opened, onClose }: { opened: boolean; on
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Manage categories" centered size="md">
+    <Modal opened={opened} onClose={onClose} title={t('title')} centered size="md">
       <Group justify="space-between" mb="sm">
-        <Text size="sm" c="dimmed">Income and expense categories</Text>
+        <Text size="sm" c="dimmed">{t('subtitle')}</Text>
         <Button size="xs" leftSection={<Plus size={14} />} onClick={openForm} variant="subtle">
-          Add category
+          {t('addCategory')}
         </Button>
       </Group>
 
       {isLoading ? (
         <Center py="lg"><Loader size="sm" color="#4686FE" /></Center>
       ) : categories.length === 0 ? (
-        <Center py="lg"><Text c="dimmed" size="sm">No categories yet.</Text></Center>
+        <Center py="lg"><Text c="dimmed" size="sm">{t('noCategories')}</Text></Center>
       ) : (
         <Stack gap="xs">
           {(categories as any[]).map((cat) => (
@@ -72,7 +75,7 @@ export function ManageCategoriesModal({ opened, onClose }: { opened: boolean; on
                 <Group gap="sm" style={{ flex: 1 }}>
                   <Text size="sm" fw={500}>{cat.name}</Text>
                   <Badge size="xs" variant="light" color={cat.type === 'income' ? 'green' : 'red'}>
-                    {cat.type}
+                    {cat.type === 'income' ? t('income') : t('expense')}
                   </Badge>
                 </Group>
               )}
@@ -102,22 +105,22 @@ export function ManageCategoriesModal({ opened, onClose }: { opened: boolean; on
         </Stack>
       )}
 
-      <Modal opened={formOpened} onClose={closeForm} title="New category" centered>
+      <Modal opened={formOpened} onClose={closeForm} title={t('newCategory')} centered>
         <Stack gap="sm">
           <TextInput
-            label="Name"
-            placeholder="e.g. Food & Dining"
+            label={t('name')}
+            placeholder={t('namePlaceholder')}
             value={catForm.name ?? ''}
             onChange={(e) => setCatForm((f) => ({ ...f, name: e.target.value }))}
           />
           <Select
-            label="Type"
-            data={[{ value: 'income', label: 'Income' }, { value: 'expense', label: 'Expense' }]}
+            label={t('type')}
+            data={[{ value: 'income', label: t('income') }, { value: 'expense', label: t('expense') }]}
             value={catForm.type}
             onChange={(v) => setCatForm((f) => ({ ...f, type: v as any }))}
           />
           <Button onClick={handleCreate} loading={createCategory.isPending} disabled={!catForm.name} style={{ backgroundColor: '#0052CC' }}>
-            Create category
+            {t('createCategory')}
           </Button>
         </Stack>
       </Modal>

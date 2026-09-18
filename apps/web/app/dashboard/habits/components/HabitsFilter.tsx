@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Group, Button, Text, Badge } from '@mantine/core';
 import { Archive, Eye, EyeOff } from 'lucide-react';
 import { HabitCounts } from '@/lib/api/services/habits';
@@ -14,6 +15,7 @@ interface HabitsFilterProps {
 }
 
 export function HabitsFilter({ currentFilter, onFilterChange, habitCounts }: HabitsFilterProps) {
+  const t = useTranslations('habits.filter');
   return (
     <>
       <style jsx global>{`
@@ -64,7 +66,7 @@ export function HabitsFilter({ currentFilter, onFilterChange, habitCounts }: Hab
               },
             }}
           >
-            Active
+            {t('active')}
           </Button>
           <Button
             onClick={() => onFilterChange('archived')}
@@ -94,7 +96,7 @@ export function HabitsFilter({ currentFilter, onFilterChange, habitCounts }: Hab
               },
             }}
           >
-            Archived
+            {t('archived')}
           </Button>
           <Button
             onClick={() => onFilterChange('all')}
@@ -124,7 +126,7 @@ export function HabitsFilter({ currentFilter, onFilterChange, habitCounts }: Hab
               },
             }}
           >
-            All
+            {t('all')}
           </Button>
         </Group>
 
@@ -138,9 +140,9 @@ export function HabitsFilter({ currentFilter, onFilterChange, habitCounts }: Hab
                 color: '#6D6D6D',
               }}
             >
-              {currentFilter === 'active' && `${habitCounts.active} active habits`}
-              {currentFilter === 'archived' && `${habitCounts.archived} archived habits`}
-              {currentFilter === 'all' && `${habitCounts.total} total habits`}
+              {currentFilter === 'active' && t('activeCount', { count: habitCounts.active })}
+              {currentFilter === 'archived' && t('archivedCount', { count: habitCounts.archived })}
+              {currentFilter === 'all' && t('totalCount', { count: habitCounts.total })}
             </Text>
 
             {currentFilter === 'archived' && habitCounts.archived > 0 && (

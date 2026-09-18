@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Title, Text, Button, Stack, Box, SimpleGrid, Loader, Center, Card, Group } from '@mantine/core';
 import { Plus } from 'lucide-react';
 import { modals } from '@mantine/modals';
@@ -24,6 +25,7 @@ import { ArchivedVisionBoardGrid } from './components/ArchivedVisionBoardGrid';
 type VisionBoardFilterType = 'active' | 'archived';
 
 export default function VisionBoardPage() {
+  const t = useTranslations('visionBoard.page');
   const [currentFilter, setCurrentFilter] = useState<VisionBoardFilterType>('active');
 
   const { data: activeItems, isLoading: activeLoading } = useVisionBoardItems(false);
@@ -103,15 +105,15 @@ export default function VisionBoardPage() {
     try {
       await toggleArchiveMutation.mutateAsync(item.id);
       notifications.show({
-        title: 'Success',
-        message: `"${item.title}" has been archived`,
+        title: t('success'),
+        message: t('itemArchived', { title: item.title }),
         color: 'green',
       });
     } catch (error) {
       console.error('Error archiving vision board item:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to archive item. Please try again.',
+        title: t('error'),
+        message: t('archiveFailed'),
         color: 'red',
       });
     }
@@ -122,15 +124,15 @@ export default function VisionBoardPage() {
     try {
       await toggleArchiveMutation.mutateAsync(item.id);
       notifications.show({
-        title: 'Success',
-        message: `"${item.title}" has been restored`,
+        title: t('success'),
+        message: t('itemRestored', { title: item.title }),
         color: 'green',
       });
     } catch (error) {
       console.error('Error unarchiving vision board item:', error);
       notifications.show({
-        title: 'Error',
-        message: 'Failed to restore item. Please try again.',
+        title: t('error'),
+        message: t('restoreFailed'),
         color: 'red',
       });
     }
@@ -138,10 +140,10 @@ export default function VisionBoardPage() {
 
   // Handler para deletar
   const handleDelete = (id: string) => {
-    const title = currentFilter === 'archived' ? 'Delete Vision Board Item Permanently' : 'Delete Vision Board Item';
+    const title = currentFilter === 'archived' ? t('deletePermanentlyTitle') : t('deleteTitle');
     const message = currentFilter === 'archived'
-      ? 'Are you sure you want to permanently delete this item? This action cannot be undone and the image will be permanently deleted.'
-      : 'Are you sure you want to delete this item? This action cannot be undone and the image will be permanently deleted.';
+      ? t('deleteBodyPermanent')
+      : t('deleteBody');
 
     modals.openConfirmModal({
       title,
@@ -158,7 +160,7 @@ export default function VisionBoardPage() {
           {message}
         </Text>
       ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      labels: { confirm: t('delete'), cancel: t('cancel') },
       confirmProps: {
         color: 'red',
         style: {
@@ -210,7 +212,7 @@ export default function VisionBoardPage() {
             letterSpacing: '-0.02em',
           }}
         >
-          My Vision Board
+          {t('title')}
         </Title>
         <Text
           style={{
@@ -222,7 +224,7 @@ export default function VisionBoardPage() {
             marginBottom: '24px',
           }}
         >
-          {currentFilter === 'active' ? 'Drag and drop to organize your goals' : 'View and manage your archived vision board items'}
+          {currentFilter === 'active' ? t('subtitleActive') : t('subtitleArchived')}
         </Text>
 
         <Box mb="lg">
@@ -248,7 +250,7 @@ export default function VisionBoardPage() {
               },
             }}
           >
-            Add Goal
+            {t('addGoal')}
           </Button>
         </Box>
 
@@ -291,7 +293,7 @@ export default function VisionBoardPage() {
                 },
               }}
             >
-              Active
+              {t('active')}
             </Button>
             <Button
               onClick={() => setCurrentFilter('archived')}
@@ -321,7 +323,7 @@ export default function VisionBoardPage() {
                 },
               }}
             >
-              Archived
+              {t('archived')}
             </Button>
           </Group>
           <Text
@@ -333,8 +335,8 @@ export default function VisionBoardPage() {
             }}
           >
             {currentFilter === 'active'
-              ? `${activeItems?.length || 0} active item${(activeItems?.length || 0) !== 1 ? 's' : ''}`
-              : `${archivedItems?.length || 0} archived item${(archivedItems?.length || 0) !== 1 ? 's' : ''}`
+              ? t('activeCount', { count: activeItems?.length || 0 })
+              : t('archivedCount', { count: archivedItems?.length || 0 })
             }
           </Text>
         </Group>
@@ -363,7 +365,7 @@ export default function VisionBoardPage() {
                     color: '#6B7280',
                   }}
                 >
-                  Start Your Vision Board
+                  {t('emptyTitle')}
                 </Text>
                 <Text
                   style={{
@@ -375,7 +377,7 @@ export default function VisionBoardPage() {
                     maxWidth: 400,
                   }}
                 >
-                  Create a visual representation of your dreams and goals. Add images that inspire you and track your progress towards achieving them!
+                  {t('emptyHint')}
                 </Text>
                 <Button
                   leftSection={<Plus size={16} />}
@@ -392,7 +394,7 @@ export default function VisionBoardPage() {
                     padding: '0 24px',
                   }}
                 >
-                  Add Your First Goal
+                  {t('addFirstGoal')}
                 </Button>
               </Stack>
             </Center>

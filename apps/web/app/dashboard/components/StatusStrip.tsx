@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { useTasks } from '@/hooks/useTasks';
 import { useTodayHabits, useHabitConsistency } from '@/hooks/useHabits';
@@ -14,16 +15,9 @@ function localToday() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function greeting() {
-  const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 18) return 'Good afternoon';
-  return 'Good evening';
-}
-
-function fmtCompact(value: number, currency = 'USD') {
+function fmtCompact(value: number, locale: string, currency = 'USD') {
   try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency, notation: 'compact', maximumFractionDigits: 1 }).format(value);
+    return new Intl.NumberFormat(locale, { style: 'currency', currency, notation: 'compact', maximumFractionDigits: 1 }).format(value);
   } catch {
     return `${currency} ${value.toFixed(0)}`;
   }
@@ -56,9 +50,18 @@ function Tile({ label, value, sub, tone }: { label: string; value: string; sub?:
 }
 
 export function StatusStrip() {
+  const t = useTranslations('dashboard.statusStrip');
+  const locale = useLocale();
   const { user } = useAuth();
   const { data: profile } = useProfile();
   const today = localToday();
+
+  const greeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return t('greetingMorning');
+    if (h < 18) return t('greetingAfternoon');
+    return t('greetingEvening');
+  };
 
   const { data: tasks = [], isLoading: tasksLoading } = useTasks();
   const { data: todayHabits = [], isLoading: habitsLoading } = useTodayHabits(today);
@@ -90,7 +93,7 @@ export function StatusStrip() {
 
   const firstName = profile?.displayName?.split(' ')[0] ?? user?.displayName?.split(' ')[0] ?? '';
   const attentionCount = overdueCount + dueTodayCount;
-  const dateLabel = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const dateLabel = new Date().toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
   const isLoading = tasksLoading || habitsLoading || consistencyLoading || netWorthLoading;
 
@@ -103,7 +106,7 @@ export function StatusStrip() {
           </Title>
           <Text style={{ fontSize: 13, color: '#64748B' }}>
             {dateLabel}
-            {attentionCount > 0 && ` · ${attentionCount} item${attentionCount !== 1 ? 's' : ''} need attention`}
+            {attentionCount > 0 && ` · ${t('attentionSuffix', { count: attentionCount })}`}
           </Text>
         </Stack>
 
@@ -112,21 +115,21 @@ export function StatusStrip() {
         ) : (
           <SimpleGrid cols={{ base: 2, sm: 4 }} spacing={10} style={{ width: '100%' }}>
             <Tile
-              label="Overdue"
+              label={t('overdue')}
               value={String(overdueCount)}
-              sub={overdueCount > 0 ? `Oldest ${oldestOverdueDays} day${oldestOverdueDays !== 1 ? 's' : ''} late` : undefined}
+              sub={overdueCount > 0 ? t('oldestLate', { count: oldestOverdueDays }) : undefined}
               tone={overdueCount > 0 ? 'danger' : undefined}
             />
-            <Tile label="Due today" value={String(dueTodayCount)} />
+            <Tile label={t('dueToday')} value={String(dueTodayCount)} />
             <Tile
-              label="Habits"
+              label={t('habits')}
               value={`${loggedToday}/${scheduledToday}`}
-              sub={consistency?.overallPct != null ? `${consistency.overallPct}% last 14 days` : undefined}
+              sub={consistency?.overallPct != null ? t('habitsLast14', { pct: consistency.overallPct }) : undefined}
             />
             <Tile
-              label="Net worth"
-              value={fmtCompact(netWorth?.netWorth ?? 0, netWorth?.displayCurrency ?? currency)}
-              sub={netWorth?.monthChangePct != null ? `${netWorth.monthChangePct >= 0 ? '+' : ''}${netWorth.monthChangePct.toFixed(1)}% this month` : undefined}
+              label={t('netWorth')}
+              value={fmtCompact(netWorth?.netWorth ?? 0, locale, netWorth?.displayCurrency ?? currency)}
+              sub={netWorth?.monthChangePct != null ? t('netWorthThisMonth', { sign: netWorth.monthChangePct >= 0 ? '+' : '', pct: netWorth.monthChangePct.toFixed(1) }) : undefined}
             />
           </SimpleGrid>
         )}

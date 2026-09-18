@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Modal, Stack, Box, Group, TextInput, Select, ActionIcon, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { Trash2 } from 'lucide-react';
@@ -52,6 +53,7 @@ function ColumnNameInput({ name, onCommit }: { name: string; onCommit: (newName:
 }
 
 export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBoardModalProps) {
+  const t = useTranslations('tasks.manageBoard');
   const isMobile = useMediaQuery('(max-width: 768px)');
   const queryClient = useQueryClient();
   const updateColumn = useUpdateColumn();
@@ -117,7 +119,7 @@ export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBo
 
   const handleDeleteColumn = (columnId: string, columnName: string, taskCount: number) => {
     modals.openConfirmModal({
-      title: 'Delete list',
+      title: t('deleteList'),
       children: (
         <Text
           style={{
@@ -129,11 +131,11 @@ export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBo
           }}
         >
           {taskCount > 0
-            ? `Are you sure you want to delete "${columnName}"? This will also permanently delete ${taskCount} task${taskCount !== 1 ? 's' : ''} inside it. This action cannot be undone.`
-            : `Are you sure you want to delete "${columnName}"? This action cannot be undone.`}
+            ? t('deleteConfirmWithTasks', { name: columnName, count: taskCount })
+            : t('deleteConfirmSimple', { name: columnName })}
         </Text>
       ),
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      labels: { confirm: t('confirm'), cancel: t('cancel') },
       confirmProps: {
         color: 'red',
         style: { fontFamily: 'Inter, sans-serif', fontWeight: 600 },
@@ -165,7 +167,7 @@ export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBo
     <Modal
       opened={opened}
       onClose={onClose}
-      title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>Manage board</Text>}
+      title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>{t('title')}</Text>}
       size="xl"
       radius={isMobile ? 0 : 'lg'}
       fullScreen={isMobile}
@@ -179,7 +181,7 @@ export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBo
               </Box>
               <Group gap="xs" wrap="nowrap" style={{ flex: isMobile ? '1 1 100%' : undefined }}>
                 <Select
-                  data={columns.map((_, i) => ({ value: String(i), label: `Position ${i + 1}` }))}
+                  data={columns.map((_, i) => ({ value: String(i), label: t('position', { n: i + 1 }) }))}
                   value={String(index)}
                   onChange={(v) => v !== null && handleMoveColumn(col.id, Number(v))}
                   size="sm"
@@ -199,7 +201,7 @@ export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBo
 
             <Stack gap={6}>
               {col.tasks.length === 0 ? (
-                <Text size="xs" c="dimmed">No tasks</Text>
+                <Text size="xs" c="dimmed">{t('noTasks')}</Text>
               ) : (
                 col.tasks.map((task, taskIndex) => (
                   <Group key={task.id} justify="space-between" wrap="wrap" gap="xs">

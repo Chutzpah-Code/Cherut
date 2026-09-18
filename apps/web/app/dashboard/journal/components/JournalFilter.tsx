@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Group, Button, Text, Badge } from '@mantine/core';
 import { JournalCounts } from '@/lib/api/services/journal';
 
@@ -17,6 +18,7 @@ export function JournalFilter({
   onFilterChange,
   journalCounts,
 }: JournalFilterProps) {
+  const t = useTranslations('journal.filter');
   return (
     <>
       <style jsx global>{`
@@ -67,7 +69,7 @@ export function JournalFilter({
               },
             }}
           >
-            Active
+            {t('active')}
           </Button>
           <Button
             onClick={() => onFilterChange('archived')}
@@ -97,7 +99,7 @@ export function JournalFilter({
               },
             }}
           >
-            Archived
+            {t('archived')}
           </Button>
           <Button
             onClick={() => onFilterChange('all')}
@@ -127,7 +129,7 @@ export function JournalFilter({
               },
             }}
           >
-            All
+            {t('all')}
           </Button>
         </Group>
 
@@ -141,9 +143,9 @@ export function JournalFilter({
                 color: '#6D6D6D',
               }}
             >
-              {currentFilter === 'active' && `${journalCounts.active} active entries`}
-              {currentFilter === 'archived' && `${journalCounts.archived} archived entries`}
-              {currentFilter === 'all' && `${journalCounts.total} total entries`}
+              {currentFilter === 'active' && t('activeCount', { count: journalCounts.active })}
+              {currentFilter === 'archived' && t('archivedCount', { count: journalCounts.archived })}
+              {currentFilter === 'all' && t('totalCount', { count: journalCounts.total })}
             </Text>
 
             {currentFilter === 'archived' && journalCounts.archived > 0 && (
