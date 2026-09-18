@@ -28,6 +28,8 @@ export class ValidationExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
+      code: 'VALIDATION_FAILED',
+      params: {},
       message: exceptionResponse.message || 'Validation failed',
       errors: exceptionResponse.message || [],
     });

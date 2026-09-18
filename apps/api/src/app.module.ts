@@ -5,6 +5,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ValidationExceptionFilter } from './common/filters/validation-exception.filter';
+import { UnauthorizedExceptionFilter } from './common/filters/unauthorized-exception.filter';
 import { FirebaseModule } from './config/firebase.module';
 import cloudinaryConfig from './config/cloudinary.config';
 import { AuthModule } from './modules/auth/auth.module';
@@ -48,6 +49,7 @@ import { BillsModule } from './modules/bills/bills.module';
   providers: [
     AppService,
     { provide: APP_FILTER, useClass: ValidationExceptionFilter },
+    { provide: APP_FILTER, useClass: UnauthorizedExceptionFilter },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
