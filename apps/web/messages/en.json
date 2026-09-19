@@ -1110,6 +1110,13 @@
       "archive": "Archive",
       "delete": "Delete"
     },
+    "lightbox": {
+      "openGallery": "View gallery",
+      "close": "Close",
+      "previous": "Previous image",
+      "next": "Next image",
+      "counter": "{current} of {total}"
+    },
     "archivedGrid": {
       "emptyTitle": "No archived vision board items",
       "emptyHint": "Archived items will appear here when you archive vision board items.",

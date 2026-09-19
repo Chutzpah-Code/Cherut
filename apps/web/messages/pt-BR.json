@@ -1110,6 +1110,13 @@
       "archive": "Arquivar",
       "delete": "Excluir"
     },
+    "lightbox": {
+      "openGallery": "Ver galeria",
+      "close": "Fechar",
+      "previous": "Imagem anterior",
+      "next": "Próxima imagem",
+      "counter": "{current} de {total}"
+    },
     "archivedGrid": {
       "emptyTitle": "Nenhum item arquivado no quadro dos sonhos",
       "emptyHint": "Itens arquivados aparecerão aqui quando você arquivar itens do quadro dos sonhos.",

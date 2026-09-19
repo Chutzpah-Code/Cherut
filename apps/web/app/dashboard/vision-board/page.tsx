@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Title, Text, Button, Stack, Box, SimpleGrid, Loader, Center, Card, Group } from '@mantine/core';
-import { Plus } from 'lucide-react';
+import { Title, Text, Button, Stack, Box, SimpleGrid, Loader, Center, Card, Group, ActionIcon, Tooltip } from '@mantine/core';
+import { Plus, Images } from 'lucide-react';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
@@ -21,11 +21,13 @@ import { Surface } from '@/components/ui/Surface';
 import { VisionBoardModal } from './components/VisionBoardModal';
 import { CreateVisionBoardModal } from './components/CreateVisionBoardModal';
 import { ArchivedVisionBoardGrid } from './components/ArchivedVisionBoardGrid';
+import { VisionBoardLightbox } from './components/VisionBoardLightbox';
 
 type VisionBoardFilterType = 'active' | 'archived';
 
 export default function VisionBoardPage() {
   const t = useTranslations('visionBoard.page');
+  const tLightbox = useTranslations('visionBoard.lightbox');
   const [currentFilter, setCurrentFilter] = useState<VisionBoardFilterType>('active');
 
   const { data: activeItems, isLoading: activeLoading } = useVisionBoardItems(false);
@@ -40,6 +42,7 @@ export default function VisionBoardPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<VisionBoardItem | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // Choose the right data source based on current filter
   const items = currentFilter === 'active' ? activeItems : archivedItems;
@@ -227,7 +230,7 @@ export default function VisionBoardPage() {
           {currentFilter === 'active' ? t('subtitleActive') : t('subtitleArchived')}
         </Text>
 
-        <Box mb="lg">
+        <Group mb="lg" gap="sm">
           <Button
             leftSection={<Plus size={20} />}
             onClick={() => setIsCreateModalOpen(true)}
@@ -252,7 +255,20 @@ export default function VisionBoardPage() {
           >
             {t('addGoal')}
           </Button>
-        </Box>
+          {!!items?.length && (
+            <Tooltip label={tLightbox('openGallery')}>
+              <ActionIcon
+                aria-label={tLightbox('openGallery')}
+                onClick={() => setLightboxOpen(true)}
+                radius={8}
+                variant="default"
+                style={{ width: 48, height: 48, border: '1px solid #E0E0E0' }}
+              >
+                <Images size={20} color="#666666" />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        </Group>
 
         <Group justify="space-between" align="center" wrap="wrap" gap="sm">
           <Group
@@ -456,6 +472,14 @@ export default function VisionBoardPage() {
           isSaving={updateMutation.isPending}
         />
       )}
+
+      {/* Fullscreen gallery */}
+      <VisionBoardLightbox
+        items={items ?? []}
+        initialIndex={0}
+        opened={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
     </Stack>
     </Surface>
   );
