@@ -4,8 +4,7 @@ import { useMemo, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import type { EventClickArg, EventDropArg } from '@fullcalendar/core';
+import type { EventClickArg } from '@fullcalendar/core';
 import { Box, Center, Loader, Text } from '@mantine/core';
 import { useBoardKanban } from '@/hooks/useBoards';
 import {
@@ -52,24 +51,18 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
       .map((t) => ({
         id: t.id,
         title: t.title,
-        date: t.dueDate,
+        // dueDate is a full ISO datetime (see TaskModal's own `.split('T')[0]`
+        // for the date picker) — passing it whole made FullCalendar parse it
+        // as a UTC instant and bucket it under the previous day in any
+        // timezone behind UTC. Stripping the time makes it a plain calendar
+        // date with no timezone conversion.
+        date: t.dueDate!.split('T')[0],
         allDay: true,
         backgroundColor: STATUS_COLORS[t.status] ?? '#0052CC',
         borderColor: STATUS_COLORS[t.status] ?? '#0052CC',
         textColor: '#ffffff',
       }));
   }, [columns]);
-
-  const handleEventDrop = useCallback(
-    (info: EventDropArg) => {
-      const newDate = info.event.startStr;
-      updateTask.mutate(
-        { id: info.event.id, dto: { dueDate: newDate } },
-        { onError: () => info.revert() },
-      );
-    },
-    [updateTask],
-  );
 
   const handleEventClick = useCallback(
     (info: EventClickArg) => {
@@ -127,9 +120,18 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
         .fc .fc-toolbar { margin-bottom: 16px; }
         .fc-theme-standard td, .fc-theme-standard th { border-color: #E2E8F0; }
         .fc-theme-standard .fc-scrollgrid { border-color: #E2E8F0; }
+
+        /* Below ~640px the single-row toolbar (prev/next/today, title,
+           month/week) has no room and gets visually crushed. Stack it into
+           three centered rows instead of letting it compress or overflow. */
+        @media (max-width: 640px) {
+          .fc .fc-toolbar { flex-direction: column; gap: 10px; }
+          .fc-toolbar-chunk { justify-content: center; width: 100%; }
+          .fc .fc-toolbar-title { font-size: 16px; text-align: center; }
+        }
       `}</style>
       <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
+        plugins={[dayGridPlugin]}
         initialView="dayGridMonth"
         headerToolbar={{
           left: 'prev,next today',
@@ -137,8 +139,6 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
           right: 'dayGridMonth,dayGridWeek',
         }}
         events={events}
-        editable
-        eventDrop={handleEventDrop}
         eventClick={handleEventClick}
         // +32px vs. the pre-Surface value, accounting for the page's
         // wrapping Surface (apps/web/components/ui/Surface.tsx) now adding

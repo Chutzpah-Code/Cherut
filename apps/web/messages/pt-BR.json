@@ -216,8 +216,11 @@
       "noLists": "Nenhuma lista ainda. Crie sua primeira lista para começar.",
       "addList": "Adicionar lista",
       "manageBoard": "Gerenciar quadro",
+      "manageBoardShort": "Gerenciar",
       "addAnotherList": "Adicionar outra lista",
-      "archivedTasksLink": "Tarefas arquivadas"
+      "addAnotherListShort": "Lista",
+      "archivedTasksLink": "Tarefas arquivadas",
+      "archivedTasksLinkShort": "Arquivadas"
     },
     "kanbanList": {
       "noTasks": "Nenhuma tarefa",

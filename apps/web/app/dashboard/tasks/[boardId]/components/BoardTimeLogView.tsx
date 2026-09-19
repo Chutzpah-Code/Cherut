@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import {
   Box, Stack, Group, Text, Select, Button, ActionIcon, Loader, Center, TextInput,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { Play, Square, Plus, Pencil, Trash2, Check, X, Clock } from 'lucide-react';
 import { useBoardKanban } from '@/hooks/useBoards';
 import {
@@ -94,6 +95,7 @@ interface TimerBarProps {
 
 function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProps) {
   const t = useTranslations('tasks.timeLog');
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [liveElapsed, setLiveElapsed] = useState(0);
   const startMutation = useStartTimeTracking();
@@ -152,6 +154,47 @@ function TimerBar({ tasks, activeTask, activeEntry, onShowManual }: TimerBarProp
             {t('stop')}
           </Button>
         </>
+      ) : isMobile ? (
+        <Stack gap={10} style={{ width: '100%' }}>
+          <Select
+            placeholder={t('selectTask')}
+            data={tasks.map(t => ({ value: t.id, label: t.title }))}
+            value={selectedTaskId}
+            onChange={setSelectedTaskId}
+            searchable
+            clearable
+            size="sm"
+            style={{ width: '100%' }}
+          />
+          <Text style={{ fontFamily: 'Inter, sans-serif', fontVariantNumeric: 'tabular-nums', fontSize: 22, color: '#94A3B8', letterSpacing: 1, textAlign: 'center' }}>
+            00:00:00
+          </Text>
+          <Group gap={8} grow wrap="nowrap">
+            <Button
+              leftSection={<Play size={14} />}
+              style={
+                selectedTaskId
+                  ? { backgroundColor: '#4686FE' }
+                  : { backgroundColor: '#4686FE', color: '#fff', opacity: 1, cursor: 'not-allowed' }
+              }
+              size="sm"
+              onClick={handleStart}
+              disabled={!selectedTaskId}
+              loading={startMutation.isPending}
+            >
+              {t('start')}
+            </Button>
+            <Button
+              leftSection={<Plus size={14} />}
+              variant="light"
+              color="blue"
+              size="sm"
+              onClick={onShowManual}
+            >
+              {t('manual')}
+            </Button>
+          </Group>
+        </Stack>
       ) : (
         <>
           <Select
@@ -281,6 +324,7 @@ interface TimeEntryRowProps {
 }
 
 function TimeEntryRow({ fe, isLast, onOpenTask }: TimeEntryRowProps) {
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const [editing, setEditing] = useState(false);
   const [editDate, setEditDate] = useState('');
   const [editStart, setEditStart] = useState('');
@@ -333,13 +377,45 @@ function TimeEntryRow({ fe, isLast, onOpenTask }: TimeEntryRowProps) {
     );
   }
 
+  if (isMobile) {
+    return (
+      <Box
+        onClick={onOpenTask}
+        style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '12px 20px', borderBottom, cursor: 'pointer' }}
+      >
+        <Box style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
+          <Text size="sm" fw={500} style={{ flex: 1, minWidth: 0, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {fe.taskTitle}
+          </Text>
+          <ActionIcon size="sm" variant="subtle" color="blue" onClick={(e) => { e.stopPropagation(); enterEdit(); }}>
+            <Pencil size={12} />
+          </ActionIcon>
+          <ActionIcon size="sm" variant="subtle" color="red" onClick={(e) => { e.stopPropagation(); handleDelete(); }} loading={deleteMutation.isPending}>
+            <Trash2 size={12} />
+          </ActionIcon>
+        </Box>
+        <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 18 }}>
+          <Text size="xs" c="dimmed">
+            {fe.entry.startTime ? toLocalTime(fe.entry.startTime) : '?'}
+            {' – '}
+            {fe.entry.endTime ? toLocalTime(fe.entry.endTime) : '...'}
+          </Text>
+          <Text size="xs" fw={600} style={{ color: '#0F172A', fontFamily: 'Inter, sans-serif', fontVariantNumeric: 'tabular-nums' }}>
+            {fmtHuman(duration)}
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box
       onClick={onOpenTask}
       style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom, cursor: 'pointer' }}
     >
       <div style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
-      <Text size="sm" fw={500} style={{ flex: 1, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <Text size="sm" fw={500} style={{ flex: 1, minWidth: 0, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {fe.taskTitle}
       </Text>
       <Text size="sm" c="dimmed" style={{ flexShrink: 0, minWidth: 120, textAlign: 'right' }}>

@@ -103,16 +103,17 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         .board-scroll::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
       `}</style>
 
-      <Group gap="sm" mb="sm">
+      <Group gap={isMobile ? 6 : 'sm'} mb="sm" wrap="nowrap">
         <Button
           variant="light"
           leftSection={<Settings2 size={14} />}
           onClick={() => setManageOpened(true)}
           radius={8}
-          size="sm"
+          size={isMobile ? 'xs' : 'sm'}
+          px={isMobile ? 8 : undefined}
           style={{ color: '#42526E', backgroundColor: '#F4F5F7', fontWeight: 500 }}
         >
-          {t('manageBoard')}
+          {isMobile ? t('manageBoardShort') : t('manageBoard')}
         </Button>
         <Button
           variant="subtle"
@@ -120,20 +121,22 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           onClick={handleAddColumn}
           loading={createColumn.isPending}
           radius={8}
-          size="sm"
+          size={isMobile ? 'xs' : 'sm'}
+          px={isMobile ? 8 : undefined}
           style={{ color: '#6B778C', fontWeight: 500 }}
         >
-          {t('addAnotherList')}
+          {isMobile ? t('addAnotherListShort') : t('addAnotherList')}
         </Button>
         <Button
           variant="subtle"
           leftSection={<Archive size={14} />}
           onClick={() => setArchivedOpened(true)}
           radius={8}
-          size="sm"
+          size={isMobile ? 'xs' : 'sm'}
+          px={isMobile ? 8 : undefined}
           style={{ color: '#6B778C', fontWeight: 500 }}
         >
-          {t('archivedTasksLink')}
+          {isMobile ? t('archivedTasksLinkShort') : t('archivedTasksLink')}
         </Button>
       </Group>
 

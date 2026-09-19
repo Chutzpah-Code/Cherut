@@ -216,8 +216,11 @@
       "noLists": "No lists yet. Create your first list to get started.",
       "addList": "Add a list",
       "manageBoard": "Manage Board",
+      "manageBoardShort": "Manage",
       "addAnotherList": "Add another list",
-      "archivedTasksLink": "Archived tasks"
+      "addAnotherListShort": "List",
+      "archivedTasksLink": "Archived tasks",
+      "archivedTasksLinkShort": "Archived"
     },
     "kanbanList": {
       "noTasks": "No tasks",
