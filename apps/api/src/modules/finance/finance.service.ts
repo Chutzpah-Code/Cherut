@@ -857,10 +857,17 @@ export class FinanceService {
     const deltaByDate: Record<string, number> = {};
     for (const doc of allTxSnap.docs) {
       const t = doc.data() as any;
-      if (!cashAccountIds.has(t.accountId)) continue;
       if (t.date <= startDate || t.date > today) continue;
-      const delta = t.type === 'income' ? t.amount : t.type === 'expense' ? -t.amount : 0;
-      deltaByDate[t.date] = (deltaByDate[t.date] ?? 0) + delta;
+      // A transfer between two cash accounts nets to zero here (money just
+      // moved within the tracked total) — but a transfer crossing into/out
+      // of a credit card only has one leg in cashAccountIds, so only that
+      // leg should move the total. Computing both legs and filtering by
+      // cashAccountIds per-leg gets both cases right in one pass.
+      const effects = this.transactionEffects(t.type, t.accountId, t.toAccountId, t.amount);
+      for (const [accId, delta] of Object.entries(effects)) {
+        if (!cashAccountIds.has(accId)) continue;
+        deltaByDate[t.date] = (deltaByDate[t.date] ?? 0) + delta;
+      }
     }
 
     const points: { date: string; total: number }[] = [{ date: today, total: currentTotal }];
@@ -968,10 +975,17 @@ export class FinanceService {
     const monthDeltaByAccount: Record<string, number> = {};
     for (const doc of allTxSnap.docs) {
       const t = doc.data() as any;
-      if (!knownAccountIds.has(t.accountId)) continue;
       if (t.date < startOfMonth || t.date > today) continue;
-      const delta = t.type === 'income' ? t.amount : t.type === 'expense' ? -t.amount : 0;
-      monthDeltaByAccount[t.accountId] = (monthDeltaByAccount[t.accountId] ?? 0) + delta;
+      // A transfer affects two accounts (e.g. cash -> credit card payment):
+      // walking back only t.accountId's leg would silently drop the other
+      // side's effect, which used to skew startLiquid/startCreditOwed apart
+      // whenever a transfer crossed the cash/credit boundary (they only
+      // cancel out when summed if both legs land in the same bucket).
+      const effects = this.transactionEffects(t.type, t.accountId, t.toAccountId, t.amount);
+      for (const [accId, delta] of Object.entries(effects)) {
+        if (!knownAccountIds.has(accId)) continue;
+        monthDeltaByAccount[accId] = (monthDeltaByAccount[accId] ?? 0) + delta;
+      }
     }
     for (const a of accounts) {
       const startBalance = (a.balance ?? 0) - (monthDeltaByAccount[a.id] ?? 0);
