@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { notifications } from '@mantine/notifications';
+import { modals } from '@mantine/modals';
 import { Save, Lock, Shield, Camera } from 'lucide-react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import {
@@ -125,13 +126,6 @@ export default function ProfilePage() {
     e.preventDefault();
     try {
       await updateMutation.mutateAsync(formData);
-      if (formData.preferences?.currency) {
-        try {
-          localStorage.setItem('finance_display_currency', formData.preferences.currency);
-        } catch {
-          // ignore write failures (private browsing, storage disabled)
-        }
-      }
     } catch (error) {
       console.error('Error updating profile:', error);
     }
@@ -454,15 +448,36 @@ export default function ProfilePage() {
                   label={t('currency')}
                   description={tp('currencyDesc')}
                   value={formData.preferences?.currency ?? 'USD'}
-                  onChange={(value) =>
-                    setFormData({
-                      ...formData,
-                      preferences: {
-                        ...formData.preferences,
-                        currency: value || 'USD',
+                  onChange={(value) => {
+                    if (!value) return;
+                    const current = formData.preferences?.currency ?? 'USD';
+                    if (value === current) return;
+                    modals.openConfirmModal({
+                      title: tp('currencyChangeTitle'),
+                      children: <Text size="sm" c="dimmed">{tp('currencyChangeBody')}</Text>,
+                      labels: { confirm: tp('currencyChangeConfirm'), cancel: tp('cancel') },
+                      onConfirm: () => {
+                        const nextPreferences = { ...formData.preferences, currency: value };
+                        setFormData({ ...formData, preferences: nextPreferences });
+                        updateMutation.mutate(
+                          { preferences: nextPreferences },
+                          {
+                            onSuccess: () => {
+                              notifications.show({ title: tp('saved'), message: tp('currencyChanged'), color: 'green' });
+                            },
+                            onError: (error) => {
+                              const code = getApiErrorCode(error);
+                              const message =
+                                code === 'AUTH_UNAUTHORIZED' || code === 'VALIDATION_FAILED'
+                                  ? tErrors(code)
+                                  : tErrors('generic');
+                              notifications.show({ title: tp('error'), message, color: 'red' });
+                            },
+                          }
+                        );
                       },
-                    })
-                  }
+                    });
+                  }}
                   radius={8}
                   styles={INPUT_STYLES}
                   data={[

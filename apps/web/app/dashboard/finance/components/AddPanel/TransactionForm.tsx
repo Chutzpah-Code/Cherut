@@ -7,6 +7,7 @@ import { useFinanceAccounts, useFinanceCategories, useCreateTransaction, useUpda
 import { useCreateBill } from '@/hooks/useBills';
 import { CreateTransactionDto, FinanceAccount } from '@/lib/api/services/finance';
 import { TransactionFormFields, EMPTY_TRANSACTION_FORM } from '../TransactionFormFields';
+import { useFinanceCurrency } from '../../currency-context';
 import type { AddSubformHandle, AddSubformProps } from './types';
 
 export const TransactionForm = forwardRef<AddSubformHandle, AddSubformProps>(function TransactionForm(
@@ -19,6 +20,7 @@ export const TransactionForm = forwardRef<AddSubformHandle, AddSubformProps>(fun
   const createTx = useCreateTransaction();
   const updateTx = useUpdateTransaction();
   const createBill = useCreateBill();
+  const { displayCurrency: currency } = useFinanceCurrency();
 
   const initial: Partial<CreateTransactionDto> = mode === 'edit' && entity
     ? {
@@ -28,16 +30,9 @@ export const TransactionForm = forwardRef<AddSubformHandle, AddSubformProps>(fun
     : { ...EMPTY_TRANSACTION_FORM, ...prefill };
 
   const [form, setForm] = useState<Partial<CreateTransactionDto>>(initial);
-  const [currency, setCurrency] = useState('USD');
   const [makeRecurring, setMakeRecurring] = useState(false);
   const dirtyRef = useRef(false);
   const mountedRef = useRef(false);
-
-  useEffect(() => {
-    const acc = (accounts as FinanceAccount[]).find((a) => a.id === initial.accountId);
-    if (acc) setCurrency(acc.currency ?? 'USD');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accounts]);
 
   useEffect(() => {
     if (mountedRef.current) dirtyRef.current = true;
@@ -51,8 +46,6 @@ export const TransactionForm = forwardRef<AddSubformHandle, AddSubformProps>(fun
   useEffect(() => { onPendingChange(pending); }, [pending, onPendingChange]);
 
   const handleAccountChange = (accountId: string | null) => {
-    const acc = (accounts as FinanceAccount[]).find((a) => a.id === accountId);
-    setCurrency(acc?.currency ?? 'USD');
     setForm((f) => ({ ...f, accountId: accountId ?? undefined }));
   };
 

@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, Stack, Text } from '@mantine/core';
 import { useNetWorth, useUpcomingBillsAndStatements } from '@/hooks/useFinance';
+import { useProfile } from '@/hooks/useProfile';
 import { BigStatSkeleton } from './skeletons';
 
 function fmt(value: number, locale: string, currency = 'USD') {
@@ -25,10 +26,9 @@ const LABEL: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: '#0F1
 export function NetWorthSummary() {
   const t = useTranslations('dashboard.netWorth');
   const locale = useLocale();
-  const [currency] = useState<string>(() => {
-    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
-  });
-  const { data, isLoading } = useNetWorth(currency);
+  const { data: profile } = useProfile();
+  const currency = profile?.preferences?.currency ?? 'USD';
+  const { data, isLoading } = useNetWorth();
   const { data: upcoming = [] } = useUpcomingBillsAndStatements(7);
   const today = localToday();
 
@@ -61,7 +61,7 @@ export function NetWorthSummary() {
       ) : (
         <>
           <Text style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
-            {fmt(data!.netWorth, locale, data?.displayCurrency ?? currency)}
+            {fmt(data!.netWorth, locale, currency)}
           </Text>
           <Stack gap={14} mt={20}>
             <Stack gap={7}>

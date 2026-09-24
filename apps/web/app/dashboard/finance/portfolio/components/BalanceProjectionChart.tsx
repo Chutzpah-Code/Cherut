@@ -14,7 +14,7 @@ export function BalanceProjectionChart({ horizon }: { horizon: number }) {
   const t = useTranslations('finance.balanceProjection');
   const locale = useLocale();
   const { displayCurrency } = useFinanceCurrency();
-  const { data, isLoading } = useProjection(horizon, displayCurrency);
+  const { data, isLoading } = useProjection(horizon);
 
   if (isLoading) return <ChartSkeleton />;
   if (!data || data.points.length === 0) return null;

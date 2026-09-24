@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, Stack, Text } from '@mantine/core';
 import { useBalanceHistory } from '@/hooks/useFinance';
 import { useFinanceOverview } from '@/hooks/useFinance';
+import { useProfile } from '@/hooks/useProfile';
 import { ChartSkeleton } from './skeletons';
 
 function fmt(value: number, locale: string, currency = 'USD') {
@@ -27,18 +27,16 @@ const MICRO: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacin
 export function BalanceChart() {
   const t = useTranslations('dashboard.balance');
   const locale = useLocale();
-  const [currency] = useState<string>(() => {
-    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
-  });
-  const { data: history, isLoading: historyLoading } = useBalanceHistory(30, currency);
-  const { data: overview, isLoading: overviewLoading } = useFinanceOverview(undefined, currency);
+  const { data: profile } = useProfile();
+  const displayCurrency = profile?.preferences?.currency ?? 'USD';
+  const { data: history, isLoading: historyLoading } = useBalanceHistory(30);
+  const { data: overview, isLoading: overviewLoading } = useFinanceOverview();
 
   const isLoading = historyLoading || overviewLoading;
   const points = history?.points ?? [];
   const hasData = points.length > 0 && points.some((p) => p.total !== 0);
   const maxValue = Math.max(1, ...points.map((p) => Math.max(0, p.total)));
   const current = points[points.length - 1]?.total ?? 0;
-  const displayCurrency = history?.displayCurrency ?? currency;
 
   const net = (overview?.totalIncomeConverted ?? 0) - (overview?.totalExpensesConverted ?? 0);
   const savedPct = overview && overview.totalIncomeConverted > 0 ? (net / overview.totalIncomeConverted) * 100 : null;

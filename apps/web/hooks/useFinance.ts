@@ -9,28 +9,28 @@ import {
   CreateInvestmentEntryDto,
 } from '@/lib/api/services/finance';
 
-export function useFinanceOverview(month?: string, displayCurrency?: string, startDate?: string, endDate?: string) {
+export function useFinanceOverview(month?: string, startDate?: string, endDate?: string) {
   return useQuery({
-    queryKey: ['finance', 'overview', month, displayCurrency, startDate, endDate],
-    queryFn: () => financeApi.getOverview(month, displayCurrency, startDate, endDate),
+    queryKey: ['finance', 'overview', month, startDate, endDate],
+    queryFn: () => financeApi.getOverview(month, startDate, endDate),
     staleTime: 15_000,
   });
 }
 
 // ─── Projection & net worth ──────────────────────────────────────────────────
 
-export function useProjection(horizon: number, displayCurrency?: string) {
+export function useProjection(horizon: number) {
   return useQuery({
-    queryKey: ['finance', 'projection', horizon, displayCurrency],
-    queryFn: () => financeApi.getProjection(horizon, displayCurrency),
+    queryKey: ['finance', 'projection', horizon],
+    queryFn: () => financeApi.getProjection(horizon),
     staleTime: 30_000,
   });
 }
 
-export function useNetWorth(displayCurrency?: string) {
+export function useNetWorth() {
   return useQuery({
-    queryKey: ['finance', 'net-worth', displayCurrency],
-    queryFn: () => financeApi.getNetWorth(displayCurrency),
+    queryKey: ['finance', 'net-worth'],
+    queryFn: () => financeApi.getNetWorth(),
     staleTime: 30_000,
   });
 }
@@ -43,18 +43,18 @@ export function useUpcomingBillsAndStatements(days: number) {
   });
 }
 
-export function useBalanceHistory(days: number, displayCurrency?: string) {
+export function useBalanceHistory(days: number) {
   return useQuery({
-    queryKey: ['finance', 'balance-history', days, displayCurrency],
-    queryFn: () => financeApi.getBalanceHistory(days, displayCurrency),
+    queryKey: ['finance', 'balance-history', days],
+    queryFn: () => financeApi.getBalanceHistory(days),
     staleTime: 30_000,
   });
 }
 
-export function useCashFlow(months: number, displayCurrency?: string) {
+export function useCashFlow(months: number) {
   return useQuery({
-    queryKey: ['finance', 'cash-flow', months, displayCurrency],
-    queryFn: () => financeApi.getCashFlow(months, displayCurrency),
+    queryKey: ['finance', 'cash-flow', months],
+    queryFn: () => financeApi.getCashFlow(months),
     staleTime: 30_000,
   });
 }
@@ -256,10 +256,10 @@ export function useDeleteTransaction() {
 
 // ─── Spending by category ────────────────────────────────────────────────────
 
-export function useSpendingByCategory(month?: string, displayCurrency?: string) {
+export function useSpendingByCategory(month?: string) {
   return useQuery({
-    queryKey: ['finance', 'spending-by-category', month, displayCurrency],
-    queryFn: () => financeApi.getSpendingByCategory(month, displayCurrency),
+    queryKey: ['finance', 'spending-by-category', month],
+    queryFn: () => financeApi.getSpendingByCategory(month),
     staleTime: 30_000,
   });
 }
@@ -350,10 +350,10 @@ export function useDeleteInvestment() {
   });
 }
 
-export function useInvestmentsSummary(displayCurrency?: string) {
+export function useInvestmentsSummary() {
   return useQuery({
-    queryKey: ['finance', 'investments-summary', displayCurrency],
-    queryFn: () => financeApi.getInvestmentsSummary(displayCurrency),
+    queryKey: ['finance', 'investments-summary'],
+    queryFn: () => financeApi.getInvestmentsSummary(),
     staleTime: 30_000,
   });
 }

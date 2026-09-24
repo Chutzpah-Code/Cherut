@@ -39,21 +39,20 @@ export class FinanceController {
   getOverview(
     @Request() req,
     @Query('month') month?: string,
-    @Query('displayCurrency') displayCurrency?: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    return this.financeService.getOverview(req.user.uid, month, displayCurrency ?? 'USD', startDate, endDate);
+    return this.financeService.getOverview(req.user.uid, month, startDate, endDate);
   }
 
   @Get('projection')
-  getProjection(@Request() req, @Query('horizon') horizon?: string, @Query('displayCurrency') displayCurrency?: string) {
-    return this.financeService.getProjection(req.user.uid, Number(horizon) || 90, displayCurrency ?? 'USD');
+  getProjection(@Request() req, @Query('horizon') horizon?: string) {
+    return this.financeService.getProjection(req.user.uid, Number(horizon) || 90);
   }
 
   @Get('net-worth')
-  getNetWorth(@Request() req, @Query('displayCurrency') displayCurrency?: string) {
-    return this.financeService.getNetWorth(req.user.uid, displayCurrency ?? 'USD');
+  getNetWorth(@Request() req) {
+    return this.financeService.getNetWorth(req.user.uid);
   }
 
   @Get('upcoming-bills')
@@ -62,13 +61,13 @@ export class FinanceController {
   }
 
   @Get('balance-history')
-  getBalanceHistory(@Request() req, @Query('days') days?: string, @Query('displayCurrency') displayCurrency?: string) {
-    return this.financeService.getBalanceHistory(req.user.uid, Number(days) || 30, displayCurrency ?? 'USD');
+  getBalanceHistory(@Request() req, @Query('days') days?: string) {
+    return this.financeService.getBalanceHistory(req.user.uid, Number(days) || 30);
   }
 
   @Get('cash-flow')
-  getCashFlow(@Request() req, @Query('months') months?: string, @Query('displayCurrency') displayCurrency?: string) {
-    return this.financeService.getCashFlow(req.user.uid, Number(months) || 6, displayCurrency ?? 'USD');
+  getCashFlow(@Request() req, @Query('months') months?: string) {
+    return this.financeService.getCashFlow(req.user.uid, Number(months) || 6);
   }
 
   // Accounts
@@ -195,12 +194,8 @@ export class FinanceController {
 
   // Budgets
   @Get('spending-by-category')
-  getSpendingByCategory(
-    @Request() req,
-    @Query('month') month?: string,
-    @Query('displayCurrency') displayCurrency?: string,
-  ) {
-    return this.financeService.getSpendingByCategory(req.user.uid, month, displayCurrency ?? 'USD');
+  getSpendingByCategory(@Request() req, @Query('month') month?: string) {
+    return this.financeService.getSpendingByCategory(req.user.uid, month);
   }
 
   @Post('budgets')
@@ -237,8 +232,8 @@ export class FinanceController {
   // Literal-segment routes must be registered before the `investments/:id`
   // param routes below, otherwise Express would match e.g. "summary" as an id.
   @Get('investments/summary')
-  getInvestmentsSummary(@Request() req, @Query('displayCurrency') displayCurrency?: string) {
-    return this.financeService.getInvestmentsSummary(req.user.uid, displayCurrency ?? 'USD');
+  getInvestmentsSummary(@Request() req) {
+    return this.financeService.getInvestmentsSummary(req.user.uid);
   }
 
   @Patch('investments/bulk-valuations')

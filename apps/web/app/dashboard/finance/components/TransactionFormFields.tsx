@@ -52,7 +52,7 @@ export function TransactionFormFields({
       />
       <Select
         label={t('account')}
-        data={accounts.map((a) => ({ value: a.id, label: `${a.name} (${a.currency})` }))}
+        data={accounts.map((a) => ({ value: a.id, label: a.name }))}
         value={form.accountId}
         onChange={onAccountChange}
         placeholder={t('selectAccount')}

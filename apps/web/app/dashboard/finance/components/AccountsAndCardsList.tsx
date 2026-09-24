@@ -14,6 +14,7 @@ import {
 } from '@/hooks/useFinance';
 import { FinanceAccount, FinanceStatement, AccountType } from '@/lib/api/services/finance';
 import { useAddPanel } from '../add-panel-context';
+import { useFinanceCurrency } from '../currency-context';
 import { RowsSkeleton } from './skeletons';
 
 function fmt(value: number, locale: string, currency?: string) {
@@ -92,6 +93,7 @@ function PayStatementModal({
 }) {
   const t = useTranslations('finance.accountsAndCards');
   const locale = useLocale();
+  const { displayCurrency: currency } = useFinanceCurrency();
   const payStatement = usePayStatement();
   const [fromAccountId, setFromAccountId] = useState<string | null>(null);
   const [amount, setAmount] = useState<number | string>(statement.total);
@@ -121,14 +123,14 @@ function PayStatementModal({
         <Stack gap="sm">
           <Box style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
             <Text size="xs" c="dimmed">{t('statementTotal')}</Text>
-            <Text size="xl" fw={700} c="green.7">{fmt(statement.total, locale, cardAccount.currency)}</Text>
+            <Text size="xl" fw={700} c="green.7">{fmt(statement.total, locale, currency)}</Text>
             <Text size="xs" c="dimmed">{t('due', { date: fmtDate(statement.dueDate, locale) })}</Text>
           </Box>
           <Select
             label={t('payFrom')}
             placeholder={t('selectAccount')}
             required
-            data={cashAccounts.map((a) => ({ value: a.id, label: `${a.name} — ${fmt(a.balance, locale, a.currency)}` }))}
+            data={cashAccounts.map((a) => ({ value: a.id, label: `${a.name} — ${fmt(a.balance, locale, currency)}` }))}
             value={fromAccountId}
             onChange={setFromAccountId}
           />
@@ -138,7 +140,7 @@ function PayStatementModal({
             decimalScale={2}
             value={amount}
             onChange={setAmount}
-            leftSection={<Text size="xs" c="dimmed" fw={600}>{cardAccount.currency}</Text>}
+            leftSection={<Text size="xs" c="dimmed" fw={600}>{currency}</Text>}
           />
         </Stack>
       </Box>
@@ -163,6 +165,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
 }) {
   const t = useTranslations('finance.accountsAndCards');
   const locale = useLocale();
+  const { displayCurrency: currency } = useFinanceCurrency();
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [expanded, setExpanded] = useState(false);
   const [payModal, { open: openPay, close: closePay }] = useDisclosure();
@@ -207,7 +210,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
                 <Box style={{ width: `${utilization}%`, height: '100%', background: '#9DB8F2' }} />
               </Box>
               <Text style={{ fontSize: 11.5, color: '#64748B', whiteSpace: 'nowrap' }}>
-                {t('ofLimit', { pct: utilization.toFixed(0), limit: fmt(limit, locale, account.currency) })}
+                {t('ofLimit', { pct: utilization.toFixed(0), limit: fmt(limit, locale, currency) })}
               </Text>
             </Group>
           )}
@@ -218,7 +221,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
           color: (account.balance ?? 0) < 0 ? '#B91C1C' : '#0F172A',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
-          {fmtBalance(account.balance ?? 0, locale, account.currency)}
+          {fmtBalance(account.balance ?? 0, locale, currency)}
         </Text>
         <Box onClick={(e) => e.stopPropagation()}>
           <RowActions onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} archived={account.archived} />
@@ -231,7 +234,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
             <Group justify="space-between" mb="sm">
               <Box>
                 <Text size="xs" c="dimmed">{t('currentStatement')}</Text>
-                <Text size="lg" fw={700}>{fmt(current.total, locale, account.currency)}</Text>
+                <Text size="lg" fw={700}>{fmt(current.total, locale, currency)}</Text>
               </Box>
               <Button size="xs" variant="light" onClick={() => closeStatement.mutate(account.id)} loading={closeStatement.isPending}>
                 {t('closeStatement')}
@@ -250,7 +253,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
                         {stmt.status === 'paid' ? t('statementPaid') : stmt.status === 'closed' ? t('statementClosed') : t('statementOpen')}
                       </Badge>
                     </Group>
-                    <Text size="sm" fw={600}>{fmt(stmt.total, locale, account.currency)}</Text>
+                    <Text size="sm" fw={600}>{fmt(stmt.total, locale, currency)}</Text>
                   </Box>
                   {stmt.status === 'closed' && (
                     <Button size="xs" color="green" variant="light" onClick={() => { setSelectedStatement(stmt); openPay(); }}>
@@ -280,6 +283,7 @@ function CashAccountRow({ account, onEdit, onArchive, onDelete }: {
 }) {
   const t = useTranslations('finance.accountsAndCards');
   const locale = useLocale();
+  const { displayCurrency: currency } = useFinanceCurrency();
   const isMobile = useMediaQuery('(max-width: 767px)');
   return (
     <Box style={{
@@ -289,7 +293,7 @@ function CashAccountRow({ account, onEdit, onArchive, onDelete }: {
       <Box style={{ minWidth: 0 }}>
         <Text style={nameTextStyle}>{account.name}</Text>
         <Text style={subTextStyle}>
-          {t(ACCOUNT_TYPE_KEY[account.type])} · {account.currency}
+          {t(ACCOUNT_TYPE_KEY[account.type])}
         </Text>
       </Box>
       <TypeChip type={account.type} />
@@ -298,7 +302,7 @@ function CashAccountRow({ account, onEdit, onArchive, onDelete }: {
         color: (account.balance ?? 0) < 0 ? '#B91C1C' : '#0F172A',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
-        {fmtBalance(account.balance ?? 0, locale, account.currency)}
+        {fmtBalance(account.balance ?? 0, locale, currency)}
       </Text>
       <RowActions onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} archived={account.archived} />
     </Box>

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Box, Group, Text } from '@mantine/core';
@@ -11,10 +10,7 @@ const LABEL: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: '#0F1
 
 export function CashFlowChart() {
   const t = useTranslations('dashboard.cashFlow');
-  const [currency] = useState<string>(() => {
-    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
-  });
-  const { data, isLoading } = useCashFlow(6, currency);
+  const { data, isLoading } = useCashFlow(6);
   const months = data?.months ?? [];
   const hasData = months.some((m) => m.income > 0 || m.expenses > 0);
   const maxValue = Math.max(1, ...months.map((m) => Math.max(m.income, m.expenses)));

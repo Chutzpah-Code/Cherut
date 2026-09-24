@@ -26,8 +26,8 @@ export function BalanceBand() {
   const t = useTranslations('finance.balanceBand');
   const locale = useLocale();
   const { displayCurrency } = useFinanceCurrency();
-  const { data, isLoading } = useFinanceOverview(undefined, displayCurrency);
-  const { data: netWorthData } = useNetWorth(displayCurrency);
+  const { data, isLoading } = useFinanceOverview();
+  const { data: netWorthData } = useNetWorth();
 
   if (isLoading) return <BigStatSkeleton />;
   if (!data) {

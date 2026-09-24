@@ -15,7 +15,7 @@ export function NetWorthPanel() {
   const t = useTranslations('finance.netWorthPanel');
   const locale = useLocale();
   const { displayCurrency } = useFinanceCurrency();
-  const { data, isLoading } = useNetWorth(displayCurrency);
+  const { data, isLoading } = useNetWorth();
 
   if (isLoading) return <BigStatSkeleton />;
   if (!data) return null;

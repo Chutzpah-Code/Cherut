@@ -3,14 +3,11 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Box, Group, Stack, Title, UnstyledButton, Select, ActionIcon, Tooltip } from '@mantine/core';
+import { Box, Group, Stack, Title, UnstyledButton, ActionIcon, Tooltip } from '@mantine/core';
 import { Plus, Download } from 'lucide-react';
-import { useFinanceCurrency } from '../currency-context';
 import { useAddPanel } from '../add-panel-context';
-import { useFinanceOverview, useExportBackup } from '@/hooks/useFinance';
+import { useExportBackup } from '@/hooks/useFinance';
 import { useFinanceShortcuts } from '../useFinanceShortcuts';
-
-const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'BRL', 'JPY', 'ARS'];
 
 function PageSwitcher({ pathname, fullWidth }: { pathname: string; fullWidth?: boolean }) {
   const t = useTranslations('finance.header');
@@ -52,15 +49,9 @@ function PageSwitcher({ pathname, fullWidth }: { pathname: string; fullWidth?: b
 export function FinanceHeader() {
   const t = useTranslations('finance.header');
   const pathname = usePathname();
-  const { displayCurrency, setDisplayCurrency } = useFinanceCurrency();
-  const { data: overview } = useFinanceOverview(undefined, displayCurrency);
   const { openCreate } = useAddPanel();
   const exportBackup = useExportBackup();
   useFinanceShortcuts();
-
-  const currencyOptions = overview
-    ? Array.from(new Set([...Object.keys(overview.balanceByCurrency), ...CURRENCY_OPTIONS]))
-    : CURRENCY_OPTIONS;
 
   const handleExportBackup = () => {
     exportBackup.mutate(undefined, {
@@ -76,18 +67,6 @@ export function FinanceHeader() {
       },
     });
   };
-
-  const currencySelect = (
-    <Select
-      data={currencyOptions}
-      value={displayCurrency}
-      onChange={(v) => v && setDisplayCurrency(v)}
-      size="xs"
-      w={90}
-      comboboxProps={{ withinPortal: true }}
-      styles={{ input: { fontSize: 13, fontWeight: 600, color: '#334155', border: '1px solid #E2E8F0' } }}
-    />
-  );
 
   const exportButton = (
     <Tooltip label={t('exportBackup')}>
@@ -112,7 +91,6 @@ export function FinanceHeader() {
         </Title>
         <Group gap="xs" wrap="wrap" className="finance-no-print">
           <PageSwitcher pathname={pathname} />
-          {currencySelect}
           {exportButton}
           <UnstyledButton
             onClick={() => openCreate('transaction')}
@@ -133,7 +111,6 @@ export function FinanceHeader() {
             {t('title')}
           </Title>
           <Group gap="xs" className="finance-no-print">
-            {currencySelect}
             {exportButton}
           </Group>
         </Group>

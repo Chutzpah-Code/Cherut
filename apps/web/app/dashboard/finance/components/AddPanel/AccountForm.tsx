@@ -2,19 +2,11 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Stack, Group, TextInput, Select, NumberInput, Text, UnstyledButton } from '@mantine/core';
+import { Stack, Group, TextInput, NumberInput, Text, UnstyledButton } from '@mantine/core';
 import { useCreateAccount, useUpdateAccount } from '@/hooks/useFinance';
 import { CreateAccountDto } from '@/lib/api/services/finance';
+import { useFinanceCurrency } from '../../currency-context';
 import type { AddSubformHandle, AddSubformProps } from './types';
-
-const CURRENCIES = [
-  { value: 'USD', label: 'USD — Dollar' },
-  { value: 'BRL', label: 'BRL — Real' },
-  { value: 'EUR', label: 'EUR — Euro' },
-  { value: 'GBP', label: 'GBP — Pound' },
-  { value: 'JPY', label: 'JPY — Yen' },
-  { value: 'ARS', label: 'ARS — Peso' },
-];
 
 export const AccountForm = forwardRef<AddSubformHandle, AddSubformProps & { forcedType?: 'credit' }>(function AccountForm(
   { mode, entity, onDone, onValidChange, onPendingChange, forcedType },
@@ -29,13 +21,14 @@ export const AccountForm = forwardRef<AddSubformHandle, AddSubformProps & { forc
   ];
   const createAccount = useCreateAccount();
   const updateAccount = useUpdateAccount();
+  const { displayCurrency: currency } = useFinanceCurrency();
 
   const initial: Partial<CreateAccountDto> = mode === 'edit' && entity
     ? {
-        name: entity.name, type: entity.type, currency: entity.currency, balance: entity.balance,
+        name: entity.name, type: entity.type, balance: entity.balance,
         creditLimit: entity.creditLimit, statementClosingDay: entity.statementClosingDay, statementDueDay: entity.statementDueDay,
       }
-    : { type: forcedType ?? 'checking', currency: 'USD', balance: 0 };
+    : { type: forcedType ?? 'checking', balance: 0 };
 
   const [form, setForm] = useState<Partial<CreateAccountDto>>(initial);
   const dirtyRef = useRef(false);
@@ -93,9 +86,8 @@ export const AccountForm = forwardRef<AddSubformHandle, AddSubformProps & { forc
           </Group>
         </Stack>
       )}
-      <Select label={t('currency')} data={CURRENCIES} value={form.currency} onChange={(v) => setForm((f) => ({ ...f, currency: v ?? 'USD' }))} />
       <NumberInput
-        label={mode === 'edit' ? t('balance', { currency: form.currency ?? 'USD' }) : t('initialBalance', { currency: form.currency ?? 'USD' })}
+        label={mode === 'edit' ? t('balance', { currency }) : t('initialBalance', { currency })}
         value={form.balance}
         onChange={(v) => setForm((f) => ({ ...f, balance: typeof v === 'number' ? v : 0 }))}
         decimalScale={2}
@@ -106,7 +98,7 @@ export const AccountForm = forwardRef<AddSubformHandle, AddSubformProps & { forc
             {forcedType ? t('creditNoteForced') : t('creditNoteGeneral')}
           </Text>
           <NumberInput
-            label={t('creditLimit', { currency: form.currency ?? 'USD' })}
+            label={t('creditLimit', { currency })}
             min={0}
             decimalScale={2}
             value={form.creditLimit ?? ''}

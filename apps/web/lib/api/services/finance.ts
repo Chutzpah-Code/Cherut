@@ -86,7 +86,6 @@ export interface FinanceNetWorth {
   creditCardOwed: number;
   netWorth: number;
   monthChangePct: number | null;
-  displayCurrency: string;
 }
 
 export interface BalanceHistoryPoint {
@@ -97,7 +96,6 @@ export interface BalanceHistoryPoint {
 export interface FinanceBalanceHistory {
   points: BalanceHistoryPoint[];
   deltaPct: number | null;
-  displayCurrency: string;
 }
 
 export interface CashFlowMonth {
@@ -109,7 +107,6 @@ export interface CashFlowMonth {
 export interface FinanceCashFlow {
   months: CashFlowMonth[];
   positiveMonths: number;
-  displayCurrency: string;
 }
 
 // A merged Upcoming-bills row — either a real bill occurrence or a
@@ -154,7 +151,6 @@ export interface SpendingByCategoryRow {
 
 export interface SpendingByCategoryResponse {
   month: string;
-  displayCurrency: string;
   categories: SpendingByCategoryRow[];
   uncategorized: { spent: number };
   spentTotal: number;
@@ -231,7 +227,6 @@ export interface FinanceInvestmentEntry {
 }
 
 export interface FinanceOverview {
-  displayCurrency: string;
   totalBalanceConverted: number;
   totalIncomeConverted: number;
   totalExpensesConverted: number;
@@ -271,10 +266,9 @@ export type UpdateInvestmentDto = Partial<CreateInvestmentDto>;
 export type CreateInvestmentEntryDto = Pick<FinanceInvestmentEntry, 'investmentId' | 'amount' | 'date'> & { notes?: string };
 
 export const financeApi = {
-  getOverview: async (month?: string, displayCurrency?: string, startDate?: string, endDate?: string): Promise<FinanceOverview> => {
+  getOverview: async (month?: string, startDate?: string, endDate?: string): Promise<FinanceOverview> => {
     const params: any = {};
     if (month) params.month = month;
-    if (displayCurrency) params.displayCurrency = displayCurrency;
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
     const { data } = await apiClient.get('/finance/overview', { params });
@@ -282,32 +276,24 @@ export const financeApi = {
   },
 
   // Projection & net worth
-  getProjection: async (horizon: number, displayCurrency?: string): Promise<FinanceProjection> => {
-    const params: any = { horizon };
-    if (displayCurrency) params.displayCurrency = displayCurrency;
-    const { data } = await apiClient.get('/finance/projection', { params });
+  getProjection: async (horizon: number): Promise<FinanceProjection> => {
+    const { data } = await apiClient.get('/finance/projection', { params: { horizon } });
     return data;
   },
-  getNetWorth: async (displayCurrency?: string): Promise<FinanceNetWorth> => {
-    const params: any = {};
-    if (displayCurrency) params.displayCurrency = displayCurrency;
-    const { data } = await apiClient.get('/finance/net-worth', { params });
+  getNetWorth: async (): Promise<FinanceNetWorth> => {
+    const { data } = await apiClient.get('/finance/net-worth');
     return data;
   },
   getUpcomingBillsAndStatements: async (days: number): Promise<UpcomingBillItem[]> => {
     const { data } = await apiClient.get('/finance/upcoming-bills', { params: { days } });
     return data;
   },
-  getBalanceHistory: async (days: number, displayCurrency?: string): Promise<FinanceBalanceHistory> => {
-    const params: any = { days };
-    if (displayCurrency) params.displayCurrency = displayCurrency;
-    const { data } = await apiClient.get('/finance/balance-history', { params });
+  getBalanceHistory: async (days: number): Promise<FinanceBalanceHistory> => {
+    const { data } = await apiClient.get('/finance/balance-history', { params: { days } });
     return data;
   },
-  getCashFlow: async (months: number, displayCurrency?: string): Promise<FinanceCashFlow> => {
-    const params: any = { months };
-    if (displayCurrency) params.displayCurrency = displayCurrency;
-    const { data } = await apiClient.get('/finance/cash-flow', { params });
+  getCashFlow: async (months: number): Promise<FinanceCashFlow> => {
+    const { data } = await apiClient.get('/finance/cash-flow', { params: { months } });
     return data;
   },
 
@@ -391,11 +377,8 @@ export const financeApi = {
   },
 
   // Spending by category
-  getSpendingByCategory: async (month?: string, displayCurrency?: string): Promise<SpendingByCategoryResponse> => {
-    const params: any = {};
-    if (month) params.month = month;
-    if (displayCurrency) params.displayCurrency = displayCurrency;
-    const { data } = await apiClient.get('/finance/spending-by-category', { params });
+  getSpendingByCategory: async (month?: string): Promise<SpendingByCategoryResponse> => {
+    const { data } = await apiClient.get('/finance/spending-by-category', { params: month ? { month } : {} });
     return data;
   },
 
@@ -443,8 +426,8 @@ export const financeApi = {
   deleteInvestmentEntry: async (id: string): Promise<void> => {
     await apiClient.delete(`/finance/investments/entries/${id}`);
   },
-  getInvestmentsSummary: async (displayCurrency?: string): Promise<InvestmentsSummaryResponse> => {
-    const { data } = await apiClient.get('/finance/investments/summary', { params: displayCurrency ? { displayCurrency } : {} });
+  getInvestmentsSummary: async (): Promise<InvestmentsSummaryResponse> => {
+    const { data } = await apiClient.get('/finance/investments/summary');
     return data;
   },
   bulkUpdateValuations: async (updates: { id: string; currentValue: number; valuedDate: string }[]): Promise<{ updated: number }> => {

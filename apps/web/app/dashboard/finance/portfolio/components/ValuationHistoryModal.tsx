@@ -4,6 +4,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Modal, Stack, Group, Text, Center, Loader, Badge } from '@mantine/core';
 import { useInvestmentValuations } from '@/hooks/useFinance';
 import { FinanceInvestment } from '@/lib/api/services/finance';
+import { useFinanceCurrency } from '../../currency-context';
 import { fmtCurrency } from './billUtils';
 
 export function ValuationHistoryModal({
@@ -14,6 +15,7 @@ export function ValuationHistoryModal({
 }) {
   const t = useTranslations('finance.valuationHistory');
   const locale = useLocale();
+  const { displayCurrency: currency } = useFinanceCurrency();
   const { data: valuations = [], isLoading } = useInvestmentValuations(investment?.id ?? '');
 
   return (
@@ -30,7 +32,7 @@ export function ValuationHistoryModal({
                 <Text size="sm">{v.valuedOn}</Text>
                 <Badge size="xs" variant="light" color={v.source === 'manual' ? 'blue' : 'gray'}>{v.source}</Badge>
               </Group>
-              <Text size="sm" fw={600}>{fmtCurrency(v.value, locale, investment?.currency)}</Text>
+              <Text size="sm" fw={600}>{fmtCurrency(v.value, locale, currency)}</Text>
             </Group>
           ))}
         </Stack>

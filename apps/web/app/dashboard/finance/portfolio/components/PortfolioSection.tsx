@@ -31,6 +31,7 @@ function detailText(
   inv: FinanceInvestment,
   locale: string,
   t: (key: string, values?: Record<string, string | number>) => string,
+  currency: string,
 ): string {
   switch (inv.assetClass) {
     case 'realEstate':
@@ -46,7 +47,7 @@ function detailText(
     case 'business':
       return [inv.interestReturn, inv.endsOn ? t('detailDue', { date: inv.endsOn }) : null].filter(Boolean).join(' · ') || '—';
     case 'digital':
-      return inv.monthlyRevenue ? t('detailMonthlyRevenue', { amount: fmtCurrency(inv.monthlyRevenue, locale, inv.currency) }) : '—';
+      return inv.monthlyRevenue ? t('detailMonthlyRevenue', { amount: fmtCurrency(inv.monthlyRevenue, locale, currency) }) : '—';
     default:
       return inv.acquiredDate ? t('detailAcquired', { date: inv.acquiredDate }) : '—';
   }
@@ -69,7 +70,7 @@ export function PortfolioSection() {
 
   const { displayCurrency } = useFinanceCurrency();
   const { data: investments = [], isLoading } = useFinanceInvestments();
-  const { data: summary } = useInvestmentsSummary(displayCurrency);
+  const { data: summary } = useInvestmentsSummary();
   const { data: accounts = [] } = useFinanceAccounts();
   const deleteInvestment = useDeleteInvestment();
   const undoableDeleteInvestment = useUndoableDelete((id: string) => deleteInvestment.mutate(id), { label: tc('asset') });
@@ -207,9 +208,9 @@ export function PortfolioSection() {
                           {getAssetTypeLabel(inv.assetType, locale)}{inv.linkedAccountId && accountMap[inv.linkedAccountId] ? ` · ${accountMap[inv.linkedAccountId].name}` : ''}
                         </Text>
                       </Box>
-                      <Text style={{ fontSize: 12.5, color: '#64748B' }}>{detailText(inv, locale, t)}</Text>
+                      <Text style={{ fontSize: 12.5, color: '#64748B' }}>{detailText(inv, locale, t, displayCurrency)}</Text>
                       <Text style={{ fontSize: 14, fontWeight: 600, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
-                        {fmtCurrency(inv.currentValue, locale, inv.currency)}
+                        {fmtCurrency(inv.currentValue, locale, displayCurrency)}
                       </Text>
                       <Text style={{
                         fontSize: 12.5, fontWeight: 700, textAlign: 'right', fontVariantNumeric: 'tabular-nums',

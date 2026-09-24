@@ -33,7 +33,7 @@ export function SpendingByCategory() {
   const locale = useLocale();
   const { displayCurrency } = useFinanceCurrency();
   const month = currentMonth();
-  const { data, isLoading } = useSpendingByCategory(month, displayCurrency);
+  const { data, isLoading } = useSpendingByCategory(month);
   const { data: rawBudgets = [] } = useFinanceBudgets(month);
   const { openCreate, openEdit } = useAddPanel();
   const [manageCategoriesOpened, setManageCategoriesOpened] = useState(false);

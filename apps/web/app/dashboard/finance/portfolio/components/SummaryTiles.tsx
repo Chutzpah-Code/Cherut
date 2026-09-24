@@ -40,7 +40,7 @@ export function SummaryTiles() {
   const { displayCurrency } = useFinanceCurrency();
   const { data: items = [] } = useUpcomingBillsAndStatements(90);
   const { data: bills = [] } = useBills();
-  const { data: netWorth } = useNetWorth(displayCurrency);
+  const { data: netWorth } = useNetWorth();
 
   const today = localToday();
   const in7 = addDays(today, 7);

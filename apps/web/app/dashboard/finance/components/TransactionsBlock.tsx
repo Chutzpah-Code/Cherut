@@ -16,6 +16,7 @@ import {
 import { CreateTransactionDto, FinanceAccount, FinanceTransaction } from '@/lib/api/services/finance';
 import { TransactionRow } from './TransactionRow';
 import { useAddPanel } from '../add-panel-context';
+import { useFinanceCurrency } from '../currency-context';
 import { RowsSkeleton } from './skeletons';
 import { useUndoableDelete } from '../useUndoableDelete';
 
@@ -98,7 +99,7 @@ function ChangeAccountModal({
       <Stack gap="sm">
         <Select
           label={t('account')}
-          data={accounts.map((a) => ({ value: a.id, label: `${a.name} (${a.currency})` }))}
+          data={accounts.map((a) => ({ value: a.id, label: a.name }))}
           value={accountId}
           onChange={setAccountId}
         />
@@ -114,6 +115,7 @@ export function TransactionsBlock() {
   const t = useTranslations('finance.transactionsBlock');
   const tc = useTranslations('finance.common');
   const locale = useLocale();
+  const { displayCurrency: currency } = useFinanceCurrency();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -441,7 +443,7 @@ export function TransactionsBlock() {
                     <Box style={{ flex: 1, minWidth: 0 }}>
                       <TransactionRow
                         tx={tx}
-                        currency={accountMap[tx.accountId]?.currency}
+                        currency={currency}
                         categoryName={tx.categoryId ? categoryMap[tx.categoryId]?.name : undefined}
                         accountName={accountMap[tx.accountId]?.name}
                         onEdit={() => openEdit(tx)}

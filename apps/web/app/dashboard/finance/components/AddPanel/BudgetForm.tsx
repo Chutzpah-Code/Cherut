@@ -5,9 +5,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Stack, Select, NumberInput, Switch, Text } from '@mantine/core';
 import { useFinanceCategories, useCreateBudget, useUpdateBudget } from '@/hooks/useFinance';
 import { CreateBudgetDto } from '@/lib/api/services/finance';
+import { useFinanceCurrency } from '../../currency-context';
 import type { AddSubformHandle, AddSubformProps } from './types';
-
-const CURRENCIES = ['USD', 'BRL', 'EUR', 'GBP', 'JPY', 'ARS'];
 
 function currentMonth() {
   const d = new Date();
@@ -35,10 +34,11 @@ export const BudgetForm = forwardRef<AddSubformHandle, AddSubformProps>(function
   const { data: categories = [] } = useFinanceCategories('expense');
   const createBudget = useCreateBudget();
   const updateBudget = useUpdateBudget();
+  const { displayCurrency: currency } = useFinanceCurrency();
 
   const initial: Partial<CreateBudgetDto> & { repeatMonthly?: boolean } = mode === 'edit' && entity
-    ? { categoryId: entity.categoryId, amount: entity.amount, month: entity.month, currency: entity.currency ?? 'USD' }
-    : { categoryId: prefill?.categoryId, month: currentMonth(), currency: 'USD' };
+    ? { categoryId: entity.categoryId, amount: entity.amount, month: entity.month }
+    : { categoryId: prefill?.categoryId, month: currentMonth() };
 
   const [form, setForm] = useState(initial);
   const [repeatMonthly, setRepeatMonthly] = useState(true);
@@ -78,13 +78,12 @@ export const BudgetForm = forwardRef<AddSubformHandle, AddSubformProps>(function
         onChange={(v) => setForm((f) => ({ ...f, categoryId: v ?? undefined }))}
       />
       <NumberInput
-        label={t('monthlyAmount', { currency: form.currency ?? 'USD' })}
+        label={t('monthlyAmount', { currency })}
         min={0.01}
         decimalScale={2}
         value={form.amount ?? ''}
         onChange={(v) => setForm((f) => ({ ...f, amount: typeof v === 'number' ? v : undefined }))}
       />
-      <Select label={t('currency')} data={CURRENCIES} value={form.currency} onChange={(v) => setForm((f) => ({ ...f, currency: v ?? 'USD' }))} />
       <Select
         label={t('startingMonth')}
         data={monthOpts}

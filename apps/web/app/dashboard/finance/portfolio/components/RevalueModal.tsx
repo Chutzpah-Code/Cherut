@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Modal, Stack, Group, Text, NumberInput, TextInput, Button } from '@mantine/core';
 import { useUpdateInvestment } from '@/hooks/useFinance';
 import { FinanceInvestment } from '@/lib/api/services/finance';
+import { useFinanceCurrency } from '../../currency-context';
 
 // Quick single-asset revalue — a lighter alternative to the full Edit form
 // when all that changed is the current value.
@@ -17,6 +18,7 @@ export function RevalueModal({
   const t = useTranslations('finance.revalue');
   const tc = useTranslations('finance.common');
   const updateInvestment = useUpdateInvestment();
+  const { displayCurrency: currency } = useFinanceCurrency();
   const [currentValue, setCurrentValue] = useState<number | string>(0);
   const [valuedDate, setValuedDate] = useState(new Date().toISOString().slice(0, 10));
 
@@ -38,7 +40,7 @@ export function RevalueModal({
     <Modal opened={!!investment} onClose={onClose} title={t('title', { name: investment?.name ?? '' })} centered size="sm">
       <Stack gap="sm">
         <NumberInput
-          label={t('currentValue', { currency: investment?.currency ?? 'USD' })}
+          label={t('currentValue', { currency })}
           min={0}
           decimalScale={2}
           value={currentValue}

@@ -22,33 +22,6 @@ import {
 export class FinanceService {
   private readonly logger = new Logger(FinanceService.name);
   private readonly ACCOUNTS = 'finance_accounts';
-
-  // Exchange rate cache: base=USD, refreshed every 24h
-  private rateCache: { rates: Record<string, number>; expiresAt: number } | null = null;
-
-  private async getExchangeRates(): Promise<Record<string, number>> {
-    if (this.rateCache && Date.now() < this.rateCache.expiresAt) {
-      return this.rateCache.rates;
-    }
-    try {
-      const res = await fetch('https://api.frankfurter.app/latest?base=USD');
-      const data: any = await res.json();
-      const rates: Record<string, number> = { USD: 1, ...data.rates };
-      this.rateCache = { rates, expiresAt: Date.now() + 24 * 60 * 60 * 1000 };
-      return rates;
-    } catch (e) {
-      this.logger.warn(`Exchange rate fetch failed: ${e}`);
-      return this.rateCache?.rates ?? { USD: 1 };
-    }
-  }
-
-  private toDisplay(amount: number, from: string, to: string, rates: Record<string, number>): number {
-    if (from === to) return amount;
-    const fromRate = rates[from] ?? 1;
-    const toRate = rates[to] ?? 1;
-    // amount (in `from`) → USD → `to`
-    return (amount / fromRate) * toRate;
-  }
   private readonly CATEGORIES = 'finance_categories';
   private readonly TRANSACTIONS = 'finance_transactions';
   private readonly BUDGETS = 'finance_budgets';
@@ -341,22 +314,17 @@ export class FinanceService {
     return budgets.map((b) => ({ ...b, spent: spent[b.categoryId] ?? 0 }));
   }
 
-  async getSpendingByCategory(userId: string, month?: string, displayCurrency = 'USD') {
+  async getSpendingByCategory(userId: string, month?: string) {
     const targetMonth = month ?? new Date().toISOString().slice(0, 7);
     const startDate = `${targetMonth}-01`;
     const [y, m] = targetMonth.split('-').map(Number);
     const endStr = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
 
-    const [accountsSnap, categoriesSnap, budgetsSnap, txSnap, rates] = await Promise.all([
-      this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
+    const [categoriesSnap, budgetsSnap, txSnap] = await Promise.all([
       this.db.collection(this.CATEGORIES).where('userId', '==', userId).where('type', '==', 'expense').get(),
       this.db.collection(this.BUDGETS).where('userId', '==', userId).where('month', '==', targetMonth).get(),
       this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
-      this.getExchangeRates(),
     ]);
-
-    const accountCurrency: Record<string, string> = {};
-    for (const d of accountsSnap.docs) accountCurrency[d.id] = (d.data() as any).currency ?? 'USD';
 
     const categories = categoriesSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
     const budgetByCategory: Record<string, any> = {};
@@ -370,24 +338,21 @@ export class FinanceService {
     for (const d of txSnap.docs) {
       const t = d.data() as any;
       if (t.type !== 'expense' || t.date < startDate || t.date > endStr) continue;
-      const cur = accountCurrency[t.accountId] ?? 'USD';
-      const converted = this.toDisplay(t.amount, cur, displayCurrency, rates);
       if (!t.categoryId) {
-        uncategorizedSpent += converted;
+        uncategorizedSpent += t.amount;
       } else {
-        spentByCategory[t.categoryId] = (spentByCategory[t.categoryId] ?? 0) + converted;
+        spentByCategory[t.categoryId] = (spentByCategory[t.categoryId] ?? 0) + t.amount;
       }
     }
 
     const categoryRows = categories.map((c) => {
       const budget = budgetByCategory[c.id];
-      const budgetCurrency = budget?.currency ?? 'USD';
       return {
         categoryId: c.id,
         name: c.name,
         spent: spentByCategory[c.id] ?? 0,
         budgetId: budget?.id,
-        budgetAmount: budget ? this.toDisplay(budget.amount, budgetCurrency, displayCurrency, rates) : undefined,
+        budgetAmount: budget ? budget.amount : undefined,
       };
     });
 
@@ -396,7 +361,6 @@ export class FinanceService {
 
     return {
       month: targetMonth,
-      displayCurrency,
       categories: categoryRows,
       uncategorized: { spent: uncategorizedSpent },
       spentTotal,
@@ -511,19 +475,16 @@ export class FinanceService {
     return { updated };
   }
 
-  async getInvestmentsSummary(userId: string, displayCurrency = 'USD') {
-    const [snap, rates] = await Promise.all([
-      this.db.collection(this.INVESTMENTS).where('userId', '==', userId).get(),
-      this.getExchangeRates(),
-    ]);
+  async getInvestmentsSummary(userId: string) {
+    const snap = await this.db.collection(this.INVESTMENTS).where('userId', '==', userId).get();
     const investments = (snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[]).map((inv) => this.withDerivedValue(inv));
 
     const classTotals: Record<string, number> = {};
     let totalValue = 0;
     for (const inv of investments) {
-      const converted = this.toDisplay(inv.currentValue ?? 0, inv.currency ?? 'USD', displayCurrency, rates);
-      classTotals[inv.assetClass] = (classTotals[inv.assetClass] ?? 0) + converted;
-      totalValue += converted;
+      const value = inv.currentValue ?? 0;
+      classTotals[inv.assetClass] = (classTotals[inv.assetClass] ?? 0) + value;
+      totalValue += value;
     }
 
     const classes = Object.entries(classTotals)
@@ -612,7 +573,7 @@ export class FinanceService {
 
   // ─── Overview ───────────────────────────────────────────────────────────────
 
-  async getOverview(userId: string, month?: string, displayCurrency = 'USD', startDate?: string, endDate?: string) {
+  async getOverview(userId: string, month?: string, startDate?: string, endDate?: string) {
     const now = new Date();
     let start: string;
     let end: string;
@@ -630,11 +591,10 @@ export class FinanceService {
       end = endObj.toISOString().slice(0, 10);
     }
 
-    const [accountsSnap, allTxSnap, categoriesSnap, rates] = await Promise.all([
+    const [accountsSnap, allTxSnap, categoriesSnap] = await Promise.all([
       this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
       this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
       this.db.collection(this.CATEGORIES).where('userId', '==', userId).get(),
-      this.getExchangeRates(),
     ]);
 
     const accounts = accountsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
@@ -678,13 +638,9 @@ export class FinanceService {
       else if (t.type === 'expense') expensesByCurrency[cur] = (expensesByCurrency[cur] ?? 0) + t.amount;
     }
 
-    // Converted totals in displayCurrency
-    const totalBalanceConverted = Object.entries(balanceByCurrency)
-      .reduce((s, [cur, val]) => s + this.toDisplay(val, cur, displayCurrency, rates), 0);
-    const totalIncomeConverted = Object.entries(incomeByCurrency)
-      .reduce((s, [cur, val]) => s + this.toDisplay(val, cur, displayCurrency, rates), 0);
-    const totalExpensesConverted = Object.entries(expensesByCurrency)
-      .reduce((s, [cur, val]) => s + this.toDisplay(val, cur, displayCurrency, rates), 0);
+    const totalBalanceConverted = Object.values(balanceByCurrency).reduce((s, val) => s + val, 0);
+    const totalIncomeConverted = Object.values(incomeByCurrency).reduce((s, val) => s + val, 0);
+    const totalExpensesConverted = Object.values(expensesByCurrency).reduce((s, val) => s + val, 0);
 
     const recentTransactions = transactions
       .sort((a, b) => (a.date < b.date ? 1 : -1))
@@ -697,7 +653,6 @@ export class FinanceService {
       }));
 
     return {
-      displayCurrency,
       totalBalanceConverted,
       totalIncomeConverted,
       totalExpensesConverted,
@@ -745,20 +700,15 @@ export class FinanceService {
     return d.toISOString().slice(0, 10);
   }
 
-  async getProjection(userId: string, horizonDays: number, displayCurrency = 'USD') {
-    const [accountsSnap, rates] = await Promise.all([
-      this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
-      this.getExchangeRates(),
-    ]);
+  async getProjection(userId: string, horizonDays: number) {
+    const accountsSnap = await this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get();
     const cashAccounts = accountsSnap.docs
       .map((d) => ({ id: d.id, ...d.data() } as any))
       .filter((a) => a.type !== 'credit' && !a.archived);
     const cashAccountIds = new Set(cashAccounts.map((a) => a.id));
-    const cashAccountCurrency: Record<string, string> = {};
-    for (const a of cashAccounts) cashAccountCurrency[a.id] = a.currency ?? 'USD';
 
     let currentTotal = 0;
-    for (const a of cashAccounts) currentTotal += this.toDisplay(a.balance ?? 0, a.currency ?? 'USD', displayCurrency, rates);
+    for (const a of cashAccounts) currentTotal += a.balance ?? 0;
 
     const today = new Date().toISOString().slice(0, 10);
     const occurrences = await this.billsService.getUpcomingOccurrences(userId, horizonDays);
@@ -767,9 +717,7 @@ export class FinanceService {
     for (const occ of occurrences as any[]) {
       const bill = occ.bill;
       if (!bill || !cashAccountIds.has(bill.accountId)) continue;
-      const cur = cashAccountCurrency[bill.accountId] ?? 'USD';
-      const converted = this.toDisplay(occ.amount, cur, displayCurrency, rates);
-      const delta = bill.type === 'income' ? converted : -converted;
+      const delta = bill.type === 'income' ? occ.amount : -occ.amount;
       deltaByDate[occ.dueDate] = (deltaByDate[occ.dueDate] ?? 0) + delta;
     }
 
@@ -792,21 +740,18 @@ export class FinanceService {
   // canonical account.balance — the exact inverse of getProjection's forward
   // walk. Used by the 2A read-only dashboard's Balance chart.
 
-  async getBalanceHistory(userId: string, days: number, displayCurrency = 'USD') {
-    const [accountsSnap, allTxSnap, rates] = await Promise.all([
+  async getBalanceHistory(userId: string, days: number) {
+    const [accountsSnap, allTxSnap] = await Promise.all([
       this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
       this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
-      this.getExchangeRates(),
     ]);
     const cashAccounts = accountsSnap.docs
       .map((d) => ({ id: d.id, ...d.data() } as any))
       .filter((a) => a.type !== 'credit' && !a.archived);
     const cashAccountIds = new Set(cashAccounts.map((a) => a.id));
-    const cashAccountCurrency: Record<string, string> = {};
-    for (const a of cashAccounts) cashAccountCurrency[a.id] = a.currency ?? 'USD';
 
     let currentTotal = 0;
-    for (const a of cashAccounts) currentTotal += this.toDisplay(a.balance ?? 0, a.currency ?? 'USD', displayCurrency, rates);
+    for (const a of cashAccounts) currentTotal += a.balance ?? 0;
 
     const today = new Date().toISOString().slice(0, 10);
     const startDate = this.addDaysStr(today, -days);
@@ -816,9 +761,7 @@ export class FinanceService {
       const t = doc.data() as any;
       if (!cashAccountIds.has(t.accountId)) continue;
       if (t.date <= startDate || t.date > today) continue;
-      const cur = cashAccountCurrency[t.accountId] ?? 'USD';
-      const converted = this.toDisplay(t.amount, cur, displayCurrency, rates);
-      const delta = t.type === 'income' ? converted : t.type === 'expense' ? -converted : 0;
+      const delta = t.type === 'income' ? t.amount : t.type === 'expense' ? -t.amount : 0;
       deltaByDate[t.date] = (deltaByDate[t.date] ?? 0) + delta;
     }
 
@@ -833,24 +776,21 @@ export class FinanceService {
     const startTotal = points[0]?.total ?? currentTotal;
     const deltaPct = startTotal !== 0 ? ((currentTotal - startTotal) / Math.abs(startTotal)) * 100 : null;
 
-    return { points, deltaPct, displayCurrency };
+    return { points, deltaPct };
   }
 
   // ─── Cash flow (dashboard) ──────────────────────────────────────────────────
   // Income vs expenses per calendar month, cash accounts only, last N months.
 
-  async getCashFlow(userId: string, months: number, displayCurrency = 'USD') {
-    const [accountsSnap, allTxSnap, rates] = await Promise.all([
+  async getCashFlow(userId: string, months: number) {
+    const [accountsSnap, allTxSnap] = await Promise.all([
       this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
       this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
-      this.getExchangeRates(),
     ]);
     const cashAccounts = accountsSnap.docs
       .map((d) => ({ id: d.id, ...d.data() } as any))
       .filter((a) => a.type !== 'credit' && !a.archived);
     const cashAccountIds = new Set(cashAccounts.map((a) => a.id));
-    const cashAccountCurrency: Record<string, string> = {};
-    for (const a of cashAccounts) cashAccountCurrency[a.id] = a.currency ?? 'USD';
 
     const now = new Date();
     const monthKeys: string[] = [];
@@ -868,10 +808,8 @@ export class FinanceService {
       if (!cashAccountIds.has(t.accountId)) continue;
       const monthKey = (t.date ?? '').slice(0, 7);
       if (!monthSet.has(monthKey)) continue;
-      const cur = cashAccountCurrency[t.accountId] ?? 'USD';
-      const converted = this.toDisplay(t.amount, cur, displayCurrency, rates);
-      if (t.type === 'income') byMonth[monthKey].income += converted;
-      else if (t.type === 'expense') byMonth[monthKey].expenses += converted;
+      if (t.type === 'income') byMonth[monthKey].income += t.amount;
+      else if (t.type === 'expense') byMonth[monthKey].expenses += t.amount;
     }
 
     const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -882,40 +820,39 @@ export class FinanceService {
     }));
     const positiveMonths = monthsOut.filter((m) => m.income >= m.expenses).length;
 
-    return { months: monthsOut, positiveMonths, displayCurrency };
+    return { months: monthsOut, positiveMonths };
   }
 
   // ─── Net worth ──────────────────────────────────────────────────────────────
   // Liquid = cash accounts + liquid-flagged assets; illiquid = illiquid-flagged
   // assets. Illiquid assets count here but are never read by getProjection.
 
-  async getNetWorth(userId: string, displayCurrency = 'USD') {
-    const [accountsSnap, investmentsSnap, allTxSnap, valuationsSnap, rates] = await Promise.all([
+  async getNetWorth(userId: string) {
+    const [accountsSnap, investmentsSnap, allTxSnap, valuationsSnap] = await Promise.all([
       this.db.collection(this.ACCOUNTS).where('userId', '==', userId).get(),
       this.db.collection(this.INVESTMENTS).where('userId', '==', userId).get(),
       this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).get(),
       this.db.collection(this.INVESTMENT_VALUATIONS).where('userId', '==', userId).get(),
-      this.getExchangeRates(),
     ]);
     const accounts = (accountsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[]).filter((a) => !a.archived);
 
     let liquid = 0;
     let creditCardOwed = 0;
     for (const a of accounts) {
-      const converted = this.toDisplay(a.balance ?? 0, a.currency ?? 'USD', displayCurrency, rates);
+      const balance = a.balance ?? 0;
       if (a.type === 'credit') {
-        creditCardOwed += Math.max(0, -converted);
+        creditCardOwed += Math.max(0, -balance);
       } else {
-        liquid += converted;
+        liquid += balance;
       }
     }
 
     let illiquid = 0;
     const investments = (investmentsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[]).map((inv) => this.withDerivedValue(inv));
     for (const inv of investments) {
-      const converted = this.toDisplay(inv.currentValue ?? 0, inv.currency ?? 'USD', displayCurrency, rates);
-      if (inv.liquidity === 'illiquid') illiquid += converted;
-      else liquid += converted;
+      const value = inv.currentValue ?? 0;
+      if (inv.liquidity === 'illiquid') illiquid += value;
+      else liquid += value;
     }
 
     const netWorth = liquid + illiquid - creditCardOwed;
@@ -927,25 +864,21 @@ export class FinanceService {
     const today = new Date().toISOString().slice(0, 10);
     const startOfMonth = `${today.slice(0, 7)}-01`;
 
-    const accountCurrency: Record<string, string> = {};
-    for (const a of accounts) accountCurrency[a.id] = a.currency ?? 'USD';
+    const knownAccountIds = new Set(accounts.map((a) => a.id));
     let startLiquid = 0;
     let startCreditOwed = 0;
     const monthDeltaByAccount: Record<string, number> = {};
     for (const doc of allTxSnap.docs) {
       const t = doc.data() as any;
-      if (!accountCurrency[t.accountId]) continue;
+      if (!knownAccountIds.has(t.accountId)) continue;
       if (t.date < startOfMonth || t.date > today) continue;
-      const cur = accountCurrency[t.accountId];
-      const converted = this.toDisplay(t.amount, cur, displayCurrency, rates);
-      const delta = t.type === 'income' ? converted : t.type === 'expense' ? -converted : 0;
+      const delta = t.type === 'income' ? t.amount : t.type === 'expense' ? -t.amount : 0;
       monthDeltaByAccount[t.accountId] = (monthDeltaByAccount[t.accountId] ?? 0) + delta;
     }
     for (const a of accounts) {
-      const currentConverted = this.toDisplay(a.balance ?? 0, a.currency ?? 'USD', displayCurrency, rates);
-      const startConverted = currentConverted - (monthDeltaByAccount[a.id] ?? 0);
-      if (a.type === 'credit') startCreditOwed += Math.max(0, -startConverted);
-      else startLiquid += startConverted;
+      const startBalance = (a.balance ?? 0) - (monthDeltaByAccount[a.id] ?? 0);
+      if (a.type === 'credit') startCreditOwed += Math.max(0, -startBalance);
+      else startLiquid += startBalance;
     }
 
     const valuationsByInvestment: Record<string, any[]> = {};
@@ -960,15 +893,14 @@ export class FinanceService {
         .filter((v) => v.valuedOn < startOfMonth)
         .sort((a, b) => (a.valuedOn < b.valuedOn ? 1 : -1));
       const startValue = priorValuations[0]?.value ?? inv.currentValue ?? 0;
-      const converted = this.toDisplay(startValue, inv.currency ?? 'USD', displayCurrency, rates);
-      if (inv.liquidity === 'illiquid') startIlliquid += converted;
-      else startLiquidFromInvestments += converted;
+      if (inv.liquidity === 'illiquid') startIlliquid += startValue;
+      else startLiquidFromInvestments += startValue;
     }
 
     const startNetWorth = startLiquid + startLiquidFromInvestments + startIlliquid - startCreditOwed;
     const monthChangePct = startNetWorth !== 0 ? ((netWorth - startNetWorth) / Math.abs(startNetWorth)) * 100 : null;
 
-    return { liquid, illiquid, creditCardOwed, netWorth, monthChangePct, displayCurrency };
+    return { liquid, illiquid, creditCardOwed, netWorth, monthChangePct };
   }
 
   // ─── Upcoming bills + credit card statements (merged) ──────────────────────

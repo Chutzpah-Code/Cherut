@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Modal, Stack, Group, Text, Box, Select, NumberInput, Button, Center, Loader } from '@mantine/core';
 import { useFinanceAccounts, useCloseStatement, usePayStatement } from '@/hooks/useFinance';
 import { FinanceAccount, FinanceStatement } from '@/lib/api/services/finance';
+import { useFinanceCurrency } from '../../currency-context';
 import { fmtCurrency } from './billUtils';
 
 // Triggered from "Mark paid" on a synthesized credit-card-statement row in
@@ -20,6 +21,7 @@ export function PayCardStatementModal({
   const t = useTranslations('finance.payCardStatement');
   const tc = useTranslations('finance.common');
   const locale = useLocale();
+  const { displayCurrency: currency } = useFinanceCurrency();
   const { data: accounts = [] } = useFinanceAccounts();
   const closeStatement = useCloseStatement();
   const payStatement = usePayStatement();
@@ -75,13 +77,13 @@ export function PayCardStatementModal({
           <Stack gap="sm">
             <Box style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
               <Text size="xs" c="dimmed">{t('statementTotal')}</Text>
-              <Text size="xl" fw={700} c="green.7">{fmtCurrency(statement.total, locale, cardAccount?.currency)}</Text>
+              <Text size="xl" fw={700} c="green.7">{fmtCurrency(statement.total, locale, currency)}</Text>
             </Box>
             <Select
               label={t('payFrom')}
               placeholder={t('selectAccount')}
               required
-              data={cashAccounts.map((a) => ({ value: a.id, label: `${a.name} — ${fmtCurrency(a.balance, locale, a.currency)}` }))}
+              data={cashAccounts.map((a) => ({ value: a.id, label: `${a.name} — ${fmtCurrency(a.balance, locale, currency)}` }))}
               value={fromAccountId}
               onChange={setFromAccountId}
             />
@@ -91,7 +93,7 @@ export function PayCardStatementModal({
               decimalScale={2}
               value={amount}
               onChange={setAmount}
-              leftSection={<Text size="xs" c="dimmed" fw={600}>{cardAccount?.currency}</Text>}
+              leftSection={<Text size="xs" c="dimmed" fw={600}>{currency}</Text>}
             />
           </Stack>
         )}

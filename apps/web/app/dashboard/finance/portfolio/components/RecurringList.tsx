@@ -4,10 +4,10 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, Stack, Text, ActionIcon, UnstyledButton } from '@mantine/core';
 import { Pencil, Trash2, Pause, Play } from 'lucide-react';
 import { useBills, useDeleteBill, usePauseBill, useResumeBill } from '@/hooks/useBills';
-import { useFinanceAccounts } from '@/hooks/useFinance';
 import { FinanceBill } from '@/lib/api/services/bills';
 import { monthlyEquivalent, fmtCurrency } from './billUtils';
 import { useAddPanel } from '../../add-panel-context';
+import { useFinanceCurrency } from '../../currency-context';
 import { RowsSkeleton } from '../../components/skeletons';
 import { useUndoableDelete } from '../../useUndoableDelete';
 
@@ -21,15 +21,14 @@ export function RecurringList() {
     weekly: tc('freqWeekly'), biweekly: tc('freqBiweekly'), monthly: tc('freqMonthly'), bimonthly: tc('freqBimonthly'),
     quarterly: tc('freqQuarterly'), semiannual: tc('freqSemiannual'), annual: tc('freqAnnual'), custom: tc('freqCustom'),
   };
+  const { displayCurrency: currency } = useFinanceCurrency();
   const { data: rawBills = [], isLoading } = useBills();
-  const { data: accounts = [] } = useFinanceAccounts();
   const deleteBill = useDeleteBill();
   const pauseBill = usePauseBill();
   const resumeBill = useResumeBill();
   const { openCreate, openEdit } = useAddPanel();
   const undoableDeleteBill = useUndoableDelete((id: string) => deleteBill.mutate(id), { label: tc('rule') });
 
-  const accountMap = Object.fromEntries((accounts as any[]).map((a) => [a.id, a]));
   const list = (rawBills as FinanceBill[]).filter((b) => !undoableDeleteBill.isPending(b.id));
   const monthlyTotal = list.filter((b) => b.isActive).reduce((s, b) => s + monthlyEquivalent(b), 0);
 
@@ -54,7 +53,6 @@ export function RecurringList() {
       ) : (
         <Stack gap={0}>
           {list.map((bill) => {
-            const currency = accountMap[bill.accountId]?.currency;
             return (
               <Box
                 key={bill.id}

@@ -2,10 +2,11 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Stack, Group, TextInput, Select, NumberInput, Switch } from '@mantine/core';
+import { Stack, Group, TextInput, Select, NumberInput, Switch, Text } from '@mantine/core';
 import { useFinanceAccounts, useFinanceCategories } from '@/hooks/useFinance';
 import { useCreateBill, useUpdateBill } from '@/hooks/useBills';
 import { CreateBillDto, BillFrequency } from '@/lib/api/services/bills';
+import { useFinanceCurrency } from '../../currency-context';
 import type { AddSubformHandle, AddSubformProps } from './types';
 
 const EMPTY: Partial<CreateBillDto> = {
@@ -33,6 +34,7 @@ export const BillRuleForm = forwardRef<AddSubformHandle, AddSubformProps>(functi
   const { data: categories = [] } = useFinanceCategories();
   const createBill = useCreateBill();
   const updateBill = useUpdateBill();
+  const { displayCurrency: currency } = useFinanceCurrency();
 
   const initial: Partial<CreateBillDto> = mode === 'edit' && entity
     ? {
@@ -76,7 +78,14 @@ export const BillRuleForm = forwardRef<AddSubformHandle, AddSubformProps>(functi
     <Stack gap="sm">
       <TextInput label={t('name')} placeholder={t('namePlaceholder')} value={form.name ?? ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
       <Group grow>
-        <NumberInput label={t('amount')} min={0.01} decimalScale={2} value={form.amount ?? ''} onChange={(v) => setForm((f) => ({ ...f, amount: typeof v === 'number' ? v : undefined }))} />
+        <NumberInput
+          label={t('amount', { currency })}
+          leftSection={<Text size="xs" c="dimmed" fw={600}>{currency}</Text>}
+          min={0.01}
+          decimalScale={2}
+          value={form.amount ?? ''}
+          onChange={(v) => setForm((f) => ({ ...f, amount: typeof v === 'number' ? v : undefined }))}
+        />
         <Select
           label={t('frequency')}
           data={FREQUENCY_OPTIONS}

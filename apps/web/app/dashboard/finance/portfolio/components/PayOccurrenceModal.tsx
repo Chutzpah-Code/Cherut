@@ -6,6 +6,7 @@ import { Modal, Stack, Group, Text, Box, TextInput, Select, NumberInput, Button 
 import { useFinanceAccounts } from '@/hooks/useFinance';
 import { usePayOccurrence } from '@/hooks/useBills';
 import { FinanceBillOccurrence } from '@/lib/api/services/bills';
+import { useFinanceCurrency } from '../../currency-context';
 
 export function PayOccurrenceModal({
   occurrence, opened, onClose,
@@ -18,10 +19,10 @@ export function PayOccurrenceModal({
   const tc = useTranslations('finance.common');
   const today = new Date().toISOString().slice(0, 10);
   const { data: accounts = [] } = useFinanceAccounts();
+  const { displayCurrency: currency } = useFinanceCurrency();
   const payMutation = usePayOccurrence();
 
   const [accountId, setAccountId] = useState('');
-  const [currency, setCurrency] = useState('USD');
   const [amount, setAmount] = useState(0);
   const [paidAt, setPaidAt] = useState(today);
   const [notes, setNotes] = useState('');
@@ -33,7 +34,6 @@ export function PayOccurrenceModal({
       setNotes('');
       const billAccount = (accounts as any[]).find((a) => a.id === occurrence.bill?.accountId);
       setAccountId(billAccount?.id ?? '');
-      setCurrency(billAccount?.currency ?? 'USD');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [occurrence, opened]);
@@ -63,12 +63,9 @@ export function PayOccurrenceModal({
           <Select
             label={t('account')}
             placeholder={t('selectAccount')}
-            data={(accounts as any[]).map((a) => ({ value: a.id, label: `${a.name} (${a.currency ?? 'USD'})` }))}
+            data={(accounts as any[]).map((a) => ({ value: a.id, label: a.name }))}
             value={accountId}
-            onChange={(v) => {
-              setAccountId(v ?? '');
-              setCurrency((accounts as any[]).find((a) => a.id === v)?.currency ?? 'USD');
-            }}
+            onChange={(v) => setAccountId(v ?? '')}
             required
           />
           <NumberInput

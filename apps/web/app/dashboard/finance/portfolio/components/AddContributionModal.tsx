@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Modal, Stack, Group, Text, NumberInput, TextInput, Button } from '@mantine/core';
 import { useCreateInvestmentEntry } from '@/hooks/useFinance';
 import { FinanceInvestment } from '@/lib/api/services/finance';
+import { useFinanceCurrency } from '../../currency-context';
 
 // Scoped to assetClass === 'financial' — periodic deposits (brokerage,
 // pension, crypto DCA) where "current value" and "total contributed" are
@@ -19,6 +20,7 @@ export function AddContributionModal({
   const t = useTranslations('finance.addContribution');
   const tc = useTranslations('finance.common');
   const createEntry = useCreateInvestmentEntry();
+  const { displayCurrency: currency } = useFinanceCurrency();
   const [amount, setAmount] = useState<number | string>('');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
 
@@ -39,7 +41,7 @@ export function AddContributionModal({
           {t('hint')}
         </Text>
         <NumberInput
-          label={t('amount', { currency: investment?.currency ?? 'USD' })}
+          label={t('amount', { currency })}
           min={0.01}
           decimalScale={2}
           value={amount}

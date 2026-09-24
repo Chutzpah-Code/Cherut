@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, Text } from '@mantine/core';
 import { useSpendingByCategory } from '@/hooks/useFinance';
+import { useProfile } from '@/hooks/useProfile';
 import { RowsSkeleton } from './skeletons';
 
 function fmt(value: number, locale: string, currency = 'USD') {
@@ -21,10 +22,9 @@ const PALETTE = ['#9DB8F2', '#AFC5F3', '#C2D2F6', '#D3DEF8', '#E1E6EC', '#EDF1F6
 export function SpendingThisMonth() {
   const t = useTranslations('dashboard.spendingThisMonth');
   const locale = useLocale();
-  const [currency] = useState<string>(() => {
-    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
-  });
-  const { data, isLoading } = useSpendingByCategory(undefined, currency);
+  const { data: profile } = useProfile();
+  const currency = profile?.preferences?.currency ?? 'USD';
+  const { data, isLoading } = useSpendingByCategory();
 
   const rows = useMemo(() => {
     if (!data) return [];

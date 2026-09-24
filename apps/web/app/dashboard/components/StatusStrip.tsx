@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { useTasks } from '@/hooks/useTasks';
@@ -66,10 +66,8 @@ export function StatusStrip() {
   const { data: tasks = [], isLoading: tasksLoading } = useTasks();
   const { data: todayHabits = [], isLoading: habitsLoading } = useTodayHabits(today);
   const { data: consistency, isLoading: consistencyLoading } = useHabitConsistency(14);
-  const [currency] = useState<string>(() => {
-    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
-  });
-  const { data: netWorth, isLoading: netWorthLoading } = useNetWorth(currency);
+  const currency = profile?.preferences?.currency ?? 'USD';
+  const { data: netWorth, isLoading: netWorthLoading } = useNetWorth();
 
   const { overdueCount, dueTodayCount, oldestOverdueDays } = useMemo(() => {
     let overdue = 0;
@@ -128,7 +126,7 @@ export function StatusStrip() {
             />
             <Tile
               label={t('netWorth')}
-              value={fmtCompact(netWorth?.netWorth ?? 0, locale, netWorth?.displayCurrency ?? currency)}
+              value={fmtCompact(netWorth?.netWorth ?? 0, locale, currency)}
               sub={netWorth?.monthChangePct != null ? t('netWorthThisMonth', { sign: netWorth.monthChangePct >= 0 ? '+' : '', pct: netWorth.monthChangePct.toFixed(1) }) : undefined}
             />
           </SimpleGrid>

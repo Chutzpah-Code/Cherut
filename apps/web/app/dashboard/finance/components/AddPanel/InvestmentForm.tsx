@@ -48,7 +48,7 @@ export const InvestmentForm = forwardRef<AddSubformHandle, AddSubformProps>(func
     ? { ...entity }
     : {
         assetClass: 'financial', assetType: ASSET_CLASSES.financial.types[0],
-        currency: 'USD', valuedDate: today(), liquidity: 'liquid',
+        valuedDate: today(), liquidity: 'liquid',
       };
 
   const [form, setForm] = useState<any>(initial);
