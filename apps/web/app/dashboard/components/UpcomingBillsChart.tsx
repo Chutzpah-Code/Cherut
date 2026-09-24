@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, Text } from '@mantine/core';
 import { useUpcomingBillsAndStatements } from '@/hooks/useFinance';
+import { useProfile } from '@/hooks/useProfile';
 import { ChartSkeleton } from './skeletons';
 
 function fmt(value: number, locale: string, currency = 'USD') {
@@ -25,9 +26,8 @@ const LABEL: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: '#0F1
 export function UpcomingBillsChart() {
   const t = useTranslations('dashboard.upcomingBills');
   const locale = useLocale();
-  const [currency] = useState<string>(() => {
-    try { return localStorage.getItem('finance_display_currency') ?? 'USD'; } catch { return 'USD'; }
-  });
+  const { data: profile } = useProfile();
+  const currency = profile?.preferences?.currency ?? 'USD';
   const { data: items = [], isLoading } = useUpcomingBillsAndStatements(30);
   const today = localToday();
 

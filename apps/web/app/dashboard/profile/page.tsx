@@ -482,11 +482,7 @@ export default function ProfilePage() {
                   styles={INPUT_STYLES}
                   data={[
                     { value: 'USD', label: 'USD — US Dollar' },
-                    { value: 'EUR', label: 'EUR — Euro' },
-                    { value: 'GBP', label: 'GBP — British Pound' },
                     { value: 'BRL', label: 'BRL — Brazilian Real' },
-                    { value: 'JPY', label: 'JPY — Japanese Yen' },
-                    { value: 'ARS', label: 'ARS — Argentine Peso' },
                   ]}
                 />
 
