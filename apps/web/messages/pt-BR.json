@@ -695,7 +695,7 @@
       "illiquid": "Não líquido",
       "cashAccounts": "Contas correntes",
       "illiquidTrackedHint": "Imóveis, veículos, equipamentos e outros ativos acompanhados",
-      "illiquidNoneHint": "Nenhum ativo não líquido acompanhado ainda — o Portfólio (em uma atualização futura) permitirá adicionar imóveis, veículos e mais",
+      "illiquidNoneHint": "Nenhum ativo não líquido acompanhado ainda — adicione imóveis, veículos e mais no Portfólio abaixo",
       "creditCardOwed": "Fatura do cartão devida"
     },
     "portfolioSection": {

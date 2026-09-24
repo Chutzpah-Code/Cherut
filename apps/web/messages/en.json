@@ -695,7 +695,7 @@
       "illiquid": "Illiquid",
       "cashAccounts": "Cash accounts",
       "illiquidTrackedHint": "Property, vehicles, equipment and other tracked assets",
-      "illiquidNoneHint": "No illiquid assets tracked yet — Portfolio (coming in a later update) will let you add real estate, vehicles and more",
+      "illiquidNoneHint": "No illiquid assets tracked yet — add real estate, vehicles and more in Portfolio below",
       "creditCardOwed": "Credit card owed"
     },
     "portfolioSection": {
