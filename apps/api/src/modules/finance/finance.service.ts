@@ -81,8 +81,18 @@ export class FinanceService {
   }
 
   async updateAccount(userId: string, id: string, dto: UpdateAccountDto) {
-    const existing = await this.assertOwner(this.ACCOUNTS, id, userId);
-    const updates = { ...this.clean(dto as any), updatedAt: this.now() };
+    const existing: any = await this.assertOwner(this.ACCOUNTS, id, userId);
+    const updates: any = { ...this.clean(dto as any), updatedAt: this.now() };
+
+    // A manual balance edit (e.g. correcting the opening number) has to move
+    // initialBalance by the same amount, or it silently drifts from the real
+    // balance — the next recalculateBalance would then discard the edit and
+    // reconstruct from a stale baseline instead of reproducing what was just
+    // typed in.
+    if (updates.balance !== undefined && updates.balance !== existing.balance) {
+      updates.initialBalance = updates.balance - await this.sumTransactionEffects(userId, id);
+    }
+
     await this.db.collection(this.ACCOUNTS).doc(id).update(updates);
     return { ...existing, ...updates };
   }
@@ -505,14 +515,35 @@ export class FinanceService {
     if (!isValidAssetType(dto.assetClass, dto.assetType)) {
       throw new BadRequestException(`Invalid assetType "${dto.assetType}" for class "${dto.assetClass}"`);
     }
-    const data = {
+    const fundingAmount = dto.acquiredValue ?? dto.currentValue;
+    const data: any = {
       ...this.clean(dto as any),
       userId,
       currency: dto.currency ?? 'USD',
       totalContributed: 0,
+      // Normalize acquiredValue so it always reflects what was actually
+      // funded from the linked account at creation, even when the caller
+      // only sent currentValue — deleteInvestment reads this back to know
+      // how much to credit back, and currentValue can drift afterwards.
+      acquiredValue: fundingAmount,
       createdAt: this.now(),
       updatedAt: this.now(),
     };
+
+    if (dto.linkedAccountId) {
+      const account: any = await this.assertOwner(this.ACCOUNTS, dto.linkedAccountId, userId);
+      if ((account.balance ?? 0) < fundingAmount) {
+        throw new BadRequestException('Insufficient balance in linked account');
+      }
+      const batch = this.db.batch();
+      const ref = this.db.collection(this.INVESTMENTS).doc();
+      batch.set(ref, data);
+      this.applyBalanceDelta(batch, dto.linkedAccountId, -fundingAmount);
+      await batch.commit();
+      await this.recordValuation(userId, ref.id, dto.currentValue, dto.valuedDate, 'manual');
+      return { id: ref.id, ...data };
+    }
+
     const ref = await this.db.collection(this.INVESTMENTS).add(data);
     await this.recordValuation(userId, ref.id, dto.currentValue, dto.valuedDate, 'manual');
     return { id: ref.id, ...data };
@@ -537,7 +568,20 @@ export class FinanceService {
   }
 
   async deleteInvestment(userId: string, id: string) {
-    await this.assertOwner(this.INVESTMENTS, id, userId);
+    const investment: any = await this.assertOwner(this.INVESTMENTS, id, userId);
+
+    // Reverses only the creation-time funding (acquiredValue) — contributions
+    // made afterwards via createInvestmentEntry are a pre-existing gap: this
+    // method has never cleaned up or reversed finance_investment_entries,
+    // and that's unchanged here.
+    if (investment.linkedAccountId) {
+      const batch = this.db.batch();
+      batch.delete(this.db.collection(this.INVESTMENTS).doc(id));
+      this.applyBalanceDelta(batch, investment.linkedAccountId, investment.acquiredValue ?? 0);
+      await batch.commit();
+      return { message: 'Investment deleted' };
+    }
+
     await this.db.collection(this.INVESTMENTS).doc(id).delete();
     return { message: 'Investment deleted' };
   }
@@ -600,7 +644,14 @@ export class FinanceService {
 
     const amount = Number(dto.amount);
     if (!isFinite(amount) || amount <= 0) {
-      throw new Error(`Invalid amount: ${dto.amount}`);
+      throw new BadRequestException(`Invalid amount: ${dto.amount}`);
+    }
+
+    if (inv.linkedAccountId) {
+      const account: any = await this.assertOwner(this.ACCOUNTS, inv.linkedAccountId, userId);
+      if ((account.balance ?? 0) < amount) {
+        throw new BadRequestException('Insufficient balance in linked account');
+      }
     }
 
     const data = {
@@ -614,21 +665,24 @@ export class FinanceService {
     };
 
     try {
-      const ref = await this.db.collection(this.INVESTMENT_ENTRIES).add(data);
+      const batch = this.db.batch();
+      const ref = this.db.collection(this.INVESTMENT_ENTRIES).doc();
+      batch.set(ref, data);
 
       // A contribution is itself a revaluation for financial assets — it
       // grows both the contribution ledger and the asset's tracked value.
-      await this.db.collection(this.INVESTMENTS).doc(dto.investmentId).update({
+      batch.update(this.db.collection(this.INVESTMENTS).doc(dto.investmentId), {
         totalContributed: admin.firestore.FieldValue.increment(amount),
         currentValue: admin.firestore.FieldValue.increment(amount),
         valuedDate: dto.date,
         updatedAt: this.now(),
       });
-      await this.recordValuation(userId, dto.investmentId, (inv.currentValue ?? 0) + amount, dto.date, 'manual');
-
       if (inv.linkedAccountId) {
-        await this.adjustBalance(inv.linkedAccountId, amount, 'expense');
+        this.applyBalanceDelta(batch, inv.linkedAccountId, -amount);
       }
+      await batch.commit();
+
+      await this.recordValuation(userId, dto.investmentId, (inv.currentValue ?? 0) + amount, dto.date, 'manual');
 
       return { id: ref.id, ...data };
     } catch (e) {
@@ -763,22 +817,29 @@ export class FinanceService {
 
   // ─── Recalculate balance ────────────────────────────────────────────────────
 
-  async recalculateBalance(userId: string, accountId: string) {
-    const account: any = await this.assertOwner(this.ACCOUNTS, accountId, userId);
+  // Sum of every transaction's effect on this account (income +, expense -,
+  // transfer-out -, transfer-in +) — deliberately excludes initialBalance so
+  // both recalculateBalance and updateAccount can share the exact same math.
+  private async sumTransactionEffects(userId: string, accountId: string): Promise<number> {
     const [outSnap, inSnap] = await Promise.all([
       this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).where('accountId', '==', accountId).get(),
       this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).where('toAccountId', '==', accountId).where('type', '==', 'transfer').get(),
     ]);
 
-    const initialBalance: number = account.initialBalance ?? 0;
-    let balance = initialBalance;
+    let sum = 0;
     for (const doc of outSnap.docs) {
       const tx = doc.data() as any;
-      if (tx.type === 'income') balance += tx.amount;
-      else if (tx.type === 'expense') balance -= tx.amount;
-      else if (tx.type === 'transfer') balance -= tx.amount; // outgoing leg
+      if (tx.type === 'income') sum += tx.amount;
+      else if (tx.type === 'expense') sum -= tx.amount;
+      else if (tx.type === 'transfer') sum -= tx.amount; // outgoing leg
     }
-    for (const doc of inSnap.docs) balance += (doc.data() as any).amount; // incoming leg
+    for (const doc of inSnap.docs) sum += (doc.data() as any).amount; // incoming leg
+    return sum;
+  }
+
+  async recalculateBalance(userId: string, accountId: string) {
+    const account: any = await this.assertOwner(this.ACCOUNTS, accountId, userId);
+    const balance = (account.initialBalance ?? 0) + await this.sumTransactionEffects(userId, accountId);
 
     await this.db.collection(this.ACCOUNTS).doc(accountId).update({
       balance,

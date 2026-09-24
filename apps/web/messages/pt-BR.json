@@ -623,6 +623,9 @@
       "illiquidHint": "Ativos não líquidos contam para o patrimônio líquido, mas ficam fora da projeção de saldo.",
       "linkedAccount": "Conta vinculada",
       "none": "Nenhuma",
+      "availableBalance": "Saldo disponível: {balance}",
+      "insufficientBalance": "Saldo insuficiente nessa conta (disponível: {balance})",
+      "genericError": "Algo deu errado. Tente novamente.",
       "notes": "Notas",
       "notesOptional": "Opcional"
     },
@@ -749,6 +752,9 @@
       "title": "Adicionar aporte — {name}",
       "hint": "Aumenta o valor atual deste ativo e, se houver uma conta vinculada, debita o valor dela.",
       "amount": "Valor ({currency})",
+      "availableBalance": "Saldo disponível: {balance}",
+      "insufficientBalance": "Saldo insuficiente nessa conta (disponível: {balance})",
+      "genericError": "Algo deu errado. Tente novamente.",
       "date": "Data",
       "addContribution": "Adicionar aporte"
     }

@@ -3,10 +3,13 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Stack, Group, Box, Text, TextInput, NumberInput, Select, UnstyledButton, Switch, SimpleGrid } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useFinanceAccounts, useCreateInvestment, useUpdateInvestment } from '@/hooks/useFinance';
-import { CreateInvestmentDto } from '@/lib/api/services/finance';
+import { CreateInvestmentDto, FinanceAccount } from '@/lib/api/services/finance';
 import { ASSET_CLASSES, ASSET_CLASS_ORDER, AssetClass, Liquidity, isVehicleLikeClass, isCurrencyLikeClass } from '@/lib/finance/asset-classes';
 import { getAssetClassLabel, getAssetTypeLabel } from '@/lib/finance/asset-classes-i18n';
+import { fmtCurrency } from '../../portfolio/components/billUtils';
+import { useFinanceCurrency } from '../../currency-context';
 import type { AddSubformHandle, AddSubformProps } from './types';
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -41,6 +44,7 @@ export const InvestmentForm = forwardRef<AddSubformHandle, AddSubformProps>(func
   const t = useTranslations('finance.investmentForm');
   const locale = useLocale();
   const { data: accounts = [] } = useFinanceAccounts();
+  const { displayCurrency: currency } = useFinanceCurrency();
   const createInvestment = useCreateInvestment();
   const updateInvestment = useUpdateInvestment();
 
@@ -63,21 +67,33 @@ export const InvestmentForm = forwardRef<AddSubformHandle, AddSubformProps>(func
   const assetClass: AssetClass = form.assetClass;
   const classDef = ASSET_CLASSES[assetClass];
 
+  // Creating (not editing — updateInvestment never moves money) with a
+  // linked account can only use what that account actually has available.
+  const linkedAccount = (accounts as FinanceAccount[]).find((a) => a.id === form.linkedAccountId);
+  const fundingAmount = form.acquiredValue ?? form.currentValue;
+  const insufficientFunds = mode === 'create' && !!linkedAccount && typeof fundingAmount === 'number'
+    && fundingAmount > (linkedAccount.balance ?? 0);
+
   const valid = !!form.name && !!form.assetClass && !!form.assetType
-    && form.currentValue !== undefined && form.currentValue !== null && !!form.valuedDate && !!form.liquidity;
+    && form.currentValue !== undefined && form.currentValue !== null && !!form.valuedDate && !!form.liquidity
+    && !insufficientFunds;
   useEffect(() => { onValidChange(valid); }, [valid, onValidChange]);
 
   const pending = createInvestment.isPending || updateInvestment.isPending;
   useEffect(() => { onPendingChange(pending); }, [pending, onPendingChange]);
+
+  const showError = (error: any) => {
+    notifications.show({ color: 'red', message: error?.response?.data?.message || t('genericError') });
+  };
 
   useImperativeHandle(ref, () => ({
     isDirty: () => dirtyRef.current,
     submit: () => {
       if (!valid) return;
       if (mode === 'edit' && entity) {
-        updateInvestment.mutate({ id: entity.id, dto: form }, { onSuccess: onDone });
+        updateInvestment.mutate({ id: entity.id, dto: form }, { onSuccess: onDone, onError: showError });
       } else {
-        createInvestment.mutate(form as CreateInvestmentDto, { onSuccess: onDone });
+        createInvestment.mutate(form as CreateInvestmentDto, { onSuccess: onDone, onError: showError });
       }
     },
   }));
@@ -204,14 +220,23 @@ export const InvestmentForm = forwardRef<AddSubformHandle, AddSubformProps>(func
         <Text size="xs" c="dimmed">{t('illiquidHint')}</Text>
       </Stack>
 
-      <Select
-        label={t('linkedAccount')}
-        placeholder={t('none')}
-        clearable
-        data={(accounts as any[]).map((a) => ({ value: a.id, label: a.name }))}
-        value={form.linkedAccountId ?? null}
-        onChange={(v) => setForm((f: any) => ({ ...f, linkedAccountId: v ?? undefined }))}
-      />
+      <Stack gap={4}>
+        <Select
+          label={t('linkedAccount')}
+          placeholder={t('none')}
+          clearable
+          data={(accounts as FinanceAccount[]).map((a) => ({ value: a.id, label: a.name }))}
+          value={form.linkedAccountId ?? null}
+          onChange={(v) => setForm((f: any) => ({ ...f, linkedAccountId: v ?? undefined }))}
+        />
+        {linkedAccount && (
+          <Text size="xs" c={insufficientFunds ? 'red' : 'dimmed'}>
+            {insufficientFunds
+              ? t('insufficientBalance', { balance: fmtCurrency(linkedAccount.balance ?? 0, locale, currency) })
+              : t('availableBalance', { balance: fmtCurrency(linkedAccount.balance ?? 0, locale, currency) })}
+          </Text>
+        )}
+      </Stack>
       <TextInput label={t('notes')} placeholder={t('notesOptional')} value={form.notes ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, notes: e.target.value || undefined }))} />
     </Stack>
   );

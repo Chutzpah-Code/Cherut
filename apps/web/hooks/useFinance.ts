@@ -330,7 +330,10 @@ export function useCreateInvestment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: CreateInvestmentDto) => financeApi.createInvestment(dto),
-    onSuccess: () => invalidateAfterInvestmentChange(qc),
+    onSuccess: () => {
+      invalidateAfterInvestmentChange(qc);
+      invalidateFinanceMoney(qc);
+    },
   });
 }
 
@@ -349,7 +352,10 @@ export function useDeleteInvestment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => financeApi.deleteInvestment(id),
-    onSuccess: () => invalidateAfterInvestmentChange(qc),
+    onSuccess: () => {
+      invalidateAfterInvestmentChange(qc);
+      invalidateFinanceMoney(qc);
+    },
   });
 }
 
@@ -400,6 +406,7 @@ export function useCreateInvestmentEntry() {
     onSuccess: (_data, dto) => {
       qc.invalidateQueries({ queryKey: ['finance', 'investment-entries', dto.investmentId] });
       qc.invalidateQueries({ queryKey: ['finance', 'investments'] });
+      invalidateFinanceMoney(qc);
     },
   });
 }
@@ -412,6 +419,7 @@ export function useDeleteInvestmentEntry() {
     onSuccess: (_data, { investmentId }) => {
       qc.invalidateQueries({ queryKey: ['finance', 'investment-entries', investmentId] });
       qc.invalidateQueries({ queryKey: ['finance', 'investments'] });
+      invalidateFinanceMoney(qc);
     },
   });
 }

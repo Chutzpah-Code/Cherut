@@ -623,6 +623,9 @@
       "illiquidHint": "Illiquid assets count towards net worth but stay out of the balance projection.",
       "linkedAccount": "Linked account",
       "none": "None",
+      "availableBalance": "Available balance: {balance}",
+      "insufficientBalance": "Not enough available in this account (balance: {balance})",
+      "genericError": "Something went wrong. Please try again.",
       "notes": "Notes",
       "notesOptional": "Optional"
     },
@@ -749,6 +752,9 @@
       "title": "Add contribution — {name}",
       "hint": "Increases this asset's current value and, if it has a linked account, withdraws the amount from it.",
       "amount": "Amount ({currency})",
+      "availableBalance": "Available balance: {balance}",
+      "insufficientBalance": "Not enough available in this account (balance: {balance})",
+      "genericError": "Something went wrong. Please try again.",
       "date": "Date",
       "addContribution": "Add contribution"
     }
