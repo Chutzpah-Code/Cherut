@@ -28,7 +28,7 @@ export function UpcomingBills({ horizon }: { horizon: number }) {
   const deleteOccurrence = useDeleteOccurrence();
   const skipOccurrence = useSkipOccurrence();
   const { openCreate, openEdit } = useAddPanel();
-  const undoableDeleteOccurrence = useUndoableDelete((id: string) => deleteOccurrence.mutate(id), { label: tc('occurrence') });
+  const undoableDeleteOccurrence = useUndoableDelete((id: string) => deleteOccurrence.mutate(id), { label: tc('occurrence'), resource: 'occurrence' });
 
   const [payTarget, setPayTarget] = useState<FinanceBillOccurrence | null>(null);
   const [payCardAccountId, setPayCardAccountId] = useState<string | null>(null);

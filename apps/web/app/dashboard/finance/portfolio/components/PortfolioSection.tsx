@@ -75,7 +75,7 @@ export function PortfolioSection() {
   const { data: summary } = useInvestmentsSummary();
   const { data: accounts = [] } = useFinanceAccounts();
   const deleteInvestment = useDeleteInvestment();
-  const undoableDeleteInvestment = useUndoableDelete((id: string) => deleteInvestment.mutate(id), { label: tc('asset') });
+  const undoableDeleteInvestment = useUndoableDelete((id: string) => deleteInvestment.mutate(id), { label: tc('asset'), resource: 'investment' });
   const { openCreate, openEdit } = useAddPanel();
 
   const classParam = searchParams.get('class');

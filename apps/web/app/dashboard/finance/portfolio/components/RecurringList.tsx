@@ -27,7 +27,7 @@ export function RecurringList() {
   const pauseBill = usePauseBill();
   const resumeBill = useResumeBill();
   const { openCreate, openEdit } = useAddPanel();
-  const undoableDeleteBill = useUndoableDelete((id: string) => deleteBill.mutate(id), { label: tc('rule') });
+  const undoableDeleteBill = useUndoableDelete((id: string) => deleteBill.mutate(id), { label: tc('rule'), resource: 'bill' });
 
   const list = (rawBills as FinanceBill[]).filter((b) => !undoableDeleteBill.isPending(b.id));
   const monthlyTotal = list.filter((b) => b.isActive).reduce((s, b) => s + monthlyEquivalent(b), 0);

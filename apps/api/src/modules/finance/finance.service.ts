@@ -625,6 +625,7 @@ export class FinanceService {
 
     const balanceByCurrency: Record<string, number> = {};
     for (const a of accounts) {
+      if (archivedAccountIds.has(a.id)) continue;
       const cur = accountCurrency[a.id];
       balanceByCurrency[cur] = (balanceByCurrency[cur] ?? 0) + computedBalance[a.id];
     }

@@ -162,7 +162,7 @@ export function TransactionsBlock() {
   const uploadReceipt = useUploadReceipt();
   const updateTx = useUpdateTransaction();
   const deleteSingleTx = useDeleteTransaction();
-  const undoableDeleteTx = useUndoableDelete((id: string) => deleteSingleTx.mutate(id), { label: tc('transaction') });
+  const undoableDeleteTx = useUndoableDelete((id: string) => deleteSingleTx.mutate(id), { label: tc('transaction'), resource: 'transaction' });
 
   // Quick-add row
   const [quickType, setQuickType] = useState<'expense' | 'income'>('expense');

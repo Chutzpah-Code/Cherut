@@ -73,26 +73,36 @@ function invalidateUpcomingBills(qc: ReturnType<typeof useQueryClient>) {
   qc.invalidateQueries({ queryKey: ['finance', 'upcoming-bills'] });
 }
 
+// Every aggregate that's derived from account.balance or transactions —
+// anything that moves money must invalidate all of these together, or a
+// panel that reads one of the untouched ones (e.g. Net worth after an
+// account edit) keeps showing pre-change numbers.
+function invalidateFinanceMoney(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'net-worth'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'projection'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'balance-history'] });
+  qc.invalidateQueries({ queryKey: ['finance', 'cash-flow'] });
+}
+
 export function useCreateAccount() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (dto: CreateAccountDto) => financeApi.createAccount(dto),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+      invalidateFinanceMoney(qc);
       invalidateUpcomingBills(qc);
     },
   });
 }
-
 
 export function useUpdateAccount() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateAccountDto }) => financeApi.updateAccount(id, dto),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+      invalidateFinanceMoney(qc);
       invalidateUpcomingBills(qc);
     },
   });
@@ -103,9 +113,8 @@ export function useDeleteAccount() {
   return useMutation({
     mutationFn: (id: string) => financeApi.deleteAccount(id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
+      invalidateFinanceMoney(qc);
       qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
       invalidateUpcomingBills(qc);
     },
   });
@@ -115,10 +124,7 @@ export function useRecalculateBalance() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => financeApi.recalculateBalance(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
-    },
+    onSuccess: () => invalidateFinanceMoney(qc),
   });
 }
 
@@ -190,9 +196,8 @@ export function useBulkDeleteTransactions() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
       qc.invalidateQueries({ queryKey: ['finance', 'transactions-page'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
       qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+      invalidateFinanceMoney(qc);
     },
   });
 }
@@ -217,9 +222,8 @@ export function useCreateTransaction() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
       qc.invalidateQueries({ queryKey: ['finance', 'transactions-page'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
       qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+      invalidateFinanceMoney(qc);
       invalidateUpcomingBills(qc);
     },
   });
@@ -232,8 +236,8 @@ export function useUpdateTransaction() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
       qc.invalidateQueries({ queryKey: ['finance', 'transactions-page'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
       qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+      invalidateFinanceMoney(qc);
       invalidateUpcomingBills(qc);
     },
   });
@@ -246,9 +250,8 @@ export function useDeleteTransaction() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['finance', 'transactions'] });
       qc.invalidateQueries({ queryKey: ['finance', 'transactions-page'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
       qc.invalidateQueries({ queryKey: ['finance', 'spending-by-category'] });
+      invalidateFinanceMoney(qc);
       invalidateUpcomingBills(qc);
     },
   });
@@ -453,8 +456,7 @@ export function usePayStatement() {
     onSuccess: (_data, { accountId }) => {
       qc.invalidateQueries({ queryKey: ['finance', 'statements', accountId] });
       qc.invalidateQueries({ queryKey: ['finance', 'statement-current', accountId] });
-      qc.invalidateQueries({ queryKey: ['finance', 'accounts'] });
-      qc.invalidateQueries({ queryKey: ['finance', 'overview'] });
+      invalidateFinanceMoney(qc);
       invalidateUpcomingBills(qc);
     },
   });

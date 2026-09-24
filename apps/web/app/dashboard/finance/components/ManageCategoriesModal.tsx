@@ -20,7 +20,7 @@ export function ManageCategoriesModal({ opened, onClose }: { opened: boolean; on
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
-  const undoableDeleteCategory = useUndoableDelete((id: string) => deleteCategory.mutate(id), { label: tc('category') });
+  const undoableDeleteCategory = useUndoableDelete((id: string) => deleteCategory.mutate(id), { label: tc('category'), resource: 'category' });
   const categories = (rawCategories as any[]).filter((c) => !undoableDeleteCategory.isPending(c.id));
 
   const [formOpened, { open: openForm, close: closeForm }] = useDisclosure();
