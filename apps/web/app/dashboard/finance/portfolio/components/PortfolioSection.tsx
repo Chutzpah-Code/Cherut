@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Box, Group, Stack, Text, Menu, ActionIcon, UnstyledButton } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { MoreHorizontal, Copy, Download, History, RefreshCw, PiggyBank } from 'lucide-react';
 import { useFinanceInvestments, useInvestmentsSummary, useDeleteInvestment, useFinanceAccounts } from '@/hooks/useFinance';
 import { useFinanceCurrency } from '../../currency-context';
@@ -64,6 +65,7 @@ export function PortfolioSection() {
   const t = useTranslations('finance.portfolioSection');
   const tc = useTranslations('finance.common');
   const locale = useLocale();
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -187,19 +189,75 @@ export function PortfolioSection() {
             const classValue = summary?.classes.find((s) => s.assetClass === c)?.value ?? 0;
             return (
               <Box key={c} style={{ borderTop: '1px solid #EFF1F5' }}>
-                <Box style={{ display: 'grid', gridTemplateColumns: ROW_GRID, alignItems: 'baseline', gap: 14, padding: '18px 12px 8px' }}>
-                  <Group gap={10} align="baseline">
-                    <Text style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: '#334155' }}>
-                      {getAssetClassLabel(c as AssetClass, ASSET_CLASSES[c as AssetClass].label, locale)}
-                    </Text>
-                    <Text style={{ fontSize: 11.5, fontWeight: 600, color: '#64748B' }}>{t('assetCount', { count: assets.length })}</Text>
-                  </Group>
-                  <Box />
-                  <Text style={{ fontSize: 12.5, fontWeight: 700, textAlign: 'right', color: '#334155' }}>{fmtCurrency(classValue, locale, displayCurrency)}</Text>
-                  <Box /><Box />
-                </Box>
+                {isMobile ? (
+                  <Box style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, padding: '18px 12px 8px' }}>
+                    <Group gap={8} align="baseline" wrap="wrap">
+                      <Text style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: '#334155' }}>
+                        {getAssetClassLabel(c as AssetClass, ASSET_CLASSES[c as AssetClass].label, locale)}
+                      </Text>
+                      <Text style={{ fontSize: 11.5, fontWeight: 600, color: '#64748B' }}>{t('assetCount', { count: assets.length })}</Text>
+                    </Group>
+                    <Text style={{ fontSize: 12.5, fontWeight: 700, textAlign: 'right', color: '#334155', flexShrink: 0 }}>{fmtCurrency(classValue, locale, displayCurrency)}</Text>
+                  </Box>
+                ) : (
+                  <Box style={{ display: 'grid', gridTemplateColumns: ROW_GRID, alignItems: 'baseline', gap: 14, padding: '18px 12px 8px' }}>
+                    <Group gap={10} align="baseline">
+                      <Text style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: '#334155' }}>
+                        {getAssetClassLabel(c as AssetClass, ASSET_CLASSES[c as AssetClass].label, locale)}
+                      </Text>
+                      <Text style={{ fontSize: 11.5, fontWeight: 600, color: '#64748B' }}>{t('assetCount', { count: assets.length })}</Text>
+                    </Group>
+                    <Box />
+                    <Text style={{ fontSize: 12.5, fontWeight: 700, textAlign: 'right', color: '#334155' }}>{fmtCurrency(classValue, locale, displayCurrency)}</Text>
+                    <Box /><Box />
+                  </Box>
+                )}
                 {assets.map((inv) => {
                   const pct = changePct(inv);
+                  const menu = (
+                    <Menu shadow="md" width={180} position="bottom-end">
+                      <Menu.Target>
+                        <ActionIcon size="sm" variant="subtle" color="gray"><MoreHorizontal size={15} /></ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        <Menu.Item onClick={() => openEdit('investment', inv)}>{t('edit')}</Menu.Item>
+                        <Menu.Item leftSection={<RefreshCw size={14} />} onClick={() => setRevalueTarget(inv)}>{t('revalue')}</Menu.Item>
+                        {inv.assetClass === 'financial' && (
+                          <Menu.Item leftSection={<PiggyBank size={14} />} onClick={() => setContributionTarget(inv)}>{t('addContribution')}</Menu.Item>
+                        )}
+                        <Menu.Item leftSection={<History size={14} />} onClick={() => setHistoryTarget(inv)}>{t('valuationHistory')}</Menu.Item>
+                        <Menu.Item leftSection={<Copy size={14} />} onClick={() => openCreate('investment', { ...inv, name: `${inv.name} (copy)`, id: undefined })}>{t('duplicate')}</Menu.Item>
+                        <Menu.Item leftSection={<Download size={14} />} onClick={() => exportOne(inv)}>{t('export')}</Menu.Item>
+                        <Menu.Item color="red" onClick={() => undoableDeleteInvestment.remove(inv.id)}>{t('delete')}</Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  );
+
+                  if (isMobile) {
+                    return (
+                      <Box key={inv.id} style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '10px 12px', borderRadius: 6 }}>
+                        <Box style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <Text style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.name}</Text>
+                          <Text style={{ fontSize: 14, fontWeight: 600, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                            {fmtCurrency(inv.currentValue, locale, displayCurrency)}
+                          </Text>
+                          {menu}
+                        </Box>
+                        <Box style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <Text style={{ flex: 1, minWidth: 0, fontSize: 12, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {getAssetTypeLabel(inv.assetType, locale)}{inv.linkedAccountId && accountMap[inv.linkedAccountId] ? ` · ${accountMap[inv.linkedAccountId].name}` : ''}
+                          </Text>
+                          <Text style={{
+                            fontSize: 12, fontWeight: 700, fontVariantNumeric: 'tabular-nums', flexShrink: 0,
+                            color: pct === null ? '#64748B' : pct >= 0 ? '#15803D' : '#B91C1C',
+                          }}>
+                            {pct === null ? '—' : `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`}
+                          </Text>
+                        </Box>
+                      </Box>
+                    );
+                  }
+
                   return (
                     <Box key={inv.id} style={{ display: 'grid', gridTemplateColumns: ROW_GRID, alignItems: 'center', gap: 14, padding: '10px 12px', borderRadius: 6 }}>
                       <Box style={{ minWidth: 0 }}>
@@ -219,22 +277,7 @@ export function PortfolioSection() {
                         {pct === null ? '—' : `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`}
                       </Text>
                       <Group gap={6} justify="flex-end" wrap="nowrap">
-                        <Menu shadow="md" width={180} position="bottom-end">
-                          <Menu.Target>
-                            <ActionIcon size="sm" variant="subtle" color="gray"><MoreHorizontal size={15} /></ActionIcon>
-                          </Menu.Target>
-                          <Menu.Dropdown>
-                            <Menu.Item onClick={() => openEdit('investment', inv)}>{t('edit')}</Menu.Item>
-                            <Menu.Item leftSection={<RefreshCw size={14} />} onClick={() => setRevalueTarget(inv)}>{t('revalue')}</Menu.Item>
-                            {inv.assetClass === 'financial' && (
-                              <Menu.Item leftSection={<PiggyBank size={14} />} onClick={() => setContributionTarget(inv)}>{t('addContribution')}</Menu.Item>
-                            )}
-                            <Menu.Item leftSection={<History size={14} />} onClick={() => setHistoryTarget(inv)}>{t('valuationHistory')}</Menu.Item>
-                            <Menu.Item leftSection={<Copy size={14} />} onClick={() => openCreate('investment', { ...inv, name: `${inv.name} (copy)`, id: undefined })}>{t('duplicate')}</Menu.Item>
-                            <Menu.Item leftSection={<Download size={14} />} onClick={() => exportOne(inv)}>{t('export')}</Menu.Item>
-                            <Menu.Item color="red" onClick={() => undoableDeleteInvestment.remove(inv.id)}>{t('delete')}</Menu.Item>
-                          </Menu.Dropdown>
-                        </Menu>
+                        {menu}
                       </Group>
                     </Box>
                   );

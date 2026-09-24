@@ -2,7 +2,7 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Stack, Group, Box, Text, TextInput, NumberInput, Select, UnstyledButton, Switch } from '@mantine/core';
+import { Stack, Group, Box, Text, TextInput, NumberInput, Select, UnstyledButton, Switch, SimpleGrid } from '@mantine/core';
 import { useFinanceAccounts, useCreateInvestment, useUpdateInvestment } from '@/hooks/useFinance';
 import { CreateInvestmentDto } from '@/lib/api/services/finance';
 import { ASSET_CLASSES, ASSET_CLASS_ORDER, AssetClass, Liquidity, isVehicleLikeClass, isCurrencyLikeClass } from '@/lib/finance/asset-classes';
@@ -119,53 +119,53 @@ export const InvestmentForm = forwardRef<AddSubformHandle, AddSubformProps>(func
 
       <TextInput label={t('name')} placeholder={t('namePlaceholder')} value={form.name ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, name: e.target.value }))} />
 
-      <Group grow>
+      <SimpleGrid cols={{ base: 1, sm: 2 }}>
         <NumberInput label={t('acquiredFor')} decimalScale={2} value={form.acquiredValue ?? ''} onChange={(v) => setForm((f: any) => ({ ...f, acquiredValue: typeof v === 'number' ? v : undefined }))} />
         <TextInput label={t('acquiredOn')} type="date" value={form.acquiredDate ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, acquiredDate: e.target.value || undefined }))} />
-      </Group>
-      <Group grow>
+      </SimpleGrid>
+      <SimpleGrid cols={{ base: 1, sm: 2 }}>
         <NumberInput label={t('currentValue')} decimalScale={2} value={form.currentValue ?? ''} onChange={(v) => setForm((f: any) => ({ ...f, currentValue: typeof v === 'number' ? v : undefined }))} />
         <TextInput label={t('valuedOn')} type="date" value={form.valuedDate ?? today()} onChange={(e) => setForm((f: any) => ({ ...f, valuedDate: e.target.value }))} />
-      </Group>
+      </SimpleGrid>
 
       {assetClass === 'realEstate' && (
         <>
-          <Group grow>
+          <SimpleGrid cols={{ base: 1, sm: 2 }}>
             <NumberInput label={t('area')} decimalScale={2} value={form.area ?? ''} onChange={(v) => setForm((f: any) => ({ ...f, area: typeof v === 'number' ? v : undefined }))} />
             <TextInput label={t('registration')} placeholder={t('registrationPlaceholder')} value={form.registration ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, registration: e.target.value || undefined }))} />
-          </Group>
+          </SimpleGrid>
           <TextInput label={t('address')} value={form.address ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, address: e.target.value || undefined }))} />
         </>
       )}
 
       {isVehicleLikeClass(assetClass) && (
-        <Group grow>
+        <SimpleGrid cols={{ base: 2, sm: 4 }}>
           <NumberInput label={t('year')} value={form.year ?? ''} onChange={(v) => setForm((f: any) => ({ ...f, year: typeof v === 'number' ? v : undefined }))} />
           <TextInput label={t('plateOrSerial')} value={form.plateOrSerial ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, plateOrSerial: e.target.value || undefined }))} />
           <NumberInput label={t('depreciationPerYear')} decimalScale={1} value={form.depreciationPerYear ?? ''} onChange={(v) => setForm((f: any) => ({ ...f, depreciationPerYear: typeof v === 'number' ? v : undefined }))} />
           <TextInput label={t('referenceTable')} placeholder={t('referenceTablePlaceholder')} value={form.referenceTable ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, referenceTable: e.target.value || undefined }))} />
-        </Group>
+        </SimpleGrid>
       )}
 
       {isCurrencyLikeClass(assetClass) && (
-        <Group grow>
+        <SimpleGrid cols={{ base: 2, sm: 4 }}>
           <NumberInput label={t('quantity')} decimalScale={4} value={form.quantity ?? ''} onChange={(v) => setForm((f: any) => ({ ...f, quantity: typeof v === 'number' ? v : undefined }))} />
           <TextInput label={t('unit')} placeholder={t('unitPlaceholder')} value={form.unit ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, unit: e.target.value || undefined }))} />
           <NumberInput label={t('unitPrice')} decimalScale={2} value={form.unitPrice ?? ''} onChange={(v) => setForm((f: any) => ({ ...f, unitPrice: typeof v === 'number' ? v : undefined }))} />
           <TextInput label={t('priceSource')} placeholder={t('priceSourcePlaceholder')} value={form.priceSource ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, priceSource: e.target.value || undefined }))} />
-        </Group>
+        </SimpleGrid>
       )}
 
       {assetClass === 'business' && (
         <>
-          <Group grow>
+          <SimpleGrid cols={{ base: 1, sm: 2 }}>
             <TextInput label={t('counterparty')} value={form.counterparty ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, counterparty: e.target.value || undefined }))} />
             <TextInput label={t('stake')} placeholder={t('stakePlaceholder')} value={form.stake ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, stake: e.target.value || undefined }))} />
-          </Group>
-          <Group grow>
+          </SimpleGrid>
+          <SimpleGrid cols={{ base: 1, sm: 2 }}>
             <TextInput label={t('interestReturn')} placeholder={t('interestReturnPlaceholder')} value={form.interestReturn ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, interestReturn: e.target.value || undefined }))} />
             <TextInput label={t('endsOn')} type="date" value={form.endsOn ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, endsOn: e.target.value || undefined }))} />
-          </Group>
+          </SimpleGrid>
           <Switch
             label={t('createIncomingBills')}
             checked={!!form.createIncomingBills}
@@ -175,10 +175,10 @@ export const InvestmentForm = forwardRef<AddSubformHandle, AddSubformProps>(func
       )}
 
       {assetClass === 'digital' && (
-        <Group grow>
+        <SimpleGrid cols={{ base: 1, sm: 2 }}>
           <NumberInput label={t('monthlyRevenue')} decimalScale={2} value={form.monthlyRevenue ?? ''} onChange={(v) => setForm((f: any) => ({ ...f, monthlyRevenue: typeof v === 'number' ? v : undefined }))} />
           <TextInput label={t('renewsOrExpires')} type="date" value={form.renewsOrExpiresOn ?? ''} onChange={(e) => setForm((f: any) => ({ ...f, renewsOrExpiresOn: e.target.value || undefined }))} />
-        </Group>
+        </SimpleGrid>
       )}
 
       <Stack gap={7}>
