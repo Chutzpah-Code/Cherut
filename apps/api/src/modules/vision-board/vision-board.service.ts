@@ -94,6 +94,7 @@ export class VisionBoardService {
       title: dto.title,
       imageUrl: dto.imageUrl,
       isActive: dto.isActive !== undefined ? dto.isActive : true,
+      completed: dto.completed !== undefined ? dto.completed : false,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
@@ -216,6 +217,7 @@ export class VisionBoardService {
       if (dto.dueDate !== undefined) updateData.dueDate = dto.dueDate;
       if (dto.order !== undefined) updateData.order = dto.order;
       if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
+      if (dto.completed !== undefined) updateData.completed = dto.completed;
 
       await docRef.update(updateData);
 

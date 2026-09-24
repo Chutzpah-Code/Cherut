@@ -90,6 +90,7 @@ export default function VisionBoardPage() {
       fullDescription?: string;
       dueDate?: string;
       imageUrl?: string;
+      completed?: boolean;
     },
   ) => {
     try {

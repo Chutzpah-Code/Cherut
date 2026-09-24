@@ -1119,7 +1119,8 @@
       "overdue": "Overdue",
       "today": "Today",
       "daysLeft": "{count, plural, one {# day left} other {# days left}}",
-      "days": "{count, plural, one {# day} other {# days}}"
+      "days": "{count, plural, one {# day} other {# days}}",
+      "completed": "Completed"
     },
     "card": {
       "viewDetails": "View Details",
@@ -1159,6 +1160,7 @@
       "dueDate": "Due Date",
       "dueDateDesc": "Target completion date",
       "dueDatePlaceholder": "Select date",
+      "completed": "Mark as completed",
       "delete": "Delete",
       "cancel": "Cancel",
       "saveChanges": "Save Changes"

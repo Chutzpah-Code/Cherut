@@ -15,6 +15,7 @@ import {
   FileButton,
   Loader,
   Alert,
+  Checkbox,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { Trash2, Upload, AlertCircle } from 'lucide-react';
@@ -31,6 +32,7 @@ interface VisionBoardModalProps {
     fullDescription?: string;
     dueDate?: string;
     imageUrl?: string;
+    completed?: boolean;
   }) => Promise<void>;
   onDelete: (id: string) => void;
   onUploadImage: (file: File) => Promise<{ imageUrl: string }>;
@@ -51,6 +53,7 @@ export function VisionBoardModal({
   const [description, setDescription] = useState('');
   const [fullDescription, setFullDescription] = useState('');
   const [dueDateValue, setDueDateValue] = useState<Date | null>(null);
+  const [completed, setCompleted] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -64,6 +67,7 @@ export function VisionBoardModal({
       setNewImageUrl(null);
       setUploadError(null);
       setSaveError(null);
+      setCompleted(!!item.completed);
 
       if (item.dueDate) {
         setDueDateValue(new Date(item.dueDate + 'T00:00:00'));
@@ -110,6 +114,7 @@ export function VisionBoardModal({
         fullDescription: fullDescription.trim() || undefined,
         dueDate: dueDateValue ? dueDateValue.toISOString().split('T')[0] : undefined,
         imageUrl: newImageUrl || undefined,
+        completed,
       });
     } catch (error: any) {
       let errorMessage = t('saveFailed');
@@ -403,6 +408,22 @@ export function VisionBoardModal({
             description: {
               fontFamily: 'Inter, sans-serif',
               color: '#666666',
+              fontSize: '14px',
+            },
+          }}
+        />
+
+        <Checkbox
+          label={t('completed')}
+          checked={completed}
+          onChange={(e) => setCompleted(e.currentTarget.checked)}
+          color="green"
+          size="md"
+          styles={{
+            label: {
+              fontFamily: 'Inter, sans-serif',
+              color: '#000000',
+              fontWeight: 600,
               fontSize: '14px',
             },
           }}

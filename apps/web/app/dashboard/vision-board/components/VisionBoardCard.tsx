@@ -20,6 +20,9 @@ export function VisionBoardCard({ item, onClick, onEdit, onArchive, onDelete }: 
   const [hoveredCard, setHoveredCard] = useState(false);
   // Calcular se está próximo do due date
   const getDueDateBadge = () => {
+    if (item.completed) {
+      return <Badge color="green" variant="filled">{td('completed')}</Badge>;
+    }
     if (!item.dueDate) return null;
 
     const today = new Date();

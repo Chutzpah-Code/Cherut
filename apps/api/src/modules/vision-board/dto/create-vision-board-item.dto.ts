@@ -34,4 +34,8 @@ export class CreateVisionBoardItemDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  completed?: boolean;
 }

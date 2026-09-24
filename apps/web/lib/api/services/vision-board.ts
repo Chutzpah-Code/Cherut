@@ -10,6 +10,7 @@ export interface VisionBoardItem {
   dueDate?: string;
   order?: number;
   isActive?: boolean;
+  completed?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -22,6 +23,7 @@ export interface CreateVisionBoardItemDto {
   dueDate?: string;
   order?: number;
   isActive?: boolean;
+  completed?: boolean;
 }
 
 export interface UpdateVisionBoardItemDto {
@@ -32,6 +34,7 @@ export interface UpdateVisionBoardItemDto {
   dueDate?: string;
   order?: number;
   isActive?: boolean;
+  completed?: boolean;
 }
 
 /**

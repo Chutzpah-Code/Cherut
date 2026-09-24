@@ -18,7 +18,10 @@ export function ArchivedVisionBoardGrid({ items, onUnarchive, onDelete, onView }
   const td = useTranslations('visionBoard.dueDateBadge');
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
-  const getDueDateBadge = (dueDate?: string) => {
+  const getDueDateBadge = (dueDate?: string, completed?: boolean) => {
+    if (completed) {
+      return <Badge color="green" variant="filled" size="sm">{td('completed')}</Badge>;
+    }
     if (!dueDate) return null;
 
     const today = new Date();
@@ -228,9 +231,9 @@ export function ArchivedVisionBoardGrid({ items, onUnarchive, onDelete, onView }
               </Stack>
 
               {/* Due Date Badge */}
-              {item.dueDate && (
+              {(item.completed || item.dueDate) && (
                 <Group justify="flex-end" mt="xs">
-                  {getDueDateBadge(item.dueDate)}
+                  {getDueDateBadge(item.dueDate, item.completed)}
                 </Group>
               )}
             </div>

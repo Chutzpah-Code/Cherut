@@ -30,4 +30,8 @@ export class UpdateVisionBoardItemDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  completed?: boolean;
 }
