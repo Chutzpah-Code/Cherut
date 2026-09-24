@@ -7,9 +7,10 @@ import {
   ActionIcon, Collapse, Badge, UnstyledButton,
 } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { Pencil, Trash2, Archive, ArchiveRestore } from 'lucide-react';
+import { notifications } from '@mantine/notifications';
+import { Pencil, Trash2, Archive, ArchiveRestore, RefreshCw } from 'lucide-react';
 import {
-  useFinanceAccounts, useUpdateAccount, useDeleteAccount,
+  useFinanceAccounts, useUpdateAccount, useDeleteAccount, useRecalculateBalance,
   useCurrentStatement, useStatements, useCloseStatement, usePayStatement,
 } from '@/hooks/useFinance';
 import { FinanceAccount, FinanceStatement, AccountType } from '@/lib/api/services/finance';
@@ -67,12 +68,15 @@ function TypeChip({ type }: { type: AccountType }) {
   );
 }
 
-function RowActions({ onEdit, onArchive, onDelete, archived }: {
-  onEdit: () => void; onArchive: () => void; onDelete: () => void; archived?: boolean;
+function RowActions({ onEdit, onArchive, onDelete, onRecalculate, recalculating, archived }: {
+  onEdit: () => void; onArchive: () => void; onDelete: () => void; onRecalculate: () => void; recalculating?: boolean; archived?: boolean;
 }) {
   const t = useTranslations('finance.accountsAndCards');
   return (
     <Group gap={6} wrap="nowrap" justify="flex-end">
+      <ActionIcon size="sm" variant="subtle" color="gray" onClick={onRecalculate} loading={recalculating} aria-label={t('recalculateBalance')} title={t('recalculateBalance')}>
+        <RefreshCw size={13} />
+      </ActionIcon>
       <ActionIcon size="sm" variant="subtle" color="blue" onClick={onEdit} aria-label={t('editAccount')}>
         <Pencil size={13} />
       </ActionIcon>
@@ -159,9 +163,9 @@ function PayStatementModal({
   );
 }
 
-function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
+function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete, onRecalculate, recalculating }: {
   account: FinanceAccount; accounts: FinanceAccount[];
-  onEdit: () => void; onArchive: () => void; onDelete: () => void;
+  onEdit: () => void; onArchive: () => void; onDelete: () => void; onRecalculate: () => void; recalculating?: boolean;
 }) {
   const t = useTranslations('finance.accountsAndCards');
   const locale = useLocale();
@@ -224,7 +228,7 @@ function CreditAccountRow({ account, accounts, onEdit, onArchive, onDelete }: {
           {fmtBalance(account.balance ?? 0, locale, currency)}
         </Text>
         <Box onClick={(e) => e.stopPropagation()}>
-          <RowActions onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} archived={account.archived} />
+          <RowActions onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} onRecalculate={onRecalculate} recalculating={recalculating} archived={account.archived} />
         </Box>
       </Box>
 
@@ -278,8 +282,8 @@ const ACCOUNT_TYPE_KEY: Record<AccountType, string> = {
   checking: 'typeChecking', wallet: 'typeWallet', savings: 'typeSavings', credit: 'typeCredit', other: 'typeOther',
 };
 
-function CashAccountRow({ account, onEdit, onArchive, onDelete }: {
-  account: FinanceAccount; onEdit: () => void; onArchive: () => void; onDelete: () => void;
+function CashAccountRow({ account, onEdit, onArchive, onDelete, onRecalculate, recalculating }: {
+  account: FinanceAccount; onEdit: () => void; onArchive: () => void; onDelete: () => void; onRecalculate: () => void; recalculating?: boolean;
 }) {
   const t = useTranslations('finance.accountsAndCards');
   const locale = useLocale();
@@ -304,7 +308,7 @@ function CashAccountRow({ account, onEdit, onArchive, onDelete }: {
       }}>
         {fmtBalance(account.balance ?? 0, locale, currency)}
       </Text>
-      <RowActions onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} archived={account.archived} />
+      <RowActions onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} onRecalculate={onRecalculate} recalculating={recalculating} archived={account.archived} />
     </Box>
   );
 }
@@ -321,9 +325,11 @@ export function AccountsAndCardsList() {
   const { data: accounts = [], isLoading } = useFinanceAccounts();
   const updateAccount = useUpdateAccount();
   const deleteAccount = useDeleteAccount();
+  const recalculateBalance = useRecalculateBalance();
   const { openCreate, openEdit } = useAddPanel();
 
   const [deletingAccount, setDeletingAccount] = useState<FinanceAccount | null>(null);
+  const [recalculatingId, setRecalculatingId] = useState<string | null>(null);
 
   if (isLoading) return <RowsSkeleton rows={3} height={52} />;
 
@@ -333,6 +339,16 @@ export function AccountsAndCardsList() {
 
   const handleArchive = (account: FinanceAccount) => {
     updateAccount.mutate({ id: account.id, dto: { archived: !account.archived } });
+  };
+
+  const handleRecalculate = (account: FinanceAccount) => {
+    setRecalculatingId(account.id);
+    recalculateBalance.mutate(account.id, {
+      onSuccess: () => {
+        notifications.show({ message: t('recalculateBalanceSuccess', { name: account.name }) });
+      },
+      onSettled: () => setRecalculatingId(null),
+    });
   };
 
   return (
@@ -359,6 +375,8 @@ export function AccountsAndCardsList() {
               onEdit={() => openEdit('account', account)}
               onArchive={() => handleArchive(account)}
               onDelete={() => setDeletingAccount(account)}
+              onRecalculate={() => handleRecalculate(account)}
+              recalculating={recalculatingId === account.id}
             />
           ))}
           {creditAccounts.map((account) => (
@@ -369,6 +387,8 @@ export function AccountsAndCardsList() {
               onEdit={() => openEdit('account', account)}
               onArchive={() => handleArchive(account)}
               onDelete={() => setDeletingAccount(account)}
+              onRecalculate={() => handleRecalculate(account)}
+              recalculating={recalculatingId === account.id}
             />
           ))}
           <UnstyledButton onClick={() => openCreate('account')} style={{ ...ADD_ROW_STYLE, marginTop: 6, fontSize: 12.5, padding: 10 }}>

@@ -398,6 +398,8 @@
       "addAccount": "Adicionar conta",
       "addAccountEmpty": "+ Adicionar um cartão de crédito ou conta",
       "editAccount": "Editar conta",
+      "recalculateBalance": "Recalcular saldo",
+      "recalculateBalanceSuccess": "O saldo de {name} foi recalculado a partir do histórico de transações",
       "archiveAccount": "Arquivar conta",
       "unarchiveAccount": "Desarquivar conta",
       "deleteAccount": "Excluir conta",

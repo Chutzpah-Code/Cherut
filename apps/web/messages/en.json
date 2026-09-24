@@ -398,6 +398,8 @@
       "addAccount": "Add account",
       "addAccountEmpty": "+ Add a credit card or account",
       "editAccount": "Edit account",
+      "recalculateBalance": "Recalculate balance",
+      "recalculateBalanceSuccess": "{name}'s balance was recalculated from its transaction history",
       "archiveAccount": "Archive account",
       "unarchiveAccount": "Unarchive account",
       "deleteAccount": "Delete account",
