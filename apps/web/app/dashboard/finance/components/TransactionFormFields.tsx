@@ -46,26 +46,47 @@ export function TransactionFormFields({
     <Stack gap="sm">
       <Select
         label={t('type')}
-        data={[{ value: 'income', label: t('income') }, { value: 'expense', label: t('expense') }]}
+        data={[
+          { value: 'income', label: t('income') },
+          { value: 'expense', label: t('expense') },
+          { value: 'transfer', label: t('transfer') },
+        ]}
         value={form.type}
-        onChange={(v) => setForm((f) => ({ ...f, type: v as any }))}
+        onChange={(v) => setForm((f) => ({
+          ...f,
+          type: v as any,
+          toAccountId: v === 'transfer' ? f.toAccountId : undefined,
+          categoryId: v === 'transfer' ? undefined : f.categoryId,
+        }))}
       />
       <Select
-        label={t('account')}
+        label={form.type === 'transfer' ? t('fromAccount') : t('account')}
         data={accounts.map((a) => ({ value: a.id, label: a.name }))}
         value={form.accountId}
         onChange={onAccountChange}
         placeholder={t('selectAccount')}
         required
       />
-      <Select
-        label={t('category')}
-        data={categories.map((c: any) => ({ value: c.id, label: c.name }))}
-        value={form.categoryId}
-        onChange={(v) => setForm((f) => ({ ...f, categoryId: v ?? undefined }))}
-        placeholder={t('uncategorized')}
-        clearable
-      />
+      {form.type === 'transfer' && (
+        <Select
+          label={t('toAccount')}
+          data={accounts.filter((a) => a.id !== form.accountId).map((a) => ({ value: a.id, label: a.name }))}
+          value={form.toAccountId ?? null}
+          onChange={(v) => setForm((f) => ({ ...f, toAccountId: v ?? undefined }))}
+          placeholder={t('selectToAccount')}
+          required
+        />
+      )}
+      {form.type !== 'transfer' && (
+        <Select
+          label={t('category')}
+          data={categories.map((c: any) => ({ value: c.id, label: c.name }))}
+          value={form.categoryId}
+          onChange={(v) => setForm((f) => ({ ...f, categoryId: v ?? undefined }))}
+          placeholder={t('uncategorized')}
+          clearable
+        />
+      )}
       <NumberInput
         label={t('amount', { currency: formCurrency })}
         min={0}
@@ -99,7 +120,7 @@ export function TransactionFormFields({
         <Button
           onClick={onSubmit}
           loading={loading}
-          disabled={!form.accountId || !form.amount}
+          disabled={!form.accountId || !form.amount || (form.type === 'transfer' && !form.toAccountId)}
           style={{ backgroundColor: '#0052CC' }}
         >
           {submitLabel}

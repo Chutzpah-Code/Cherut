@@ -26,6 +26,7 @@ export const TransactionForm = forwardRef<AddSubformHandle, AddSubformProps>(fun
     ? {
         accountId: entity.accountId, categoryId: entity.categoryId, amount: entity.amount,
         type: entity.type, date: entity.date, description: entity.description,
+        toAccountId: entity.toAccountId,
       }
     : { ...EMPTY_TRANSACTION_FORM, ...prefill };
 
@@ -39,7 +40,8 @@ export const TransactionForm = forwardRef<AddSubformHandle, AddSubformProps>(fun
     mountedRef.current = true;
   }, [form, makeRecurring]);
 
-  const valid = !!form.accountId && !!form.amount && !!form.type && !!form.date;
+  const valid = !!form.accountId && !!form.amount && !!form.type && !!form.date
+    && (form.type !== 'transfer' || !!form.toAccountId);
   useEffect(() => { onValidChange(valid); }, [valid, onValidChange]);
 
   const pending = createTx.isPending || updateTx.isPending || createBill.isPending;
@@ -93,7 +95,7 @@ export const TransactionForm = forwardRef<AddSubformHandle, AddSubformProps>(fun
         submitLabel=""
         hideSubmit
       />
-      {mode === 'create' && (
+      {mode === 'create' && form.type !== 'transfer' && (
         <Switch
           mt="sm"
           label={t('makeRecurring')}

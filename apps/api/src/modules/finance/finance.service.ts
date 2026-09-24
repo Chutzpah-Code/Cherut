@@ -11,6 +11,7 @@ import {
   UpdateCategoryDto,
   CreateTransactionDto,
   UpdateTransactionDto,
+  TransactionType,
   CreateBudgetDto,
   UpdateBudgetDto,
   CreateInvestmentDto,
@@ -133,8 +134,27 @@ export class FinanceService {
   // ─── Transactions ───────────────────────────────────────────────────────────
 
   async createTransaction(userId: string, dto: CreateTransactionDto) {
-    await this.assertOwner(this.ACCOUNTS, dto.accountId, userId);
+    const originAccount: any = await this.assertOwner(this.ACCOUNTS, dto.accountId, userId);
     const data = { ...this.clean(dto as any), userId, createdAt: this.now(), updatedAt: this.now() };
+
+    if (dto.type === TransactionType.TRANSFER) {
+      if (!dto.toAccountId) throw new BadRequestException('toAccountId is required for transfer transactions');
+      if (dto.toAccountId === dto.accountId) throw new BadRequestException('Cannot transfer to the same account');
+      if (!(dto.amount > 0)) throw new BadRequestException('Transfer amount must be positive');
+      const destAccount: any = await this.assertOwner(this.ACCOUNTS, dto.toAccountId, userId);
+      if ((originAccount.currency ?? 'USD') !== (destAccount.currency ?? 'USD')) {
+        throw new BadRequestException('Cannot transfer between accounts with different currencies');
+      }
+
+      const batch = this.db.batch();
+      const ref = this.db.collection(this.TRANSACTIONS).doc();
+      batch.set(ref, data);
+      this.applyBalanceDelta(batch, dto.accountId, -dto.amount);
+      this.applyBalanceDelta(batch, dto.toAccountId, dto.amount);
+      await batch.commit();
+      return { id: ref.id, ...data };
+    }
+
     const ref = await this.db.collection(this.TRANSACTIONS).add(data);
     await this.adjustBalance(dto.accountId, dto.amount, dto.type);
     return { id: ref.id, ...data };
@@ -150,28 +170,91 @@ export class FinanceService {
     if (opts.startDate) query = query.where('date', '>=', opts.startDate);
     if (opts.endDate) query = query.where('date', '<=', opts.endDate);
 
+    let docs: any[];
     try {
       const snap = await query.orderBy('date', 'desc').get();
-      return snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+      docs = snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
     } catch {
       const snap = await query.get();
-      const docs = snap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as any[];
-      return docs.sort((a, b) => (a.date < b.date ? 1 : -1));
+      docs = (snap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as any[])
+        .sort((a, b) => (a.date < b.date ? 1 : -1));
     }
+
+    // A transfer belongs to two accounts — when filtering by account, also
+    // surface transfers where this account is the destination, not just the
+    // source, so "view transactions for this account" shows both legs.
+    if (opts.accountId && (!opts.type || opts.type === 'transfer')) {
+      const incomingSnap = await this.db.collection(this.TRANSACTIONS)
+        .where('userId', '==', userId)
+        .where('toAccountId', '==', opts.accountId)
+        .where('type', '==', 'transfer')
+        .get();
+      let incoming = incomingSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as any[];
+      if (opts.startDate) incoming = incoming.filter((t) => t.date >= opts.startDate!);
+      if (opts.endDate) incoming = incoming.filter((t) => t.date <= opts.endDate!);
+      docs = [...docs, ...incoming].sort((a, b) => (a.date < b.date ? 1 : -1));
+    }
+
+    return docs;
   }
 
   async updateTransaction(userId: string, id: string, dto: UpdateTransactionDto) {
-    const existing = await this.assertOwner(this.TRANSACTIONS, id, userId);
+    const existing: any = await this.assertOwner(this.TRANSACTIONS, id, userId);
     const updates = { ...this.clean(dto as any), updatedAt: this.now() };
-    await this.db.collection(this.TRANSACTIONS).doc(id).update(updates);
+    const merged = { ...existing, ...updates };
+
+    // Only a transfer's balance effect is reconciled here — income/expense
+    // amount edits keep the pre-existing (documented) behavior of not
+    // touching account balances. A transfer always spans two accounts, so
+    // leaving it unreconciled would let the transaction and both balances
+    // silently drift apart.
+    const touchesTransfer = existing.type === 'transfer' || merged.type === 'transfer';
+    if (!touchesTransfer) {
+      await this.db.collection(this.TRANSACTIONS).doc(id).update(updates);
+      return { ...existing, ...updates };
+    }
+
+    if (merged.type === 'transfer') {
+      if (!merged.toAccountId) throw new BadRequestException('toAccountId is required for transfer transactions');
+      if (merged.toAccountId === merged.accountId) throw new BadRequestException('Cannot transfer to the same account');
+      if (!(merged.amount > 0)) throw new BadRequestException('Transfer amount must be positive');
+      const originAccount: any = await this.assertOwner(this.ACCOUNTS, merged.accountId, userId);
+      const destAccount: any = await this.assertOwner(this.ACCOUNTS, merged.toAccountId, userId);
+      if ((originAccount.currency ?? 'USD') !== (destAccount.currency ?? 'USD')) {
+        throw new BadRequestException('Cannot transfer between accounts with different currencies');
+      }
+    }
+
+    const oldEffects = this.transactionEffects(existing.type, existing.accountId, existing.toAccountId, existing.amount);
+    const newEffects = this.transactionEffects(merged.type, merged.accountId, merged.toAccountId, merged.amount);
+    const affectedAccountIds = new Set([...Object.keys(oldEffects), ...Object.keys(newEffects)]);
+
+    const batch = this.db.batch();
+    batch.update(this.db.collection(this.TRANSACTIONS).doc(id), updates);
+    for (const accountId of affectedAccountIds) {
+      const netDelta = (newEffects[accountId] ?? 0) - (oldEffects[accountId] ?? 0);
+      this.applyBalanceDelta(batch, accountId, netDelta);
+    }
+    await batch.commit();
+
     return { ...existing, ...updates };
   }
 
   async deleteTransaction(userId: string, id: string) {
     const tx: any = await this.assertOwner(this.TRANSACTIONS, id, userId);
-    const reverseType = tx.type === 'income' ? 'expense' : 'income';
     try {
-      await this.adjustBalance(tx.accountId, tx.amount, reverseType);
+      if (tx.type === 'transfer' && tx.toAccountId) {
+        // Reverse both legs atomically — if either account was deleted, the
+        // whole batch fails and neither leg is reversed, which is safer than
+        // partially reversing only the surviving account.
+        const batch = this.db.batch();
+        this.applyBalanceDelta(batch, tx.accountId, tx.amount);
+        this.applyBalanceDelta(batch, tx.toAccountId, -tx.amount);
+        await batch.commit();
+      } else {
+        const reverseType = tx.type === 'income' ? 'expense' : 'income';
+        await this.adjustBalance(tx.accountId, tx.amount, reverseType);
+      }
     } catch {
       // Account was already deleted; skip balance reversal
     }
@@ -221,6 +304,19 @@ export class FinanceService {
       docs = (snap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as any[])
         .filter((t) => t.date >= startDate && t.date <= endStr)
         .sort((a, b) => (a.date < b.date ? 1 : -1));
+    }
+
+    // Same OR-across-two-fields need as findTransactions — a transfer must
+    // show up when browsing either the source or the destination account.
+    if (opts.accountId) {
+      const incomingSnap = await this.db.collection(this.TRANSACTIONS)
+        .where('userId', '==', userId)
+        .where('toAccountId', '==', opts.accountId)
+        .where('type', '==', 'transfer')
+        .get();
+      const incoming = (incomingSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as any[])
+        .filter((t) => t.date >= startDate && t.date <= endStr);
+      docs = [...docs, ...incoming].sort((a, b) => (a.date < b.date ? 1 : -1));
     }
 
     if (opts.categoryId === 'uncategorized') {
@@ -669,19 +765,20 @@ export class FinanceService {
 
   async recalculateBalance(userId: string, accountId: string) {
     const account: any = await this.assertOwner(this.ACCOUNTS, accountId, userId);
-    const snap = await this.db
-      .collection(this.TRANSACTIONS)
-      .where('userId', '==', userId)
-      .where('accountId', '==', accountId)
-      .get();
+    const [outSnap, inSnap] = await Promise.all([
+      this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).where('accountId', '==', accountId).get(),
+      this.db.collection(this.TRANSACTIONS).where('userId', '==', userId).where('toAccountId', '==', accountId).where('type', '==', 'transfer').get(),
+    ]);
 
     const initialBalance: number = account.initialBalance ?? 0;
     let balance = initialBalance;
-    for (const doc of snap.docs) {
+    for (const doc of outSnap.docs) {
       const tx = doc.data() as any;
       if (tx.type === 'income') balance += tx.amount;
       else if (tx.type === 'expense') balance -= tx.amount;
+      else if (tx.type === 'transfer') balance -= tx.amount; // outgoing leg
     }
+    for (const doc of inSnap.docs) balance += (doc.data() as any).amount; // incoming leg
 
     await this.db.collection(this.ACCOUNTS).doc(accountId).update({
       balance,
@@ -963,13 +1060,32 @@ export class FinanceService {
 
   // ─── Private helpers ────────────────────────────────────────────────────────
 
-  private async adjustBalance(accountId: string, amount: number, type: string) {
-    const delta = type === 'income' ? amount : type === 'expense' ? -amount : 0;
+  private applyBalanceDelta(batch: admin.firestore.WriteBatch, accountId: string, delta: number) {
     if (delta === 0) return;
-    await this.db.collection(this.ACCOUNTS).doc(accountId).update({
+    batch.update(this.db.collection(this.ACCOUNTS).doc(accountId), {
       balance: admin.firestore.FieldValue.increment(delta),
       updatedAt: this.now(),
     });
+  }
+
+  private async adjustBalance(accountId: string, amount: number, type: string) {
+    const delta = type === 'income' ? amount : type === 'expense' ? -amount : 0;
+    if (delta === 0) return;
+    const batch = this.db.batch();
+    this.applyBalanceDelta(batch, accountId, delta);
+    await batch.commit();
+  }
+
+  // Per-account balance effect of a transaction, keyed by accountId. Shared by
+  // createTransaction/updateTransaction so a transfer's two-account math (and
+  // any future type) is computed in exactly one place.
+  private transactionEffects(type: string, accountId: string, toAccountId: string | undefined, amount: number): Record<string, number> {
+    if (type === 'income') return { [accountId]: amount };
+    if (type === 'expense') return { [accountId]: -amount };
+    if (type === 'transfer' && toAccountId) {
+      return { [accountId]: -amount, [toAccountId]: amount };
+    }
+    return {};
   }
 
   // ─── Credit card statements ─────────────────────────────────────────────────

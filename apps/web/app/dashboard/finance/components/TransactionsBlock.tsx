@@ -60,13 +60,14 @@ function exportTransactionsCsv(
   categoryMap: Record<string, any>,
   filename: string,
 ) {
-  const header = ['Date', 'Description', 'Category', 'Account', 'Type', 'Amount'];
+  const header = ['Date', 'Description', 'Category', 'Account', 'To Account', 'Type', 'Amount'];
   const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
   const lines = rows.map((t) => [
     t.date,
     t.description ?? '',
     t.categoryId ? (categoryMap[t.categoryId]?.name ?? '') : 'Uncategorized',
     accountMap[t.accountId]?.name ?? '',
+    t.toAccountId ? (accountMap[t.toAccountId]?.name ?? '') : '',
     t.type,
     String(t.amount),
   ].map((v) => escape(String(v))).join(','));
@@ -218,6 +219,7 @@ export function TransactionsBlock() {
     openAddCreate('transaction', {
       accountId: tx.accountId, categoryId: tx.categoryId, amount: tx.amount,
       type: tx.type, date: localToday(), description: tx.description,
+      toAccountId: tx.toAccountId,
     });
   };
 
@@ -446,6 +448,7 @@ export function TransactionsBlock() {
                         currency={currency}
                         categoryName={tx.categoryId ? categoryMap[tx.categoryId]?.name : undefined}
                         accountName={accountMap[tx.accountId]?.name}
+                        toAccountName={tx.toAccountId ? accountMap[tx.toAccountId]?.name : undefined}
                         onEdit={() => openEdit(tx)}
                         onDelete={() => undoableDeleteTx.remove(tx.id)}
                       />

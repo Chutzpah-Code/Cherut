@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, Min, Matches } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, Min, Matches, ValidateIf } from 'class-validator';
 
 export enum TransactionType {
   INCOME = 'income',
@@ -35,8 +35,9 @@ export class CreateTransactionDto {
   @IsOptional()
   notes?: string;
 
+  @ValidateIf((o) => o.type === TransactionType.TRANSFER)
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   toAccountId?: string;
 
   @IsString()
