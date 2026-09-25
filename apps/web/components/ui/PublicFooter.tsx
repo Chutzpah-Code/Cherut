@@ -33,7 +33,6 @@ export function PublicFooter() {
     {
       label: t('resources'),
       links: [
-        [t('community'), 'https://t.me/+MxfNsOTcN-Y5MmYx'],
         [t('helpCenter'), '/help-center'],
         [t('privacy'), '/privacy-policy'],
       ],

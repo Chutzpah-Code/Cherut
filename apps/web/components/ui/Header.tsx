@@ -43,7 +43,6 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
     [`${prefix}features`, t('features')],
     [`${prefix}how`, t('method')],
     [`${prefix}pricing`, t('pricing')],
-    ['/about', t('about')],
   ];
 
   const closeMenu = () => setMenuOpen(false);
