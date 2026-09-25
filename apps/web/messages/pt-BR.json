@@ -1294,9 +1294,14 @@
     "visionDeadlineMsg": "Sua meta \"{title}\" vence em {count, plural, one {# dia} other {# dias}}. Mantenha o foco nos seus sonhos!"
   },
   "landing": {
+    "meta": {
+      "title": "Cherut — Obsessão estruturada para a vida que você está construindo",
+      "description": "Transforme ambição em uma direção, execução diária e um sistema que sobrevive aos dias difíceis. Escolha o sistema que sua direção exige."
+    },
     "hero": {
       "kicker": "Obsessão estruturada",
       "headlinePrefix": "A única coisa que distorce o tempo é",
+      "animatedWords": ["intensidade", "velocidade", "foco", "obsessão", "direção", "intensidade"],
       "sub": "Você veio do zero com nada além de vontade de mudar. Mas obsessão sem estrutura se esgota. O Cherut dá a ela uma direção, um sistema e um método para continuar. Esse método se chama All In All The Time.",
       "ctaStart": "Comece seu sistema",
       "ctaSystem": "Veja como funciona",
@@ -1307,7 +1312,7 @@
       "heading": "Você sabe o que fazer. Ainda assim não cumpre o que disse a si mesmo que faria.",
       "sub": "Essa distância é o que destrói sua confiança na própria palavra. O Cherut cria a estrutura que te tira desse ciclo.",
       "cycleHeading": "O mesmo ciclo, sempre",
-      "cycle": ["Você cria uma meta", "Começa com intensidade", "Encontra cansaço, medo, tédio ou distração", "Escolhe a recompensa imediata", "Abandona a meta", "Sente a culpa", "Promete recomeçar", "Cria um novo sistema", "Repete o ciclo"],
+      "cycle": ["Você cria uma meta", "Começa com intensidade", "Encontra cansaço, medo, tédio ou distração", "Escolhe a recompensa imediata", "Abandona a meta", "Sente a culpa", "Promete recomeçar", "Decide seguir outra fórmula mágica", "Repete o ciclo"],
       "voicesHeading": "O que fica sem dizer",
       "voices": [
         "Eu sei o que preciso fazer, mas continuo fazendo outra coisa.",

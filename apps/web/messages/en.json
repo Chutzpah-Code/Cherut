@@ -1294,9 +1294,14 @@
     "visionDeadlineMsg": "Your vision board goal \"{title}\" is due in {count, plural, one {# day} other {# days}}. Stay focused on your dreams!"
   },
   "landing": {
+    "meta": {
+      "title": "Cherut — Structured obsession for the life you are building",
+      "description": "Turn ambition into one direction, daily execution, and a system that survives the hard days. Choose the system your direction requires."
+    },
     "hero": {
       "kicker": "Structured obsession",
       "headlinePrefix": "The only thing that distorts time is",
+      "animatedWords": ["intensity", "speed", "focus", "obsession", "direction", "intensity"],
       "sub": "You came from nothing but a desire to change. But obsession without structure burns out. Cherut gives it a direction, a system, and a method to keep going. That method is called All In All The Time.",
       "ctaStart": "Start your system",
       "ctaSystem": "See how it works",

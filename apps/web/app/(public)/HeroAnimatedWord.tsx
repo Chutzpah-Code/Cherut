@@ -2,27 +2,29 @@
 
 import { useEffect, useState } from 'react';
 
-const WORDS = ['intensity', 'speed', 'focus', 'obsession', 'direction', 'intensity'];
 const TYPE_MS = 60;
 const DELETE_MS = 34;
 const HOLD_MS = 950;
-const LONGEST = Math.max(...WORDS.map((w) => w.length));
 
 interface HeroAnimatedWordProps {
   color: string;
+  words: string[];
 }
 
-// Typewriter cycle through WORDS, always settling back on the final
-// "intensity" with a blinking cursor left on. Reserves width for the
-// longest word up front so swapping words never shifts the layout.
-export function HeroAnimatedWord({ color }: HeroAnimatedWordProps) {
+// Typewriter cycle through `words` (locale-specific — the caller passes the
+// translated list so the animated word is never left in English on a
+// non-English page), always settling back on the final word with a blinking
+// cursor left on. Reserves width for the longest word up front so swapping
+// words never shifts the layout.
+export function HeroAnimatedWord({ color, words }: HeroAnimatedWordProps) {
   const [display, setDisplay] = useState('');
   const [settled, setSettled] = useState(false);
+  const longest = Math.max(...words.map((w) => w.length));
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) {
-      setDisplay(WORDS[WORDS.length - 1]);
+      setDisplay(words[words.length - 1]);
       setSettled(true);
       return;
     }
@@ -35,8 +37,8 @@ export function HeroAnimatedWord({ color }: HeroAnimatedWordProps) {
 
     const tick = () => {
       if (cancelled) return;
-      const word = WORDS[wordIndex];
-      const isLastWord = wordIndex === WORDS.length - 1;
+      const word = words[wordIndex];
+      const isLastWord = wordIndex === words.length - 1;
 
       if (phase === 'typing') {
         charIndex += 1;
@@ -76,7 +78,7 @@ export function HeroAnimatedWord({ color }: HeroAnimatedWordProps) {
     <span
       style={{
         display: 'inline-block',
-        minWidth: `${LONGEST + 0.6}ch`,
+        minWidth: `${longest + 0.6}ch`,
         textAlign: 'left',
         color,
         whiteSpace: 'nowrap',
@@ -109,7 +111,7 @@ export function HeroAnimatedWord({ color }: HeroAnimatedWordProps) {
           border: 0,
         }}
       >
-        {WORDS[WORDS.length - 1]}
+        {words[words.length - 1]}
       </span>
     </span>
   );

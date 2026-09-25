@@ -7,7 +7,7 @@ import { PublicHeader } from '@/components/ui/Header';
 import { PublicFooter } from '@/components/ui/PublicFooter';
 import { HeroAnimatedWord } from './HeroAnimatedWord';
 
-// ── Dark landing page theme ──────────────────────────────────────────────────
+// ── Dark landing page theme — same background as every other public page ──
 const BG      = '#07070D';
 const SURF    = '#0F0F1B';
 const SURF2   = '#161628';
@@ -33,6 +33,7 @@ export default function LandingPageClient() {
   const [openFaq, setOpenFaq] = useState<number>(0);
   const [billing, setBilling] = useState<'monthly' | 'annual'>('annual');
 
+  const animatedWords = t.raw('hero.animatedWords') as string[];
   const cycle = t.raw('problem.cycle') as string[];
   const voices = t.raw('problem.voices') as string[];
   const principles = t.raw('solution.principles') as PrincipleItem[];
@@ -60,12 +61,15 @@ export default function LandingPageClient() {
         .lp-cta-primary:hover { opacity: .87; transform: translateY(-1px); }
         .lp-cta-ghost { transition: background .15s, color .15s, border-color .15s; }
         .lp-cta-ghost:hover { background: ${TEXT}; color: ${BG}; border-color: ${TEXT}; }
-        .lp-feature-card { transition: transform .22s, border-color .22s; }
+        .lp-feature-card { transition: transform .22s, border-color .22s; flex: 1 1 300px; max-width: 320px; }
         .lp-feature-card:hover { transform: translateY(-3px); border-color: ${ACCENT}; }
         .lp-faq-item { transition: background .15s; }
         .lp-faq-item:hover { background: ${SURF2}; }
-        .lp-pricing-card { transition: transform .28s, box-shadow .28s; }
+        .lp-pricing-card { transition: transform .28s, box-shadow .28s; flex: 1 1 300px; max-width: 340px; }
         .lp-pricing-card:hover { transform: translateY(-4px); }
+        .lp-step-item, .lp-principle-item { flex: 1 1 200px; max-width: 220px; }
+        .lp-testimonial-card { flex: 1 1 260px; max-width: 300px; }
+        .lp-benefit-item { flex: 1 1 320px; max-width: 380px; }
         @keyframes lp-glow-pulse {
           0%, 100% { opacity: 0.10; }
           50%       { opacity: 0.18; }
@@ -92,28 +96,31 @@ export default function LandingPageClient() {
 
         /* Hero */
         .lp-hero-section { padding: 108px 32px 64px; position: relative; overflow: hidden; text-align: center; }
+        .lp-hero-inner { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; }
         .lp-hero-h1 {
           font-family: ${DISPLAY}; font-style: normal; text-transform: uppercase;
           font-size: clamp(40px, 7.4vw, 92px);
           line-height: 1.02; letter-spacing: 0.005em; font-weight: 800;
           margin: 0 0 28px; color: ${TEXT};
         }
-        .lp-hero-sub { font-size: clamp(15px, 1.8vw, 18px); line-height: 1.65; color: ${MUTED}; max-width: 600px; margin: 0 auto 32px; }
+        .lp-hero-sub { font-size: clamp(16px, 1.9vw, 19px); line-height: 1.65; color: ${MUTED}; max-width: 620px; margin: 0 auto 32px; }
         .lp-hero-ctas { display: flex; gap: 14px; justify-content: center; align-items: center; flex-wrap: wrap; }
-        .lp-hero-micro { font-size: 13px; color: rgba(237,238,246,0.34); margin: 18px 0 0; }
+        .lp-hero-micro { font-size: 13.5px; color: rgba(237,238,246,0.36); margin: 18px 0 0; }
 
-        /* Sections */
-        .lp-section      { padding: 120px 32px; }
-        .lp-section-alt  { padding: 120px 32px; background: ${SURF}; }
-        .lp-section-head { max-width: 760px; margin: 0 auto 64px; text-align: center; }
-        .lp-features-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
-        .lp-steps-grid    { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 32px; }
-        .lp-principles-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; }
-        .lp-pricing-grid  { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; align-items: stretch; }
-        .lp-loop-row      { max-width: 980px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 4px; align-items: center; }
+        /* Sections — one consistent background across the whole page, same
+           tone as every other public page. Alternate sections get a soft
+           hairline instead of a hard color swap. */
+        .lp-section      { padding: 120px 32px; background: ${BG}; }
+        .lp-section-alt  { padding: 120px 32px; background: ${BG}; border-top: 1px solid ${RULE}; }
+        .lp-section-head { max-width: 780px; margin: 0 auto 64px; text-align: center; }
+        .lp-features-grid { max-width: 1160px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+        .lp-steps-grid    { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 36px; }
+        .lp-principles-grid { max-width: 960px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 36px; }
+        .lp-pricing-grid  { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 14px; }
+        .lp-loop-row      { max-width: 980px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 6px; align-items: center; }
         .lp-voices-grid   { max-width: 980px; margin: 40px auto 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .lp-benefits-grid { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 28px; }
-        .lp-testimonial-grid { max-width: 1140px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+        .lp-benefits-grid { max-width: 860px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px 32px; }
+        .lp-testimonial-grid { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
 
         /* Section headings */
         .lp-h2 {
@@ -121,7 +128,7 @@ export default function LandingPageClient() {
           font-size: clamp(34px, 5.2vw, 60px); line-height: 1.02;
           letter-spacing: 0.01em; font-weight: 800; margin: 0; color: ${TEXT};
         }
-        .lp-h2-sub { font-size: 17px; color: ${MUTED}; line-height: 1.6; margin: 22px auto 0; max-width: 560px; }
+        .lp-h2-sub { font-size: 18.5px; color: ${MUTED}; line-height: 1.6; margin: 22px auto 0; max-width: 580px; }
 
         /* ═══ Responsive ═══ */
         @media (max-width: 1023px) {
@@ -135,16 +142,12 @@ export default function LandingPageClient() {
           .lp-section     { padding: 64px 20px; }
           .lp-section-alt { padding: 64px 20px; }
           .lp-section-head { margin-bottom: 40px; }
-          .lp-features-grid { grid-template-columns: 1fr; }
-          .lp-steps-grid    { grid-template-columns: 1fr 1fr; gap: 24px; }
-          .lp-principles-grid { grid-template-columns: 1fr; }
-          .lp-pricing-grid  { grid-template-columns: 1fr; }
           .lp-voices-grid   { grid-template-columns: 1fr; }
-          .lp-benefits-grid { grid-template-columns: 1fr; }
+          .lp-feature-card, .lp-pricing-card, .lp-testimonial-card,
+          .lp-step-item, .lp-principle-item, .lp-benefit-item { flex-basis: 100%; max-width: 460px; }
           .lp-final-cta { padding: 80px 20px !important; }
         }
         @media (max-width: 479px) {
-          .lp-steps-grid   { grid-template-columns: 1fr; }
           .lp-section      { padding: 56px 16px; }
           .lp-section-alt  { padding: 56px 16px; }
           .lp-final-cta    { padding: 64px 16px !important; }
@@ -158,11 +161,11 @@ export default function LandingPageClient() {
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px)', backgroundSize: '80px 80px', maskImage: 'radial-gradient(ellipse at 50% 40%, #000 35%, transparent 80%)', WebkitMaskImage: 'radial-gradient(ellipse at 50% 40%, #000 35%, transparent 80%)', pointerEvents: 'none' }} />
         <div className="lp-hero-glow" style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 80% 55% at 50% -5%, ${ACCENT} 0%, transparent 65%)`, pointerEvents: 'none' }} />
 
-        <div style={{ position: 'relative', zIndex: 1 }}>
+        <div className="lp-hero-inner">
           <span className="lp-kicker">{t('hero.kicker')}</span>
 
           <h1 className="lp-hero-h1">
-            {t('hero.headlinePrefix')} <HeroAnimatedWord color={ACCENT} />
+            {t('hero.headlinePrefix')} <HeroAnimatedWord color={ACCENT} words={animatedWords} />
           </h1>
 
           <p className="lp-hero-sub">{t('hero.sub')}</p>
@@ -191,8 +194,8 @@ export default function LandingPageClient() {
         <div className="lp-loop-row">
           {cycle.map((step, i) => (
             <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 13.5, color: MUTED, padding: '8px 14px', border: `1px solid ${RULE}`, borderRadius: 999, background: SURF2, whiteSpace: 'nowrap' }}>{step}</span>
-              {i < cycle.length - 1 && <span style={{ color: ACCENT, fontSize: 13 }}>→</span>}
+              <span style={{ fontSize: 15, color: MUTED, padding: '9px 15px', border: `1px solid ${RULE}`, borderRadius: 999, background: SURF2, whiteSpace: 'nowrap' }}>{step}</span>
+              {i < cycle.length - 1 && <span style={{ color: ACCENT, fontSize: 14 }}>→</span>}
             </span>
           ))}
         </div>
@@ -201,12 +204,12 @@ export default function LandingPageClient() {
         <div className="lp-voices-grid">
           {voices.map((v, i) => (
             <div key={i} style={{ padding: '18px 22px', background: SURF, border: `1px solid ${RULE}`, borderRadius: 12 }}>
-              <p style={{ fontSize: 15, lineHeight: 1.55, color: 'rgba(237,238,246,0.78)', margin: 0, fontStyle: 'italic' }}>&ldquo;{v}&rdquo;</p>
+              <p style={{ fontSize: 16.5, lineHeight: 1.55, color: 'rgba(237,238,246,0.8)', margin: 0, fontStyle: 'italic' }}>&ldquo;{v}&rdquo;</p>
             </div>
           ))}
         </div>
 
-        <p style={{ maxWidth: 640, margin: '48px auto 0', textAlign: 'center', fontSize: 15, color: MUTED, lineHeight: 1.6 }}>{t('problem.note')}</p>
+        <p style={{ maxWidth: 660, margin: '48px auto 0', textAlign: 'center', fontSize: 16, color: MUTED, lineHeight: 1.6 }}>{t('problem.note')}</p>
       </section>
 
       {/* ── Solution / Method ── */}
@@ -218,22 +221,22 @@ export default function LandingPageClient() {
         </div>
 
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ fontSize: 12, color: MUTED, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>{t('solution.methodLabel')}</div>
+          <div style={{ fontSize: 12.5, color: MUTED, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>{t('solution.methodLabel')}</div>
           <div style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 800, color: ACCENT, letterSpacing: '0.02em' }}>{t('solution.methodName')}</div>
         </div>
 
         <div className="lp-principles-grid">
           {principles.map((p, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div key={i} className="lp-principle-item" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, letterSpacing: '0.1em' }}>{p.n}</div>
               <div style={{ height: 2, background: ACCENT, width: 32, borderRadius: 1, marginBottom: 4 }} />
-              <h3 style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 20, lineHeight: 1.1, fontWeight: 700, margin: 0, color: TEXT }}>{p.title}</h3>
-              <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.6, margin: 0 }}>{p.body}</p>
+              <h3 style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 21, lineHeight: 1.1, fontWeight: 700, margin: 0, color: TEXT }}>{p.title}</h3>
+              <p style={{ fontSize: 15.5, color: MUTED, lineHeight: 1.6, margin: 0 }}>{p.body}</p>
             </div>
           ))}
         </div>
 
-        <p style={{ maxWidth: 560, margin: '48px auto 0', textAlign: 'center', fontSize: 14.5, color: MUTED, lineHeight: 1.6, fontStyle: 'italic' }}>{t('solution.note')}</p>
+        <p style={{ maxWidth: 580, margin: '48px auto 0', textAlign: 'center', fontSize: 16, color: MUTED, lineHeight: 1.6, fontStyle: 'italic' }}>{t('solution.note')}</p>
       </section>
 
       {/* ── System (modules) ── */}
@@ -250,12 +253,12 @@ export default function LandingPageClient() {
                 <span style={{ fontSize: 16, color: ACCENT }}>{featureIcons[i % featureIcons.length]}</span>
               </div>
               <span style={{ fontSize: 10, color: ACCENT, letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700 }}>{f.tag}</span>
-              <h3 style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 19, lineHeight: 1.08, fontWeight: 700, margin: 0, color: TEXT }}>{f.title}</h3>
-              <p style={{ fontSize: 13.5, lineHeight: 1.62, color: MUTED, margin: 0 }}>{f.body}</p>
+              <h3 style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 20, lineHeight: 1.08, fontWeight: 700, margin: 0, color: TEXT }}>{f.title}</h3>
+              <p style={{ fontSize: 15, lineHeight: 1.6, color: MUTED, margin: 0 }}>{f.body}</p>
             </div>
           ))}
         </div>
-        <p style={{ maxWidth: 560, margin: '48px auto 0', textAlign: 'center', fontSize: 15, color: TEXT, fontWeight: 600, lineHeight: 1.5 }}>{t('features.banner')}</p>
+        <p style={{ maxWidth: 580, margin: '48px auto 0', textAlign: 'center', fontSize: 16.5, color: TEXT, fontWeight: 600, lineHeight: 1.5 }}>{t('features.banner')}</p>
       </section>
 
       {/* ── How it works ── */}
@@ -267,15 +270,15 @@ export default function LandingPageClient() {
         </div>
         <div className="lp-steps-grid">
           {howSteps.map((s, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div key={i} className="lp-step-item" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, letterSpacing: '0.1em' }}>{s.n}</div>
               <div style={{ height: 2, background: ACCENT, width: 32, borderRadius: 1, marginBottom: 6 }} />
-              <h3 style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 20, lineHeight: 1.08, fontWeight: 700, margin: 0, color: TEXT }}>{s.title}</h3>
-              <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.62, margin: 0 }}>{s.body}</p>
+              <h3 style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 21, lineHeight: 1.08, fontWeight: 700, margin: 0, color: TEXT }}>{s.title}</h3>
+              <p style={{ fontSize: 15.5, color: MUTED, lineHeight: 1.6, margin: 0 }}>{s.body}</p>
             </div>
           ))}
         </div>
-        <p style={{ maxWidth: 560, margin: '56px auto 0', textAlign: 'center', fontSize: 14.5, color: MUTED, lineHeight: 1.6, fontStyle: 'italic' }}>{t('how.note')}</p>
+        <p style={{ maxWidth: 580, margin: '56px auto 0', textAlign: 'center', fontSize: 16, color: MUTED, lineHeight: 1.6, fontStyle: 'italic' }}>{t('how.note')}</p>
       </section>
 
       {/* ── Benefits / ROI ── */}
@@ -287,16 +290,16 @@ export default function LandingPageClient() {
         </div>
         <div className="lp-benefits-grid">
           {benefitItems.map((b, i) => (
-            <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <span style={{ color: ACCENT, fontWeight: 700, fontSize: 15, lineHeight: '1.6' }}>✓</span>
-              <span style={{ fontSize: 15, color: 'rgba(237,238,246,0.78)', lineHeight: 1.55 }}>{b}</span>
+            <div key={i} className="lp-benefit-item" style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <span style={{ color: ACCENT, fontWeight: 700, fontSize: 16, lineHeight: '1.6' }}>✓</span>
+              <span style={{ fontSize: 16.5, color: 'rgba(237,238,246,0.8)', lineHeight: 1.55 }}>{b}</span>
             </div>
           ))}
         </div>
-        <div style={{ maxWidth: 700, margin: '56px auto 0', padding: '28px 32px', background: SURF, border: `1px solid ${RULE}`, borderRadius: 14, textAlign: 'center' }}>
+        <div style={{ maxWidth: 720, margin: '56px auto 0', padding: '28px 32px', background: SURF, border: `1px solid ${RULE}`, borderRadius: 14, textAlign: 'center' }}>
           <div style={{ fontSize: 11, color: ACCENT, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700, marginBottom: 12 }}>{t('benefits.roiHeading')}</div>
-          <p style={{ fontSize: 15, color: TEXT, lineHeight: 1.6, margin: '0 0 10px' }}>{t('benefits.roiFormula')}</p>
-          <p style={{ fontSize: 12.5, color: MUTED, margin: 0 }}>{t('benefits.roiDisclaimer')}</p>
+          <p style={{ fontSize: 16.5, color: TEXT, lineHeight: 1.6, margin: '0 0 10px' }}>{t('benefits.roiFormula')}</p>
+          <p style={{ fontSize: 13.5, color: MUTED, margin: 0 }}>{t('benefits.roiDisclaimer')}</p>
         </div>
       </section>
 
@@ -312,9 +315,9 @@ export default function LandingPageClient() {
             three cards for real, authorized testimonials as they come in. */}
         <div className="lp-testimonial-grid">
           {[0, 1, 2].map((i) => (
-            <div key={i} style={{ padding: '24px 22px', border: `1px dashed rgba(237,238,246,0.18)`, borderRadius: 14, textAlign: 'center' }}>
+            <div key={i} className="lp-testimonial-card" style={{ padding: '24px 22px', border: `1px dashed rgba(237,238,246,0.18)`, borderRadius: 14, textAlign: 'center' }}>
               <div style={{ fontSize: 11, color: ACCENT, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700, marginBottom: 10 }}>{t('testimonials.placeholderLabel')}</div>
-              <p style={{ fontSize: 13.5, color: MUTED, lineHeight: 1.6, margin: 0 }}>{t('testimonials.placeholderBody')}</p>
+              <p style={{ fontSize: 15, color: MUTED, lineHeight: 1.6, margin: 0 }}>{t('testimonials.placeholderBody')}</p>
             </div>
           ))}
         </div>
@@ -322,7 +325,7 @@ export default function LandingPageClient() {
         <div style={{ maxWidth: 1140, margin: '48px auto 0', padding: '28px 36px', background: SURF, borderRadius: 14, border: `1px solid ${RULE}`, display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 22, fontWeight: 700, color: TEXT, marginBottom: 4 }}>{t('testimonials.joinTitle')}</div>
-            <div style={{ fontSize: 14, color: MUTED }}>{t('testimonials.joinBody')}</div>
+            <div style={{ fontSize: 15.5, color: MUTED }}>{t('testimonials.joinBody')}</div>
           </div>
           <a href="https://t.me/+MxfNsOTcN-Y5MmYx" className="lp-cta-primary" style={{ background: TEXT, color: BG, fontSize: 14, fontWeight: 700, padding: '12px 22px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             {t('testimonials.joinCta')} →
@@ -337,12 +340,12 @@ export default function LandingPageClient() {
           <h2 className="lp-h2">{t('pricing.heading1')}<br/>{t('pricing.heading2')}</h2>
           <p className="lp-h2-sub">{t('pricing.sub')}</p>
           <div style={{ display: 'inline-flex', gap: 4, marginTop: 28, padding: 4, background: SURF2, border: `1px solid ${RULE}`, borderRadius: 999 }}>
-            <button onClick={() => setBilling('monthly')} style={{ padding: '8px 18px', borderRadius: 999, fontSize: 13, fontWeight: 600, color: billing === 'monthly' ? BG : MUTED, background: billing === 'monthly' ? TEXT : 'transparent', transition: 'background .15s, color .15s' }}>{t('pricing.monthly')}</button>
-            <button onClick={() => setBilling('annual')}  style={{ padding: '8px 18px', borderRadius: 999, fontSize: 13, fontWeight: 600, color: billing === 'annual'  ? BG : MUTED, background: billing === 'annual'  ? TEXT : 'transparent', transition: 'background .15s, color .15s', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <button onClick={() => setBilling('monthly')} style={{ padding: '8px 18px', borderRadius: 999, fontSize: 13.5, fontWeight: 600, color: billing === 'monthly' ? BG : MUTED, background: billing === 'monthly' ? TEXT : 'transparent', transition: 'background .15s, color .15s' }}>{t('pricing.monthly')}</button>
+            <button onClick={() => setBilling('annual')}  style={{ padding: '8px 18px', borderRadius: 999, fontSize: 13.5, fontWeight: 600, color: billing === 'annual'  ? BG : MUTED, background: billing === 'annual'  ? TEXT : 'transparent', transition: 'background .15s, color .15s', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
               {t('pricing.annual')} <span style={{ fontSize: 10, fontWeight: 700, background: ACCENT, color: BG, padding: '2px 8px', borderRadius: 999, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t('pricing.saveBadge')}</span>
             </button>
           </div>
-          <p style={{ fontSize: 12.5, color: 'rgba(237,238,246,0.34)', marginTop: 14 }}>{t('pricing.toggleNote')}</p>
+          <p style={{ fontSize: 13, color: 'rgba(237,238,246,0.36)', marginTop: 14 }}>{t('pricing.toggleNote')}</p>
         </div>
 
         <div className="lp-pricing-grid">
@@ -351,19 +354,19 @@ export default function LandingPageClient() {
             <div style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', opacity: 0.7 }}>{t('pricing.plans.saas.name')}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <span style={{ fontFamily: DISPLAY, fontSize: 52, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.01em' }}>{billing === 'annual' ? t('pricing.plans.saas.priceAnnual') : t('pricing.plans.saas.priceMonthly')}</span>
-              <span style={{ fontSize: 14, opacity: 0.55 }}>{billing === 'annual' ? t('pricing.plans.saas.cadenceAnnual') : t('pricing.plans.saas.cadenceMonthly')}</span>
+              <span style={{ fontSize: 15, opacity: 0.55 }}>{billing === 'annual' ? t('pricing.plans.saas.cadenceAnnual') : t('pricing.plans.saas.cadenceMonthly')}</span>
             </div>
-            {billing === 'annual' && <div style={{ fontSize: 12, fontWeight: 600, color: ACCENT, marginTop: -6 }}>{t('pricing.plans.saas.annualNote')}</div>}
-            <p style={{ fontSize: 14, opacity: 0.7, margin: 0, minHeight: 40 }}>{t('pricing.plans.saas.blurb')}</p>
+            {billing === 'annual' && <div style={{ fontSize: 13, fontWeight: 600, color: ACCENT, marginTop: -6 }}>{t('pricing.plans.saas.annualNote')}</div>}
+            <p style={{ fontSize: 15.5, opacity: 0.7, margin: 0, minHeight: 40 }}>{t('pricing.plans.saas.blurb')}</p>
             <div style={{ height: 1, background: 'currentColor', opacity: 0.1, margin: '4px 0' }} />
             <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {saasFeatures.map((feat, j) => (
-                <li key={j} style={{ fontSize: 14, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <li key={j} style={{ fontSize: 15, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                   <span style={{ fontWeight: 700, color: ACCENT }}>✓</span> {feat}
                 </li>
               ))}
             </ul>
-            <a href="/auth/register" style={{ marginTop: 'auto', padding: '13px 24px', borderRadius: 999, background: SURF2, color: TEXT, fontSize: 14, fontWeight: 700, textAlign: 'center', border: `1px solid ${RULE}`, display: 'block', letterSpacing: '-0.01em' }}>{t('pricing.plans.saas.cta')}</a>
+            <a href="/auth/register" style={{ marginTop: 'auto', padding: '13px 24px', borderRadius: 999, background: SURF2, color: TEXT, fontSize: 14.5, fontWeight: 700, textAlign: 'center', border: `1px solid ${RULE}`, display: 'block', letterSpacing: '-0.01em' }}>{t('pricing.plans.saas.cta')}</a>
           </div>
 
           {/* Plan 2 — SaaS + Course (most popular) */}
@@ -372,19 +375,19 @@ export default function LandingPageClient() {
             <div style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', opacity: 0.7 }}>{t('pricing.plans.course.name')}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <span style={{ fontFamily: DISPLAY, fontSize: 52, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.01em' }}>{t('pricing.plans.course.price')}</span>
-              <span style={{ fontSize: 14, opacity: 0.55 }}>{t('pricing.plans.course.cadence')}</span>
+              <span style={{ fontSize: 15, opacity: 0.55 }}>{t('pricing.plans.course.cadence')}</span>
             </div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(7,7,13,0.65)', marginTop: -6 }}>{t('pricing.plans.course.priceNote')}</div>
-            <p style={{ fontSize: 14, opacity: 0.7, margin: 0, minHeight: 40 }}>{t('pricing.plans.course.blurb')}</p>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(7,7,13,0.65)', marginTop: -6 }}>{t('pricing.plans.course.priceNote')}</div>
+            <p style={{ fontSize: 15.5, opacity: 0.7, margin: 0, minHeight: 40 }}>{t('pricing.plans.course.blurb')}</p>
             <div style={{ height: 1, background: 'currentColor', opacity: 0.1, margin: '4px 0' }} />
             <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {courseFeatures.map((feat, j) => (
-                <li key={j} style={{ fontSize: 14, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <li key={j} style={{ fontSize: 15, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                   <span style={{ fontWeight: 700, color: 'rgba(7,7,13,0.7)' }}>✓</span> {feat}
                 </li>
               ))}
             </ul>
-            <a href="/auth/register" style={{ marginTop: 'auto', padding: '13px 24px', borderRadius: 999, background: BG, color: TEXT, fontSize: 14, fontWeight: 700, textAlign: 'center', border: `1px solid ${BG}`, display: 'block', letterSpacing: '-0.01em' }}>{t('pricing.plans.course.cta')}</a>
+            <a href="/auth/register" style={{ marginTop: 'auto', padding: '13px 24px', borderRadius: 999, background: BG, color: TEXT, fontSize: 14.5, fontWeight: 700, textAlign: 'center', border: `1px solid ${BG}`, display: 'block', letterSpacing: '-0.01em' }}>{t('pricing.plans.course.cta')}</a>
           </div>
 
           {/* Plan 3 — Mentorship (apply, not checkout) */}
@@ -392,18 +395,18 @@ export default function LandingPageClient() {
             <div style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', opacity: 0.7 }}>{t('pricing.plans.mentorship.name')}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <span style={{ fontFamily: DISPLAY, fontSize: 52, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.01em' }}>{t('pricing.plans.mentorship.price')}</span>
-              <span style={{ fontSize: 14, opacity: 0.55 }}>{t('pricing.plans.mentorship.cadence')}</span>
+              <span style={{ fontSize: 15, opacity: 0.55 }}>{t('pricing.plans.mentorship.cadence')}</span>
             </div>
-            <p style={{ fontSize: 14, opacity: 0.7, margin: 0, minHeight: 40 }}>{t('pricing.plans.mentorship.blurb')}</p>
+            <p style={{ fontSize: 15.5, opacity: 0.7, margin: 0, minHeight: 40 }}>{t('pricing.plans.mentorship.blurb')}</p>
             <div style={{ height: 1, background: 'currentColor', opacity: 0.1, margin: '4px 0' }} />
             <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {mentorshipFeatures.map((feat, j) => (
-                <li key={j} style={{ fontSize: 14, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <li key={j} style={{ fontSize: 15, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                   <span style={{ fontWeight: 700, color: ACCENT }}>✓</span> {feat}
                 </li>
               ))}
             </ul>
-            <a href="/contact" style={{ marginTop: 'auto', padding: '13px 24px', borderRadius: 999, background: SURF2, color: TEXT, fontSize: 14, fontWeight: 700, textAlign: 'center', border: `1px solid ${RULE}`, display: 'block', letterSpacing: '-0.01em' }}>{t('pricing.plans.mentorship.cta')}</a>
+            <a href="/contact" style={{ marginTop: 'auto', padding: '13px 24px', borderRadius: 999, background: SURF2, color: TEXT, fontSize: 14.5, fontWeight: 700, textAlign: 'center', border: `1px solid ${RULE}`, display: 'block', letterSpacing: '-0.01em' }}>{t('pricing.plans.mentorship.cta')}</a>
           </div>
         </div>
       </section>
@@ -414,14 +417,14 @@ export default function LandingPageClient() {
           <span className="lp-kicker">{t('faq.kicker')}</span>
           <h2 className="lp-h2">{t('faq.heading')}</h2>
         </div>
-        <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', border: `1px solid ${RULE}`, borderRadius: 14, overflow: 'hidden', background: SURF }}>
+        <div style={{ maxWidth: 820, margin: '0 auto', display: 'flex', flexDirection: 'column', border: `1px solid ${RULE}`, borderRadius: 14, overflow: 'hidden', background: SURF }}>
           {faqItems.map((item, i) => (
             <div key={i} className="lp-faq-item" style={{ borderBottom: i < faqItems.length - 1 ? `1px solid ${RULE}` : 'none' }}>
-              <button onClick={() => setOpenFaq(openFaq === i ? -1 : i)} aria-expanded={openFaq === i} style={{ width: '100%', textAlign: 'left', padding: '22px 26px', fontSize: 16, fontWeight: 600, lineHeight: 1.4, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, color: TEXT, letterSpacing: '-0.01em', fontFamily: BODY }}>
+              <button onClick={() => setOpenFaq(openFaq === i ? -1 : i)} aria-expanded={openFaq === i} style={{ width: '100%', textAlign: 'left', padding: '22px 26px', fontSize: 17, fontWeight: 600, lineHeight: 1.4, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, color: TEXT, letterSpacing: '-0.01em', fontFamily: BODY }}>
                 <span>{item.q}</span>
                 <span style={{ fontSize: 22, color: ACCENT, transition: 'transform .2s', display: 'inline-block', transform: openFaq === i ? 'rotate(45deg)' : 'rotate(0deg)', flexShrink: 0 }}>+</span>
               </button>
-              {openFaq === i && <div style={{ padding: '0 26px 22px', fontSize: 15, lineHeight: 1.62, color: MUTED }}>{item.a}</div>}
+              {openFaq === i && <div style={{ padding: '0 26px 22px', fontSize: 16.5, lineHeight: 1.62, color: MUTED }}>{item.a}</div>}
             </div>
           ))}
         </div>
@@ -431,11 +434,11 @@ export default function LandingPageClient() {
       <section className="lp-final-cta" style={{ position: 'relative', padding: '120px 32px', textAlign: 'center', overflow: 'hidden', background: BG }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px)', backgroundSize: '80px 80px', maskImage: 'radial-gradient(ellipse at 50% 50%, #000 30%, transparent 70%)', WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, #000 30%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 55% 50% at 50% 110%, ${ACCENT} 0%, transparent 65%)`, opacity: 0.09, pointerEvents: 'none' }} />
-        <div style={{ position: 'relative', maxWidth: 780, margin: '0 auto', zIndex: 1 }}>
+        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', zIndex: 1 }}>
           <h2 style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 'clamp(38px, 6.4vw, 72px)', lineHeight: 1.03, letterSpacing: '0.01em', fontWeight: 800, margin: '0 0 24px', color: TEXT }}>
             {t('finalCta.heading1')}<br/>{t('finalCta.heading2')}
           </h2>
-          <p style={{ fontSize: 17, color: MUTED, lineHeight: 1.6, maxWidth: 560, margin: '0 auto 40px' }}>{t('finalCta.sub')}</p>
+          <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.6, maxWidth: 580, margin: '0 auto 40px' }}>{t('finalCta.sub')}</p>
           <div className="lp-hero-ctas">
             <a href="/auth/register" className="lp-cta-primary" style={{ background: TEXT, color: BG, fontSize: 15, fontWeight: 700, padding: '14px 28px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 10, letterSpacing: '-0.01em' }}>
               {t('finalCta.ctaStart')} <span>→</span>

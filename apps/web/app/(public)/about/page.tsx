@@ -4,7 +4,6 @@ import { useTranslations } from 'next-intl';
 import { PageShell } from '@/components/shell/Shell';
 
 const BG      = '#07070D';
-const SURF    = '#0F0F1B';
 const SURF2   = '#161628';
 const TEXT    = '#EDEEF6';
 const MUTED   = 'rgba(237,238,246,0.46)';
@@ -41,7 +40,7 @@ export default function AboutPage() {
         @media (max-width: 479px) { .ab-manifesto-item { gap: 14px; padding: 18px 0; } }
       `}</style>
 
-      <section style={{ background: SURF, borderBottom: `1px solid ${RULE}` }}>
+      <section style={{ background: BG, borderBottom: `1px solid ${RULE}` }}>
         <div className="ab-section">
           <div className="ab-manifesto">
             {manifesto.map((line, i) => (
@@ -72,7 +71,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section style={{ background: SURF, borderTop: `1px solid ${RULE}` }}>
+      <section style={{ background: BG, borderTop: `1px solid ${RULE}` }}>
         <div style={{ maxWidth: 720, margin: '0 auto', padding: '64px 20px', textAlign: 'center' }}>
           <h2 style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 'clamp(36px, 5vw, 60px)', fontWeight: 800, lineHeight: 0.96, color: TEXT, margin: '0 0 16px' }}>{t('tryHeading')}</h2>
           <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.55, margin: '0 0 32px' }}>{t('trySub')}</p>
