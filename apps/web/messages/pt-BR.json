@@ -1349,8 +1349,7 @@
         { "tag": "Tarefas & Calendário", "title": "Coloque suas prioridades em um dia real", "body": "Uma caixa de entrada, uma agenda. O que você assume aparece ao lado do tempo que você realmente tem." },
         { "tag": "Hábitos", "title": "Construa os comportamentos que sustentam suas metas", "body": "Acompanhe sequências, intenção e reflexão — não apenas caixinhas de marcar. Hábitos a serviço de uma direção, não hábitos por si só." },
         { "tag": "Diário & Reflexão", "title": "Veja seus próprios padrões antes que custem caro", "body": "Intenções matinais, reflexões noturnas e um registro pesquisável — para que fuga, progresso e inconsistência parem de se esconder." },
-        { "tag": "Finanças", "title": "Organize dinheiro e patrimônio junto com o resto da vida", "body": "Contas, transferências, orçamentos e investimentos acompanhados junto das suas metas — não num app separado que você esquece de abrir." },
-        { "tag": "Integrações", "title": "Conecte as ferramentas que você já usa", "body": "Google Agenda hoje, mais no roadmap. O Cherut se encaixa no seu stack em vez de pedir para você trocá-lo." }
+        { "tag": "Finanças", "title": "Organize dinheiro e patrimônio junto com o resto da vida", "body": "Contas, transferências, orçamentos e investimentos acompanhados junto das suas metas — não num app separado que você esquece de abrir." }
       ],
       "banner": "Menos assinaturas. Menos sistemas desconectados. Uma direção."
     },

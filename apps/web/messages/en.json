@@ -1349,8 +1349,7 @@
         { "tag": "Tasks & Calendar", "title": "Put your priorities on a real day", "body": "One inbox, one agenda. What you commit to shows up next to the time you actually have." },
         { "tag": "Habits", "title": "Build the behaviors that hold up your goals", "body": "Track streaks, intent and reflection — not just checkboxes. Habits that serve a direction, not habits for their own sake." },
         { "tag": "Journal & Reflection", "title": "See your own patterns before they cost you", "body": "Morning intentions, evening reflections, and a searchable record — so escape, progress and inconsistency stop hiding from you." },
-        { "tag": "Finances", "title": "Organize money and net worth with the rest of your life", "body": "Accounts, transfers, budgets and investments tracked alongside your goals — not in a separate app you forget to open." },
-        { "tag": "Integrations", "title": "Connect the tools you already use", "body": "Google Calendar today, more on the roadmap. Cherut fits into your stack instead of asking you to replace it." }
+        { "tag": "Finances", "title": "Organize money and net worth with the rest of your life", "body": "Accounts, transfers, budgets and investments tracked alongside your goals — not in a separate app you forget to open." }
       ],
       "banner": "Fewer subscriptions. Fewer disconnected systems. One direction."
     },

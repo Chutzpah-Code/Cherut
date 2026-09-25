@@ -31,7 +31,7 @@ function ItemCard({ name, desc, status, label }: { name: string; desc: string; s
         <span style={{ fontSize: 16, fontWeight: 600, color: TEXT, letterSpacing: '-0.01em' }}>{name}</span>
         <StatusBadge status={status} label={label} />
       </div>
-      <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.55, margin: 0 }}>{desc}</p>
+      <p style={{ fontSize: 15.5, color: MUTED, lineHeight: 1.58, margin: 0 }}>{desc}</p>
     </div>
   );
 }
@@ -84,7 +84,7 @@ export default function RoadmapPage() {
           </div>
 
           <div style={{ marginTop: 64, padding: '28px 24px', background: SURF2, border: `1px solid ${RULE}`, borderRadius: 14, textAlign: 'center' }}>
-            <p style={{ fontSize: 15, color: MUTED, margin: '0 0 16px' }}>{t('footerNote')}</p>
+            <p style={{ fontSize: 16.5, color: MUTED, margin: '0 0 16px' }}>{t('footerNote')}</p>
             <a href="/contact" style={{ display: 'inline-block', fontSize: 14, fontWeight: 700, color: BG, padding: '10px 20px', borderRadius: 999, background: TEXT }}>
               {t('footerCta')} →
             </a>

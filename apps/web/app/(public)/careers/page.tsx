@@ -39,7 +39,7 @@ export default function CareersPage() {
         .ca-card { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 14px; padding: 24px; display: flex; gap: 16px; }
         .ca-icon { width: 40px; height: 40px; border-radius: 10px; background: ${ACCENT_DIM}; color: ${ACCENT}; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
         .ca-values-list { display: flex; flex-direction: column; gap: 12px; }
-        .ca-value { display: flex; align-items: flex-start; gap: 12px; font-size: 16px; color: rgba(237,238,246,0.82); }
+        .ca-value { display: flex; align-items: flex-start; gap: 12px; font-size: 17px; color: rgba(237,238,246,0.82); }
         .ca-form { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 16px; padding: 32px; display: flex; flex-direction: column; gap: 20px; }
         .ca-field { display: flex; flex-direction: column; gap: 6px; }
         .ca-label { font-size: 13px; font-weight: 600; color: rgba(237,238,246,0.6); }
@@ -65,8 +65,8 @@ export default function CareersPage() {
                 <div key={w.title} className="ca-card">
                   <div className="ca-icon">{whyJoinIcons[i % whyJoinIcons.length]}</div>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: TEXT, marginBottom: 6 }}>{w.title}</div>
-                    <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.55, margin: 0 }}>{w.body}</p>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: TEXT, marginBottom: 6 }}>{w.title}</div>
+                    <p style={{ fontSize: 15.5, color: MUTED, lineHeight: 1.58, margin: 0 }}>{w.body}</p>
                   </div>
                 </div>
               ))}
@@ -87,14 +87,14 @@ export default function CareersPage() {
 
           <div className="ca-section">
             <h2 className="ca-section-title">{t('poolHeading')}</h2>
-            <p style={{ fontSize: 15, color: MUTED, margin: '0 0 24px', lineHeight: 1.55 }}>
+            <p style={{ fontSize: 16.5, color: MUTED, margin: '0 0 24px', lineHeight: 1.58 }}>
               {t('poolSub')}
             </p>
             {submitted ? (
               <div className="ca-form ca-success">
                 <div style={{ fontSize: 36, marginBottom: 16 }}>✓</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: TEXT, marginBottom: 8 }}>{t('successTitle')}</div>
-                <p style={{ fontSize: 15, color: MUTED, margin: 0, maxWidth: 360, marginLeft: 'auto', marginRight: 'auto' }}>{t('successBody')}</p>
+                <p style={{ fontSize: 16.5, color: MUTED, margin: 0, maxWidth: 360, marginLeft: 'auto', marginRight: 'auto' }}>{t('successBody')}</p>
               </div>
             ) : (
               <form className="ca-form" onSubmit={handleSubmit}>

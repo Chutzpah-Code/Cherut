@@ -41,7 +41,7 @@ export default function GettingStarted() {
         .gs-right { padding-top: 6px; }
         .gs-title { font-family: "Barlow Condensed", sans-serif; text-transform: uppercase; font-size: 22px; font-weight: 700; color: ${TEXT}; margin: 0 0 8px; letter-spacing: 0.01em; }
         .gs-time  { font-size: 11px; color: ${ACCENT}; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; display: block; }
-        .gs-body  { font-size: 15px; color: ${MUTED}; line-height: 1.65; margin: 0; }
+        .gs-body  { font-size: 16.5px; color: ${MUTED}; line-height: 1.65; margin: 0; }
         .gs-tips  { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 64px; }
         .gs-tip   { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 14px; padding: 24px; }
         .gs-cta   { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 14px; padding: 32px; text-align: center; margin-top: 48px; }
@@ -76,14 +76,14 @@ export default function GettingStarted() {
             {tips.map((tip) => (
               <div key={tip.title} className="gs-tip">
                 <div style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 16, fontWeight: 700, color: TEXT, marginBottom: 8 }}>{tip.title}</div>
-                <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.6, margin: 0 }}>{tip.body}</p>
+                <p style={{ fontSize: 15.5, color: MUTED, lineHeight: 1.6, margin: 0 }}>{tip.body}</p>
               </div>
             ))}
           </div>
 
           <div className="gs-cta">
             <h3 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 32, fontWeight: 800, color: TEXT, margin: '0 0 12px', lineHeight: 0.96 }}>{t('ctaHeading')}</h3>
-            <p style={{ fontSize: 16, color: MUTED, margin: '0 0 24px', lineHeight: 1.5 }}>{t('ctaSub')}</p>
+            <p style={{ fontSize: 17, color: MUTED, margin: '0 0 24px', lineHeight: 1.5 }}>{t('ctaSub')}</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               <a href="/auth/register" style={{ background: TEXT, color: BG, fontSize: 14, fontWeight: 700, padding: '12px 24px', borderRadius: 999, display: 'inline-block' }}>{t('ctaStart')} →</a>
               <a href="/help-center"   style={{ background: 'transparent', color: TEXT, fontSize: 14, fontWeight: 500, padding: '12px 24px', borderRadius: 999, border: `1px solid ${RULE}`, display: 'inline-block' }}>{t('ctaHelp')}</a>

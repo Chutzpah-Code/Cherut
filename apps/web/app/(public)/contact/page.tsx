@@ -59,7 +59,7 @@ export default function ContactPage() {
                 <div className="ct-form-box ct-success">
                   <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
                   <div style={{ fontSize: 22, fontWeight: 700, color: TEXT, marginBottom: 8 }}>{t('successTitle')}</div>
-                  <p style={{ fontSize: 15, color: MUTED, margin: 0, maxWidth: 340, marginLeft: 'auto', marginRight: 'auto' }}>{t('successBody')}</p>
+                  <p style={{ fontSize: 16.5, color: MUTED, margin: 0, maxWidth: 340, marginLeft: 'auto', marginRight: 'auto' }}>{t('successBody')}</p>
                 </div>
               ) : (
                 <form className="ct-form-box" onSubmit={handleSubmit}>
@@ -93,17 +93,17 @@ export default function ContactPage() {
             <div className="ct-sidebar">
               <div className="ct-info-card">
                 <div className="ct-info-title">{t('sidebar.emailTitle')}</div>
-                <a href="mailto:contact@hanielrolemberg.com" style={{ fontSize: 16, fontWeight: 600, color: ACCENT, display: 'block', marginBottom: 6 }}>contact@hanielrolemberg.com</a>
-                <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.5 }}>{t('sidebar.emailDesc')}</p>
+                <a href="mailto:contact@hanielrolemberg.com" style={{ fontSize: 17, fontWeight: 600, color: ACCENT, display: 'block', marginBottom: 6 }}>contact@hanielrolemberg.com</a>
+                <p style={{ fontSize: 15.5, color: MUTED, margin: 0, lineHeight: 1.55 }}>{t('sidebar.emailDesc')}</p>
               </div>
               <div className="ct-info-card">
                 <div className="ct-info-title">{t('sidebar.responseTitle')}</div>
-                <div style={{ fontSize: 16, fontWeight: 600, color: TEXT, marginBottom: 6 }}>{t('sidebar.responseValue')}</div>
-                <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.5 }}>{t('sidebar.responseDesc')}</p>
+                <div style={{ fontSize: 17, fontWeight: 600, color: TEXT, marginBottom: 6 }}>{t('sidebar.responseValue')}</div>
+                <p style={{ fontSize: 15.5, color: MUTED, margin: 0, lineHeight: 1.55 }}>{t('sidebar.responseDesc')}</p>
               </div>
               <div className="ct-info-card">
                 <div className="ct-info-title">{t('sidebar.communityTitle')}</div>
-                <p style={{ fontSize: 14, color: MUTED, margin: '0 0 12px', lineHeight: 1.5 }}>{t('sidebar.communityDesc')}</p>
+                <p style={{ fontSize: 15.5, color: MUTED, margin: '0 0 12px', lineHeight: 1.55 }}>{t('sidebar.communityDesc')}</p>
                 <a href="https://t.me/+MxfNsOTcN-Y5MmYx" target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 600, color: ACCENT, padding: '10px 16px', background: ACCENT_DIM, borderRadius: 999, display: 'inline-block', border: `1px solid rgba(80,110,255,0.3)` }}>
                   {t('sidebar.communityCta')} →
                 </a>

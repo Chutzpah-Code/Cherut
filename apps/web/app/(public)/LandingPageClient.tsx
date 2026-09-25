@@ -19,7 +19,7 @@ const RULE    = 'rgba(255,255,255,0.08)';
 const DISPLAY = '"Barlow Condensed", "Arial Narrow", sans-serif';
 const BODY    = '"DM Sans", -apple-system, system-ui, sans-serif';
 
-const featureIcons = ['◆', '◐', '◯', '✦', '◇', '◈', '□'];
+const featureIcons = ['◆', '◐', '◯', '✦', '◇', '◈'];
 
 interface FaqItem { q?: string; a?: string }
 interface SystemItem { tag: string; title: string; body: string }

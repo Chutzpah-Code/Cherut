@@ -15,6 +15,7 @@ const RULE    = 'rgba(255,255,255,0.08)';
 type TagKey = 'major' | 'feature' | 'integration' | 'improvement' | 'launch';
 
 const entryMeta: { version: string; tagKey: TagKey }[] = [
+  { version: 'v1.1', tagKey: 'major' },
   { version: 'v1.0', tagKey: 'major' },
   { version: 'v0.9', tagKey: 'feature' },
   { version: 'v0.8', tagKey: 'feature' },
@@ -54,7 +55,7 @@ export default function ChangelogPage() {
         .cl-tag { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; }
         .cl-title { font-size: 20px; font-weight: 700; color: ${TEXT}; letter-spacing: -0.015em; margin-bottom: 12px; padding-left: 20px; }
         .cl-items { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
-        .cl-item { display: flex; gap: 10px; font-size: 14px; color: rgba(237,238,246,0.72); line-height: 1.55; }
+        .cl-item { display: flex; gap: 10px; font-size: 15.5px; color: rgba(237,238,246,0.72); line-height: 1.58; }
         .cl-bullet { color: ${ACCENT}; flex-shrink: 0; margin-top: 2px; }
         @media (min-width: 640px) {
           .cl-wrap { padding: 64px 32px 100px; }

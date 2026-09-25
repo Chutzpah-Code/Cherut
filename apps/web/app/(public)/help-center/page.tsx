@@ -32,10 +32,10 @@ export default function HelpCenterPage() {
         .hc-cat-title { font-size: 17px; font-weight: 700; color: ${TEXT}; margin: 0; letter-spacing: -0.01em; }
         .hc-article { border-bottom: 1px solid ${RULE}; }
         .hc-article:last-child { border-bottom: none; }
-        .hc-art-btn { width: 100%; text-align: left; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: none; border: none; cursor: pointer; font-family: inherit; font-size: 15px; font-weight: 600; color: ${TEXT}; transition: background .1s; }
+        .hc-art-btn { width: 100%; text-align: left; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: none; border: none; cursor: pointer; font-family: inherit; font-size: 16px; font-weight: 600; color: ${TEXT}; transition: background .1s; }
         .hc-art-btn:hover { background: rgba(255,255,255,0.04); }
         .hc-art-chevron { font-size: 18px; color: ${ACCENT}; transition: transform .2s; flex-shrink: 0; display: inline-block; }
-        .hc-art-body { padding: 0 24px 18px; font-size: 15px; color: ${MUTED}; line-height: 1.65; }
+        .hc-art-body { padding: 0 24px 18px; font-size: 16.5px; color: ${MUTED}; line-height: 1.65; }
         .hc-cta { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 14px; padding: 28px 24px; text-align: center; }
         @media (min-width: 640px)  { .hc-wrap { padding: 64px 32px 100px; } }
         @media (min-width: 1024px) { .hc-wrap { padding: 80px 32px 120px; } }
@@ -68,7 +68,7 @@ export default function HelpCenterPage() {
           ))}
 
           <div className="hc-cta">
-            <p style={{ fontSize: 16, color: MUTED, margin: '0 0 16px', lineHeight: 1.55 }}>{t('notFound')}</p>
+            <p style={{ fontSize: 17, color: MUTED, margin: '0 0 16px', lineHeight: 1.55 }}>{t('notFound')}</p>
             <a href="/contact" style={{ display: 'inline-block', background: TEXT, color: BG, fontSize: 14, fontWeight: 700, padding: '12px 22px', borderRadius: 999 }}>
               {t('contactCta')} →
             </a>
