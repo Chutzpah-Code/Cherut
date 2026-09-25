@@ -93,7 +93,7 @@ export default function ContactPage() {
             <div className="ct-sidebar">
               <div className="ct-info-card">
                 <div className="ct-info-title">{t('sidebar.emailTitle')}</div>
-                <a href="mailto:hello@cherut.app" style={{ fontSize: 16, fontWeight: 600, color: ACCENT, display: 'block', marginBottom: 6 }}>hello@cherut.app</a>
+                <a href="mailto:contact@hanielrolemberg.com" style={{ fontSize: 16, fontWeight: 600, color: ACCENT, display: 'block', marginBottom: 6 }}>contact@hanielrolemberg.com</a>
                 <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.5 }}>{t('sidebar.emailDesc')}</p>
               </div>
               <div className="ct-info-card">

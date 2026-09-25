@@ -1204,6 +1204,7 @@
     "tagline": "Cherut (חירות) significa liberdade em hebraico. Não a liberdade de não ter responsabilidade — a liberdade através dela.",
     "product": "Produto",
     "features": "Recursos",
+    "method": "Método",
     "pricing": "Preços",
     "changelog": "Novidades",
     "roadmap": "Roadmap",
@@ -1216,7 +1217,9 @@
     "helpCenter": "Central de ajuda",
     "privacy": "Privacidade",
     "copyright": "© 2026 Cherut. Feito com obsessão.",
-    "tagline2": "Para quem se recusou a esperar."
+    "tagline2": "Para quem se recusou a esperar.",
+    "disclaimer": "O Cherut é um sistema pessoal de execução. Não é terapia, cuidado médico, nem substitui tratamento profissional de saúde mental.",
+    "poweredBy": "Powered by Problem Solver Foundation — com a missão de impactar positivamente 1 bilhão de vidas até 2035. Be a problem solver."
   },
   "localeSwitcher": {
     "ariaLabel": "Trocar idioma"
@@ -1291,124 +1294,197 @@
     "visionDeadlineMsg": "Sua meta \"{title}\" vence em {count, plural, one {# dia} other {# dias}}. Mantenha o foco nos seus sonhos!"
   },
   "landing": {
-    "kicker": "Feito para os obcecados",
     "hero": {
-      "line1": "A única coisa",
-      "line2": "que distorce o tempo",
-      "line3": "é",
-      "emphasis": "intensidade.",
-      "subBefore": "Você veio do zero com nada além de obsessão. Obsessão sozinha se esgota — ela precisa de um método. O Cherut te dá um. O método se chama",
-      "subBold": "ALL IN ALL THE TIME",
-      "ctaStart": "Começar agora",
-      "ctaSystem": "Ver o sistema"
+      "kicker": "Obsessão estruturada",
+      "headlinePrefix": "A única coisa que distorce o tempo é",
+      "sub": "Você veio do zero com nada além de vontade de mudar. Mas obsessão sem estrutura se esgota. O Cherut dá a ela uma direção, um sistema e um método para continuar. Esse método se chama All In All The Time.",
+      "ctaStart": "Comece seu sistema",
+      "ctaSystem": "Veja como funciona",
+      "microcopy": "Escolha o nível de estrutura que sua direção exige."
     },
-    "trust": {
-      "heading": "Conecta com as ferramentas que você já usa"
+    "problem": {
+      "kicker": "O padrão",
+      "heading": "Você sabe o que fazer. Ainda assim não cumpre o que disse a si mesmo que faria.",
+      "sub": "Essa distância é o que destrói sua confiança na própria palavra. O Cherut cria a estrutura que te tira desse ciclo.",
+      "cycleHeading": "O mesmo ciclo, sempre",
+      "cycle": ["Você cria uma meta", "Começa com intensidade", "Encontra cansaço, medo, tédio ou distração", "Escolhe a recompensa imediata", "Abandona a meta", "Sente a culpa", "Promete recomeçar", "Cria um novo sistema", "Repete o ciclo"],
+      "voicesHeading": "O que fica sem dizer",
+      "voices": [
+        "Eu sei o que preciso fazer, mas continuo fazendo outra coisa.",
+        "Estou sempre começando uma nova versão de mim.",
+        "Tenho potencial, mas minha vida não mostra esse potencial.",
+        "Não confio mais na minha própria palavra.",
+        "Não sei mais se estou descansando ou fugindo.",
+        "Estou cansado de recomeçar, mas ainda não desisti."
+      ],
+      "note": "Isso não é sobre disciplina ou preguiça. É sobre estrutura que falta."
+    },
+    "solution": {
+      "kicker": "O método",
+      "heading": "Sua obsessão não é o problema. Ela não tem estrutura.",
+      "body": "O Cherut concentra sua energia, conecta seus valores, objetivos e ações diárias, e dá aos dias difíceis uma estrutura para funcionar. Se você cair, pode revisar e retomar — sem começar do zero.",
+      "methodLabel": "O método por trás do Cherut",
+      "methodName": "All In All The Time",
+      "principles": [
+        { "n": "01", "title": "Uma Direção", "body": "Escolha a única direção que mais importa agora, não tudo ao mesmo tempo." },
+        { "n": "02", "title": "Intensidade Estruturada", "body": "Transforme intensidade em ações, horários e sistemas — não em explosões pontuais." },
+        { "n": "03", "title": "Atravessar o Momento Difícil", "body": "Passe pelo tédio, pelo medo e pela distração em vez de fugir automaticamente." },
+        { "n": "04", "title": "Voltar Sem Recomeçar do Zero", "body": "Volte depois de um dia ruim sem transformar isso em uma crise de identidade." }
+      ],
+      "note": "All in não significa produzir o tempo todo. Significa nunca se desconectar da direção."
     },
     "features": {
-      "kicker": "O Arsenal",
-      "heading1": "Oito armas.",
-      "heading2": "Uma direção.",
-      "sub": "Cada módulo construído para execução. Ative cada um conforme seu sistema exigir.",
+      "kicker": "Um sistema só",
+      "heading1": "Um sistema só para a vida",
+      "heading2": "que você está de fato tentando construir.",
+      "sub": "Você não precisa de cinco assinaturas e uma planilha para manter sua vida de pé. O Cherut reúne direção, ação e reflexão em um só lugar.",
       "items": [
-        { "tag": "Hábitos", "title": "Sistemas diários que se acumulam", "body": "Acompanhe hábitos com sequências, intenção e reflexão — não apenas caixinhas de marcar. Construa a versão de você que conquista o sonho." },
-        { "tag": "Tarefas & Calendário", "title": "Uma caixa de entrada. Uma agenda.", "body": "Capture tarefas em qualquer lugar e veja-as ao lado do seu calendário real. Sincronização bidirecional com o Google Agenda mantém tudo honesto." },
-        { "tag": "OKRs", "title": "Metas com um método", "body": "Defina objetivos, estabeleça resultados-chave, revise semanalmente. O framework que o Google usa — adaptado para uma vida humana." },
-        { "tag": "Quadro dos Sonhos", "title": "Fixe o futuro que você quer", "body": "Uma tela visual para a vida que você está construindo. Conecte cada hábito e tarefa de volta ao sonho que os originou." },
-        { "tag": "Valores", "title": "Uma bússola, não uma lista de tarefas", "body": "Defina o que importa e deixe suas decisões diárias se confrontarem com isso. Desalinhamentos aparecem cedo." },
-        { "tag": "Finanças", "title": "Dinheiro na mesma página", "body": "Orçamentos, metas e patrimônio líquido junto com o resto da sua vida — porque liberdade financeira é liberdade." },
-        { "tag": "Diário", "title": "Pense no papel, todos os dias", "body": "Intenções matinais, reflexões noturnas, gratidão e anotações livres. Pesquisável, privado, seu." },
-        { "tag": "Integrações", "title": "Funciona bem com as ferramentas que você usa", "body": "Google Agenda, Notion, Apple Health e mais. O Cherut se adapta ao seu stack — não o contrário." }
-      ]
+        { "tag": "Valores & Quadro dos Sonhos", "title": "Conecte sua rotina à vida que você quer", "body": "Defina o que importa, depois fixe o futuro para o qual isso aponta. Cada hábito e tarefa pode ser rastreado até o sonho que o originou." },
+        { "tag": "Objetivos & OKRs", "title": "Transforme ambição em resultados concretos", "body": "Defina uma direção, quebre-a em resultados mensuráveis e revise seu progresso em vez de chutar." },
+        { "tag": "Tarefas & Calendário", "title": "Coloque suas prioridades em um dia real", "body": "Uma caixa de entrada, uma agenda. O que você assume aparece ao lado do tempo que você realmente tem." },
+        { "tag": "Hábitos", "title": "Construa os comportamentos que sustentam suas metas", "body": "Acompanhe sequências, intenção e reflexão — não apenas caixinhas de marcar. Hábitos a serviço de uma direção, não hábitos por si só." },
+        { "tag": "Diário & Reflexão", "title": "Veja seus próprios padrões antes que custem caro", "body": "Intenções matinais, reflexões noturnas e um registro pesquisável — para que fuga, progresso e inconsistência parem de se esconder." },
+        { "tag": "Finanças", "title": "Organize dinheiro e patrimônio junto com o resto da vida", "body": "Contas, transferências, orçamentos e investimentos acompanhados junto das suas metas — não num app separado que você esquece de abrir." },
+        { "tag": "Integrações", "title": "Conecte as ferramentas que você já usa", "body": "Google Agenda hoje, mais no roadmap. O Cherut se encaixa no seu stack em vez de pedir para você trocá-lo." }
+      ],
+      "banner": "Menos assinaturas. Menos sistemas desconectados. Uma direção."
     },
     "how": {
-      "kicker": "O Método",
-      "heading1": "Intenção sem",
-      "heading2": "um sistema é ansiedade.",
-      "sub": "O Cherut conecta o que você faz hoje com quem você precisa se tornar. Quatro passos. Sem atalhos.",
+      "kicker": "Como funciona",
+      "heading1": "Comece com uma direção.",
+      "heading2": "Construa a partir dela.",
+      "sub": "Cinco passos. Você não precisa organizar a vida inteira para começar.",
       "steps": [
-        { "n": "01", "title": "Nomeie a obsessão", "body": "Defina seus valores e a vida para a qual eles apontam. Não metas vagas — o resultado específico pelo qual você está disposto a se sacrificar." },
-        { "n": "02", "title": "Divida em apostas trimestrais", "body": "OKRs transformam ambição em alvo. Você para de sonhar em anos e passa a executar em semanas." },
-        { "n": "03", "title": "Rode a semana como uma máquina", "body": "Hábitos, tarefas e calendário alinhados a uma direção. Check-ins diários evitam que você se disperse." },
-        { "n": "04", "title": "Revise. Adapte. Aperte mais.", "body": "Revisões semanais e trimestrais embutidas. Sistemas que não evoluem quebram. O seu não vai." }
-      ]
+        { "n": "01", "title": "Escolha o que importa agora", "body": "Escolha a única direção que merece sua energia hoje — não tudo ao mesmo tempo." },
+        { "n": "02", "title": "Defina um resultado concreto", "body": "Transforme essa direção em um resultado que você consegue medir de verdade." },
+        { "n": "03", "title": "Crie o sistema mínimo necessário", "body": "Adicione só os hábitos, tarefas e check-ins que esse resultado exige. Nada além disso." },
+        { "n": "04", "title": "Execute o próximo passo hoje", "body": "Não o plano inteiro. A próxima ação, feita agora." },
+        { "n": "05", "title": "Revise, ajuste e retome", "body": "Veja o que funcionou, corrija o que não funcionou e volte — mesmo depois de uma semana ruim." }
+      ],
+      "note": "Você não precisa organizar a vida inteira para começar. Só precisa escolher a próxima direção."
+    },
+    "benefits": {
+      "kicker": "O retorno",
+      "heading": "O retorno não é mais tarefas. É mais da sua vida se movendo em uma direção.",
+      "sub": "O que muda quando sua direção, suas ações e sua revisão vivem em um só lugar:",
+      "items": [
+        "Menos assinaturas — um sistema em vez de cinco apps desconectados",
+        "Menos tempo perdido planejando e replanejando",
+        "Menos troca de contexto entre ferramentas",
+        "Menos decisões desnecessárias",
+        "Tarefas conectadas a um objetivo real",
+        "Mais confiança na própria palavra, um compromisso cumprido de cada vez",
+        "Menos tempo em atividades desconectadas da sua direção"
+      ],
+      "roiHeading": "Uma forma simples de enxergar isso",
+      "roiFormula": "Horas economizadas por semana × valor da sua hora + assinaturas que você deixa de pagar − custo do Cherut = valor potencial recuperado.",
+      "roiDisclaimer": "Uma estimativa para pensar, não uma garantia."
     },
     "testimonials": {
-      "kicker": "Da comunidade",
+      "kicker": "Histórias reais",
       "heading1": "De pessoas que",
       "heading2": "recusaram se acomodar.",
-      "items": [
-        { "quote": "Já experimentei todo app de produtividade. O Cherut é o primeiro que conecta o que eu faço hoje com quem eu quero me tornar.", "name": "Marina A.", "role": "Designer · São Paulo" },
-        { "quote": "A camada de OKR foi o que fez clicar. Meus hábitos pararam de ser aleatórios — passaram a servir uma meta de verdade.", "name": "Daniel R.", "role": "Fundador · Lisboa" },
-        { "quote": "Ele silencia o ruído. Eu abro um app de manhã em vez de sete, e saio sabendo o que importa hoje.", "name": "Sara K.", "role": "PM · Berlim" }
-      ],
+      "sub": "Estamos reunindo histórias reais de quem usa o Cherut. Até esta seção ter depoimentos verificados, aqui vai a versão honesta.",
+      "placeholderLabel": "Espaço reservado para depoimento",
+      "placeholderBody": "História real — o problema antes, a mudança depois, um resultado concreto. Adicionada quando tivermos uma, não antes.",
       "joinTitle": "Junte-se à comunidade",
       "joinBody": "Conecte-se com pessoas construindo vidas intencionais. Compartilhe sistemas, receba feedback, cresçam juntos.",
       "joinCta": "Entrar no Telegram"
     },
     "pricing": {
-      "kicker": "Seu Ponto de Entrada",
-      "heading1": "Comece grátis.",
-      "heading2": "Conquiste o upgrade.",
-      "sub": "Sem fricção para começar. Faça upgrade quando seu sistema exigir mais.",
+      "kicker": "Escolha seu nível",
+      "heading1": "Estrutura tem níveis.",
+      "heading2": "Escolha o que sua direção pede.",
+      "sub": "Sem plano grátis, sem teste gratuito. Cada nível é um compromisso pago com a direção que você escolhe.",
       "monthly": "Mensal",
       "annual": "Anual",
-      "saveBadge": "economize 22%",
+      "saveBadge": "economize US$ 20",
       "mostPopular": "Mais popular",
-      "billedAnnually": "cobrado anualmente",
-      "cadenceForever": "para sempre",
-      "cadenceOnetime": "pagamento único",
-      "cadenceMonth": "mês",
+      "toggleNote": "O alternador mensal/anual vale para o plano SaaS. Os pacotes Curso e Mentoria têm prazo fechado.",
       "plans": {
-        "free": { "name": "Grátis", "blurb": "Comece a prática. Sem desculpas.", "features": ["Hábitos, tarefas, diários", "Até 3 OKRs", "Web + mobile", "Acesso à comunidade"], "cta": "Começar agora" },
-        "pro": { "name": "Pro", "blurb": "Para quem leva o próprio sistema a sério.", "features": ["OKRs ilimitados", "Calendário e integrações", "Quadro dos sonhos, valores, finanças", "Automações de revisão semanal", "Suporte prioritário"], "cta": "Ir all in" },
-        "lifetime": { "name": "Vitalício", "blurb": "Pague uma vez. Seja dono do seu sistema para sempre.", "features": ["Tudo do Pro", "Todas as atualizações futuras", "Comunidade de fundadores", "Acesso antecipado a novos módulos"], "cta": "Ter para sempre" }
+        "saas": {
+          "name": "SaaS Cherut",
+          "blurb": "Para organizar sua direção, suas ações e sua rotina dentro do Cherut.",
+          "priceMonthly": "US$ 10",
+          "priceAnnual": "US$ 100",
+          "cadenceMonthly": "/mês",
+          "cadenceAnnual": "/ano",
+          "annualNote": "Economize US$ 20 vs. pagar mensal (US$ 120/ano)",
+          "features": ["Valores, objetivos e OKRs", "Hábitos, tarefas e calendário", "Diário e reflexão", "Finanças e patrimônio", "Quadro dos sonhos"],
+          "cta": "Começar o sistema"
+        },
+        "course": {
+          "name": "SaaS + Curso All In All The Time",
+          "blurb": "Para usar o sistema e aprender o método por trás dele.",
+          "price": "US$ 200",
+          "cadence": "por 1 ano",
+          "priceNote": "US$ 100 do SaaS (1 ano) + US$ 100 do curso (1 ano)",
+          "features": ["Tudo do SaaS Cherut, por 1 ano", "Curso All In All The Time, por 1 ano", "Exercícios práticos", "Percurso guiado de 7 ou 14 dias", "Templates de implementação", "Práticas de direção, execução, desconforto e retomada"],
+          "cta": "Construir o método"
+        },
+        "mentorship": {
+          "name": "SaaS + Curso + Mentoria Individual",
+          "blurb": "Para aplicar o método com acompanhamento durante uma mudança de verdade.",
+          "price": "US$ 1.100",
+          "cadence": "programa de 6 meses",
+          "features": ["SaaS Cherut", "Curso All In All The Time", "6 meses de mentoria individual", "Revisão de direção", "Análise do padrão de execução", "Ajuste do sistema", "Plano de retomada"],
+          "cta": "Aplicar para a mentoria"
+        }
       }
     },
     "faq": {
       "kicker": "Perguntas",
       "heading": "Respostas diretas.",
       "items": [
-        { "q": "O Cherut é só mais um app de produtividade?", "a": "Não. A maioria dos apps para em tarefas. O Cherut conecta suas ações diárias a um método (OKRs), uma bússola (valores) e um destino (quadro dos sonhos). É um sistema, não uma lista." },
-        { "q": "Preciso conhecer o método OKR?", "a": "Não mesmo. O Cherut te guia por ele na primeira vez que você define uma meta. O framework fica em segundo plano — você só responde perguntas." },
-        { "q": "Quais integrações estão disponíveis?", "a": "Google Agenda hoje, com Notion, Apple Health e Outlook chegando em seguida. O roadmap é moldado pelo que a comunidade pede." },
-        { "q": "Meus dados são privados?", "a": "Sim. Seus diários, finanças e reflexões são criptografados e nunca usados para treinar modelos. Você pode exportar tudo como JSON puro a qualquer momento." },
-        { "q": "Posso usar o Cherut no celular?", "a": "Sim — os apps iOS e Android estão em beta, disponíveis para quem tem um plano pago." },
-        { "q": "O que o nome significa?", "a": "Cherut (חירות) significa liberdade em hebraico. Não a liberdade de não ter responsabilidade — a liberdade através dela." }
+        { "q": "O Cherut é apenas mais um aplicativo de produtividade?", "a": "Não. A maioria dos apps de produtividade para numa lista de tarefas. O Cherut conecta seus valores, objetivos e ações diárias em um sistema só, e dá a você uma estrutura para os dias em que não tem vontade de aparecer." },
+        { "q": "Já tentei Notion, Todoist e outros. Por que seria diferente?", "a": "Aquelas são ferramentas que você mesmo configura, peça por peça. O Cherut já vem como um sistema conectado, construído em torno do método All In All The Time — você deixa de ser quem segura tudo junto." },
+        { "q": "Preciso ser disciplinado para usar o Cherut?", "a": "Não. O Cherut é a estrutura — feita para os dias em que sua disciplina acaba, não só para os dias em que ela funciona." },
+        { "q": "All In All The Time significa trabalhar o tempo todo?", "a": "Não. Significa se manter conectado à sua direção o tempo todo, não maximizar horas trabalhadas. All in não significa todo o output." },
+        { "q": "O Cherut substitui terapia ou tratamento psicológico?", "a": "Não. O Cherut é um sistema pessoal de execução, não terapia nem tratamento médico. Se você lida com uma condição de saúde mental, procure um profissional qualificado." },
+        { "q": "Preciso configurar minha vida inteira para começar?", "a": "Não. Comece com uma direção e o sistema mínimo que ela exige. Adicione módulos conforme seu sistema pedir." },
+        { "q": "O que acontece se eu parar de usar por alguns dias?", "a": "Nada se perde. Revise o que aconteceu, ajuste e retome. O Cherut é feito para você voltar sem começar do zero." },
+        { "q": "Posso usar apenas algumas funcionalidades?", "a": "Sim. Ative os módulos que sua direção precisa agora — Hábitos, Tarefas, OKRs, Diário, Finanças, Quadro dos Sonhos — e adicione o resto depois." },
+        { "q": "Existe plano gratuito ou freemium?", "a": "Não. Não há plano grátis nem teste gratuito. Todo plano é pago desde o checkout." },
+        { "q": "Quanto custa o SaaS mensal e anual?", "a": "US$ 10 por mês, ou US$ 100 por ano — uma economia de US$ 20 em relação ao pagamento mensal." },
+        { "q": "O que está incluído no pacote SaaS + Curso?", "a": "Um ano de Cherut mais um ano do curso All In All The Time — exercícios, um percurso guiado de 7 ou 14 dias e templates de implementação — por US$ 200." },
+        { "q": "O que está incluído no pacote SaaS + Curso + Mentoria Individual?", "a": "Cherut, o curso e seis meses de mentoria individual — revisão de direção, análise do padrão de execução, ajustes no sistema e um plano de retomada — por US$ 1.100." },
+        { "q": "Como funcionam os planos?", "a": "O SaaS é cobrado mensal ou anualmente. O pacote Curso é um combo fechado de um ano. A Mentoria é um programa fechado de seis meses, não uma assinatura recorrente." },
+        { "q": "Como funciona a mentoria?", "a": "É um programa de seis meses, não um checkout de autoatendimento. Você aplica, e confirmamos se faz sentido antes de você se comprometer." },
+        { "q": "Posso cancelar quando quiser?", "a": "O plano SaaS pode ser cancelado a qualquer momento pela sua conta. Os pacotes Curso e Mentoria são programas de prazo fechado, pagos à vista pelo período." }
       ]
     },
-    "about": {
-      "kicker": "Sobre",
-      "heading": "Construído por alguém que precisava disso.",
-      "body": "O Cherut começou quando nosso fundador passou um ano alternando entre Notion, Todoist, diários e planilhas — e percebeu que o que faltava não era outra ferramenta, era um sistema. Somos um time pequeno construindo o app que queríamos usar: com opinião forte sobre método, implacável sobre execução.",
-      "teamNote": "+ um time pequeno e focado"
-    },
     "finalCta": {
-      "heading1": "O relógio",
-      "heading2": "já está correndo.",
-      "sub": "Toda hora sem um sistema é uma decisão. Comece grátis. Sem cartão de crédito. Sem desculpas.",
-      "ctaStart": "Começar agora",
-      "ctaTalk": "Falar com o time"
+      "heading1": "Você não precisa",
+      "heading2": "de outro recomeço.",
+      "sub": "A vida que você quer não será construída por uma explosão de motivação. Ela será construída pela direção que você escolhe, pelas ações que repete e pela sua capacidade de voltar quando os dias difíceis chegarem. Sua intensidade já existe. Agora dê uma estrutura a ela.",
+      "ctaStart": "Comece o All In All The Time",
+      "ctaTalk": "Falar com o time",
+      "microcopy": "Escolha o nível de compromisso que sua direção exige."
     }
   },
   "aboutPage": {
-    "hero": { "kicker": "Sobre", "title": "Construído por pessoas que precisavam disso", "lead": "Somos o Cherut — um time pequeno fazendo o app que não conseguimos encontrar." },
+    "hero": { "kicker": "Manifesto", "title": "É nisso que a gente realmente acredita.", "lead": "Não é uma missão institucional. Não é linguagem de marketing. São as crenças em que o sistema inteiro foi construído." },
     "manifesto": [
-      "O Cherut começou com uma frustração simples: toda ferramenta que prometia ajudar a viver melhor só deixava o sistema mais complicado. Apps separados para hábitos, tarefas, metas, finanças, diário — nenhum conversando entre si, nenhum ligado a um porquê.",
-      "Passamos um ano alternando entre Notion, Todoist, planilhas e cadernos de papel. O que faltava nunca foi outro app. Era um método coerente — um que conecta o que você faz hoje com quem você está se tornando.",
-      "Então construímos o Cherut. Com opinião forte sobre método. Discreto sobre o resto. Acreditamos que a melhor ferramenta de produtividade é a que você realmente usa — uma que respeita sua atenção e conquista sua confiança ao sair do caminho."
+      "Motivação não é estratégia. Estrutura é.",
+      "Sua obsessão não é o problema. A ausência de um sistema é.",
+      "Disciplina se esgota. Uma estrutura bem construída não depende dela para funcionar.",
+      "All in não significa produzir o tempo todo. Significa nunca se desconectar da sua direção.",
+      "Um dia ruim não é um veredito sobre quem você é. É um dia para revisar e retomar.",
+      "Cherut (חירות) significa liberdade em hebraico — não a liberdade de não ter responsabilidade, a liberdade através dela.",
+      "Toda funcionalidade que não serve à sua direção é ruído, não importa o quão bem desenhada ela seja.",
+      "Construímos para os dias em que você não tem vontade de aparecer, não só para os dias em que tem."
     ],
-    "principlesKicker": "Princípios",
-    "principlesHeading": "O que defendemos",
+    "principlesKicker": "Como construímos",
+    "principlesHeading": "As regras por trás de cada funcionalidade",
     "principles": [
       { "title": "Sistema em vez de força de vontade", "body": "Motivação não é confiável. Um sistema bem projetado funciona também nos dias difíceis. Construímos para consistência, não para picos de inspiração." },
       { "title": "Método, não humor", "body": "O framework OKR, a ciência dos hábitos e a reflexão espaçada não são enfeite motivacional — são engenharia aplicada ao comportamento humano." },
-      { "title": "Liberdade através da responsabilidade", "body": "Cherut (חירות) significa liberdade em hebraico. Assumir seus compromissos é o que torna a liberdade real possível, não evitá-los." },
-      { "title": "Discreto, não barulhento", "body": "Sem gamificação. Sem sequências desenhadas para te fazer sentir culpa. Sem dark patterns. Só o seu sistema, fazendo o trabalho dele." }
+      { "title": "Liberdade através da responsabilidade", "body": "Assumir seus compromissos é o que torna a liberdade real possível, não evitá-los. Todo módulo se conecta a essa ideia." },
+      { "title": "Discreto, não barulhento", "body": "Sequências e progresso existem para mostrar a verdade, não para gamificá-la. Sem selos, sem truques de engajamento, sem dark patterns." }
     ],
-    "tryHeading": "Experimente você mesmo",
-    "trySub": "Grátis para começar. Sem cartão de crédito. Sem pegadinhas.",
-    "tryCta": "Começar agora"
+    "tryHeading": "Agora construa a estrutura.",
+    "trySub": "Sem plano grátis, sem teste gratuito. Todo plano é um compromisso pago — escolha o nível que sua direção exige.",
+    "tryCta": "Comece seu sistema"
   },
   "careersPage": {
     "hero": { "kicker": "Carreiras", "title": "Venha construir o futuro da vida intencional", "lead": "Não há vagas abertas no momento — mas sempre queremos ouvir pessoas excepcionais." },
@@ -1441,6 +1517,7 @@
     "hero": { "kicker": "Novidades", "title": "O que há de novo no Cherut", "lead": "Todas as melhorias, semana a semana." },
     "tags": { "major": "Grande atualização", "feature": "Recurso", "integration": "Integração", "improvement": "Melhoria", "launch": "Lançamento" },
     "entries": [
+      { "date": "Setembro de 2026", "title": "Nova estrutura de preços", "items": ["Aposentamos o plano grátis e os planos Pro/Vitalício.", "Nova estrutura: SaaS Cherut (US$ 10/mês ou US$ 100/ano), SaaS + Curso All In All The Time (US$ 200 por 1 ano) e SaaS + Curso + Mentoria Individual (US$ 1.100 por um programa de 6 meses).", "Sem teste gratuito — todo plano é um compromisso pago desde o checkout."] },
       { "date": "Maio de 2026", "title": "Disponibilidade Geral", "items": ["O Cherut agora está disponível publicamente — planos Grátis, Pro e Vitalício no ar.", "Todos os módulos principais prontos para produção: Hábitos, Tarefas, OKRs, Diário, Quadro dos Sonhos, Valores, Áreas da Vida.", "Web mobile totalmente otimizada; beta de iOS e Android aberto para todos os planos pagos."] },
       { "date": "Abril de 2026", "title": "Beta do módulo de Finanças", "items": ["Acompanhamento de orçamento com categorias e metas mensais.", "Instantâneo de patrimônio líquido com entradas manuais de ativos e passivos.", "Metas financeiras conectadas aos seus OKRs."] },
       { "date": "Março de 2026", "title": "Quadro dos Sonhos e Valores", "items": ["Tela visual para fixar imagens, citações e metas.", "Módulo de Valores: defina sua bússola e identifique desalinhamentos nas revisões diárias.", "Tarefas e hábitos agora podem ser vinculados a um valor ou sonho específico."] },
@@ -1526,7 +1603,7 @@
         { "title": "Check-ins semanais", "body": "Toda semana, abra cada Resultado-Chave e atualize o valor atual. Adicione uma nota de confiança e uma breve observação. O Cherut acompanha a tendência ao longo do tempo." }
       ]},
       { "title": "Conta e cobrança", "articles": [
-        { "title": "Mudando seu plano", "body": "Vá em Configurações → Cobrança para fazer upgrade, downgrade ou cancelar seu plano. As mudanças têm efeito no fim do seu período de cobrança atual." },
+        { "title": "Mudando seu plano", "body": "O gerenciamento de plano por autoatendimento está a caminho. Até lá, entre em contato para mudar ou cancelar seu plano e cuidamos disso diretamente." },
         { "title": "Exportando seus dados", "body": "Vá em Configurações → Dados → Exportar. Seus hábitos, tarefas, OKRs, diário e todos os outros dados são exportados em um único arquivo JSON." },
         { "title": "Excluindo sua conta", "body": "Vá em Configurações → Conta → Excluir conta. Isso remove permanentemente todos os seus dados. Não pode ser desfeito. Exporte antes se quiser uma cópia." }
       ]}
@@ -1536,13 +1613,13 @@
   },
   "privacyPolicyPage": {
     "hero": { "kicker": "Privacidade", "title": "Sua privacidade não é uma nota de rodapé.", "lead": "Linguagem simples. Sem surpresas. Atualizado pela última vez em maio de 2026." },
-    "notice": "Este é um resumo em linguagem simples das nossas práticas de privacidade. Foi feito para ser legível, não exaustivo. Para o texto legal completo, entre em contato pelo privacy@cherut.app",
+    "notice": "Este é um resumo em linguagem simples das nossas práticas de privacidade. Foi feito para ser legível, não exaustivo. Para o texto legal completo, entre em contato pelo contact@hanielrolemberg.com",
     "sections": [
       { "title": "O que coletamos", "items": ["Seu e-mail e nome quando você se cadastra.", "Dados de uso: quais recursos você usa e quando, para melhorar o produto.", "Conteúdo que você cria: hábitos, tarefas, entradas de diário, OKRs. Armazenado criptografado.", "Tipo de dispositivo e navegador para depuração e desempenho."] },
       { "title": "O que não fazemos", "items": ["Nunca vendemos seus dados. Nem para anunciantes, nem para corretores de dados.", "Não mostramos anúncios. Não há redes de anúncios no Cherut.", "Não usamos seu diário, hábitos ou metas para treinar modelos de IA.", "Não compartilhamos seus dados pessoais com terceiros sem seu consentimento."] },
       { "title": "Como armazenamos", "items": ["Os dados são armazenados no Firebase (Google Cloud) com criptografia em repouso e em trânsito.", "Backups rodam diariamente e são retidos por 30 dias.", "Usamos TLS padrão da indústria para todos os dados em trânsito.", "O acesso aos dados de produção é restrito aos membros principais do time."] },
       { "title": "Seus direitos", "items": ["Exportar: você pode baixar todos os seus dados como JSON a qualquer momento em Configurações.", "Excluir: você pode excluir permanentemente sua conta e todos os dados associados.", "Correção: você pode atualizar ou corrigir qualquer informação pessoal que forneceu.", "Portabilidade: seus dados exportados estão em formatos abertos, sem aprisionamento."] },
-      { "title": "Contato", "items": ["Dúvidas sobre esta política? Escreva para privacy@cherut.app", "Buscamos responder a todas as solicitações de privacidade em até 5 dias úteis.", "Para pedidos urgentes de exclusão de dados, inclua \"URGENTE\" no assunto."] }
+      { "title": "Contato", "items": ["Dúvidas sobre esta política? Escreva para contact@hanielrolemberg.com", "Buscamos responder a todas as solicitações de privacidade em até 5 dias úteis.", "Para pedidos urgentes de exclusão de dados, inclua \"URGENTE\" no assunto."] }
     ]
   },
   "roadmapPage": {

@@ -75,7 +75,7 @@ export function NotFoundContent() {
 
         <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>
           {t('needHelp')}{' '}
-          <a href="mailto:support@cherut.com" style={{ color: ACCENT, textDecoration: 'none', fontWeight: 600 }}>{t('contactSupport')}</a>
+          <a href="mailto:contact@hanielrolemberg.com" style={{ color: ACCENT, textDecoration: 'none', fontWeight: 600 }}>{t('contactSupport')}</a>
         </p>
       </div>
     </div>

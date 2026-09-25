@@ -115,7 +115,7 @@ export default function AdminSettingsPage() {
             smtpHost: 'smtp.gmail.com',
             smtpPort: 587,
             smtpSecure: true,
-            fromEmail: 'noreply@cherut.com',
+            fromEmail: 'contact@hanielrolemberg.com',
             fromName: 'Cherut Platform',
           },
           notifications: {

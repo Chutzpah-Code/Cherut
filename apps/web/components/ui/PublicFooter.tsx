@@ -16,6 +16,7 @@ export function PublicFooter() {
       label: t('product'),
       links: [
         [t('features'), '/#features'],
+        [t('method'), '/#how'],
         [t('pricing'), '/#pricing'],
         [t('changelog'), '/changelog'],
         [t('roadmap'), '/roadmap'],
@@ -92,10 +93,12 @@ export function PublicFooter() {
             </div>
           ))}
         </div>
+        <p style={{ maxWidth: 1280, margin: '24px auto 0', fontSize: 12, lineHeight: 1.6, color: 'rgba(237,238,246,0.28)' }}>{t('disclaimer')}</p>
         <div className="pf-bottom">
           <span>{t('copyright')}</span>
           <span>{t('tagline2')}</span>
         </div>
+        <p style={{ maxWidth: 1280, margin: '16px auto 0', fontSize: 12, color: 'rgba(237,238,246,0.28)' }}>{t('poweredBy')}</p>
       </footer>
     </>
   );
