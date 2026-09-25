@@ -439,9 +439,9 @@ export default function LandingPageClient() {
             <div style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', opacity: 0.7 }}>{t('pricing.plans.course.name')}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <span style={{ fontFamily: DISPLAY, fontSize: 52, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.01em' }}>{billing === 'annual' ? t('pricing.plans.course.priceAnnual') : t('pricing.plans.course.priceMonthly')}</span>
-              <span style={{ fontSize: 15, opacity: 0.55 }}>{t('pricing.plans.course.cadence')}</span>
+              <span style={{ fontSize: 15, opacity: 0.55 }}>{billing === 'annual' ? t('pricing.plans.course.cadenceAnnual') : t('pricing.plans.course.cadenceMonthly')}</span>
             </div>
-            {billing === 'annual' && <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(7,7,13,0.65)', marginTop: -6 }}>{t('pricing.plans.course.priceNote')}</div>}
+            {billing === 'annual' && <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(7,7,13,0.65)', marginTop: -6 }}>{t('pricing.plans.course.annualNote')}</div>}
             <p style={{ fontSize: 15.5, opacity: 0.7, margin: 0, minHeight: 40 }}>{t('pricing.plans.course.blurb')}</p>
             <div style={{ height: 1, background: 'currentColor', opacity: 0.1, margin: '4px 0' }} />
             <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -459,8 +459,9 @@ export default function LandingPageClient() {
             <div style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', opacity: 0.7 }}>{t('pricing.plans.mentorship.name')}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <span style={{ fontFamily: DISPLAY, fontSize: 52, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.01em' }}>{billing === 'annual' ? t('pricing.plans.mentorship.priceAnnual') : t('pricing.plans.mentorship.priceMonthly')}</span>
-              <span style={{ fontSize: 15, opacity: 0.55 }}>{t('pricing.plans.mentorship.cadence')}</span>
+              <span style={{ fontSize: 15, opacity: 0.55 }}>{billing === 'annual' ? t('pricing.plans.mentorship.cadenceAnnual') : t('pricing.plans.mentorship.cadenceMonthly')}</span>
             </div>
+            {billing === 'annual' && <div style={{ fontSize: 13, fontWeight: 600, color: ACCENT, marginTop: -6 }}>{t('pricing.plans.mentorship.annualNote')}</div>}
             <p style={{ fontSize: 15.5, opacity: 0.7, margin: 0, minHeight: 40 }}>{t('pricing.plans.mentorship.blurb')}</p>
             <div style={{ height: 1, background: 'currentColor', opacity: 0.1, margin: '4px 0' }} />
             <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

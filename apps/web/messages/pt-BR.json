@@ -1403,38 +1403,41 @@
       "sub": "Sem plano grátis, sem teste gratuito. Cada nível é um compromisso pago com a direção que você escolhe.",
       "monthly": "Mensal",
       "annual": "Anual",
-      "saveBadge": "economize US$ 20",
+      "saveBadge": "2 meses grátis",
       "mostPopular": "Mais popular",
-      "toggleNote": "Pagar anual economiza US$ 20 em todos os planos. Os prazos do Curso e da Mentoria continuam fixos de qualquer forma.",
+      "toggleNote": "A cobrança anual economiza dois meses em qualquer plano.",
       "plans": {
         "saas": {
-          "name": "SaaS Cherut",
+          "name": "Core",
           "blurb": "Para organizar sua direção, suas ações e sua rotina dentro do Cherut.",
-          "priceMonthly": "US$ 10",
-          "priceAnnual": "US$ 100",
+          "priceMonthly": "US$ 20",
+          "priceAnnual": "US$ 200",
           "cadenceMonthly": "/mês",
           "cadenceAnnual": "/ano",
-          "annualNote": "Economize US$ 20 vs. pagar mensal (US$ 120/ano)",
+          "annualNote": "Economize US$ 40 vs. pagar mensal (US$ 240/ano)",
           "features": ["Valores, objetivos e OKRs", "Hábitos, tarefas e calendário", "Diário e reflexão", "Finanças e patrimônio", "Quadro dos sonhos"],
           "cta": "Começar o sistema"
         },
         "course": {
-          "name": "SaaS + Curso All In All The Time",
+          "name": "Method",
           "blurb": "Para usar o sistema e aprender o método por trás dele.",
-          "priceMonthly": "US$ 200",
-          "priceAnnual": "US$ 180",
-          "cadence": "por 1 ano",
-          "priceNote": "US$ 100 do SaaS (1 ano) + US$ 100 do curso (1 ano) — US$ 20 de desconto no combo",
-          "features": ["Tudo do SaaS Cherut, por 1 ano", "Curso All In All The Time, por 1 ano", "Exercícios práticos", "Percurso guiado de 7 ou 14 dias", "Templates de implementação", "Práticas de direção, execução, desconforto e retomada"],
+          "priceMonthly": "US$ 50",
+          "priceAnnual": "US$ 500",
+          "cadenceMonthly": "/mês",
+          "cadenceAnnual": "/ano",
+          "annualNote": "Economize US$ 100 vs. pagar mensal (US$ 600/ano)",
+          "features": ["Tudo do Core", "Curso All In All The Time", "Exercícios práticos", "Percurso guiado de 7 ou 14 dias", "Templates de implementação", "Práticas de direção, execução, desconforto e retomada"],
           "cta": "Construir o método"
         },
         "mentorship": {
-          "name": "SaaS + Curso + Mentoria Individual",
+          "name": "Mentorship",
           "blurb": "Para aplicar o método com acompanhamento durante uma mudança de verdade.",
-          "priceMonthly": "US$ 1.100",
-          "priceAnnual": "US$ 1.080",
-          "cadence": "programa de 6 meses",
-          "features": ["SaaS Cherut", "Curso All In All The Time", "6 meses de mentoria individual", "Revisão de direção", "Análise do padrão de execução", "Ajuste do sistema", "Plano de retomada"],
+          "priceMonthly": "US$ 100",
+          "priceAnnual": "US$ 1.000",
+          "cadenceMonthly": "/mês",
+          "cadenceAnnual": "/ano",
+          "annualNote": "Economize US$ 200 vs. pagar mensal (US$ 1.200/ano)",
+          "features": ["Core", "Curso All In All The Time", "Mentoria individual", "Revisão de direção", "Análise do padrão de execução", "Ajuste do sistema", "Plano de retomada"],
           "cta": "Aplicar para a mentoria"
         }
       }
@@ -1452,12 +1455,12 @@
         { "q": "O que acontece se eu parar de usar por alguns dias?", "a": "Nada se perde. Revise o que aconteceu, ajuste e retome. O Cherut é feito para você voltar sem começar do zero." },
         { "q": "Posso usar apenas algumas funcionalidades?", "a": "Sim. Ative os módulos que sua direção precisa agora — Hábitos, Tarefas, OKRs, Diário, Finanças, Quadro dos Sonhos — e adicione o resto depois." },
         { "q": "Existe plano gratuito ou freemium?", "a": "Não. Não há plano grátis nem teste gratuito. Todo plano é pago desde o checkout." },
-        { "q": "Quanto custa o SaaS mensal e anual?", "a": "US$ 10 por mês, ou US$ 100 por ano — uma economia de US$ 20 em relação ao pagamento mensal." },
-        { "q": "O que está incluído no pacote SaaS + Curso?", "a": "Um ano de Cherut mais um ano do curso All In All The Time — exercícios, um percurso guiado de 7 ou 14 dias e templates de implementação — por US$ 180, US$ 20 mais barato que comprar os dois separados." },
-        { "q": "O que está incluído no pacote SaaS + Curso + Mentoria Individual?", "a": "Cherut, o curso e seis meses de mentoria individual — revisão de direção, análise do padrão de execução, ajustes no sistema e um plano de retomada — por US$ 1.080." },
-        { "q": "Como funcionam os planos?", "a": "O SaaS é cobrado mensal ou anualmente. O pacote Curso é um combo fechado de um ano. A Mentoria é um programa fechado de seis meses, não uma assinatura recorrente." },
-        { "q": "Como funciona a mentoria?", "a": "É um programa de seis meses, não um checkout de autoatendimento. Você aplica, e confirmamos se faz sentido antes de você se comprometer." },
-        { "q": "Posso cancelar quando quiser?", "a": "O plano SaaS pode ser cancelado a qualquer momento pela sua conta. Os pacotes Curso e Mentoria são programas de prazo fechado, pagos à vista pelo período." }
+        { "q": "Quanto custa o Core, mensal e anual?", "a": "US$ 20 por mês, ou US$ 200 por ano — uma economia de US$ 40 em relação ao pagamento mensal." },
+        { "q": "O que está incluído no plano Method?", "a": "Cherut mais o curso All In All The Time — exercícios, um percurso guiado de 7 ou 14 dias e templates de implementação — US$ 50 por mês, ou US$ 500 por ano, uma economia de US$ 100." },
+        { "q": "O que está incluído no plano Mentorship?", "a": "Cherut, o curso e mentoria individual — revisão de direção, análise do padrão de execução, ajustes no sistema e um plano de retomada — US$ 100 por mês, ou US$ 1.000 por ano, uma economia de US$ 200." },
+        { "q": "Como funcionam os planos?", "a": "Os três planos — Core, Method e Mentorship — são cobrados mensal ou anualmente. A cobrança anual economiza dois meses em qualquer um deles." },
+        { "q": "Como funciona a mentoria?", "a": "É cobrada mensal ou anualmente como os outros planos, mas não é autoatendimento instantâneo — você aplica, e confirmamos se faz sentido antes de você se comprometer." },
+        { "q": "Posso cancelar quando quiser?", "a": "Sim. Todo plano — Core, Method e Mentorship — pode ser cancelado a qualquer momento pela sua conta." }
       ]
     },
     "finalCta": {
@@ -1524,7 +1527,7 @@
     "hero": { "kicker": "Novidades", "title": "O que há de novo no Cherut", "lead": "Todas as melhorias, semana a semana." },
     "tags": { "major": "Grande atualização", "feature": "Recurso", "integration": "Integração", "improvement": "Melhoria", "launch": "Lançamento" },
     "entries": [
-      { "date": "Setembro de 2026", "title": "Nova estrutura de preços", "items": ["Aposentamos o plano grátis e os planos Pro/Vitalício.", "Nova estrutura: SaaS Cherut (US$ 10/mês ou US$ 100/ano), SaaS + Curso All In All The Time (US$ 180 por 1 ano) e SaaS + Curso + Mentoria Individual (US$ 1.080 por um programa de 6 meses).", "Sem teste gratuito — todo plano é um compromisso pago desde o checkout."] },
+      { "date": "Setembro de 2026", "title": "Nova estrutura de preços", "items": ["Aposentamos o plano grátis e os planos Pro/Vitalício.", "Nova estrutura: Core (US$ 20/mês ou US$ 200/ano), Method (US$ 50/mês ou US$ 500/ano) e Mentorship (US$ 100/mês ou US$ 1.000/ano) — a cobrança anual economiza dois meses em qualquer plano.", "Sem teste gratuito — todo plano é um compromisso pago desde o checkout."] },
       { "date": "Maio de 2026", "title": "Disponibilidade Geral", "items": ["O Cherut agora está disponível publicamente — planos Grátis, Pro e Vitalício no ar.", "Todos os módulos principais prontos para produção: Hábitos, Tarefas, OKRs, Diário, Quadro dos Sonhos, Valores, Áreas da Vida.", "Web mobile totalmente otimizada; beta de iOS e Android aberto para todos os planos pagos."] },
       { "date": "Abril de 2026", "title": "Beta do módulo de Finanças", "items": ["Acompanhamento de orçamento com categorias e metas mensais.", "Instantâneo de patrimônio líquido com entradas manuais de ativos e passivos.", "Metas financeiras conectadas aos seus OKRs."] },
       { "date": "Março de 2026", "title": "Quadro dos Sonhos e Valores", "items": ["Tela visual para fixar imagens, citações e metas.", "Módulo de Valores: defina sua bússola e identifique desalinhamentos nas revisões diárias.", "Tarefas e hábitos agora podem ser vinculados a um valor ou sonho específico."] },

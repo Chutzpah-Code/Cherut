@@ -1403,38 +1403,41 @@
       "sub": "No free plan, no trial. Every level is a paid commitment to the direction you choose.",
       "monthly": "Monthly",
       "annual": "Annual",
-      "saveBadge": "save $20",
+      "saveBadge": "2 months free",
       "mostPopular": "Most popular",
-      "toggleNote": "Paying annually saves $20 on every plan. The Course and Mentorship terms stay fixed either way.",
+      "toggleNote": "Annual billing saves two months' cost on every plan.",
       "plans": {
         "saas": {
-          "name": "SaaS Cherut",
+          "name": "Core",
           "blurb": "For organizing your direction, your actions and your routine inside Cherut.",
-          "priceMonthly": "$10",
-          "priceAnnual": "$100",
+          "priceMonthly": "$20",
+          "priceAnnual": "$200",
           "cadenceMonthly": "/month",
           "cadenceAnnual": "/year",
-          "annualNote": "Save $20 vs. paying monthly ($120/year)",
+          "annualNote": "Save $40 vs. paying monthly ($240/year)",
           "features": ["Values, objectives and OKRs", "Habits, tasks and calendar", "Journal and reflection", "Finances and net worth", "Dream board"],
           "cta": "Start the system"
         },
         "course": {
-          "name": "SaaS + All In All The Time Course",
+          "name": "Method",
           "blurb": "For using the system and learning the method behind it.",
-          "priceMonthly": "$200",
-          "priceAnnual": "$180",
-          "cadence": "for 1 year",
-          "priceNote": "$100 SaaS (1 year) + $100 course (1 year) — $20 off the bundle",
-          "features": ["Everything in SaaS Cherut, for 1 year", "All In All The Time course, for 1 year", "Practical exercises", "Guided 7- or 14-day path", "Implementation templates", "Direction, execution, discomfort and return practices"],
+          "priceMonthly": "$50",
+          "priceAnnual": "$500",
+          "cadenceMonthly": "/month",
+          "cadenceAnnual": "/year",
+          "annualNote": "Save $100 vs. paying monthly ($600/year)",
+          "features": ["Everything in Core", "All In All The Time course", "Practical exercises", "Guided 7- or 14-day path", "Implementation templates", "Direction, execution, discomfort and return practices"],
           "cta": "Build the method"
         },
         "mentorship": {
-          "name": "SaaS + Course + Individual Mentorship",
+          "name": "Mentorship",
           "blurb": "For applying the method with guidance through a real change.",
-          "priceMonthly": "$1,100",
-          "priceAnnual": "$1,080",
-          "cadence": "6-month program",
-          "features": ["SaaS Cherut", "All In All The Time course", "6 months of individual mentorship", "Direction review", "Execution pattern analysis", "System adjustment", "Return plan"],
+          "priceMonthly": "$100",
+          "priceAnnual": "$1,000",
+          "cadenceMonthly": "/month",
+          "cadenceAnnual": "/year",
+          "annualNote": "Save $200 vs. paying monthly ($1,200/year)",
+          "features": ["Core", "All In All The Time course", "Individual mentorship", "Direction review", "Execution pattern analysis", "System adjustment", "Return plan"],
           "cta": "Apply for mentorship"
         }
       }
@@ -1452,12 +1455,12 @@
         { "q": "What happens if I stop using it for a few days?", "a": "Nothing is lost. Review what happened, adjust, and pick back up. Cherut is built to let you return without starting over." },
         { "q": "Can I use only some of the features?", "a": "Yes. Turn on the modules your direction needs right now — Habits, Tasks, OKRs, Journal, Finances, Dream Board — and add the rest later." },
         { "q": "Is there a free plan or freemium version?", "a": "No. There's no free tier and no free trial. Every plan is a paid plan from checkout." },
-        { "q": "How much does the SaaS cost, monthly and annually?", "a": "$10 per month, or $100 per year — a $20 savings compared with paying monthly." },
-        { "q": "What's included in the SaaS + Course package?", "a": "One year of Cherut plus one year of the All In All The Time course — exercises, a guided 7- or 14-day path, and implementation templates — for $180, $20 off buying both separately." },
-        { "q": "What's included in the SaaS + Course + Individual Mentorship package?", "a": "Cherut, the course, and six months of one-on-one mentorship — direction review, execution pattern analysis, system adjustments and a return plan — for $1,080." },
-        { "q": "How do the plans work?", "a": "SaaS is billed monthly or annually. The Course package is a fixed one-year bundle. Mentorship is a closed six-month program, not a recurring subscription." },
-        { "q": "How does the mentorship work?", "a": "It's a six-month program, not a self-serve checkout. Apply, and we'll confirm it's a fit before you commit." },
-        { "q": "Can I cancel anytime?", "a": "The SaaS plan can be cancelled anytime through your account. The Course and Mentorship packages are fixed-term programs paid upfront for their term." }
+        { "q": "How much does Core cost, monthly and annually?", "a": "$20 per month, or $200 per year — a $40 savings compared with paying monthly." },
+        { "q": "What's included in the Method plan?", "a": "Cherut plus the All In All The Time course — exercises, a guided 7- or 14-day path, and implementation templates — $50 per month, or $500 per year, a $100 savings." },
+        { "q": "What's included in the Mentorship plan?", "a": "Cherut, the course, and individual mentorship — direction review, execution pattern analysis, system adjustments and a return plan — $100 per month, or $1,000 per year, a $200 savings." },
+        { "q": "How do the plans work?", "a": "All three plans — Core, Method and Mentorship — bill monthly or annually. Annual billing saves two months' cost on every one." },
+        { "q": "How does the mentorship work?", "a": "It bills monthly or annually like the other plans, but it's not instant self-serve — apply, and we'll confirm it's a fit before you commit." },
+        { "q": "Can I cancel anytime?", "a": "Yes. Every plan — Core, Method and Mentorship — can be cancelled anytime through your account." }
       ]
     },
     "finalCta": {
@@ -1524,7 +1527,7 @@
     "hero": { "kicker": "Changelog", "title": "What's new in Cherut", "lead": "All the improvements, week by week." },
     "tags": { "major": "Major", "feature": "Feature", "integration": "Integration", "improvement": "Improvement", "launch": "Launch" },
     "entries": [
-      { "date": "September 2026", "title": "New pricing structure", "items": ["Retired the free tier and the Pro/Lifetime plans.", "New structure: SaaS Cherut ($10/month or $100/year), SaaS + All In All The Time Course ($180 for 1 year), and SaaS + Course + Individual Mentorship ($1,080 for a 6-month program).", "No free trial — every plan is a paid commitment from checkout."] },
+      { "date": "September 2026", "title": "New pricing structure", "items": ["Retired the free tier and the Pro/Lifetime plans.", "New structure: Core ($20/month or $200/year), Method ($50/month or $500/year), and Mentorship ($100/month or $1,000/year) — annual billing saves two months on every plan.", "No free trial — every plan is a paid commitment from checkout."] },
       { "date": "May 2026", "title": "General Availability", "items": ["Cherut is now publicly available — free tier, Pro and Lifetime plans live.", "All core modules production-ready: Habits, Tasks, OKRs, Journal, Vision Board, Values, Life Areas.", "Mobile web fully optimised; iOS and Android beta open to all paid plans."] },
       { "date": "April 2026", "title": "Finances module beta", "items": ["Budget tracking with categories and monthly targets.", "Net worth snapshot with manual asset and liability entries.", "Financial goals connected to your OKRs."] },
       { "date": "March 2026", "title": "Vision Board & Values", "items": ["Visual canvas to pin images, quotes and goals.", "Values module: define your compass and surface misalignment in daily reviews.", "Tasks and habits can now be linked to a specific value or dream."] },
