@@ -3,6 +3,7 @@
 import { useAdminRedirect } from '@/hooks/useAdminRedirect';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { RotateCcw } from 'lucide-react';
 import { PublicHeader } from '@/components/ui/Header';
 import { PublicFooter } from '@/components/ui/PublicFooter';
 import { HeroAnimatedWord } from './HeroAnimatedWord';
@@ -83,6 +84,7 @@ export default function LandingPageClient() {
         @media (prefers-reduced-motion: reduce) {
           .lp-hero-glow { animation: none; opacity: 0.14; }
           .lp-hero-cursor-blink { animation: none; opacity: 1; }
+          .lp-loop-arc-path { animation: none; }
         }
 
         /* Kicker */
@@ -117,10 +119,38 @@ export default function LandingPageClient() {
         .lp-steps-grid > *:nth-child(odd):last-child { grid-column: 1 / -1; max-width: 320px; }
         .lp-principles-grid { max-width: 960px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 36px; }
         .lp-pricing-grid  { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 14px; }
-        .lp-loop-row      { max-width: 980px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 6px; align-items: center; }
         .lp-voices-grid   { max-width: 980px; margin: 40px auto 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .lp-benefits-grid { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 40px; }
         .lp-testimonial-grid { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+
+        /* Problem cycle — mobile-first vertical timeline. Base (unprefixed)
+           values are already correct at 320px; wider breakpoints only add
+           breathing room, never restructure. */
+        @keyframes lp-loop-flow { to { stroke-dashoffset: -24; } }
+        .lp-loop-wrap      { max-width: 640px; margin: 0 auto; }
+        .lp-loop-col       { position: relative; max-width: 480px; margin: 0 auto; padding-left: 30px; }
+        .lp-loop-arc       { position: absolute; left: -6px; top: 4px; width: 24px; height: calc(100% - 8px); }
+        .lp-loop-arc-path  { stroke-dasharray: 4 5; animation: lp-loop-flow 1.6s linear infinite; }
+        .lp-loop-step      { display: grid; grid-template-columns: 32px 1fr; column-gap: 16px; position: relative; padding-bottom: 22px; }
+        .lp-loop-step:last-child { padding-bottom: 0; }
+        .lp-loop-left      { display: flex; flex-direction: column; align-items: center; }
+        .lp-loop-num       {
+          width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+          font-family: ${DISPLAY}; font-size: 13px; font-weight: 700; letter-spacing: 0.02em;
+          color: ${ACCENT}; background: ${ACCENT_DIM}; border: 1px solid rgba(80,110,255,0.4);
+        }
+        .lp-loop-num-repeat { background: ${ACCENT}; color: ${BG}; border-color: ${ACCENT}; }
+        .lp-loop-line      { flex: 1; width: 1px; background: ${RULE}; margin: 6px 0 0; }
+        .lp-loop-text      { margin: 0; padding-top: 5px; font-size: 16px; line-height: 1.5; color: ${MUTED}; }
+        .lp-loop-text-last { color: ${TEXT}; font-weight: 600; }
+        .lp-loop-caption   { max-width: 440px; margin: 28px auto 0; text-align: center; font-size: 14px; font-style: italic; color: ${MUTED}; }
+        @media (min-width: 768px) {
+          .lp-loop-col  { max-width: 560px; padding-left: 34px; }
+          .lp-loop-arc  { width: 28px; left: -8px; }
+          .lp-loop-num  { width: 36px; height: 36px; font-size: 14px; }
+          .lp-loop-text { font-size: 16.5px; }
+        }
 
         /* Section headings */
         .lp-h2 {
@@ -153,8 +183,11 @@ export default function LandingPageClient() {
           .lp-section      { padding: 56px 16px; }
           .lp-section-alt  { padding: 56px 16px; }
           .lp-final-cta    { padding: 64px 16px !important; }
-          .lp-loop-pill    { max-width: 200px; font-size: 14px; }
           .lp-hero-h1      { font-size: 34px; }
+          .lp-loop-col     { padding-left: 26px; }
+          .lp-loop-arc     { left: -5px; width: 20px; }
+          .lp-loop-num     { width: 28px; height: 28px; font-size: 12px; }
+          .lp-loop-text    { font-size: 15px; }
         }
       `}</style>
 
@@ -194,14 +227,51 @@ export default function LandingPageClient() {
           <p className="lp-h2-sub">{t('problem.sub')}</p>
         </div>
 
-        <div style={{ fontSize: 11, color: 'rgba(237,238,246,0.34)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20, fontWeight: 700, textAlign: 'center' }}>{t('problem.cycleHeading')}</div>
-        <div className="lp-loop-row">
-          {cycle.map((step, i) => (
-            <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              <span className="lp-loop-pill" style={{ display: 'inline-block', fontSize: 15, color: MUTED, padding: '9px 15px', border: `1px solid ${RULE}`, borderRadius: 14, background: SURF2, maxWidth: 260, lineHeight: 1.4 }}>{step}</span>
-              {i < cycle.length - 1 && <span style={{ color: ACCENT, fontSize: 14 }}>→</span>}
-            </span>
-          ))}
+        <div style={{ fontSize: 11, color: 'rgba(237,238,246,0.34)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 28, fontWeight: 700, textAlign: 'center' }}>{t('problem.cycleHeading')}</div>
+        <div className="lp-loop-wrap">
+          <div className="lp-loop-col">
+            <svg className="lp-loop-arc" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true">
+              <path
+                className="lp-loop-arc-path"
+                d="M 20 94 C 2 94, 2 6, 20 6"
+                fill="none"
+                stroke={ACCENT}
+                strokeWidth={1.5}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+                opacity={0.55}
+              />
+              <path
+                d="M 15 11 L 20 5 L 25 11"
+                fill="none"
+                stroke={ACCENT}
+                strokeWidth={1.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+
+            {cycle.map((step, i) => {
+              const isLast = i === cycle.length - 1;
+              return (
+                <div key={i} className="lp-loop-step">
+                  <div className="lp-loop-left">
+                    <div className={isLast ? 'lp-loop-num lp-loop-num-repeat' : 'lp-loop-num'}>
+                      {String(i + 1).padStart(2, '0')}
+                    </div>
+                    {!isLast && <div className="lp-loop-line" />}
+                  </div>
+                  <p className={isLast ? 'lp-loop-text lp-loop-text-last' : 'lp-loop-text'}>
+                    {step}
+                    {isLast && <RotateCcw size={13} strokeWidth={2.5} aria-hidden="true" style={{ marginLeft: 7, verticalAlign: '-2px', color: ACCENT }} />}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          <p className="lp-loop-caption">{t('problem.loopCaption')}</p>
         </div>
 
         <div style={{ fontSize: 11, color: 'rgba(237,238,246,0.34)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 56, marginBottom: 4, fontWeight: 700, textAlign: 'center' }}>{t('problem.voicesHeading')}</div>
@@ -368,10 +438,10 @@ export default function LandingPageClient() {
             <div style={{ position: 'absolute', top: -12, right: 24, background: TEXT, color: BG, fontSize: 10, fontWeight: 700, padding: '5px 12px', borderRadius: 999, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{t('pricing.mostPopular')}</div>
             <div style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', opacity: 0.7 }}>{t('pricing.plans.course.name')}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-              <span style={{ fontFamily: DISPLAY, fontSize: 52, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.01em' }}>{t('pricing.plans.course.price')}</span>
+              <span style={{ fontFamily: DISPLAY, fontSize: 52, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.01em' }}>{billing === 'annual' ? t('pricing.plans.course.priceAnnual') : t('pricing.plans.course.priceMonthly')}</span>
               <span style={{ fontSize: 15, opacity: 0.55 }}>{t('pricing.plans.course.cadence')}</span>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(7,7,13,0.65)', marginTop: -6 }}>{t('pricing.plans.course.priceNote')}</div>
+            {billing === 'annual' && <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(7,7,13,0.65)', marginTop: -6 }}>{t('pricing.plans.course.priceNote')}</div>}
             <p style={{ fontSize: 15.5, opacity: 0.7, margin: 0, minHeight: 40 }}>{t('pricing.plans.course.blurb')}</p>
             <div style={{ height: 1, background: 'currentColor', opacity: 0.1, margin: '4px 0' }} />
             <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -388,7 +458,7 @@ export default function LandingPageClient() {
           <div className="lp-pricing-card" style={{ padding: '32px 28px', background: SURF, color: TEXT, border: `1px solid ${RULE}`, borderRadius: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', opacity: 0.7 }}>{t('pricing.plans.mentorship.name')}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-              <span style={{ fontFamily: DISPLAY, fontSize: 52, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.01em' }}>{t('pricing.plans.mentorship.price')}</span>
+              <span style={{ fontFamily: DISPLAY, fontSize: 52, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.01em' }}>{billing === 'annual' ? t('pricing.plans.mentorship.priceAnnual') : t('pricing.plans.mentorship.priceMonthly')}</span>
               <span style={{ fontSize: 15, opacity: 0.55 }}>{t('pricing.plans.mentorship.cadence')}</span>
             </div>
             <p style={{ fontSize: 15.5, opacity: 0.7, margin: 0, minHeight: 40 }}>{t('pricing.plans.mentorship.blurb')}</p>

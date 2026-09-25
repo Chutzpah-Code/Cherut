@@ -1314,6 +1314,7 @@
       "sub": "That gap is what wears down your trust in your own word. Cherut builds the structure that gets you out of the loop.",
       "cycleHeading": "The same loop, every time",
       "cycle": ["You set a goal", "You start with intensity", "You hit tiredness, fear, boredom, or a distraction", "You choose the immediate reward", "You drop the goal", "You feel the guilt", "You promise to restart", "You build a new system", "You repeat the loop"],
+      "loopCaption": "And the loop restarts — again, and again.",
       "voicesHeading": "What it sounds like",
       "voices": [
         "I know what I need to do, but I keep doing something else.",
@@ -1404,7 +1405,7 @@
       "annual": "Annual",
       "saveBadge": "save $20",
       "mostPopular": "Most popular",
-      "toggleNote": "The monthly/annual toggle applies to the SaaS plan. The Course and Mentorship packages are fixed-term.",
+      "toggleNote": "Paying annually saves $20 on every plan. The Course and Mentorship terms stay fixed either way.",
       "plans": {
         "saas": {
           "name": "SaaS Cherut",
@@ -1420,7 +1421,8 @@
         "course": {
           "name": "SaaS + All In All The Time Course",
           "blurb": "For using the system and learning the method behind it.",
-          "price": "$180",
+          "priceMonthly": "$200",
+          "priceAnnual": "$180",
           "cadence": "for 1 year",
           "priceNote": "$100 SaaS (1 year) + $100 course (1 year) — $20 off the bundle",
           "features": ["Everything in SaaS Cherut, for 1 year", "All In All The Time course, for 1 year", "Practical exercises", "Guided 7- or 14-day path", "Implementation templates", "Direction, execution, discomfort and return practices"],
@@ -1429,7 +1431,8 @@
         "mentorship": {
           "name": "SaaS + Course + Individual Mentorship",
           "blurb": "For applying the method with guidance through a real change.",
-          "price": "$1,080",
+          "priceMonthly": "$1,100",
+          "priceAnnual": "$1,080",
           "cadence": "6-month program",
           "features": ["SaaS Cherut", "All In All The Time course", "6 months of individual mentorship", "Direction review", "Execution pattern analysis", "System adjustment", "Return plan"],
           "cta": "Apply for mentorship"

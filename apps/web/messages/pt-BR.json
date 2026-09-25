@@ -1314,7 +1314,8 @@
       "sub": "Essa distância é o que destrói sua confiança na própria palavra. O Cherut cria a estrutura que te tira desse ciclo.",
       "cycleHeading": "O mesmo ciclo, sempre",
       "cycle": ["Você cria uma meta", "Começa com intensidade", "Encontra cansaço, medo, tédio ou distração", "Escolhe a recompensa imediata", "Abandona a meta", "Sente a culpa", "Promete recomeçar", "Decide seguir outra fórmula mágica", "Repete o ciclo"],
-      "voicesHeading": "O que fica sem dizer",
+      "loopCaption": "E o ciclo recomeça — de novo, e de novo.",
+      "voicesHeading": "Frases que você já disse pra si mesmo",
       "voices": [
         "Eu sei o que preciso fazer, mas continuo fazendo outra coisa.",
         "Estou sempre começando uma nova versão de mim.",
@@ -1404,7 +1405,7 @@
       "annual": "Anual",
       "saveBadge": "economize US$ 20",
       "mostPopular": "Mais popular",
-      "toggleNote": "O alternador mensal/anual vale para o plano SaaS. Os pacotes Curso e Mentoria têm prazo fechado.",
+      "toggleNote": "Pagar anual economiza US$ 20 em todos os planos. Os prazos do Curso e da Mentoria continuam fixos de qualquer forma.",
       "plans": {
         "saas": {
           "name": "SaaS Cherut",
@@ -1420,7 +1421,8 @@
         "course": {
           "name": "SaaS + Curso All In All The Time",
           "blurb": "Para usar o sistema e aprender o método por trás dele.",
-          "price": "US$ 180",
+          "priceMonthly": "US$ 200",
+          "priceAnnual": "US$ 180",
           "cadence": "por 1 ano",
           "priceNote": "US$ 100 do SaaS (1 ano) + US$ 100 do curso (1 ano) — US$ 20 de desconto no combo",
           "features": ["Tudo do SaaS Cherut, por 1 ano", "Curso All In All The Time, por 1 ano", "Exercícios práticos", "Percurso guiado de 7 ou 14 dias", "Templates de implementação", "Práticas de direção, execução, desconforto e retomada"],
@@ -1429,7 +1431,8 @@
         "mentorship": {
           "name": "SaaS + Curso + Mentoria Individual",
           "blurb": "Para aplicar o método com acompanhamento durante uma mudança de verdade.",
-          "price": "US$ 1.080",
+          "priceMonthly": "US$ 1.100",
+          "priceAnnual": "US$ 1.080",
           "cadence": "programa de 6 meses",
           "features": ["SaaS Cherut", "Curso All In All The Time", "6 meses de mentoria individual", "Revisão de direção", "Análise do padrão de execução", "Ajuste do sistema", "Plano de retomada"],
           "cta": "Aplicar para a mentoria"
