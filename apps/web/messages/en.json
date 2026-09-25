@@ -1358,13 +1358,14 @@
       "kicker": "How it works",
       "heading1": "Start with one direction.",
       "heading2": "Build from there.",
-      "sub": "Five steps. You do not need to set up your whole life to start.",
+      "sub": "Six steps. You do not need to set up your whole life to start.",
       "steps": [
         { "n": "01", "title": "Choose what matters now", "body": "Pick the one direction that deserves your energy today — not everything at once." },
         { "n": "02", "title": "Define a concrete result", "body": "Turn that direction into an outcome you can actually measure." },
         { "n": "03", "title": "Build the minimum system you need", "body": "Add only the habits, tasks and check-ins that result requires. Nothing more." },
         { "n": "04", "title": "Execute the next step today", "body": "Not the whole plan. The next action, done now." },
-        { "n": "05", "title": "Review, adjust, and pick back up", "body": "Check what worked, correct what didn't, and return — even after a bad week." }
+        { "n": "05", "title": "Review, adjust, and pick back up", "body": "Check what worked, correct what didn't, and return — even after a bad week." },
+        { "n": "06", "title": "Move to the next direction", "body": "Finish one loop, then choose the next direction and start again — without reconfiguring everything from scratch." }
       ],
       "note": "You do not need to set up your whole life to start. You only need to choose the next direction."
     },

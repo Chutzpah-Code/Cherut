@@ -1358,13 +1358,14 @@
       "kicker": "Como funciona",
       "heading1": "Comece com uma direção.",
       "heading2": "Construa a partir dela.",
-      "sub": "Cinco passos. Você não precisa organizar a vida inteira para começar.",
+      "sub": "Seis passos. Você não precisa organizar a vida inteira para começar.",
       "steps": [
         { "n": "01", "title": "Escolha o que importa agora", "body": "Escolha a única direção que merece sua energia hoje — não tudo ao mesmo tempo." },
         { "n": "02", "title": "Defina um resultado concreto", "body": "Transforme essa direção em um resultado que você consegue medir de verdade." },
         { "n": "03", "title": "Crie o sistema mínimo necessário", "body": "Adicione só os hábitos, tarefas e check-ins que esse resultado exige. Nada além disso." },
         { "n": "04", "title": "Execute o próximo passo hoje", "body": "Não o plano inteiro. A próxima ação, feita agora." },
-        { "n": "05", "title": "Revise, ajuste e retome", "body": "Veja o que funcionou, corrija o que não funcionou e volte — mesmo depois de uma semana ruim." }
+        { "n": "05", "title": "Revise, ajuste e retome", "body": "Veja o que funcionou, corrija o que não funcionou e volte — mesmo depois de uma semana ruim." },
+        { "n": "06", "title": "Passe para a próxima direção", "body": "Terminou um ciclo? Escolha a próxima direção e comece de novo — sem precisar reconfigurar tudo do zero." }
       ],
       "note": "Você não precisa organizar a vida inteira para começar. Só precisa escolher a próxima direção."
     },

@@ -153,6 +153,8 @@ export default function LandingPageClient() {
           .lp-section      { padding: 56px 16px; }
           .lp-section-alt  { padding: 56px 16px; }
           .lp-final-cta    { padding: 64px 16px !important; }
+          .lp-loop-pill    { max-width: 200px; font-size: 14px; }
+          .lp-hero-h1      { font-size: 34px; }
         }
       `}</style>
 
@@ -196,7 +198,7 @@ export default function LandingPageClient() {
         <div className="lp-loop-row">
           {cycle.map((step, i) => (
             <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 15, color: MUTED, padding: '9px 15px', border: `1px solid ${RULE}`, borderRadius: 999, background: SURF2, whiteSpace: 'nowrap' }}>{step}</span>
+              <span className="lp-loop-pill" style={{ display: 'inline-block', fontSize: 15, color: MUTED, padding: '9px 15px', border: `1px solid ${RULE}`, borderRadius: 14, background: SURF2, maxWidth: 260, lineHeight: 1.4 }}>{step}</span>
               {i < cycle.length - 1 && <span style={{ color: ACCENT, fontSize: 14 }}>→</span>}
             </span>
           ))}
