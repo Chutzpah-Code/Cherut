@@ -1242,6 +1242,7 @@
   },
   "dashboardHeader": {
     "darkModeSoon": "Dark mode coming soon",
+    "community": "Community",
     "notifications": "Notifications",
     "notificationsUnread": "Notifications ({count} unread)",
     "active": "Active",
@@ -1378,7 +1379,8 @@
         "Fewer unnecessary decisions",
         "Tasks that connect back to a real objective",
         "More trust in your own word, one kept commitment at a time",
-        "Less time spent on activity disconnected from your direction"
+        "Less time spent on activity disconnected from your direction",
+        "One place to see what's working and what isn't"
       ],
       "roiHeading": "A rough way to see it",
       "roiFormula": "Hours saved per week × your hourly rate + subscriptions you no longer need − the cost of Cherut = potential value recovered.",
@@ -1390,10 +1392,7 @@
       "heading2": "refused to settle.",
       "sub": "We're collecting real stories from people using Cherut. Until this section has verified testimonials, here's the honest version.",
       "placeholderLabel": "Testimonial placeholder",
-      "placeholderBody": "Real story — the problem before, the change after, a concrete result. Added once we have one, not before.",
-      "joinTitle": "Join the community",
-      "joinBody": "Connect with people building intentional lives. Share systems, get feedback, grow together.",
-      "joinCta": "Join on Telegram"
+      "placeholderBody": "Real story — the problem before, the change after, a concrete result. Added once we have one, not before."
     },
     "pricing": {
       "kicker": "Choose your level",
@@ -1420,16 +1419,16 @@
         "course": {
           "name": "SaaS + All In All The Time Course",
           "blurb": "For using the system and learning the method behind it.",
-          "price": "$200",
+          "price": "$180",
           "cadence": "for 1 year",
-          "priceNote": "$100 SaaS (1 year) + $100 course (1 year)",
+          "priceNote": "$100 SaaS (1 year) + $100 course (1 year) — $20 off the bundle",
           "features": ["Everything in SaaS Cherut, for 1 year", "All In All The Time course, for 1 year", "Practical exercises", "Guided 7- or 14-day path", "Implementation templates", "Direction, execution, discomfort and return practices"],
           "cta": "Build the method"
         },
         "mentorship": {
           "name": "SaaS + Course + Individual Mentorship",
           "blurb": "For applying the method with guidance through a real change.",
-          "price": "$1,100",
+          "price": "$1,080",
           "cadence": "6-month program",
           "features": ["SaaS Cherut", "All In All The Time course", "6 months of individual mentorship", "Direction review", "Execution pattern analysis", "System adjustment", "Return plan"],
           "cta": "Apply for mentorship"
@@ -1450,8 +1449,8 @@
         { "q": "Can I use only some of the features?", "a": "Yes. Turn on the modules your direction needs right now — Habits, Tasks, OKRs, Journal, Finances, Dream Board — and add the rest later." },
         { "q": "Is there a free plan or freemium version?", "a": "No. There's no free tier and no free trial. Every plan is a paid plan from checkout." },
         { "q": "How much does the SaaS cost, monthly and annually?", "a": "$10 per month, or $100 per year — a $20 savings compared with paying monthly." },
-        { "q": "What's included in the SaaS + Course package?", "a": "One year of Cherut plus one year of the All In All The Time course — exercises, a guided 7- or 14-day path, and implementation templates — for $200." },
-        { "q": "What's included in the SaaS + Course + Individual Mentorship package?", "a": "Cherut, the course, and six months of one-on-one mentorship — direction review, execution pattern analysis, system adjustments and a return plan — for $1,100." },
+        { "q": "What's included in the SaaS + Course package?", "a": "One year of Cherut plus one year of the All In All The Time course — exercises, a guided 7- or 14-day path, and implementation templates — for $180, $20 off buying both separately." },
+        { "q": "What's included in the SaaS + Course + Individual Mentorship package?", "a": "Cherut, the course, and six months of one-on-one mentorship — direction review, execution pattern analysis, system adjustments and a return plan — for $1,080." },
         { "q": "How do the plans work?", "a": "SaaS is billed monthly or annually. The Course package is a fixed one-year bundle. Mentorship is a closed six-month program, not a recurring subscription." },
         { "q": "How does the mentorship work?", "a": "It's a six-month program, not a self-serve checkout. Apply, and we'll confirm it's a fit before you commit." },
         { "q": "Can I cancel anytime?", "a": "The SaaS plan can be cancelled anytime through your account. The Course and Mentorship packages are fixed-term programs paid upfront for their term." }
@@ -1521,7 +1520,7 @@
     "hero": { "kicker": "Changelog", "title": "What's new in Cherut", "lead": "All the improvements, week by week." },
     "tags": { "major": "Major", "feature": "Feature", "integration": "Integration", "improvement": "Improvement", "launch": "Launch" },
     "entries": [
-      { "date": "September 2026", "title": "New pricing structure", "items": ["Retired the free tier and the Pro/Lifetime plans.", "New structure: SaaS Cherut ($10/month or $100/year), SaaS + All In All The Time Course ($200 for 1 year), and SaaS + Course + Individual Mentorship ($1,100 for a 6-month program).", "No free trial — every plan is a paid commitment from checkout."] },
+      { "date": "September 2026", "title": "New pricing structure", "items": ["Retired the free tier and the Pro/Lifetime plans.", "New structure: SaaS Cherut ($10/month or $100/year), SaaS + All In All The Time Course ($180 for 1 year), and SaaS + Course + Individual Mentorship ($1,080 for a 6-month program).", "No free trial — every plan is a paid commitment from checkout."] },
       { "date": "May 2026", "title": "General Availability", "items": ["Cherut is now publicly available — free tier, Pro and Lifetime plans live.", "All core modules production-ready: Habits, Tasks, OKRs, Journal, Vision Board, Values, Life Areas.", "Mobile web fully optimised; iOS and Android beta open to all paid plans."] },
       { "date": "April 2026", "title": "Finances module beta", "items": ["Budget tracking with categories and monthly targets.", "Net worth snapshot with manual asset and liability entries.", "Financial goals connected to your OKRs."] },
       { "date": "March 2026", "title": "Vision Board & Values", "items": ["Visual canvas to pin images, quotes and goals.", "Values module: define your compass and surface misalignment in daily reviews.", "Tasks and habits can now be linked to a specific value or dream."] },

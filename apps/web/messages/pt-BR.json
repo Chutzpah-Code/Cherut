@@ -1242,6 +1242,7 @@
   },
   "dashboardHeader": {
     "darkModeSoon": "Modo escuro em breve",
+    "community": "Comunidade",
     "notifications": "Notificações",
     "notificationsUnread": "Notificações ({count} não lidas)",
     "active": "Ativo",
@@ -1378,7 +1379,8 @@
         "Menos decisões desnecessárias",
         "Tarefas conectadas a um objetivo real",
         "Mais confiança na própria palavra, um compromisso cumprido de cada vez",
-        "Menos tempo em atividades desconectadas da sua direção"
+        "Menos tempo em atividades desconectadas da sua direção",
+        "Uma visão única do que está funcionando e do que não está"
       ],
       "roiHeading": "Uma forma simples de enxergar isso",
       "roiFormula": "Horas economizadas por semana × valor da sua hora + assinaturas que você deixa de pagar − custo do Cherut = valor potencial recuperado.",
@@ -1390,10 +1392,7 @@
       "heading2": "recusaram se acomodar.",
       "sub": "Estamos reunindo histórias reais de quem usa o Cherut. Até esta seção ter depoimentos verificados, aqui vai a versão honesta.",
       "placeholderLabel": "Espaço reservado para depoimento",
-      "placeholderBody": "História real — o problema antes, a mudança depois, um resultado concreto. Adicionada quando tivermos uma, não antes.",
-      "joinTitle": "Junte-se à comunidade",
-      "joinBody": "Conecte-se com pessoas construindo vidas intencionais. Compartilhe sistemas, receba feedback, cresçam juntos.",
-      "joinCta": "Entrar no Telegram"
+      "placeholderBody": "História real — o problema antes, a mudança depois, um resultado concreto. Adicionada quando tivermos uma, não antes."
     },
     "pricing": {
       "kicker": "Escolha seu nível",
@@ -1420,16 +1419,16 @@
         "course": {
           "name": "SaaS + Curso All In All The Time",
           "blurb": "Para usar o sistema e aprender o método por trás dele.",
-          "price": "US$ 200",
+          "price": "US$ 180",
           "cadence": "por 1 ano",
-          "priceNote": "US$ 100 do SaaS (1 ano) + US$ 100 do curso (1 ano)",
+          "priceNote": "US$ 100 do SaaS (1 ano) + US$ 100 do curso (1 ano) — US$ 20 de desconto no combo",
           "features": ["Tudo do SaaS Cherut, por 1 ano", "Curso All In All The Time, por 1 ano", "Exercícios práticos", "Percurso guiado de 7 ou 14 dias", "Templates de implementação", "Práticas de direção, execução, desconforto e retomada"],
           "cta": "Construir o método"
         },
         "mentorship": {
           "name": "SaaS + Curso + Mentoria Individual",
           "blurb": "Para aplicar o método com acompanhamento durante uma mudança de verdade.",
-          "price": "US$ 1.100",
+          "price": "US$ 1.080",
           "cadence": "programa de 6 meses",
           "features": ["SaaS Cherut", "Curso All In All The Time", "6 meses de mentoria individual", "Revisão de direção", "Análise do padrão de execução", "Ajuste do sistema", "Plano de retomada"],
           "cta": "Aplicar para a mentoria"
@@ -1450,8 +1449,8 @@
         { "q": "Posso usar apenas algumas funcionalidades?", "a": "Sim. Ative os módulos que sua direção precisa agora — Hábitos, Tarefas, OKRs, Diário, Finanças, Quadro dos Sonhos — e adicione o resto depois." },
         { "q": "Existe plano gratuito ou freemium?", "a": "Não. Não há plano grátis nem teste gratuito. Todo plano é pago desde o checkout." },
         { "q": "Quanto custa o SaaS mensal e anual?", "a": "US$ 10 por mês, ou US$ 100 por ano — uma economia de US$ 20 em relação ao pagamento mensal." },
-        { "q": "O que está incluído no pacote SaaS + Curso?", "a": "Um ano de Cherut mais um ano do curso All In All The Time — exercícios, um percurso guiado de 7 ou 14 dias e templates de implementação — por US$ 200." },
-        { "q": "O que está incluído no pacote SaaS + Curso + Mentoria Individual?", "a": "Cherut, o curso e seis meses de mentoria individual — revisão de direção, análise do padrão de execução, ajustes no sistema e um plano de retomada — por US$ 1.100." },
+        { "q": "O que está incluído no pacote SaaS + Curso?", "a": "Um ano de Cherut mais um ano do curso All In All The Time — exercícios, um percurso guiado de 7 ou 14 dias e templates de implementação — por US$ 180, US$ 20 mais barato que comprar os dois separados." },
+        { "q": "O que está incluído no pacote SaaS + Curso + Mentoria Individual?", "a": "Cherut, o curso e seis meses de mentoria individual — revisão de direção, análise do padrão de execução, ajustes no sistema e um plano de retomada — por US$ 1.080." },
         { "q": "Como funcionam os planos?", "a": "O SaaS é cobrado mensal ou anualmente. O pacote Curso é um combo fechado de um ano. A Mentoria é um programa fechado de seis meses, não uma assinatura recorrente." },
         { "q": "Como funciona a mentoria?", "a": "É um programa de seis meses, não um checkout de autoatendimento. Você aplica, e confirmamos se faz sentido antes de você se comprometer." },
         { "q": "Posso cancelar quando quiser?", "a": "O plano SaaS pode ser cancelado a qualquer momento pela sua conta. Os pacotes Curso e Mentoria são programas de prazo fechado, pagos à vista pelo período." }
@@ -1521,7 +1520,7 @@
     "hero": { "kicker": "Novidades", "title": "O que há de novo no Cherut", "lead": "Todas as melhorias, semana a semana." },
     "tags": { "major": "Grande atualização", "feature": "Recurso", "integration": "Integração", "improvement": "Melhoria", "launch": "Lançamento" },
     "entries": [
-      { "date": "Setembro de 2026", "title": "Nova estrutura de preços", "items": ["Aposentamos o plano grátis e os planos Pro/Vitalício.", "Nova estrutura: SaaS Cherut (US$ 10/mês ou US$ 100/ano), SaaS + Curso All In All The Time (US$ 200 por 1 ano) e SaaS + Curso + Mentoria Individual (US$ 1.100 por um programa de 6 meses).", "Sem teste gratuito — todo plano é um compromisso pago desde o checkout."] },
+      { "date": "Setembro de 2026", "title": "Nova estrutura de preços", "items": ["Aposentamos o plano grátis e os planos Pro/Vitalício.", "Nova estrutura: SaaS Cherut (US$ 10/mês ou US$ 100/ano), SaaS + Curso All In All The Time (US$ 180 por 1 ano) e SaaS + Curso + Mentoria Individual (US$ 1.080 por um programa de 6 meses).", "Sem teste gratuito — todo plano é um compromisso pago desde o checkout."] },
       { "date": "Maio de 2026", "title": "Disponibilidade Geral", "items": ["O Cherut agora está disponível publicamente — planos Grátis, Pro e Vitalício no ar.", "Todos os módulos principais prontos para produção: Hábitos, Tarefas, OKRs, Diário, Quadro dos Sonhos, Valores, Áreas da Vida.", "Web mobile totalmente otimizada; beta de iOS e Android aberto para todos os planos pagos."] },
       { "date": "Abril de 2026", "title": "Beta do módulo de Finanças", "items": ["Acompanhamento de orçamento com categorias e metas mensais.", "Instantâneo de patrimônio líquido com entradas manuais de ativos e passivos.", "Metas financeiras conectadas aos seus OKRs."] },
       { "date": "Março de 2026", "title": "Quadro dos Sonhos e Valores", "items": ["Tela visual para fixar imagens, citações e metas.", "Módulo de Valores: defina sua bússola e identifique desalinhamentos nas revisões diárias.", "Tarefas e hábitos agora podem ser vinculados a um valor ou sonho específico."] },

@@ -67,9 +67,8 @@ export default function LandingPageClient() {
         .lp-faq-item:hover { background: ${SURF2}; }
         .lp-pricing-card { transition: transform .28s, box-shadow .28s; flex: 1 1 300px; max-width: 340px; }
         .lp-pricing-card:hover { transform: translateY(-4px); }
-        .lp-step-item, .lp-principle-item { flex: 1 1 200px; max-width: 220px; }
+        .lp-principle-item { flex: 1 1 200px; max-width: 220px; }
         .lp-testimonial-card { flex: 1 1 260px; max-width: 300px; }
-        .lp-benefit-item { flex: 1 1 320px; max-width: 380px; }
         @keyframes lp-glow-pulse {
           0%, 100% { opacity: 0.10; }
           50%       { opacity: 0.18; }
@@ -114,12 +113,13 @@ export default function LandingPageClient() {
         .lp-section-alt  { padding: 120px 32px; background: ${BG}; border-top: 1px solid ${RULE}; }
         .lp-section-head { max-width: 780px; margin: 0 auto 64px; text-align: center; }
         .lp-features-grid { max-width: 1160px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
-        .lp-steps-grid    { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 36px; }
+        .lp-steps-grid    { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px 48px; }
+        .lp-steps-grid > *:nth-child(odd):last-child { grid-column: 1 / -1; max-width: 320px; }
         .lp-principles-grid { max-width: 960px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 36px; }
         .lp-pricing-grid  { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 14px; }
         .lp-loop-row      { max-width: 980px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 6px; align-items: center; }
         .lp-voices-grid   { max-width: 980px; margin: 40px auto 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .lp-benefits-grid { max-width: 860px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px 32px; }
+        .lp-benefits-grid { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 40px; }
         .lp-testimonial-grid { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
 
         /* Section headings */
@@ -144,7 +144,9 @@ export default function LandingPageClient() {
           .lp-section-head { margin-bottom: 40px; }
           .lp-voices-grid   { grid-template-columns: 1fr; }
           .lp-feature-card, .lp-pricing-card, .lp-testimonial-card,
-          .lp-step-item, .lp-principle-item, .lp-benefit-item { flex-basis: 100%; max-width: 460px; }
+          .lp-principle-item { flex-basis: 100%; max-width: 460px; }
+          .lp-steps-grid, .lp-benefits-grid { grid-template-columns: 1fr; max-width: 460px; }
+          .lp-steps-grid > *:nth-child(odd):last-child { max-width: 100%; }
           .lp-final-cta { padding: 80px 20px !important; }
         }
         @media (max-width: 479px) {
@@ -320,16 +322,6 @@ export default function LandingPageClient() {
               <p style={{ fontSize: 15, color: MUTED, lineHeight: 1.6, margin: 0 }}>{t('testimonials.placeholderBody')}</p>
             </div>
           ))}
-        </div>
-
-        <div style={{ maxWidth: 1140, margin: '48px auto 0', padding: '28px 36px', background: SURF, borderRadius: 14, border: `1px solid ${RULE}`, display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: DISPLAY, textTransform: 'uppercase', fontSize: 22, fontWeight: 700, color: TEXT, marginBottom: 4 }}>{t('testimonials.joinTitle')}</div>
-            <div style={{ fontSize: 15.5, color: MUTED }}>{t('testimonials.joinBody')}</div>
-          </div>
-          <a href="https://t.me/+MxfNsOTcN-Y5MmYx" className="lp-cta-primary" style={{ background: TEXT, color: BG, fontSize: 14, fontWeight: 700, padding: '12px 22px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            {t('testimonials.joinCta')} →
-          </a>
         </div>
       </section>
 

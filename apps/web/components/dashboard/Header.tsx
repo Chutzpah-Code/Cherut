@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslations } from 'next-intl';
-import { Bell, Moon } from 'lucide-react';
+import { Bell, Moon, Users } from 'lucide-react';
 import { Group, Burger, Text, ActionIcon, Avatar, Box, useMantineColorScheme, useComputedColorScheme, Badge, Stack, Indicator, Tooltip } from '@mantine/core';
 import { CherutLockup } from '@/components/ui/CherutLockup';
 import { useEffect, useState } from 'react';
@@ -110,6 +110,41 @@ export default function Header({ mobileOpened, toggleMobile }: HeaderProps) {
             </Tooltip>
           </Box>
         )}
+
+        <Tooltip
+          label={t('community')}
+          position="bottom"
+          withArrow
+          styles={{
+            tooltip: {
+              backgroundColor: '#1F2937',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 500,
+              fontFamily: 'Inter, sans-serif',
+              borderRadius: '8px',
+              padding: '8px 12px'
+            }
+          }}
+        >
+          <ActionIcon
+            component="a"
+            href="https://t.me/+MxfNsOTcN-Y5MmYx"
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="subtle"
+            size="lg"
+            radius="xl"
+            title={t('community')}
+            style={{
+              transition: 'all 0.2s ease',
+              minWidth: '44px',
+              minHeight: '44px',
+            }}
+          >
+            <Users size={20} />
+          </ActionIcon>
+        </Tooltip>
 
         <NotificationCenter
           notifications={notifications}
