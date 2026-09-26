@@ -1592,7 +1592,7 @@
     "categories": [
       { "title": "Primeiros passos", "articles": [
         { "title": "O que é o Cherut?", "body": "O Cherut é um sistema operacional pessoal que conecta seus hábitos, tarefas, OKRs, diário e quadro dos sonhos em um só lugar. Comece configurando suas Áreas da Vida e criando seu primeiro Objetivo." },
-        { "title": "Configurando sua conta", "body": "Depois de se cadastrar, você será guiado por um breve fluxo de integração. Escolha os módulos que quer ativos — você pode ligar outros depois em Configurações." },
+        { "title": "Configurando sua conta", "body": "Depois de se cadastrar, você cai direto no Dashboard — não existe um fluxo de integração obrigatório nem módulos para ligar ou desligar. Todos os módulos (Hábitos, Tarefas, OKRs, Diário, Quadro dos Sonhos, Valores, Áreas da Vida, Finanças) já ficam disponíveis na barra lateral; use só o que fizer sentido para você agora." },
         { "title": "Escolhendo seu primeiro módulo", "body": "Não sabe por onde começar? A maioria das pessoas começa com Hábitos ou Tarefas. Depois de pegar o ritmo, adicione OKRs para dar direção às suas ações diárias." }
       ]},
       { "title": "Hábitos", "articles": [

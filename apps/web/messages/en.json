@@ -1592,7 +1592,7 @@
     "categories": [
       { "title": "Getting started", "articles": [
         { "title": "What is Cherut?", "body": "Cherut is a personal operating system that connects your habits, tasks, OKRs, journal and vision board in one place. Start by setting up your Life Areas and creating your first Objective." },
-        { "title": "Setting up your account", "body": "After signing up, you will be guided through a short onboarding flow. Pick the modules you want active — you can turn others on later from Settings." },
+        { "title": "Setting up your account", "body": "After signing up, you land directly on the Dashboard — there's no mandatory onboarding flow, and no modules to turn on or off. Every module (Habits, Tasks, OKRs, Journal, Dream Board, Values, Life Areas, Finances) is already available in the sidebar; just use whichever ones make sense for you right now." },
         { "title": "Choosing your first module", "body": "Not sure where to start? Most people begin with Habits or Tasks. Once you have a rhythm, add OKRs to give your daily actions a direction." }
       ]},
       { "title": "Habits", "articles": [
