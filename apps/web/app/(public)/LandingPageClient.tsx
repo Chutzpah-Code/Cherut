@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { RotateCcw } from 'lucide-react';
 import { PublicHeader } from '@/components/ui/Header';
 import { PublicFooter } from '@/components/ui/PublicFooter';
+import { PublicDisclaimer } from '@/components/ui/PublicDisclaimer';
 import { HeroAnimatedWord } from './HeroAnimatedWord';
 
 // ── Dark landing page theme — same background as every other public page ──
@@ -516,6 +517,7 @@ export default function LandingPageClient() {
         </div>
       </section>
 
+      <PublicDisclaimer />
       <PublicFooter />
     </div>
   );

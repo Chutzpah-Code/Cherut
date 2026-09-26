@@ -92,7 +92,6 @@ export function PublicFooter() {
             </div>
           ))}
         </div>
-        <p style={{ maxWidth: 1280, margin: '24px auto 0', fontSize: 12, lineHeight: 1.6, color: 'rgba(237,238,246,0.28)' }}>{t('disclaimer')}</p>
         <div className="pf-bottom">
           <span>{t('copyright')}</span>
           <span>{t('tagline2')}</span>

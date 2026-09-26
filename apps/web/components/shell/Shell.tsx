@@ -2,6 +2,7 @@
 
 import { PublicHeader } from '@/components/ui/Header';
 import { PublicFooter } from '@/components/ui/PublicFooter';
+import { PublicDisclaimer } from '@/components/ui/PublicDisclaimer';
 
 export const SHELL_TOKENS = {
   BLUE:      'oklch(0.5 0.18 260)',
@@ -120,6 +121,7 @@ export function PageShell({ children, kicker, title, lead }: PageShellProps) {
         {children}
       </main>
 
+      <PublicDisclaimer />
       <PublicFooter />
     </div>
   );
