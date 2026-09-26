@@ -936,9 +936,11 @@ export function TaskModal({
                 placeholder={t('descriptionPlaceholder')}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                minRows={3}
+                autosize
+                minRows={8}
+                maxRows={20}
                 radius={6}
-                styles={{ input: { fontSize: 13.5, lineHeight: 1.5, borderColor: BORDER, wordBreak: 'break-all' } }}
+                styles={{ input: { fontSize: 13.5, lineHeight: 1.5, borderColor: BORDER, wordBreak: 'normal', overflowWrap: 'break-word' } }}
               />
             </Stack>
 

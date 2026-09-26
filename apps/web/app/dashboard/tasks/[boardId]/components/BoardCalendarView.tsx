@@ -1,9 +1,11 @@
 'use client';
 
 import { useMemo, useCallback, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import ptBrLocale from '@fullcalendar/core/locales/pt-br';
 import type { EventClickArg } from '@fullcalendar/core';
 import { Box, Center, Loader, Text } from '@mantine/core';
 import { useBoardKanban } from '@/hooks/useBoards';
@@ -29,8 +31,22 @@ const STATUS_COLORS: Record<string, string> = {
   done: '#216E4E',
 };
 
+// Default block length for timed tasks in the day/week time-grid views.
+// Tasks only carry a single dueTime (HH:mm), no explicit duration field, so
+// this mirrors Google Calendar's own default new-event length.
+const DEFAULT_BLOCK_MINUTES = 60;
+
+// Formats a Date using its local getters (not toISOString, which converts to
+// UTC) so FullCalendar reads it as floating local time with no timezone
+// shift — same reasoning as the dueDate.split('T')[0] fix below.
+function toLocalISOString(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+}
+
 export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
   const t = useTranslations('tasks.calendar');
+  const locale = useLocale();
   const { data: columns, isLoading } = useBoardKanban(boardId);
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
@@ -48,20 +64,42 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
     return columns
       .flatMap((col) => col.tasks)
       .filter((t) => !!t.dueDate && !t.archived)
-      .map((t) => ({
-        id: t.id,
-        title: t.title,
+      .map((t) => {
+        const color = STATUS_COLORS[t.status] ?? '#0052CC';
         // dueDate is a full ISO datetime (see TaskModal's own `.split('T')[0]`
         // for the date picker) — passing it whole made FullCalendar parse it
         // as a UTC instant and bucket it under the previous day in any
         // timezone behind UTC. Stripping the time makes it a plain calendar
         // date with no timezone conversion.
-        date: t.dueDate!.split('T')[0],
-        allDay: true,
-        backgroundColor: STATUS_COLORS[t.status] ?? '#0052CC',
-        borderColor: STATUS_COLORS[t.status] ?? '#0052CC',
-        textColor: '#ffffff',
-      }));
+        const datePart = t.dueDate!.split('T')[0];
+
+        if (t.dueTime) {
+          const [year, month, day] = datePart.split('-').map(Number);
+          const [hour, minute] = t.dueTime.split(':').map(Number);
+          const start = new Date(year, month - 1, day, hour, minute);
+          const end = new Date(start.getTime() + DEFAULT_BLOCK_MINUTES * 60_000);
+          return {
+            id: t.id,
+            title: t.title,
+            start: toLocalISOString(start),
+            end: toLocalISOString(end),
+            allDay: false,
+            backgroundColor: color,
+            borderColor: color,
+            textColor: '#ffffff',
+          };
+        }
+
+        return {
+          id: t.id,
+          title: t.title,
+          date: datePart,
+          allDay: true,
+          backgroundColor: color,
+          borderColor: color,
+          textColor: '#ffffff',
+        };
+      });
   }, [columns]);
 
   const handleEventClick = useCallback(
@@ -131,12 +169,13 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
         }
       `}</style>
       <FullCalendar
-        plugins={[dayGridPlugin]}
+        plugins={[dayGridPlugin, timeGridPlugin]}
+        locale={locale === 'pt-BR' ? ptBrLocale : undefined}
         initialView="dayGridMonth"
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
-          right: 'dayGridMonth,dayGridWeek',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay',
         }}
         events={events}
         eventClick={handleEventClick}
@@ -147,6 +186,9 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
         dayMaxEvents={4}
         eventDisplay="block"
         firstDay={1}
+        nowIndicator
+        slotDuration="00:30:00"
+        allDaySlot
       />
 
       {selectedTask && (
