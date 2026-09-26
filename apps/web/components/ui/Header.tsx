@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { PublicLocaleSwitcher } from '@/i18n/PublicLocaleSwitcher';
@@ -24,6 +24,8 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
   const t = useTranslations('publicHeader');
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const navInnerRef = useRef<HTMLDivElement>(null);
+  const [navHeight, setNavHeight] = useState(0);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -36,6 +38,23 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
     const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // position: sticky is unreliable here — html/body carry overflow-x: hidden
+  // (needed to clip the decorative bleed elements elsewhere on these pages),
+  // and per the CSS overflow spec, setting only overflow-x forces the
+  // browser to compute overflow-y: auto too. That silently turns body into
+  // its own scroll container, which breaks sticky positioning relative to
+  // the viewport in several browsers (notably Safari/iOS). position: fixed
+  // isn't affected by ancestor scroll-container status, so we use that
+  // instead and measure the bar's own height to reserve equivalent space —
+  // measuring the inner row only (not the mobile dropdown) so the mobile
+  // menu can still overlay page content instead of pushing it down.
+  useEffect(() => {
+    const measure = () => setNavHeight(navInnerRef.current?.offsetHeight ?? 0);
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
   }, []);
 
   const prefix = variant === 'home' ? '#' : '/#';
@@ -80,14 +99,14 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
       `}</style>
 
       <nav style={{
-        position: 'sticky', top: 0, zIndex: 100,
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
         background: scrolled ? 'rgba(7,7,13,0.88)' : 'transparent',
         backdropFilter: scrolled ? 'saturate(160%) blur(16px)' : 'none',
         WebkitBackdropFilter: scrolled ? 'saturate(160%) blur(16px)' : 'none',
         borderBottom: `1px solid ${scrolled ? RULE : 'transparent'}`,
         transition: 'background .25s, border-color .25s',
       }}>
-        <div className="ph-nav-inner">
+        <div className="ph-nav-inner" ref={navInnerRef}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <svg viewBox="0 0 64 64" width={24} height={24} fill="none" aria-hidden="true">
               <circle cx="32" cy="32" r="23.8" stroke={TEXT} strokeWidth="8.4" />
@@ -141,6 +160,7 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
           </div>
         </div>
       </nav>
+      <div style={{ height: navHeight }} aria-hidden="true" />
     </>
   );
 }
