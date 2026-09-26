@@ -15,6 +15,7 @@ const RULE    = 'rgba(255,255,255,0.08)';
 type TagKey = 'major' | 'feature' | 'integration' | 'improvement' | 'launch';
 
 const entryMeta: { version: string; tagKey: TagKey }[] = [
+  { version: 'v1.2', tagKey: 'improvement' },
   { version: 'v1.1', tagKey: 'major' },
   { version: 'v1.0', tagKey: 'major' },
   { version: 'v0.9', tagKey: 'feature' },
