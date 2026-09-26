@@ -224,7 +224,13 @@
       "addAnotherList": "Add another list",
       "addAnotherListShort": "List",
       "archivedTasksLink": "Archived tasks",
-      "archivedTasksLinkShort": "Archived"
+      "archivedTasksLinkShort": "Archived",
+      "restoreColumnMissingTitle": "Restore task?",
+      "restoreColumnMissingBody": "The list this task was in no longer exists. It will be restored into \"{column}\" instead.",
+      "restoreNoColumnsBody": "This board has no lists left. A new default list will be created and the task will be restored there.",
+      "defaultColumnName": "To Do",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
     },
     "kanbanList": {
       "noTasks": "No tasks",
@@ -240,6 +246,7 @@
       "deleteList": "Delete list",
       "deleteConfirmWithTasks": "Are you sure you want to delete \"{name}\"? This will also permanently delete {count, plural, one {# task} other {# tasks}} inside it. This action cannot be undone.",
       "deleteConfirmSimple": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+      "deleteConfirmArchivedPreserved": "{count, plural, one {# archived task} other {# archived tasks}} in this list will be kept and can still be restored later.",
       "confirm": "Delete",
       "cancel": "Cancel",
       "position": "Position {n}",

@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Box, Button, Group, Center, Loader, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
+import { modals } from '@mantine/modals';
 import { Plus, Settings2, Archive } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { KanbanList } from '../../components/KanbanList';
@@ -13,6 +14,7 @@ import { ArchivedTasksModal } from './ArchivedTasksModal';
 import { Task, UpdateTaskDto } from '@/lib/api/services/tasks';
 import {
   useUpdateTask,
+  useUpdateTaskOrder,
   useDeleteTask,
   useToggleArchive,
   useStartTimeTracking,
@@ -40,6 +42,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
 
   const createTask = useCreateTask();
   const updateMutation = useUpdateTask();
+  const updateOrderMutation = useUpdateTaskOrder();
   const deleteMutation = useDeleteTask();
   const archiveMutation = useToggleArchive();
   const startTrackingMutation = useStartTimeTracking();
@@ -66,6 +69,65 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
       dto: { name: 'New List', order: nextOrder },
     });
   };
+
+  // Restoring an archived task normally just flips `archived` back off — it
+  // returns to whichever column it already had, since that column is
+  // guaranteed to still exist (deleteColumn cascades active tasks, but
+  // spares archived ones; see boards.service.ts). The one case that isn't
+  // guaranteed: the task was archived, and *then* its column got deleted.
+  // That's surfaced here, with a confirmation, rather than silently
+  // reassigning it.
+  const handleArchiveToggle = useCallback((task: Task) => {
+    if (!task.archived) {
+      archiveMutation.mutate(task.id);
+      return;
+    }
+
+    const columnStillExists = kanbanColumns?.some((c) => c.id === task.columnId);
+    if (columnStillExists) {
+      archiveMutation.mutate(task.id);
+      return;
+    }
+
+    const firstColumn = kanbanColumns && kanbanColumns.length > 0
+      ? [...kanbanColumns].sort((a, b) => a.order - b.order)[0]
+      : undefined;
+
+    modals.openConfirmModal({
+      title: t('restoreColumnMissingTitle'),
+      children: (
+        <Text size="sm" c="dimmed">
+          {firstColumn
+            ? t('restoreColumnMissingBody', { column: firstColumn.name })
+            : t('restoreNoColumnsBody')}
+        </Text>
+      ),
+      labels: { confirm: t('confirm'), cancel: t('cancel') },
+      onConfirm: async () => {
+        let targetColumnId: string;
+        let targetOrder = 0;
+
+        if (firstColumn) {
+          targetColumnId = firstColumn.id;
+          targetOrder = firstColumn.tasks.length
+            ? Math.max(...firstColumn.tasks.map((t) => t.order ?? 0)) + 1
+            : 0;
+        } else {
+          const newColumn = await createColumn.mutateAsync({
+            boardId,
+            dto: { name: t('defaultColumnName'), order: 0 },
+          });
+          targetColumnId = newColumn.id;
+        }
+
+        await updateOrderMutation.mutateAsync({
+          id: task.id,
+          dto: { newOrder: targetOrder, newColumnId: targetColumnId },
+        });
+        archiveMutation.mutate(task.id);
+      },
+    });
+  }, [kanbanColumns, archiveMutation, updateOrderMutation, createColumn, boardId, t]);
 
   if (isLoading) {
     return (
@@ -226,7 +288,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           onClose={() => { setModalOpened(false); setSelectedTask(null); }}
           onSave={(id, dto: UpdateTaskDto) => updateMutation.mutate({ id, dto })}
           onDelete={(id) => { deleteMutation.mutate(id); setModalOpened(false); setSelectedTask(null); }}
-          onArchive={(id) => archiveMutation.mutate(id)}
+          onArchive={() => { if (selectedTask) handleArchiveToggle(selectedTask); }}
           onStartTimeTracking={(id) => startTrackingMutation.mutate(id)}
           onPauseTimeTracking={(id, trackingId) => pauseTrackingMutation.mutate({ id, trackingId })}
           onStopTimeTracking={(id, trackingId) => stopTrackingMutation.mutate({ id, trackingId })}

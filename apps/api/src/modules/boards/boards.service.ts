@@ -180,12 +180,18 @@ export class BoardsService {
     const db = this.firebaseService.getFirestore();
     const batch = db.batch();
 
-    // Cascade-delete every task in this column — tasks reference columnId
-    // but aren't cleaned up automatically by Firestore.
+    // Cascade-delete every active task in this column — tasks reference
+    // columnId but aren't cleaned up automatically by Firestore. Archived
+    // tasks are deliberately spared: they're kept with their now-dangling
+    // columnId, and the frontend (BoardKanbanView's restore flow) re-homes
+    // them into another (or a newly created) column when the user later
+    // restores them, after confirming with a dialog since it's not what
+    // they'll expect.
     const taskSnap = await db
       .collection(this.tasksCollection)
       .where('userId', '==', userId)
       .where('columnId', '==', columnId)
+      .where('archived', '==', false)
       .get();
     taskSnap.docs.forEach((doc) => batch.delete(doc.ref));
 

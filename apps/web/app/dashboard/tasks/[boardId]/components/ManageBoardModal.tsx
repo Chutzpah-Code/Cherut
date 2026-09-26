@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Modal, Stack, Box, Group, TextInput, Select, ActionIcon, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { arrayMove } from '@dnd-kit/sortable';
 import { modals } from '@mantine/modals';
 import { useUpdateColumn, useDeleteColumn } from '@/hooks/useBoards';
+import { useArchivedTasksByBoard } from '@/hooks/useTasks';
 import { KanbanColumn } from '@/lib/api/services/boards';
 import { Task, tasksApi } from '@/lib/api/services/tasks';
 
@@ -58,6 +59,21 @@ export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBo
   const queryClient = useQueryClient();
   const updateColumn = useUpdateColumn();
   const deleteColumn = useDeleteColumn();
+
+  // Deleting a column only cascade-deletes its active tasks — archived ones
+  // are spared (see boards.service.ts's deleteColumn) so they can be
+  // restored later. The confirmation dialog below tells the user both
+  // things separately: how many active tasks are about to be permanently
+  // deleted, and how many archived tasks in the list will be kept.
+  const { data: archivedTasks } = useArchivedTasksByBoard(boardId, opened);
+  const archivedCountByColumn = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const task of archivedTasks ?? []) {
+      if (!task.columnId) continue;
+      counts[task.columnId] = (counts[task.columnId] ?? 0) + 1;
+    }
+    return counts;
+  }, [archivedTasks]);
 
   const updateOrderMutation = useMutation({
     mutationFn: ({ taskId, newOrder, newColumnId }: { taskId: string; newOrder: number; newColumnId: string }) =>
@@ -117,23 +133,30 @@ export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBo
     updateColumn.mutate({ boardId, columnId, dto: { order: newOrder } });
   };
 
-  const handleDeleteColumn = (columnId: string, columnName: string, taskCount: number) => {
+  const handleDeleteColumn = (columnId: string, columnName: string, taskCount: number, archivedCount: number) => {
     modals.openConfirmModal({
       title: t('deleteList'),
       children: (
-        <Text
-          style={{
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '14px',
-            fontWeight: 400,
-            color: '#666666',
-            lineHeight: '20px',
-          }}
-        >
-          {taskCount > 0
-            ? t('deleteConfirmWithTasks', { name: columnName, count: taskCount })
-            : t('deleteConfirmSimple', { name: columnName })}
-        </Text>
+        <Stack gap={6}>
+          <Text
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              fontWeight: 400,
+              color: '#666666',
+              lineHeight: '20px',
+            }}
+          >
+            {taskCount > 0
+              ? t('deleteConfirmWithTasks', { name: columnName, count: taskCount })
+              : t('deleteConfirmSimple', { name: columnName })}
+          </Text>
+          {archivedCount > 0 && (
+            <Text style={{ fontFamily: 'Inter, sans-serif', fontSize: '13px', color: '#666666', lineHeight: '18px' }}>
+              {t('deleteConfirmArchivedPreserved', { count: archivedCount })}
+            </Text>
+          )}
+        </Stack>
       ),
       labels: { confirm: t('confirm'), cancel: t('cancel') },
       confirmProps: {
@@ -192,7 +215,7 @@ export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBo
                   color="red"
                   variant="subtle"
                   disabled={columns.length <= 1}
-                  onClick={() => handleDeleteColumn(col.id, col.name, col.tasks.length)}
+                  onClick={() => handleDeleteColumn(col.id, col.name, col.tasks.length, archivedCountByColumn[col.id] ?? 0)}
                 >
                   <Trash2 size={14} />
                 </ActionIcon>

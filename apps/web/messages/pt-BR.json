@@ -224,7 +224,13 @@
       "addAnotherList": "Adicionar outra lista",
       "addAnotherListShort": "Lista",
       "archivedTasksLink": "Tarefas arquivadas",
-      "archivedTasksLinkShort": "Arquivadas"
+      "archivedTasksLinkShort": "Arquivadas",
+      "restoreColumnMissingTitle": "Restaurar tarefa?",
+      "restoreColumnMissingBody": "A lista em que essa tarefa estava não existe mais. Ela será restaurada na lista \"{column}\" no lugar.",
+      "restoreNoColumnsBody": "Esse quadro não tem mais nenhuma lista. Uma lista padrão nova será criada e a tarefa será restaurada nela.",
+      "defaultColumnName": "A Fazer",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar"
     },
     "kanbanList": {
       "noTasks": "Nenhuma tarefa",
@@ -240,6 +246,7 @@
       "deleteList": "Excluir lista",
       "deleteConfirmWithTasks": "Tem certeza que deseja excluir \"{name}\"? Isso também excluirá permanentemente {count, plural, one {# tarefa} other {# tarefas}} dentro dela. Essa ação não pode ser desfeita.",
       "deleteConfirmSimple": "Tem certeza que deseja excluir \"{name}\"? Essa ação não pode ser desfeita.",
+      "deleteConfirmArchivedPreserved": "{count, plural, one {# tarefa arquivada dessa lista será mantida e ainda poderá ser restaurada mais tarde.} other {# tarefas arquivadas dessa lista serão mantidas e ainda poderão ser restauradas mais tarde.}}",
       "confirm": "Excluir",
       "cancel": "Cancelar",
       "position": "Posição {n}",
