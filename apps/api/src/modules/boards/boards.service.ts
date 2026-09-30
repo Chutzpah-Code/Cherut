@@ -12,13 +12,16 @@ import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
 
 export type BoardRole = 'owner' | 'editor' | 'collaborator';
+export type BoardMemberStatus = 'pending' | 'accepted';
 
 export interface BoardMember {
   email: string;
   uid: string;
   role: BoardRole;
+  status: BoardMemberStatus;
   invitedAt: string;
   invitedByUid: string;
+  invitedByEmail: string;
 }
 
 @Injectable()
@@ -56,12 +59,15 @@ export class BoardsService {
     const db = this.firebaseService.getFirestore();
     const now = new Date().toISOString();
 
+    const ownerEmail = (email ?? '').toLowerCase();
     const ownerMember: BoardMember = {
-      email: (email ?? '').toLowerCase(),
+      email: ownerEmail,
       uid: userId,
       role: 'owner',
+      status: 'accepted',
       invitedAt: now,
       invitedByUid: userId,
+      invitedByEmail: ownerEmail,
     };
 
     const board = {
@@ -70,6 +76,7 @@ export class BoardsService {
       colorIndex: dto.colorIndex ?? 0,
       members: [ownerMember],
       memberUids: [userId],
+      pendingInviteUids: [] as string[],
       createdAt: now,
       updatedAt: now,
     };
@@ -177,7 +184,13 @@ export class BoardsService {
 
   // ─── Members ───────────────────────────────────────────────────────────────
 
-  async addMember(userId: string, boardId: string, email: string, role: 'editor' | 'collaborator') {
+  async addMember(
+    userId: string,
+    boardId: string,
+    callerEmail: string | null,
+    email: string,
+    role: 'editor' | 'collaborator',
+  ) {
     const board = await this.findOneBoard(userId, boardId);
     const callerRole = this.getRole(board, userId);
     if (callerRole !== 'owner' && callerRole !== 'editor') {
@@ -196,19 +209,26 @@ export class BoardsService {
       throw new NotFoundException('No Cherut account found for this email');
     }
 
+    // The invite is pending until the invitee accepts it — their uid is
+    // tracked separately in pendingInviteUids (used to look up "invitations
+    // sent to me") and deliberately kept OUT of memberUids (which is what
+    // every access check — findOneBoard, getKanban, etc. — reads), so they
+    // have no board access at all until they accept.
     const newMember: BoardMember = {
       email: normalizedEmail,
       uid: resolvedUid,
       role,
+      status: 'pending',
       invitedAt: new Date().toISOString(),
       invitedByUid: userId,
+      invitedByEmail: (callerEmail ?? '').toLowerCase(),
     };
 
     const updatedMembers = [...members, newMember];
     const db = this.firebaseService.getFirestore();
     await db.collection(this.boardsCollection).doc(boardId).update({
       members: updatedMembers,
-      memberUids: updatedMembers.map((m) => m.uid),
+      pendingInviteUids: [...(board.pendingInviteUids ?? []), resolvedUid],
       updatedAt: new Date().toISOString(),
     });
 
@@ -232,11 +252,15 @@ export class BoardsService {
       throw new BadRequestException('The board owner cannot be removed');
     }
 
+    // Covers both cases with the same action: removing an already-accepted
+    // member, and cancelling a still-pending invite — the target's uid is
+    // just cleared from whichever of the two denormalized arrays it's in.
     const updatedMembers = members.filter((m) => m.email !== normalizedEmail);
     const db = this.firebaseService.getFirestore();
     await db.collection(this.boardsCollection).doc(boardId).update({
       members: updatedMembers,
-      memberUids: updatedMembers.map((m) => m.uid),
+      memberUids: (board.memberUids ?? []).filter((uid: string) => uid !== target.uid),
+      pendingInviteUids: (board.pendingInviteUids ?? []).filter((uid: string) => uid !== target.uid),
       updatedAt: new Date().toISOString(),
     });
 
@@ -257,6 +281,9 @@ export class BoardsService {
     if (!target) {
       throw new NotFoundException('Member not found');
     }
+    if (target.status === 'pending') {
+      throw new BadRequestException('Cannot change the role of a pending invitation');
+    }
 
     const updatedMembers = members.map((m) => (m.uid === targetUid ? { ...m, role } : m));
     const db = this.firebaseService.getFirestore();
@@ -275,8 +302,12 @@ export class BoardsService {
     }
 
     const members: BoardMember[] = board.members ?? [];
-    if (!members.some((m) => m.uid === newOwnerUid)) {
+    const target = members.find((m) => m.uid === newOwnerUid);
+    if (!target) {
       throw new BadRequestException('The new owner must already be a member of this board');
+    }
+    if (target.status === 'pending') {
+      throw new BadRequestException('Cannot transfer ownership to a pending invitation');
     }
     if (newOwnerUid === board.userId) {
       throw new BadRequestException('This member is already the owner');
@@ -297,6 +328,88 @@ export class BoardsService {
 
     this.logger.log(`Board ${boardId} ownership transferred from ${userId} to ${newOwnerUid}`);
     return this.findOneBoard(newOwnerUid, boardId);
+  }
+
+  // ─── Invitations ───────────────────────────────────────────────────────────
+
+  async findPendingInvitations(userId: string) {
+    const db = this.firebaseService.getFirestore();
+    const snap = await db
+      .collection(this.boardsCollection)
+      .where('pendingInviteUids', 'array-contains', userId)
+      .get();
+
+    return snap.docs
+      .map((doc) => {
+        const data: any = doc.data();
+        const member: BoardMember | undefined = (data.members ?? []).find(
+          (m: BoardMember) => m.uid === userId,
+        );
+        if (!member) return null;
+        return {
+          boardId: doc.id,
+          boardName: data.name,
+          colorIndex: data.colorIndex,
+          role: member.role,
+          invitedByEmail: member.invitedByEmail,
+          invitedAt: member.invitedAt,
+        };
+      })
+      .filter((invitation): invitation is NonNullable<typeof invitation> => invitation !== null);
+  }
+
+  // Pending invitees aren't in memberUids yet, so findOneBoard (which gates
+  // on memberUids) would 404 them — accept/decline need their own direct
+  // lookup that instead checks pendingInviteUids.
+  private async loadBoardForInvitee(userId: string, boardId: string) {
+    const db = this.firebaseService.getFirestore();
+    const doc = await db.collection(this.boardsCollection).doc(boardId).get();
+
+    if (!doc.exists) {
+      throw new NotFoundException('Invitation not found');
+    }
+
+    const data: any = doc.data();
+    if (!(data.pendingInviteUids ?? []).includes(userId)) {
+      throw new NotFoundException('Invitation not found');
+    }
+
+    return { id: doc.id, ...data };
+  }
+
+  async acceptInvitation(userId: string, boardId: string) {
+    const board = await this.loadBoardForInvitee(userId, boardId);
+    const members: BoardMember[] = board.members ?? [];
+
+    const updatedMembers = members.map((m) =>
+      m.uid === userId ? { ...m, status: 'accepted' as const } : m,
+    );
+
+    const db = this.firebaseService.getFirestore();
+    await db.collection(this.boardsCollection).doc(boardId).update({
+      members: updatedMembers,
+      memberUids: [...(board.memberUids ?? []), userId],
+      pendingInviteUids: (board.pendingInviteUids ?? []).filter((uid: string) => uid !== userId),
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Invitation accepted: board ${boardId} by ${userId}`);
+  }
+
+  async declineInvitation(userId: string, boardId: string) {
+    const board = await this.loadBoardForInvitee(userId, boardId);
+    const members: BoardMember[] = board.members ?? [];
+
+    const updatedMembers = members.filter((m) => m.uid !== userId);
+
+    const db = this.firebaseService.getFirestore();
+    await db.collection(this.boardsCollection).doc(boardId).update({
+      members: updatedMembers,
+      pendingInviteUids: (board.pendingInviteUids ?? []).filter((uid: string) => uid !== userId),
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Invitation declined: board ${boardId} by ${userId}`);
   }
 
   // ─── Columns ───────────────────────────────────────────────────────────────

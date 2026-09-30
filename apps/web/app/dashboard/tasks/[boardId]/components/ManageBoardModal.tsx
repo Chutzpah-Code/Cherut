@@ -115,7 +115,9 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
       <Stack gap="xs" mb={canInvite ? 'sm' : 0}>
         {sortedMembers.map((member) => {
           const isOwnerRow = member.uid === board.userId;
-          const editable = canManage && !isOwnerRow;
+          const isPending = member.status === 'pending';
+          const canRemove = canManage && !isOwnerRow;
+          const canEditRole = canRemove && !isPending;
 
           return (
             <Group key={member.uid} justify="space-between" wrap={isMobile ? 'wrap' : 'nowrap'} gap="xs">
@@ -127,7 +129,7 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
                   {member.email}
                   {member.uid === user?.uid && t('youSuffix')}
                 </Text>
-                {editable && (
+                {canRemove && (
                   <Tooltip label={t('removeMemberTooltip')}>
                     <ActionIcon
                       size="sm"
@@ -143,13 +145,15 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
               </Group>
 
               {/* The role indicator is always the same Select component, at
-                  the same size, whether it's editable (owner managing
-                  someone else) or a read-only display (the owner's own row,
-                  or any row seen by a non-owner) — this is what keeps every
-                  row's role rectangle the same size and column-aligned with
-                  the role/invite selects below, instead of a plain Text
-                  next to a bordered Select looking mismatched. */}
-              {editable ? (
+                  the same size, whether it's editable (owner managing an
+                  already-accepted member), a read-only display (the owner's
+                  own row, or any row seen by a non-owner), or a pending
+                  invite (nothing to edit until it's accepted) — this is what
+                  keeps every row's role rectangle the same size and
+                  column-aligned with the role/invite selects below, instead
+                  of a plain Text next to a bordered Select looking
+                  mismatched. */}
+              {canEditRole ? (
                 <Select
                   data={[
                     { value: 'editor', label: t('roleEditor') },
@@ -168,8 +172,12 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
                 />
               ) : (
                 <Select
-                  data={[{ value: member.role, label: roleLabel(member.role) }]}
-                  value={member.role}
+                  data={[
+                    isPending
+                      ? { value: 'pending', label: t('roleStatusPending') }
+                      : { value: member.role, label: roleLabel(member.role) },
+                  ]}
+                  value={isPending ? 'pending' : member.role}
                   disabled
                   size="sm"
                   style={{ width: isMobile ? undefined : 288, flex: isMobile ? 1 : undefined }}

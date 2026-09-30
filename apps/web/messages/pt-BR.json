@@ -194,7 +194,13 @@
       "boardNameLabel": "Nome do quadro",
       "boardNamePlaceholder": "ex.: Trabalho, Pessoal, Metas do Q2...",
       "cancel": "Cancelar",
-      "createBoard": "Criar quadro"
+      "createBoard": "Criar quadro",
+      "invitations": {
+        "sectionTitle": "Convites pendentes",
+        "invitedBy": "{email} convidou você como {role}",
+        "accept": "Aceitar",
+        "decline": "Recusar"
+      }
     },
     "boardCard": {
       "rename": "Renomear",
@@ -256,6 +262,7 @@
       "roleOwner": "Dono",
       "roleEditor": "Editor",
       "roleCollaborator": "Colaborador",
+      "roleStatusPending": "Pendente",
       "inviteEmailPlaceholder": "Endereço de e-mail",
       "inviteButton": "Convidar",
       "inviteErrorNotFound": "Nenhuma conta Cherut encontrada para esse e-mail.",

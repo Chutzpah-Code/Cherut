@@ -194,7 +194,13 @@
       "boardNameLabel": "Board name",
       "boardNamePlaceholder": "e.g. Work, Personal, Q2 Goals...",
       "cancel": "Cancel",
-      "createBoard": "Create board"
+      "createBoard": "Create board",
+      "invitations": {
+        "sectionTitle": "Pending invitations",
+        "invitedBy": "{email} invited you as {role}",
+        "accept": "Accept",
+        "decline": "Decline"
+      }
     },
     "boardCard": {
       "rename": "Rename",
@@ -256,6 +262,7 @@
       "roleOwner": "Owner",
       "roleEditor": "Editor",
       "roleCollaborator": "Collaborator",
+      "roleStatusPending": "Pending",
       "inviteEmailPlaceholder": "Email address",
       "inviteButton": "Invite",
       "inviteErrorNotFound": "No Cherut account found for this email.",

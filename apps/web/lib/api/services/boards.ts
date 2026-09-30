@@ -2,13 +2,25 @@ import { apiClient } from '../client';
 import { Task } from './tasks';
 
 export type BoardRole = 'owner' | 'editor' | 'collaborator';
+export type BoardMemberStatus = 'pending' | 'accepted';
 
 export interface BoardMember {
   email: string;
   uid: string;
   role: BoardRole;
+  status: BoardMemberStatus;
   invitedAt: string;
   invitedByUid: string;
+  invitedByEmail: string;
+}
+
+export interface PendingInvitation {
+  boardId: string;
+  boardName: string;
+  colorIndex: number;
+  role: BoardRole;
+  invitedByEmail: string;
+  invitedAt: string;
 }
 
 export interface Board {
@@ -18,6 +30,7 @@ export interface Board {
   colorIndex: number;
   members: BoardMember[];
   memberUids: string[];
+  pendingInviteUids: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -145,6 +158,20 @@ export const boardsApi = {
       newOwnerUid,
     });
     return data;
+  },
+
+  // Invitations
+  getPendingInvitations: async (): Promise<PendingInvitation[]> => {
+    const { data } = await apiClient.get('/boards/invitations');
+    return data;
+  },
+
+  acceptInvitation: async (boardId: string): Promise<void> => {
+    await apiClient.post(`/boards/${boardId}/invitations/accept`);
+  },
+
+  declineInvitation: async (boardId: string): Promise<void> => {
+    await apiClient.post(`/boards/${boardId}/invitations/decline`);
   },
 
   // Kanban view

@@ -45,6 +45,13 @@ export class BoardsController {
     return this.boardsService.findAllBoards(req.user.uid);
   }
 
+  // Registered before ':boardId' — a literal route must come before a
+  // param route with the same prefix, same ordering used for /habits/counts.
+  @Get('invitations')
+  findPendingInvitations(@Request() req) {
+    return this.boardsService.findPendingInvitations(req.user.uid);
+  }
+
   @Get(':boardId')
   findOneBoard(@Request() req, @Param('boardId') boardId: string) {
     return this.boardsService.findOneBoard(req.user.uid, boardId);
@@ -73,7 +80,13 @@ export class BoardsController {
     @Param('boardId') boardId: string,
     @Body() dto: AddMemberDto,
   ) {
-    return this.boardsService.addMember(req.user.uid, boardId, dto.email, dto.role);
+    return this.boardsService.addMember(
+      req.user.uid,
+      boardId,
+      req.user.email ?? null,
+      dto.email,
+      dto.role,
+    );
   }
 
   @Delete(':boardId/members/:email')
@@ -102,6 +115,18 @@ export class BoardsController {
     @Body() dto: TransferOwnershipDto,
   ) {
     return this.boardsService.transferOwnership(req.user.uid, boardId, dto.newOwnerUid);
+  }
+
+  @Post(':boardId/invitations/accept')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  acceptInvitation(@Request() req, @Param('boardId') boardId: string) {
+    return this.boardsService.acceptInvitation(req.user.uid, boardId);
+  }
+
+  @Post(':boardId/invitations/decline')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  declineInvitation(@Request() req, @Param('boardId') boardId: string) {
+    return this.boardsService.declineInvitation(req.user.uid, boardId);
   }
 
   // ─── Columns ───────────────────────────────────────────────────────────────

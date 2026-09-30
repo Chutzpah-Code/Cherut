@@ -21,6 +21,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { Plus, Search } from 'lucide-react';
 import { Surface } from '@/components/ui/Surface';
 import { BoardCard } from './components/BoardCard';
+import { PendingInvitationsList } from './components/PendingInvitationsList';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useBoards,
@@ -107,6 +108,8 @@ export default function TasksPage() {
             {t('subtitle')}
           </Text>
         </Box>
+
+        <PendingInvitationsList />
 
         <Group
           justify="space-between"

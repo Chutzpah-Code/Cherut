@@ -130,6 +130,37 @@ export const useTransferBoardOwnership = () => {
   });
 };
 
+// ── Invitations ──────────────────────────────────────────────────────────────
+
+export const usePendingInvitations = () =>
+  useQuery({
+    queryKey: ['boards', 'invitations'],
+    queryFn: () => boardsApi.getPendingInvitations(),
+    staleTime: 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+
+export const useAcceptInvitation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (boardId: string) => boardsApi.acceptInvitation(boardId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
+      queryClient.invalidateQueries({ queryKey: ['boards', 'invitations'] });
+    },
+  });
+};
+
+export const useDeclineInvitation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (boardId: string) => boardsApi.declineInvitation(boardId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['boards', 'invitations'] });
+    },
+  });
+};
+
 // ── Columns ──────────────────────────────────────────────────────────────────
 
 export const useColumns = (boardId: string) =>
