@@ -1,11 +1,23 @@
 import { apiClient } from '../client';
 import { Task } from './tasks';
 
+export type BoardRole = 'owner' | 'editor' | 'collaborator';
+
+export interface BoardMember {
+  email: string;
+  uid: string;
+  role: BoardRole;
+  invitedAt: string;
+  invitedByUid: string;
+}
+
 export interface Board {
   id: string;
   userId: string;
   name: string;
   colorIndex: number;
+  members: BoardMember[];
+  memberUids: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -100,6 +112,39 @@ export const boardsApi = {
 
   deleteColumn: async (boardId: string, columnId: string): Promise<void> => {
     await apiClient.delete(`/boards/${boardId}/columns/${columnId}`);
+  },
+
+  // Members
+  addMember: async (
+    boardId: string,
+    email: string,
+    role: 'editor' | 'collaborator',
+  ): Promise<Board> => {
+    const { data } = await apiClient.post(`/boards/${boardId}/members`, { email, role });
+    return data;
+  },
+
+  removeMember: async (boardId: string, email: string): Promise<Board> => {
+    const { data } = await apiClient.delete(
+      `/boards/${boardId}/members/${encodeURIComponent(email)}`,
+    );
+    return data;
+  },
+
+  updateMemberRole: async (
+    boardId: string,
+    uid: string,
+    role: 'editor' | 'collaborator',
+  ): Promise<Board> => {
+    const { data } = await apiClient.patch(`/boards/${boardId}/members/${uid}`, { role });
+    return data;
+  },
+
+  transferOwnership: async (boardId: string, newOwnerUid: string): Promise<Board> => {
+    const { data } = await apiClient.post(`/boards/${boardId}/transfer-ownership`, {
+      newOwnerUid,
+    });
+    return data;
   },
 
   // Kanban view

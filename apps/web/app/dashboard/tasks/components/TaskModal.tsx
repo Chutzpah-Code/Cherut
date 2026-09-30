@@ -19,6 +19,7 @@ import {
   SegmentedControl,
   Progress,
   Popover,
+  MultiSelect,
 } from '@mantine/core';
 import { DateInput, TimeInput } from '@mantine/dates';
 import { useMediaQuery } from '@mantine/hooks';
@@ -30,6 +31,7 @@ import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { useObjectives } from '@/hooks/useObjectives';
 import { useKeyResults } from '@/hooks/useKeyResults';
 import { useTask, useUpdateTask, useToggleRecurringDate } from '@/hooks/useTasks';
+import { useBoard } from '@/hooks/useBoards';
 import { notifications } from '@mantine/notifications';
 
 // ── tokens ────────────────────────────────────────────────────────────────────
@@ -742,6 +744,7 @@ export function TaskModal({
 
   const { data: liveTask } = useTask(task?.id || '');
   const currentTask = liveTask || task;
+  const { data: board } = useBoard(currentTask?.boardId || '');
 
   const updateTaskMutation = useUpdateTask();
   const toggleRecurringDate = useToggleRecurringDate();
@@ -790,6 +793,7 @@ export function TaskModal({
         isRecurring: currentTask.isRecurring ?? false,
         recurringConfig: currentTask.recurringConfig,
         completedDates: currentTask.completedDates,
+        assigneeUids: currentTask.assigneeUids,
       });
     }
   }, [currentTask]);
@@ -1062,6 +1066,22 @@ export function TaskModal({
                 }}
               />
             </Stack>
+
+            {board && board.members.length > 1 && (
+              <Stack gap={7}>
+                <Text style={fieldLabelStyle}>{t('assignedTo')}</Text>
+                <MultiSelect
+                  placeholder={t('selectAssignees')}
+                  value={formData.assigneeUids ?? []}
+                  onChange={(value) => setFormData({ ...formData, assigneeUids: value })}
+                  data={board.members.map((m) => ({ value: m.uid, label: m.email }))}
+                  searchable
+                  clearable
+                  size="sm"
+                  styles={selectStyles}
+                />
+              </Stack>
+            )}
 
             <Group justify="space-between" align="center" gap="md" pt="sm" style={{ borderTop: `1px solid ${HAIRLINE}` }}>
               <Stack gap={2} style={{ minWidth: 0 }}>

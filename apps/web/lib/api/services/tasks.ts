@@ -38,6 +38,7 @@ export interface Task {
   estimatedPomodoros?: number;
   checklist?: ChecklistItem[];
   timeTracking?: TimeTrackingEntry[];
+  assigneeUids?: string[];
   totalTimeTracked?: number; // seconds
   archived?: boolean;
   tags?: string[];
@@ -70,6 +71,7 @@ export interface CreateTaskDto {
   isRecurring?: boolean;
   recurringConfig?: RecurringConfig;
   completedDates?: string[];
+  assigneeUids?: string[];
 }
 
 export interface UpdateTaskDto {
@@ -90,6 +92,7 @@ export interface UpdateTaskDto {
   isRecurring?: boolean;
   recurringConfig?: RecurringConfig;
   completedDates?: string[];
+  assigneeUids?: string[];
 }
 
 export interface UpdateTaskOrderDto {

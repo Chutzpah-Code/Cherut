@@ -38,9 +38,10 @@ interface BoardCardProps {
   onRename: (id: string, newName: string) => void;
   onDelete: (id: string) => void;
   onColorChange: (id: string, colorIndex: number) => void;
+  isOwner?: boolean;
 }
 
-export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCardProps) {
+export function BoardCard({ board, onRename, onDelete, onColorChange, isOwner = true }: BoardCardProps) {
   const t = useTranslations('tasks.boardCard');
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
@@ -128,17 +129,21 @@ export function BoardCard({ board, onRename, onDelete, onColorChange }: BoardCar
                 >
                   {t('color')}
                 </Menu.Item>
-                <Menu.Divider />
-                <Menu.Item
-                  color="red"
-                  leftSection={<Trash2 size={14} />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(board.id);
-                  }}
-                >
-                  {t('delete')}
-                </Menu.Item>
+                {isOwner && (
+                  <>
+                    <Menu.Divider />
+                    <Menu.Item
+                      color="red"
+                      leftSection={<Trash2 size={14} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(board.id);
+                      }}
+                    >
+                      {t('delete')}
+                    </Menu.Item>
+                  </>
+                )}
               </Menu.Dropdown>
             </Menu>
           </Group>

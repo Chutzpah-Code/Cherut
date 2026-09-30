@@ -17,6 +17,11 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
+import {
+  AddMemberDto,
+  UpdateMemberRoleDto,
+  TransferOwnershipDto,
+} from './dto/board-member.dto';
 
 @Controller('boards')
 @UseGuards(FirebaseAuthGuard)
@@ -27,12 +32,12 @@ export class BoardsController {
 
   @Post()
   createBoard(@Request() req, @Body() dto: CreateBoardDto) {
-    return this.boardsService.createBoard(req.user.uid, dto);
+    return this.boardsService.createBoard(req.user.uid, req.user.email ?? null, dto);
   }
 
   @Post('default')
   ensureDefaultBoard(@Request() req) {
-    return this.boardsService.createDefaultBoard(req.user.uid);
+    return this.boardsService.createDefaultBoard(req.user.uid, req.user.email ?? null);
   }
 
   @Get()
@@ -58,6 +63,45 @@ export class BoardsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteBoard(@Request() req, @Param('boardId') boardId: string) {
     return this.boardsService.deleteBoard(req.user.uid, boardId);
+  }
+
+  // ─── Members ───────────────────────────────────────────────────────────────
+
+  @Post(':boardId/members')
+  addMember(
+    @Request() req,
+    @Param('boardId') boardId: string,
+    @Body() dto: AddMemberDto,
+  ) {
+    return this.boardsService.addMember(req.user.uid, boardId, dto.email, dto.role);
+  }
+
+  @Delete(':boardId/members/:email')
+  removeMember(
+    @Request() req,
+    @Param('boardId') boardId: string,
+    @Param('email') email: string,
+  ) {
+    return this.boardsService.removeMember(req.user.uid, boardId, decodeURIComponent(email));
+  }
+
+  @Patch(':boardId/members/:uid')
+  updateMemberRole(
+    @Request() req,
+    @Param('boardId') boardId: string,
+    @Param('uid') uid: string,
+    @Body() dto: UpdateMemberRoleDto,
+  ) {
+    return this.boardsService.updateMemberRole(req.user.uid, boardId, uid, dto.role);
+  }
+
+  @Post(':boardId/transfer-ownership')
+  transferOwnership(
+    @Request() req,
+    @Param('boardId') boardId: string,
+    @Body() dto: TransferOwnershipDto,
+  ) {
+    return this.boardsService.transferOwnership(req.user.uid, boardId, dto.newOwnerUid);
   }
 
   // ─── Columns ───────────────────────────────────────────────────────────────

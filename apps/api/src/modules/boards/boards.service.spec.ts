@@ -66,7 +66,7 @@ describe('BoardsService', () => {
     it('creates board with userId, name and colorIndex', async () => {
       mockFirestore.add.mockResolvedValue({ id: BOARD_ID });
 
-      const result = await service.createBoard(USER, { name: 'My Board', colorIndex: 2 }) as any;
+      const result = await service.createBoard(USER, 'user@example.com', { name: 'My Board', colorIndex: 2 }) as any;
 
       const added = mockFirestore.add.mock.calls[0][0];
       expect(added.userId).toBe(USER);
@@ -78,7 +78,7 @@ describe('BoardsService', () => {
     it('defaults colorIndex to 0 when omitted', async () => {
       mockFirestore.add.mockResolvedValue({ id: BOARD_ID });
 
-      await service.createBoard(USER, { name: 'Board' });
+      await service.createBoard(USER, 'user@example.com', { name: 'Board' });
 
       expect(mockFirestore.add.mock.calls[0][0].colorIndex).toBe(0);
     });
@@ -92,7 +92,7 @@ describe('BoardsService', () => {
         snap([{ id: BOARD_ID, data: boardData }]),
       );
 
-      const result = await service.createDefaultBoard(USER) as any;
+      const result = await service.createDefaultBoard(USER, 'user@example.com') as any;
 
       expect(mockFirestore.add).not.toHaveBeenCalled();
       expect(result.id).toBe(BOARD_ID);
@@ -108,7 +108,7 @@ describe('BoardsService', () => {
         .mockResolvedValueOnce({ id: BOARD_ID })                 // createBoard
         .mockResolvedValue({ id: COL_ID });                       // 3× createColumn
 
-      await service.createDefaultBoard(USER);
+      await service.createDefaultBoard(USER, 'user@example.com');
 
       // add called 4 times: 1 board + 3 columns
       expect(mockFirestore.add).toHaveBeenCalledTimes(4);
@@ -249,12 +249,15 @@ describe('BoardsService', () => {
 
   describe('deleteColumn', () => {
     it('deletes column after verifying board ownership', async () => {
-      mockFirestore.get.mockResolvedValue(docOf(BOARD_ID, boardData));
+      mockFirestore.get
+        .mockResolvedValueOnce(docOf(BOARD_ID, boardData)) // findOneBoard
+        .mockResolvedValueOnce(snap([]));                   // active tasks in column
       mockFirestore.delete.mockResolvedValue(undefined);
 
       await service.deleteColumn(USER, BOARD_ID, COL_ID);
 
-      expect(mockFirestore.delete).toHaveBeenCalled();
+      expect(mockBatch.delete).toHaveBeenCalled();
+      expect(mockBatch.commit).toHaveBeenCalled();
     });
   });
 

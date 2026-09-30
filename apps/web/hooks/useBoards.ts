@@ -69,6 +69,67 @@ export const useDeleteBoard = () => {
   });
 };
 
+// ── Members ──────────────────────────────────────────────────────────────────
+
+export const useAddBoardMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      boardId,
+      email,
+      role,
+    }: {
+      boardId: string;
+      email: string;
+      role: 'editor' | 'collaborator';
+    }) => boardsApi.addMember(boardId, email, role),
+    onSuccess: (_data, { boardId }) => {
+      queryClient.invalidateQueries({ queryKey: ['boards', boardId] });
+    },
+  });
+};
+
+export const useRemoveBoardMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ boardId, email }: { boardId: string; email: string }) =>
+      boardsApi.removeMember(boardId, email),
+    onSuccess: (_data, { boardId }) => {
+      queryClient.invalidateQueries({ queryKey: ['boards', boardId] });
+    },
+  });
+};
+
+export const useUpdateBoardMemberRole = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      boardId,
+      uid,
+      role,
+    }: {
+      boardId: string;
+      uid: string;
+      role: 'editor' | 'collaborator';
+    }) => boardsApi.updateMemberRole(boardId, uid, role),
+    onSuccess: (_data, { boardId }) => {
+      queryClient.invalidateQueries({ queryKey: ['boards', boardId] });
+    },
+  });
+};
+
+export const useTransferBoardOwnership = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ boardId, newOwnerUid }: { boardId: string; newOwnerUid: string }) =>
+      boardsApi.transferOwnership(boardId, newOwnerUid),
+    onSuccess: (_data, { boardId }) => {
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
+      queryClient.invalidateQueries({ queryKey: ['boards', boardId] });
+    },
+  });
+};
+
 // ── Columns ──────────────────────────────────────────────────────────────────
 
 export const useColumns = (boardId: string) =>
@@ -113,12 +174,12 @@ export const useUpdateColumn = () => {
       });
       return { previous };
     },
-    onError: (_err, { boardId }, context: any) => {
+    onError: (_err, { boardId, dto }, context: any) => {
       if (context?.previous) {
         queryClient.setQueryData(['boards', boardId, 'kanban'], context.previous);
       }
       notifications.show({
-        title: 'Could not rename list',
+        title: dto.order !== undefined ? 'Could not move list' : 'Could not rename list',
         message: 'The change was not saved — please try again.',
         color: 'red',
       });

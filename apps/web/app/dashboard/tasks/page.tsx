@@ -21,6 +21,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { Plus, Search } from 'lucide-react';
 import { Surface } from '@/components/ui/Surface';
 import { BoardCard } from './components/BoardCard';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   useBoards,
   useCreateBoard,
@@ -36,6 +37,7 @@ export default function TasksPage() {
   const [newBoardName, setNewBoardName] = useState('');
   const isMobile = useMediaQuery('(max-width: 600px)');
 
+  const { user } = useAuth();
   const { data: boards, isLoading } = useBoards();
   const ensureDefault = useEnsureDefaultBoard();
   const createBoard = useCreateBoard();
@@ -143,6 +145,7 @@ export default function TasksPage() {
                 onRename={handleRename}
                 onDelete={handleDelete}
                 onColorChange={handleColorChange}
+                isOwner={board.userId === user?.uid}
               />
             ))}
 

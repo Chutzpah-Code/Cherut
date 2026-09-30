@@ -14,8 +14,56 @@ export class TasksService {
 
   constructor(private readonly firebaseService: FirebaseService) {}
 
+  // Boards are collaborative: any member (owner/editor/collaborator) can
+  // access and create tasks in a board, but every task belonging to that
+  // board is always stamped with the board OWNER's uid, never the
+  // individual creator's — this keeps every existing `where('userId'...)`
+  // query (findOne, findAll, etc.) valid without a full rewrite. Returns
+  // the board's data so callers can also validate assigneeUids against
+  // memberUids.
+  private async resolveBoardAccess(userId: string, boardId: string) {
+    const db = this.firebaseService.getFirestore();
+    const boardDoc = await db.collection('boards').doc(boardId).get();
+    const board = boardDoc.data();
+    const isMember =
+      !!board && (board.userId === userId || (board.memberUids ?? []).includes(userId));
+
+    if (!boardDoc.exists || !isMember) {
+      throw new NotFoundException('Board not found');
+    }
+
+    return board as any;
+  }
+
+  private validateAssignees(assigneeUids: string[] | undefined, board: any) {
+    if (!assigneeUids?.length) return;
+    const memberUids: string[] = board?.memberUids ?? [];
+    const invalid = assigneeUids.filter((uid) => !memberUids.includes(uid));
+    if (invalid.length) {
+      throw new BadRequestException('Some assignees are not members of this board');
+    }
+  }
+
+  private async hasTaskAccess(userId: string, task: any): Promise<boolean> {
+    if (task.userId === userId) return true;
+    if (!task.boardId) return false;
+
+    const db = this.firebaseService.getFirestore();
+    const boardDoc = await db.collection('boards').doc(task.boardId).get();
+    const memberUids: string[] = boardDoc.data()?.memberUids ?? [];
+    return memberUids.includes(userId);
+  }
+
   async create(userId: string, createDto: CreateTaskDto) {
     const db = this.firebaseService.getFirestore();
+
+    let ownerUserId = userId;
+
+    if (createDto.boardId) {
+      const board = await this.resolveBoardAccess(userId, createDto.boardId);
+      this.validateAssignees(createDto.assigneeUids, board);
+      ownerUserId = board.userId;
+    }
 
     // Filter out undefined values
     const cleanedDto = Object.fromEntries(
@@ -25,7 +73,7 @@ export class TasksService {
     // Set defaults
     const task = {
       ...cleanedDto,
-      userId,
+      userId: ownerUserId,
       status: createDto.status || 'todo',
       priority: createDto.priority || 'medium',
       order: createDto.order ?? 0,
@@ -81,11 +129,12 @@ export class TasksService {
   // composite index — same pattern already used for the column
   // cascade-delete query.
   async findArchivedByBoard(userId: string, boardId: string) {
+    const board = await this.resolveBoardAccess(userId, boardId);
     const db = this.firebaseService.getFirestore();
 
     const snapshot = await db
       .collection(this.collection)
-      .where('userId', '==', userId)
+      .where('userId', '==', board.userId)
       .where('boardId', '==', boardId)
       .where('archived', '==', true)
       .get();
@@ -102,17 +151,22 @@ export class TasksService {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
 
-    const task: any = doc.data();
+    const task: any = { id: doc.id, ...doc.data() };
 
-    if (task?.userId !== userId) {
+    if (!(await this.hasTaskAccess(userId, task))) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
 
-    return { id: doc.id, ...task };
+    return task;
   }
 
   async update(userId: string, id: string, updateDto: UpdateTaskDto) {
-    await this.findOne(userId, id);
+    const existing = await this.findOne(userId, id);
+
+    if (updateDto.assigneeUids !== undefined && existing.boardId) {
+      const board = await this.resolveBoardAccess(userId, existing.boardId);
+      this.validateAssignees(updateDto.assigneeUids, board);
+    }
 
     const db = this.firebaseService.getFirestore();
 

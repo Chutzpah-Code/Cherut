@@ -2,16 +2,224 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Modal, Stack, Box, Group, TextInput, Select, ActionIcon, Text } from '@mantine/core';
+import {
+  Modal,
+  Stack,
+  Box,
+  Group,
+  TextInput,
+  Select,
+  ActionIcon,
+  Text,
+  Avatar,
+  Button,
+  Tooltip,
+} from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { Trash2 } from 'lucide-react';
+import { Trash2, UserPlus } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { arrayMove } from '@dnd-kit/sortable';
 import { modals } from '@mantine/modals';
-import { useUpdateColumn, useDeleteColumn } from '@/hooks/useBoards';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  useUpdateColumn,
+  useDeleteColumn,
+  useBoard,
+  useAddBoardMember,
+  useRemoveBoardMember,
+  useUpdateBoardMemberRole,
+  useTransferBoardOwnership,
+} from '@/hooks/useBoards';
 import { useArchivedTasksByBoard } from '@/hooks/useTasks';
-import { KanbanColumn } from '@/lib/api/services/boards';
+import { KanbanColumn, BoardRole } from '@/lib/api/services/boards';
 import { Task, tasksApi } from '@/lib/api/services/tasks';
+
+const ROLE_ORDER: Record<BoardRole, number> = { owner: 0, editor: 1, collaborator: 2 };
+
+function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: boolean }) {
+  const t = useTranslations('tasks.manageBoard');
+  const { user } = useAuth();
+  const { data: board } = useBoard(boardId);
+  const addMember = useAddBoardMember();
+  const removeMember = useRemoveBoardMember();
+  const updateRole = useUpdateBoardMemberRole();
+  const transferOwnership = useTransferBoardOwnership();
+
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState<'editor' | 'collaborator'>('collaborator');
+  const [inviteError, setInviteError] = useState<string | null>(null);
+
+  if (!board) return null;
+
+  const myRole: BoardRole =
+    board.userId === user?.uid
+      ? 'owner'
+      : (board.members.find((m) => m.uid === user?.uid)?.role ?? 'collaborator');
+
+  const canInvite = myRole === 'owner' || myRole === 'editor';
+  const canManage = myRole === 'owner';
+
+  const sortedMembers = [...board.members].sort((a, b) => ROLE_ORDER[a.role] - ROLE_ORDER[b.role]);
+
+  const roleLabel = (role: BoardRole) =>
+    role === 'owner' ? t('roleOwner') : role === 'editor' ? t('roleEditor') : t('roleCollaborator');
+
+  const handleInvite = () => {
+    const email = inviteEmail.trim();
+    if (!email) return;
+    setInviteError(null);
+    addMember.mutate(
+      { boardId, email, role: inviteRole },
+      {
+        onSuccess: () => setInviteEmail(''),
+        onError: (err: any) => {
+          const status = err?.response?.status;
+          if (status === 404) setInviteError(t('inviteErrorNotFound'));
+          else if (status === 400 && err?.response?.data?.message?.includes('already')) {
+            setInviteError(t('inviteErrorDuplicate'));
+          } else {
+            setInviteError(t('inviteErrorGeneric'));
+          }
+        },
+      },
+    );
+  };
+
+  const handleRemove = (email: string) => {
+    modals.openConfirmModal({
+      title: t('removeMemberConfirmTitle'),
+      children: <Text size="sm" c="dimmed">{t('removeMemberConfirmBody', { email })}</Text>,
+      labels: { confirm: t('confirm'), cancel: t('cancel') },
+      confirmProps: { color: 'red' },
+      onConfirm: () => removeMember.mutate({ boardId, email }),
+    });
+  };
+
+  const handleRoleChange = (uid: string, role: 'editor' | 'collaborator') => {
+    updateRole.mutate({ boardId, uid, role });
+  };
+
+  const handleTransfer = (uid: string, email: string) => {
+    modals.openConfirmModal({
+      title: t('transferOwnershipConfirmTitle'),
+      children: <Text size="sm" c="dimmed">{t('transferOwnershipConfirmBody', { email })}</Text>,
+      labels: { confirm: t('transferOwnershipConfirmButton'), cancel: t('cancel') },
+      onConfirm: () => transferOwnership.mutate({ boardId, newOwnerUid: uid }),
+    });
+  };
+
+  return (
+    <Box>
+      <Text fw={600} size="sm" mb="xs">{t('membersTitle')}</Text>
+
+      <Stack gap="xs" mb={canInvite ? 'sm' : 0}>
+        {sortedMembers.map((member) => {
+          const isOwnerRow = member.uid === board.userId;
+          const editable = canManage && !isOwnerRow;
+
+          return (
+            <Group key={member.uid} justify="space-between" wrap={isMobile ? 'wrap' : 'nowrap'} gap="xs">
+              <Group gap={6} wrap="nowrap" style={{ minWidth: 0, flex: isMobile ? '1 1 100%' : 1 }}>
+                <Avatar size="sm" radius="xl" color="blue">
+                  {member.email.charAt(0).toUpperCase()}
+                </Avatar>
+                <Text size="sm" truncate style={{ flexShrink: 1, minWidth: 0 }}>
+                  {member.email}
+                  {member.uid === user?.uid && t('youSuffix')}
+                </Text>
+                {editable && (
+                  <Tooltip label={t('removeMemberTooltip')}>
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      color="red"
+                      onClick={() => handleRemove(member.email)}
+                      style={{ flexShrink: 0 }}
+                    >
+                      <Trash2 size={13} />
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+              </Group>
+
+              {/* The role indicator is always the same Select component, at
+                  the same size, whether it's editable (owner managing
+                  someone else) or a read-only display (the owner's own row,
+                  or any row seen by a non-owner) — this is what keeps every
+                  row's role rectangle the same size and column-aligned with
+                  the role/invite selects below, instead of a plain Text
+                  next to a bordered Select looking mismatched. */}
+              {editable ? (
+                <Select
+                  data={[
+                    { value: 'editor', label: t('roleEditor') },
+                    { value: 'collaborator', label: t('roleCollaborator') },
+                    { value: 'owner', label: t('roleOwner') },
+                  ]}
+                  value={member.role}
+                  onChange={(v) => {
+                    if (v === 'owner') handleTransfer(member.uid, member.email);
+                    else if (v === 'editor' || v === 'collaborator') handleRoleChange(member.uid, v);
+                  }}
+                  size="sm"
+                  style={{ width: isMobile ? undefined : 288, flex: isMobile ? 1 : undefined }}
+                  comboboxProps={{ width: 200 }}
+                  allowDeselect={false}
+                />
+              ) : (
+                <Select
+                  data={[{ value: member.role, label: roleLabel(member.role) }]}
+                  value={member.role}
+                  disabled
+                  size="sm"
+                  style={{ width: isMobile ? undefined : 288, flex: isMobile ? 1 : undefined }}
+                  allowDeselect={false}
+                />
+              )}
+            </Group>
+          );
+        })}
+      </Stack>
+
+      {canInvite && (
+        <Group gap="xs" wrap={isMobile ? 'wrap' : 'nowrap'} align="flex-start">
+          <Stack gap={4} style={{ flex: isMobile ? '1 1 100%' : 1 }}>
+            <TextInput
+              placeholder={t('inviteEmailPlaceholder')}
+              value={inviteEmail}
+              onChange={(e) => { setInviteEmail(e.currentTarget.value); setInviteError(null); }}
+              onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
+              size="sm"
+            />
+            {inviteError && <Text size="xs" c="red">{inviteError}</Text>}
+          </Stack>
+          <Select
+            data={[
+              { value: 'editor', label: t('roleEditor') },
+              { value: 'collaborator', label: t('roleCollaborator') },
+            ]}
+            value={inviteRole}
+            onChange={(v) => v && (v === 'editor' || v === 'collaborator') && setInviteRole(v)}
+            size="sm"
+            style={{ width: isMobile ? undefined : 150, flex: isMobile ? 1 : undefined }}
+            comboboxProps={{ width: 160 }}
+            allowDeselect={false}
+          />
+          <Button
+            leftSection={<UserPlus size={14} />}
+            onClick={handleInvite}
+            loading={addMember.isPending}
+            disabled={!inviteEmail.trim()}
+            size="sm"
+            style={{ backgroundColor: '#4686FE', flexShrink: 0 }}
+          >
+            {t('inviteButton')}
+          </Button>
+        </Group>
+      )}
+    </Box>
+  );
+}
 
 interface ManageBoardModalProps {
   boardId: string;
@@ -196,6 +404,8 @@ export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBo
       fullScreen={isMobile}
     >
       <Stack gap="lg">
+        <MembersSection boardId={boardId} isMobile={!!isMobile} />
+
         {columns.map((col, index) => (
           <Box key={col.id} style={{ border: '1px solid #E2E8F0', borderRadius: 12, padding: 16 }}>
             <Group justify="space-between" mb="sm" wrap="wrap" gap="xs">

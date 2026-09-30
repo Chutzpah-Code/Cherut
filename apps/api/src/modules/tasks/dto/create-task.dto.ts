@@ -186,6 +186,12 @@ export class CreateTaskDto {
   @IsOptional()
   columnId?: string;
 
+  // Board members assigned to this task (subset of the board's memberUids)
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  assigneeUids?: string[];
+
   // Recurring task fields
   @IsBoolean()
   @IsOptional()
