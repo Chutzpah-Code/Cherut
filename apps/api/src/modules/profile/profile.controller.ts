@@ -7,6 +7,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Query,
   UseInterceptors,
   UploadedFile,
   BadRequestException,
@@ -29,6 +30,12 @@ export class ProfileController {
   @Get()
   findOne(@Request() req) {
     return this.profileService.findOne(req.user.uid);
+  }
+
+  @Get('batch')
+  findBatch(@Query('uids') uids?: string) {
+    const uidList = uids ? uids.split(',').filter(Boolean) : [];
+    return this.profileService.findBatch(uidList);
   }
 
   @Patch()

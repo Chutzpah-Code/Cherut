@@ -54,3 +54,16 @@ export const useUploadAvatar = () => {
     },
   });
 };
+
+// Avatars for a list of other users (e.g. board members) — sorted uids in
+// the query key so the same set in a different order shares one cache entry.
+export const useProfilesBatch = (uids: string[]) => {
+  const sortedUids = [...uids].sort();
+  return useQuery({
+    queryKey: ['profiles', 'batch', sortedUids],
+    enabled: sortedUids.length > 0,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    queryFn: () => profileApi.getBatch(sortedUids),
+  });
+};

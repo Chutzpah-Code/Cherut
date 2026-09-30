@@ -1436,29 +1436,29 @@
       "sub": "Sem plano grátis, sem teste gratuito. Cada nível é um compromisso pago com a direção que você escolhe.",
       "monthly": "Mensal",
       "annual": "Anual",
-      "saveBadge": "2 meses grátis",
+      "saveBadge": "Economize no anual",
       "mostPopular": "Mais popular",
-      "toggleNote": "A cobrança anual economiza dois meses em qualquer plano.",
+      "toggleNote": "A cobrança anual sai mais barata em qualquer plano.",
       "plans": {
         "saas": {
           "name": "Core",
           "blurb": "Para organizar sua direção, suas ações e sua rotina dentro do Cherut.",
-          "priceMonthly": "US$ 20",
-          "priceAnnual": "US$ 200",
+          "priceMonthly": "US$ 12,50",
+          "priceAnnual": "US$ 120",
           "cadenceMonthly": "/mês",
           "cadenceAnnual": "/ano",
-          "annualNote": "Economize US$ 40 vs. pagar mensal (US$ 240/ano)",
+          "annualNote": "Equivale a US$ 10/mês, cobrado anualmente",
           "features": ["Valores, objetivos e OKRs", "Hábitos, tarefas e calendário", "Diário e reflexão", "Finanças e patrimônio", "Quadro dos sonhos"],
           "cta": "Começar o sistema"
         },
         "course": {
           "name": "Method",
           "blurb": "Para usar o sistema e aprender o método por trás dele.",
-          "priceMonthly": "US$ 50",
-          "priceAnnual": "US$ 500",
+          "priceMonthly": "US$ 48",
+          "priceAnnual": "US$ 480",
           "cadenceMonthly": "/mês",
           "cadenceAnnual": "/ano",
-          "annualNote": "Economize US$ 100 vs. pagar mensal (US$ 600/ano)",
+          "annualNote": "Equivale a US$ 40/mês, cobrado anualmente",
           "features": ["Tudo do Core", "Curso All In All The Time", "Exercícios práticos", "Percurso guiado de 7 ou 14 dias", "Templates de implementação", "Práticas de direção, execução, desconforto e retomada"],
           "cta": "Construir o método"
         },
@@ -1469,7 +1469,7 @@
           "priceAnnual": "US$ 1.000",
           "cadenceMonthly": "/mês",
           "cadenceAnnual": "/ano",
-          "annualNote": "Economize US$ 200 vs. pagar mensal (US$ 1.200/ano)",
+          "annualNote": "Equivale a US$ 83,33/mês, cobrado anualmente",
           "features": ["Core", "Curso All In All The Time", "Mentoria individual", "Revisão de direção", "Análise do padrão de execução", "Ajuste do sistema", "Plano de retomada"],
           "cta": "Aplicar para a mentoria"
         }

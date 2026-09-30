@@ -1436,29 +1436,29 @@
       "sub": "No free plan, no trial. Every level is a paid commitment to the direction you choose.",
       "monthly": "Monthly",
       "annual": "Annual",
-      "saveBadge": "2 months free",
+      "saveBadge": "Save annually",
       "mostPopular": "Most popular",
-      "toggleNote": "Annual billing saves two months' cost on every plan.",
+      "toggleNote": "Annual billing costs less than monthly on every plan.",
       "plans": {
         "saas": {
           "name": "Core",
           "blurb": "For organizing your direction, your actions and your routine inside Cherut.",
-          "priceMonthly": "$20",
-          "priceAnnual": "$200",
+          "priceMonthly": "$12.50",
+          "priceAnnual": "$120",
           "cadenceMonthly": "/month",
           "cadenceAnnual": "/year",
-          "annualNote": "Save $40 vs. paying monthly ($240/year)",
+          "annualNote": "That's $10/month, billed annually",
           "features": ["Values, objectives and OKRs", "Habits, tasks and calendar", "Journal and reflection", "Finances and net worth", "Dream board"],
           "cta": "Start the system"
         },
         "course": {
           "name": "Method",
           "blurb": "For using the system and learning the method behind it.",
-          "priceMonthly": "$50",
-          "priceAnnual": "$500",
+          "priceMonthly": "$48",
+          "priceAnnual": "$480",
           "cadenceMonthly": "/month",
           "cadenceAnnual": "/year",
-          "annualNote": "Save $100 vs. paying monthly ($600/year)",
+          "annualNote": "That's $40/month, billed annually",
           "features": ["Everything in Core", "All In All The Time course", "Practical exercises", "Guided 7- or 14-day path", "Implementation templates", "Direction, execution, discomfort and return practices"],
           "cta": "Build the method"
         },
@@ -1469,7 +1469,7 @@
           "priceAnnual": "$1,000",
           "cadenceMonthly": "/month",
           "cadenceAnnual": "/year",
-          "annualNote": "Save $200 vs. paying monthly ($1,200/year)",
+          "annualNote": "That's $83.33/month, billed annually",
           "features": ["Core", "All In All The Time course", "Individual mentorship", "Direction review", "Execution pattern analysis", "System adjustment", "Return plan"],
           "cta": "Apply for mentorship"
         }

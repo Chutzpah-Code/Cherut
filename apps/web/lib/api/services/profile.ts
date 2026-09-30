@@ -70,4 +70,10 @@ export const profileApi = {
     });
     return data;
   },
+
+  getBatch: async (uids: string[]): Promise<Array<{ uid: string; avatarUrl?: string }>> => {
+    if (uids.length === 0) return [];
+    const { data } = await apiClient.get('/profile/batch', { params: { uids: uids.join(',') } });
+    return data;
+  },
 };

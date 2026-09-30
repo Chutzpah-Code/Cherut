@@ -31,6 +31,25 @@ export class ProfileService {
     return { avatarUrl };
   }
 
+  // Used to show avatars in places that list other users (e.g. board
+  // members) — profiles are 1:1 with users but there's no batch-get
+  // endpoint until now. Individual parallel .get() calls rather than a
+  // FieldPath.documentId() 'in' query: simpler, no 30-item chunking to
+  // worry about, and the lists this backs (board members) are always small.
+  async findBatch(uids: string[]): Promise<Array<{ uid: string; avatarUrl?: string }>> {
+    const db = this.firebaseService.getFirestore();
+    const uniqueUids = Array.from(new Set(uids));
+
+    const docs = await Promise.all(
+      uniqueUids.map((uid) => db.collection(this.collection).doc(uid).get()),
+    );
+
+    return docs.map((doc, i) => ({
+      uid: uniqueUids[i],
+      avatarUrl: doc.data()?.avatarUrl,
+    }));
+  }
+
   async create(userId: string, createDto: CreateProfileDto) {
     const db = this.firebaseService.getFirestore();
 

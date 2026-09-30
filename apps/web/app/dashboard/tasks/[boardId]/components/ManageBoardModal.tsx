@@ -31,6 +31,7 @@ import {
   useTransferBoardOwnership,
 } from '@/hooks/useBoards';
 import { useArchivedTasksByBoard } from '@/hooks/useTasks';
+import { useProfilesBatch } from '@/hooks/useProfile';
 import { KanbanColumn, BoardRole } from '@/lib/api/services/boards';
 import { Task, tasksApi } from '@/lib/api/services/tasks';
 
@@ -48,6 +49,14 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'editor' | 'collaborator'>('collaborator');
   const [inviteError, setInviteError] = useState<string | null>(null);
+
+  const memberUids = useMemo(() => board?.members.map((m) => m.uid) ?? [], [board?.members]);
+  const { data: avatars } = useProfilesBatch(memberUids);
+  const avatarByUid = useMemo(() => {
+    const map = new Map<string, string | undefined>();
+    avatars?.forEach((a) => map.set(a.uid, a.avatarUrl));
+    return map;
+  }, [avatars]);
 
   if (!board) return null;
 
@@ -122,7 +131,7 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
           return (
             <Group key={member.uid} justify="space-between" wrap={isMobile ? 'wrap' : 'nowrap'} gap="xs">
               <Group gap={6} wrap="nowrap" style={{ minWidth: 0, flex: isMobile ? '1 1 100%' : 1 }}>
-                <Avatar size="sm" radius="xl" color="blue">
+                <Avatar src={avatarByUid.get(member.uid) ?? undefined} size="sm" radius="xl" color="blue">
                   {member.email.charAt(0).toUpperCase()}
                 </Avatar>
                 <Text size="sm" truncate style={{ flexShrink: 1, minWidth: 0 }}>
