@@ -19,7 +19,6 @@ import {
   SegmentedControl,
   Progress,
   Popover,
-  MultiSelect,
 } from '@mantine/core';
 import { DateInput, TimeInput } from '@mantine/dates';
 import { useMediaQuery } from '@mantine/hooks';
@@ -410,6 +409,32 @@ function ChecklistSection({
         )}
       </Group>
 
+      {!bulkOpen && (
+        <Group gap={8}>
+          <Button
+            size="sm"
+            radius={6}
+            variant="default"
+            leftSection={<Plus size={14} />}
+            onClick={onAddItem}
+            disabled={!newItemValue.trim()}
+            style={{ fontSize: 13, fontWeight: 600, color: SECONDARY, borderColor: BORDER }}
+          >
+            {t('addItem')}
+          </Button>
+          <Button
+            size="sm"
+            radius={6}
+            variant="default"
+            leftSection={<ListPlus size={14} />}
+            onClick={() => setBulkOpen(true)}
+            style={{ fontSize: 13, fontWeight: 600, color: SECONDARY, borderColor: BORDER }}
+          >
+            {t('bulkAdd')}
+          </Button>
+        </Group>
+      )}
+
       {total > 0 && <Progress value={pct} size={4} radius={2} color={PRIMARY} styles={{ root: { background: PROGRESS_TRACK } }} />}
 
       <Stack gap={2}>
@@ -429,15 +454,18 @@ function ChecklistSection({
               }}
             />
             {editingId === item.id ? (
-              <TextInput
+              <Textarea
                 value={editingValue}
                 onChange={(e) => setEditingValue(e.target.value)}
                 onBlur={commitEdit}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') { e.preventDefault(); commitEdit(); }
+                  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitEdit(); }
                   if (e.key === 'Escape') setEditingId(null);
                 }}
                 maxLength={CHECKLIST_ITEM_MAX_LENGTH}
+                autosize
+                minRows={1}
+                maxRows={6}
                 autoFocus
                 size="xs"
                 style={{ flex: 1 }}
@@ -455,6 +483,7 @@ function ChecklistSection({
                   color: item.completed ? MUTED : INK,
                   textDecoration: item.completed ? 'line-through' : 'none',
                   cursor: 'pointer',
+                  wordBreak: 'break-word',
                 }}
               >
                 {item.title}
@@ -503,44 +532,35 @@ function ChecklistSection({
           </Group>
         </Stack>
       ) : (
-        <Group gap={8}>
-          <TextInput
+        <Stack gap={2}>
+          <Textarea
             placeholder={t('addAnItem')}
             value={newItemValue}
             onChange={(e) => onNewItemChange(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 onAddItem();
               }
             }}
+            maxLength={CHECKLIST_ITEM_MAX_LENGTH}
+            autosize
+            minRows={1}
+            maxRows={6}
             size="sm"
             radius={6}
-            style={{ flex: 1 }}
             styles={{ input: { fontSize: 13, borderColor: BORDER } }}
           />
-          <Button
-            size="sm"
-            radius={6}
-            variant="default"
-            leftSection={<Plus size={14} />}
-            onClick={onAddItem}
-            disabled={!newItemValue.trim()}
-            style={{ fontSize: 13, fontWeight: 600, color: SECONDARY, borderColor: BORDER }}
-          >
-            {t('addItem')}
-          </Button>
-          <Button
-            size="sm"
-            radius={6}
-            variant="default"
-            leftSection={<ListPlus size={14} />}
-            onClick={() => setBulkOpen(true)}
-            style={{ fontSize: 13, fontWeight: 600, color: SECONDARY, borderColor: BORDER }}
-          >
-            {t('bulkAdd')}
-          </Button>
-        </Group>
+          {newItemValue.length > CHECKLIST_ITEM_MAX_LENGTH * 0.8 && (
+            <Text
+              size="xs"
+              ta="right"
+              style={{ color: newItemValue.length >= CHECKLIST_ITEM_MAX_LENGTH ? DANGER : MUTED }}
+            >
+              {newItemValue.length}/{CHECKLIST_ITEM_MAX_LENGTH}
+            </Text>
+          )}
+        </Stack>
       )}
 
       <Modal
@@ -796,7 +816,15 @@ export function TaskModal({
         assigneeUids: currentTask.assigneeUids,
       });
     }
-  }, [currentTask]);
+    // Deliberately keyed on the task's id, not the whole currentTask object.
+    // Fields like estimatedPomodoros or checklist items save immediately in
+    // the background (see onEstimateChange, onToggleChecklistItem below),
+    // which refreshes currentTask with a new object reference — keying this
+    // effect on the object itself re-ran it on every one of those saves and
+    // clobbered any other field the user had edited locally but not yet
+    // saved (e.g. priority) back to whatever the server last had.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTask?.id]);
 
   if (!currentTask) return null;
 
@@ -948,6 +976,81 @@ export function TaskModal({
               />
             </Stack>
 
+            {(() => {
+              // Shown whenever the board has any other member — accepted OR
+              // still pending — so an invite-in-progress doesn't make this
+              // section disappear entirely.
+              const otherMembers = board?.members ?? [];
+              if (otherMembers.length <= 1) return null;
+
+              // Checked as "not pending" rather than "=== accepted" — boards
+              // created before this field existed have owner entries with no
+              // status at all, and treating a missing status as excluded
+              // would wrongly hide them here.
+              const assignableMembers = otherMembers.filter((m) => m.status !== 'pending');
+              const pendingCount = otherMembers.filter((m) => m.status === 'pending').length;
+              const assignedUids = formData.assigneeUids ?? [];
+              const assignedMembers = assignableMembers.filter((m) => assignedUids.includes(m.uid));
+              const unassignedMembers = assignableMembers.filter((m) => !assignedUids.includes(m.uid));
+
+              // Mantine's MultiSelect pills kept rendering blank/collapsed
+              // for this field regardless of label content or data fixes —
+              // a hand-rolled chip list sidesteps that entirely and is
+              // easier to keep legible: one add-dropdown (always resets to
+              // its placeholder after picking someone) plus a plain chip per
+              // assignee, each with its own single, unambiguous remove ×.
+              return (
+                <Stack gap={7}>
+                  <Text style={fieldLabelStyle}>{t('assignedTo')}</Text>
+
+                  {assignedMembers.length > 0 && (
+                    <Group gap={6} wrap="wrap">
+                      {assignedMembers.map((m) => (
+                        <Group
+                          key={m.uid}
+                          gap={4}
+                          wrap="nowrap"
+                          style={{ background: CHIP, borderRadius: 999, padding: '4px 6px 4px 10px' }}
+                        >
+                          <Text size="xs" fw={500} style={{ color: SECONDARY }}>
+                            {m.email.split('@')[0]}
+                          </Text>
+                          <ActionIcon
+                            size="xs"
+                            variant="subtle"
+                            color="gray"
+                            onClick={() =>
+                              setFormData({ ...formData, assigneeUids: assignedUids.filter((u) => u !== m.uid) })
+                            }
+                          >
+                            <X size={11} />
+                          </ActionIcon>
+                        </Group>
+                      ))}
+                    </Group>
+                  )}
+
+                  {unassignedMembers.length > 0 && (
+                    <Select
+                      placeholder={t('selectAssignees')}
+                      value={null}
+                      onChange={(uid) => uid && setFormData({ ...formData, assigneeUids: [...assignedUids, uid] })}
+                      data={unassignedMembers.map((m) => ({ value: m.uid, label: m.email }))}
+                      searchable
+                      size="sm"
+                      styles={selectStyles}
+                    />
+                  )}
+
+                  {pendingCount > 0 && (
+                    <Text size="xs" c="dimmed">
+                      {t('pendingInvitesNote', { count: pendingCount })}
+                    </Text>
+                  )}
+                </Stack>
+              );
+            })()}
+
             <TimePanel
               totalTimeTracked={currentTask.totalTimeTracked ?? 0}
               isRunning={!!activeTracking}
@@ -1066,22 +1169,6 @@ export function TaskModal({
                 }}
               />
             </Stack>
-
-            {board && board.members.length > 1 && (
-              <Stack gap={7}>
-                <Text style={fieldLabelStyle}>{t('assignedTo')}</Text>
-                <MultiSelect
-                  placeholder={t('selectAssignees')}
-                  value={formData.assigneeUids ?? []}
-                  onChange={(value) => setFormData({ ...formData, assigneeUids: value })}
-                  data={board.members.map((m) => ({ value: m.uid, label: m.email }))}
-                  searchable
-                  clearable
-                  size="sm"
-                  styles={selectStyles}
-                />
-              </Stack>
-            )}
 
             <Group justify="space-between" align="center" gap="md" pt="sm" style={{ borderTop: `1px solid ${HAIRLINE}` }}>
               <Stack gap={2} style={{ minWidth: 0 }}>
@@ -1211,11 +1298,14 @@ export function TaskModal({
 
       <Box
         style={{
-          padding: isPhone ? '12px 20px' : '16px 24px',
+          paddingTop: isPhone ? 12 : 18,
+          paddingLeft: isPhone ? 20 : 24,
+          paddingRight: isPhone ? 20 : 24,
+          paddingBottom: isPhone ? 'max(12px, env(safe-area-inset-bottom))' : 22,
           borderTop: `1px solid ${BORDER}`,
           background: SURFACE,
+          borderRadius: isPhone ? 0 : '0 0 12px 12px',
           flexShrink: 0,
-          paddingBottom: isPhone ? 'max(12px, env(safe-area-inset-bottom))' : undefined,
         }}
       >
         <Group gap={10} justify="flex-end" style={{ flexDirection: isPhone ? 'column-reverse' : 'row' }}>

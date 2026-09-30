@@ -109,6 +109,14 @@ export const useCreateKeyResult = () => {
           return { ...obj, keyResults: updatedKeyResults };
         });
       });
+      // useKeyResults(undefined) (used by TaskModal's key-result picker) reads
+      // from its own flat ['keyResults', undefined] cache entry, separate from
+      // the nested one above — keep it in sync too, or a newly created key
+      // result stays invisible there until the 5-minute staleTime lapses.
+      queryClient.setQueryData(['keyResults', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return [...old, newKeyResult];
+      });
     },
   });
 };
@@ -136,6 +144,10 @@ export const useUpdateKeyResult = () => {
           return { ...obj, keyResults: updatedKeyResults };
         });
       });
+      queryClient.setQueryData(['keyResults', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((kr: any) => (kr.id === keyResultId ? { ...kr, ...updatedKeyResult } : kr));
+      });
     },
   });
 };
@@ -160,6 +172,10 @@ export const useDeleteKeyResult = () => {
           return { ...obj, keyResults: updatedKeyResults };
         });
       });
+      queryClient.setQueryData(['keyResults', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.filter((kr: any) => kr.id !== keyResultId);
+      });
     },
   });
 };
@@ -181,6 +197,10 @@ export const useCompleteKeyResult = () => {
           ) || [];
           return { ...obj, keyResults: updatedKeyResults };
         });
+      });
+      queryClient.setQueryData(['keyResults', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((kr: any) => (kr.id === keyResultId ? { ...kr, ...updatedKeyResult } : kr));
       });
     },
   });
@@ -204,6 +224,13 @@ export const useBatchUpdateKeyResults = () => {
             return update ? { ...kr, ...update.dto } : kr;
           }) || [];
           return { ...obj, keyResults: updatedKeyResults };
+        });
+      });
+      queryClient.setQueryData(['keyResults', undefined], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        return old.map((kr: any) => {
+          const update = updates.find((u) => u.id === kr.id);
+          return update ? { ...kr, ...update.dto } : kr;
         });
       });
     },

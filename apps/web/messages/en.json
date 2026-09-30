@@ -366,6 +366,7 @@
       "pickObjectiveFirst": "Pick an objective first",
       "assignedTo": "Assigned to",
       "selectAssignees": "Select board members",
+      "pendingInvitesNote": "{count, plural, one {# invited member hasn't accepted yet and can't be assigned.} other {# invited members haven't accepted yet and can't be assigned.}}",
       "recurring": "Recurring",
       "on": "On",
       "off": "Off",

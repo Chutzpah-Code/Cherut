@@ -366,6 +366,7 @@
       "pickObjectiveFirst": "Escolha um objetivo primeiro",
       "assignedTo": "Atribuído a",
       "selectAssignees": "Selecionar membros do board",
+      "pendingInvitesNote": "{count, plural, one {# membro convidado ainda não aceitou e não pode ser atribuído.} other {# membros convidados ainda não aceitaram e não podem ser atribuídos.}}",
       "recurring": "Recorrente",
       "on": "Ativado",
       "off": "Desativado",
