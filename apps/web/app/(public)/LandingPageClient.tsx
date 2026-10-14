@@ -123,7 +123,7 @@ export default function LandingPageClient() {
         .node p { transition: opacity .3s; opacity: .7; font-size: 14px; line-height: 1.3; color: #fff; text-wrap: balance; margin: 0; }
         .node.on span { color: ${accLight}; }
         .node.on p { opacity: 1; }
-        .loop-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 64px; align-items: center; }
+        .loop-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 56px; align-items: center; max-width: 640px; margin: 0 auto; }
         .quotes { display: flex; flex-direction: column; gap: 0; border-top: 1px solid ${ruleD}; padding: 0; margin: 18px 0 0; }
         .quotes li { list-style: none; padding: 18px 0; border-bottom: 1px solid ${ruleD}; font-size: 19px; letter-spacing: -.01em; color: rgba(255,255,255,.88); }
         .loop-foot { margin-top: 28px; font-size: 18px; }
