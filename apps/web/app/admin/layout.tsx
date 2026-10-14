@@ -22,7 +22,8 @@ import {
   IconSettings,
   IconLogout,
   IconShieldCheck,
-  IconMenu2
+  IconMenu2,
+  IconBook
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -163,6 +164,12 @@ export default function AdminLayout({
       icon: IconUsers,
       href: '/admin/users',
       active: pathname === '/admin/users',
+    },
+    {
+      label: 'Courses',
+      icon: IconBook,
+      href: '/admin/courses',
+      active: pathname.startsWith('/admin/courses'),
     },
     {
       label: 'Analytics',

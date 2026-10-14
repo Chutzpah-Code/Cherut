@@ -1288,6 +1288,30 @@
       "addToBoard": "Adicionar ao quadro"
     }
   },
+  "learning": {
+    "page": {
+      "title": "Aprendizado",
+      "subtitle": "Cursos e práticas guiadas para ir mais além.",
+      "empty": "Nenhum curso disponível ainda.",
+      "availableOnPlan": "Disponível no plano {plan}",
+      "progress": "Progresso"
+    },
+    "course": {
+      "back": "Voltar",
+      "availableOnPlan": "Disponível no plano {plan}",
+      "lockedBody": "Faça upgrade do seu plano para desbloquear o conteúdo deste curso.",
+      "overallProgress": "Progresso geral",
+      "pace": "Ritmo",
+      "pace7": "7 dias",
+      "pace14": "14 dias",
+      "targetDate": "Data alvo: {date}",
+      "watchVideo": "Ver vídeo",
+      "exercise": "Exercício",
+      "template": "Template",
+      "noLessons": "Nenhuma lição ainda.",
+      "noModules": "Nenhum módulo ainda."
+    }
+  },
   "publicHeader": {
     "features": "Recursos",
     "method": "Método",
@@ -1330,6 +1354,7 @@
     "tasks": "Tarefas",
     "habits": "Hábitos",
     "journal": "Diário",
+    "learning": "Aprendizado",
     "profile": "Perfil",
     "reports": "Relatórios",
     "cherutOS": "CherutOS",

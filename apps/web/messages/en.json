@@ -1288,6 +1288,30 @@
       "addToBoard": "Add to Vision Board"
     }
   },
+  "learning": {
+    "page": {
+      "title": "Learning",
+      "subtitle": "Courses and guided practices to go further.",
+      "empty": "No courses available yet.",
+      "availableOnPlan": "Available on {plan}",
+      "progress": "Progress"
+    },
+    "course": {
+      "back": "Back",
+      "availableOnPlan": "Available on {plan}",
+      "lockedBody": "Upgrade your plan to unlock this course's content.",
+      "overallProgress": "Overall progress",
+      "pace": "Pace",
+      "pace7": "7 days",
+      "pace14": "14 days",
+      "targetDate": "Target date: {date}",
+      "watchVideo": "Watch video",
+      "exercise": "Exercise",
+      "template": "Template",
+      "noLessons": "No lessons yet.",
+      "noModules": "No modules yet."
+    }
+  },
   "publicHeader": {
     "features": "Features",
     "method": "Method",
@@ -1330,6 +1354,7 @@
     "tasks": "Tasks",
     "habits": "Habits",
     "journal": "Journal",
+    "learning": "Learning",
     "profile": "Profile",
     "reports": "Reports",
     "cherutOS": "CherutOS",

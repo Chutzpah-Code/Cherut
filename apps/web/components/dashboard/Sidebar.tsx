@@ -18,6 +18,7 @@ import {
   Heart,
   Bot,
   Wallet,
+  GraduationCap,
 } from 'lucide-react';
 import { Stack, ScrollArea, Tooltip, ActionIcon } from '@mantine/core';
 import { logoutUser } from '@/lib/firebase/auth';
@@ -45,6 +46,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
     { name: t('tasks'), href: '/dashboard/tasks', icon: CheckSquare },
     { name: t('habits'), href: '/dashboard/habits', icon: Calendar },
     { name: t('journal'), href: '/dashboard/journal', icon: BookOpen },
+    { name: t('learning'), href: '/dashboard/learning', icon: GraduationCap },
     { name: t('profile'), href: '/dashboard/profile', icon: User },
   ];
 

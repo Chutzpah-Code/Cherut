@@ -23,6 +23,7 @@ import { ValuesModule } from './modules/values/values.module';
 import { BoardsModule } from './modules/boards/boards.module';
 import { FinanceModule } from './modules/finance/finance.module';
 import { BillsModule } from './modules/bills/bills.module';
+import { LearningModule } from './modules/learning/learning.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { BillsModule } from './modules/bills/bills.module';
     BoardsModule,
     FinanceModule,
     BillsModule,
+    LearningModule,
   ],
   controllers: [AppController],
   providers: [
