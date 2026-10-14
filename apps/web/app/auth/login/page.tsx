@@ -9,21 +9,16 @@ import { getLoginErrorMessage, getAuthErrorMessage } from '@/lib/utils/auth-erro
 import { useLoginRateLimit } from '@/hooks/useRateLimit';
 import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
 import { Modal } from '@mantine/core';
+import { AuthShell } from '@/components/shell/AuthShell';
+import { SHELL_TOKENS } from '@/components/shell/Shell';
 
-const BG      = '#07070D';
-const SURF    = '#0F0F1B';
-const SURF2   = '#161628';
-const TEXT    = '#EDEEF6';
-const MUTED   = 'rgba(237,238,246,0.46)';
-const ACCENT  = 'oklch(0.68 0.24 260)';
-const ACCENT_DIM = 'rgba(80,110,255,0.12)';
-const RULE    = 'rgba(255,255,255,0.08)';
-const GRID    = 'rgba(255,255,255,0.04)';
+const { ink, mute, rule, acc } = SHELL_TOKENS;
 
 export default function LoginPage() {
   const t = useTranslations('loginPage');
   const tc = useTranslations('authCommon');
   const tErr = useTranslations('authErrors');
+  const tf = useTranslations('publicFooter');
 
   const [email, setEmail]                     = useState('');
   const [password, setPassword]               = useState('');
@@ -81,148 +76,77 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', position: 'relative', fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif' }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600;700&family=Sora:wght@700&display=swap');
-        *, *::before, *::after { box-sizing: border-box; }
-        html { background: ${BG} !important; color-scheme: dark !important; }
-        body { background: ${BG} !important; }
-        .auth-input {
-          width: 100%; padding: 12px 14px; font-size: 15px; font-family: inherit;
-          background: ${SURF}; border: 1px solid ${RULE}; border-radius: 8px;
-          color: ${TEXT}; outline: none; transition: border-color .15s, box-shadow .15s;
-          appearance: none;
-        }
-        .auth-input:focus { border-color: ${ACCENT}; box-shadow: 0 0 0 3px ${ACCENT_DIM}; }
-        .auth-input::placeholder { color: rgba(237,238,246,0.22); }
-        .auth-pw-wrap { position: relative; }
-        .auth-pw-wrap .auth-input { padding-right: 44px; }
-        .auth-pw-toggle {
-          position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-          background: none; border: none; cursor: pointer; color: ${MUTED};
-          font-size: 13px; font-family: inherit; padding: 4px;
-        }
-        .auth-btn {
-          width: 100%; padding: 14px; background: ${TEXT}; color: ${BG};
-          font-size: 15px; font-weight: 700; font-family: inherit;
-          border: none; border-radius: 999px; cursor: pointer;
-          transition: opacity .15s; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .auth-btn:hover:not(:disabled) { opacity: .85; }
-        .auth-btn:disabled { opacity: .5; cursor: not-allowed; }
-        .auth-label { font-size: 13px; font-weight: 600; color: rgba(237,238,246,0.55); display: block; margin-bottom: 6px; }
-        .auth-link { color: ${ACCENT}; font-weight: 600; text-decoration: none; }
-        .auth-link:hover { text-decoration: underline; }
-        .auth-error { background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.25); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: #f87171; }
-        .auth-card { padding: 22px 18px; }
-        @media (min-width: 420px) { .auth-card { padding: 28px 28px; } }
-      `}</style>
+    <AuthShell
+      footer={tf('disclaimer')}
+      quote="A bad day is not a verdict on who you are. It is a day to review and return from."
+      quoteNote="All In All The Time"
+    >
+      <h1 style={{ fontSize: 'clamp(34px,3.6vw,44px)', letterSpacing: '-.04em', fontWeight: 600, lineHeight: 1.02, margin: 0 }}>{t('title')}</h1>
+      <p className="lede" style={{ fontSize: 16, marginTop: -6 }}>{t('subtitle')}</p>
 
-      <div style={{
-        position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
-        backgroundImage: `linear-gradient(${GRID} 1px, transparent 1px), linear-gradient(90deg, ${GRID} 1px, transparent 1px)`,
-        backgroundSize: '90px 90px',
-        maskImage: 'radial-gradient(ellipse at 50% 30%, #000 40%, transparent 75%)',
-        WebkitMaskImage: 'radial-gradient(ellipse at 50% 30%, #000 40%, transparent 75%)',
-      }} />
+      <RateLimitDisplay result={loginRateLimit.result} message={loginRateLimit.warningMessage} showProgress />
 
-      <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {error && <p className="au-err">{error}</p>}
 
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: TEXT }}>
-            <svg viewBox="0 0 64 64" width={34} height={34} fill="none" aria-hidden="true">
-              <circle cx="32" cy="32" r="27" stroke={TEXT} strokeWidth="5.6" />
-              <circle cx="32" cy="32" r="5.6" fill={TEXT} />
-            </svg>
-            <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 26, letterSpacing: '-0.025em', color: TEXT }}>Cherut</span>
-          </a>
-          <div>
-            <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '0 0 6px', color: TEXT }}>{t('title')}</h1>
-            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>{t('subtitle')}</p>
+        <div className="f">
+          <label htmlFor="login-email">{tc('emailLabel')}</label>
+          <input id="login-email" type="email" placeholder={tc('emailPlaceholder')} value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+        </div>
+
+        <div className="f">
+          <label htmlFor="login-password">{t('passwordLabel')}<a href="#" onClick={(e) => { e.preventDefault(); setResetModalOpened(true); }}>{t('forgotPassword')}</a></label>
+          <div className="pw">
+            <input id="login-password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
+            <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? tc('hidePasswordAria') : tc('showPasswordAria')}>
+              {showPassword ? tc('hide') : tc('show')}
+            </button>
           </div>
         </div>
 
-        <div className="auth-card" style={{ background: SURF2, border: `1px solid ${RULE}`, borderRadius: 16 }}>
-          <RateLimitDisplay result={loginRateLimit.result} message={loginRateLimit.warningMessage} showProgress />
+        <button type="submit" className="btn btn-dark au-submit" disabled={loading}>
+          {loading ? t('signingIn') : <>{t('signIn')} →</>}
+        </button>
+      </form>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-            {error && <div className="auth-error">{error}</div>}
-
-            <div>
-              <label className="auth-label" htmlFor="login-email">{tc('emailLabel')}</label>
-              <input id="login-email" className="auth-input" type="email" placeholder={tc('emailPlaceholder')} value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
-            </div>
-
-            <div>
-              <label className="auth-label" htmlFor="login-password">{t('passwordLabel')}</label>
-              <div className="auth-pw-wrap">
-                <input id="login-password" className="auth-input" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" />
-                <button type="button" className="auth-pw-toggle" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? tc('hidePasswordAria') : tc('showPasswordAria')}>
-                  {showPassword ? tc('hide') : tc('show')}
-                </button>
-              </div>
-            </div>
-
-            <button type="submit" className="auth-btn" disabled={loading}>
-              {loading ? t('signingIn') : <>{t('signIn')} <span>→</span></>}
-            </button>
-
-            <button type="button" onClick={() => setResetModalOpened(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: ACCENT, fontWeight: 600, fontFamily: 'inherit', textAlign: 'center', padding: 0 }}>
-              {t('forgotPassword')}
-            </button>
-          </form>
-        </div>
-
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>
-            {t('noAccount')}{' '}
-            <a href="/auth/register" className="auth-link">{t('signUp')}</a>
-          </p>
-          <a href="/" style={{ fontSize: 13, color: MUTED, textDecoration: 'none' }}>{tc('backToHome')}</a>
-        </div>
-      </div>
+      <p className="au-alt">{t('noAccount')} <a href="/auth/register">{t('signUp')}</a></p>
 
       <Modal
         opened={resetModalOpened}
         onClose={handleResetModalClose}
-        title={<span style={{ fontWeight: 700, fontSize: 18, color: TEXT, fontFamily: 'inherit', letterSpacing: '-0.01em' }}>{t('resetModal.title')}</span>}
+        title={<span style={{ fontWeight: 600, fontSize: 18, color: ink, letterSpacing: '-0.01em' }}>{t('resetModal.title')}</span>}
         centered
         radius={16}
         styles={{
-          content: { background: SURF2, border: `1px solid ${RULE}` },
-          header: { background: SURF2, borderBottom: `1px solid ${RULE}` },
-          overlay: { backdropFilter: 'blur(4px)', background: 'rgba(7,7,13,0.7)' },
-          close: { color: MUTED },
+          content: { background: '#fff', border: `1px solid ${rule}` },
+          header: { background: '#fff', borderBottom: `1px solid ${rule}` },
+          close: { color: mute },
         }}
       >
         {resetSuccess ? (
           <div style={{ textAlign: 'center', padding: '16px 0 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontSize: 32 }}>✓</div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: TEXT }}>{t('resetModal.emailSentTitle')}</div>
-            <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.55 }}>{t('resetModal.emailSentBody')}</p>
-            <button onClick={handleResetModalClose} className="auth-btn" style={{ marginTop: 8 }}>{t('resetModal.gotIt')}</button>
+            <div style={{ fontSize: 32, color: acc }}>{'✓'}</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: ink }}>{t('resetModal.emailSentTitle')}</div>
+            <p style={{ fontSize: 14, color: mute, margin: 0, lineHeight: 1.55 }}>{t('resetModal.emailSentBody')}</p>
+            <button onClick={handleResetModalClose} className="btn btn-dark" style={{ marginTop: 8 }}>{t('resetModal.gotIt')}</button>
           </div>
         ) : (
           <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {resetError && <div className="auth-error">{resetError}</div>}
-            <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.55 }}>
-              {t('resetModal.prompt')}
-            </p>
-            <div>
-              <label className="auth-label" htmlFor="reset-email">{tc('emailLabel')}</label>
-              <input id="reset-email" className="auth-input" type="email" placeholder={tc('emailPlaceholder')} value={resetEmail} onChange={e => setResetEmail(e.target.value)} required />
+            {resetError && <p className="au-err">{resetError}</p>}
+            <p style={{ fontSize: 14, color: mute, margin: 0, lineHeight: 1.55 }}>{t('resetModal.prompt')}</p>
+            <div className="f">
+              <label htmlFor="reset-email">{tc('emailLabel')}</label>
+              <input id="reset-email" type="email" placeholder={tc('emailPlaceholder')} value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} required />
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button type="button" onClick={handleResetModalClose} style={{ padding: '11px 20px', background: SURF, border: `1px solid ${RULE}`, borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: TEXT }}>
-                {t('resetModal.cancel')}
-              </button>
-              <button type="submit" disabled={resetLoading} style={{ padding: '11px 20px', background: TEXT, color: BG, border: 'none', borderRadius: 999, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: resetLoading ? 0.5 : 1 }}>
+              <button type="button" onClick={handleResetModalClose} className="btn btn-line">{t('resetModal.cancel')}</button>
+              <button type="submit" disabled={resetLoading} className="btn btn-dark">
                 {resetLoading ? t('resetModal.sending') : t('resetModal.sendResetLink')}
               </button>
             </div>
           </form>
         )}
       </Modal>
-    </div>
+    </AuthShell>
   );
 }

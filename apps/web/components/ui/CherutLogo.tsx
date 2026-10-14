@@ -2,18 +2,28 @@ interface CherutLogoProps {
   size?: number;
   className?: string;
   fillColor?: string;
+  // Crop into the same 688x688 artwork. Defaults preserve the original
+  // full-canvas mark. The public-site rebrand reuses two other crops of the
+  // identical path data instead of shipping separate logo files:
+  // "200 279 338 132" = full wordmark (nav/footer), "200 279 108 132" =
+  // symbol only (decorative uses) — see docs/rebranding/logo/*.svg, which
+  // are the same geometry at those exact crops.
+  viewBox?: string;
+  width?: number;
+  height?: number;
+  style?: React.CSSProperties;
 }
 
-export default function CherutLogo({ size = 120, className, fillColor = '#000000' }: CherutLogoProps) {
+export default function CherutLogo({ size = 120, className, fillColor = '#000000', viewBox = '0 0 688 688', width, height, style }: CherutLogoProps) {
 
   return (
     <svg
-      width={size}
-      height={size}
-      viewBox="0 0 688 688"
+      width={width ?? size}
+      height={height ?? size}
+      viewBox={viewBox}
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={{ display: 'block', pointerEvents: 'none' }}
+      style={{ display: 'block', pointerEvents: 'none', ...style }}
     >
       <path
         fill={fillColor}

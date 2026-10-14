@@ -2,11 +2,10 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import CherutLogo from '@/components/ui/CherutLogo';
+import { SHELL_TOKENS } from '@/components/shell/Shell';
 
-const SURF = '#0F0F1B';
-const TEXT = '#EDEEF6';
-const MUTED = 'rgba(237,238,246,0.46)';
-const RULE = 'rgba(255,255,255,0.08)';
+const { ink, ruleD } = SHELL_TOKENS;
 
 export function PublicFooter() {
   const t = useTranslations('publicFooter');
@@ -16,7 +15,7 @@ export function PublicFooter() {
       label: t('product'),
       links: [
         [t('features'), '/#features'],
-        [t('method'), '/#how'],
+        [t('method'), '/#method'],
         [t('pricing'), '/#pricing'],
         [t('changelog'), '/changelog'],
         [t('roadmap'), '/roadmap'],
@@ -41,63 +40,41 @@ export function PublicFooter() {
 
   return (
     <>
-      <style jsx global>{`
-        .pf-inner {
-          max-width: 1280px; margin: 0 auto;
-          display: grid; grid-template-columns: repeat(4, 1fr);
-          gap: 32px; padding-bottom: 48px; border-bottom: 1px solid ${RULE};
-        }
-        .pf-brand { grid-column: span 1; }
-        .pf-bottom {
-          max-width: 1280px; margin: 0 auto; padding-top: 24px;
-          display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
-          font-size: 13px; color: rgba(237,238,246,.28);
-        }
-        @media (max-width: 767px) {
-          .pf-inner { grid-template-columns: 1fr 1fr; }
-          .pf-brand { grid-column: span 2; }
-          .pf-bottom { flex-direction: column; gap: 8px; }
-        }
-        @media (max-width: 479px) {
-          .pf-inner { grid-template-columns: 1fr; }
-          .pf-brand { grid-column: span 1; }
-        }
+      <style>{`
+        .ft-footer { padding: 72px 0 36px; background: ${ink}; color: rgba(255,255,255,.62); border-top: 1px solid ${ruleD}; }
+        .ft { max-width: 1200px; margin: 0 auto; padding: 0 32px 48px; display: grid; grid-template-columns: minmax(0,2fr) repeat(3,minmax(0,1fr)); gap: 40px; border-bottom: 1px solid ${ruleD}; }
+        .ft p { margin-top: 14px; font-size: 14px; max-width: 320px; }
+        .ft h4 { margin: 0 0 14px; font-family: var(--font-geist-mono), monospace; font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.4); }
+        .ft nav { display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+        .ft a:hover { color: #fff; }
+        .fb { max-width: 1200px; margin: 0 auto; padding: 24px 32px 0; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,.4); }
+        @media (max-width: 960px) { .ft { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 640px) { .ft, .fb { padding-left: 20px; padding-right: 20px; } }
       `}</style>
-      <footer style={{ background: SURF, color: MUTED, padding: '64px 32px 32px', borderTop: `1px solid ${RULE}` }}>
-        <div className="pf-inner">
-          <div className="pf-brand" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <svg viewBox="0 0 64 64" width={24} height={24} fill="none" aria-hidden="true">
-                <circle cx="32" cy="32" r="23.8" stroke={TEXT} strokeWidth="8.4" />
-                <circle cx="32" cy="32" r="7" fill={TEXT} />
-              </svg>
-              <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 19, letterSpacing: '-0.025em', color: TEXT }}>Cherut</span>
-            </div>
-            <p style={{ fontSize: 14, color: MUTED, margin: '8px 0 0', lineHeight: 1.5, maxWidth: 280 }}>{t('tagline')}</p>
+      <footer className="ft-footer">
+        <div className="ft">
+          <div>
+            <Link href="/" aria-label="Cherut" style={{ display: 'inline-flex' }}>
+              <CherutLogo viewBox="200 279 338 132" width={88} height={34} fillColor="#fff" />
+            </Link>
+            <p>{t('tagline')}</p>
           </div>
           {columns.map((col) => (
-            <div key={col.label} style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
-              <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(237,238,246,0.28)', marginBottom: 4, fontWeight: 700 }}>{col.label}</div>
-              {col.links.map(([text, href]) => (
-                <Link
-                  key={text}
-                  href={href}
-                  style={{ color: MUTED, transition: 'color .12s' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = TEXT)}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = MUTED)}
-                >
-                  {text}
-                </Link>
-              ))}
+            <div key={col.label}>
+              <h4>{col.label}</h4>
+              <nav>
+                {col.links.map(([text, href]) => <Link key={text} href={href}>{text}</Link>)}
+              </nav>
             </div>
           ))}
         </div>
-        <div className="pf-bottom">
-          <span>{t('copyright')}</span>
-          <span>{t('tagline2')}</span>
+        <div className="fb">
+          <span>{t('copyright')} {t('tagline2')}</span>
+          <span>{t('poweredBy')}</span>
         </div>
-        <p style={{ maxWidth: 1280, margin: '16px auto 0', fontSize: 12, color: 'rgba(237,238,246,0.28)' }}>{t('poweredBy')}</p>
       </footer>
     </>
   );
 }
+
+export default PublicFooter;

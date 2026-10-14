@@ -1,62 +1,45 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { PageShell } from '@/components/shell/Shell';
+import { PageShell, SHELL_TOKENS } from '@/components/shell/Shell';
+import { Section, Reveal, ChecksList } from '@/components/shell/primitives';
 
-const BG      = '#07070D';
-const SURF    = '#0F0F1B';
-const SURF2   = '#161628';
-const TEXT    = '#EDEEF6';
-const MUTED   = 'rgba(237,238,246,0.46)';
-const ACCENT  = 'oklch(0.68 0.24 260)';
-const ACCENT_DIM = 'rgba(80,110,255,0.12)';
-const RULE    = 'rgba(255,255,255,0.08)';
-
-const sectionIcons = ['◐', '◇', '◯', '◈', '✦'];
+const { rule, acc, off, ink2 } = SHELL_TOKENS;
 
 export default function PrivacyPolicyPage() {
   const t = useTranslations('privacyPolicyPage');
   const sections = t.raw('sections') as { title: string; items: string[] }[];
 
   return (
-    <PageShell kicker={t('hero.kicker')} title={t('hero.title')} lead={t('hero.lead')}>
+    <PageShell crumb={t('hero.kicker')} title={t('hero.title')} lead={t('hero.lead')}>
       <style>{`
-        .pp-wrap { max-width: 800px; margin: 0 auto; padding: 48px 20px 80px; display: flex; flex-direction: column; gap: 16px; }
-        .pp-card { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 14px; padding: 24px; }
-        .pp-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .pp-icon { width: 36px; height: 36px; border-radius: 8px; background: ${ACCENT_DIM}; color: ${ACCENT}; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
-        .pp-card-title { font-size: 17px; font-weight: 700; color: ${TEXT}; margin: 0; letter-spacing: -0.01em; }
-        .pp-list { display: flex; flex-direction: column; gap: 10px; padding: 0; margin: 0; list-style: none; }
-        .pp-item { display: flex; gap: 10px; font-size: 16.5px; color: rgba(237,238,246,0.72); line-height: 1.58; }
-        .pp-bullet { color: ${ACCENT}; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
-        .pp-notice { background: ${ACCENT_DIM}; border: 1px solid rgba(80,110,255,0.25); border-radius: 12px; padding: 18px 20px; font-size: 15px; color: rgba(237,238,246,0.65); line-height: 1.58; text-align: center; }
-        @media (min-width: 640px)  { .pp-wrap { padding: 64px 32px 100px; } .pp-card { padding: 28px 32px; } }
-        @media (min-width: 1024px) { .pp-wrap { padding: 80px 32px 120px; } }
+        .pv { display: grid; grid-template-columns: 220px minmax(0,1fr); gap: 64px; }
+        .pv nav { position: sticky; top: 112px; align-self: start; display: flex; flex-direction: column; gap: 4px; }
+        .pv nav a { padding: 8px 12px; border-radius: 8px; font-size: 14px; color: ${ink2}; }
+        .pv nav a:hover { background: ${off}; color: #0B0B10; }
+        .pv-note { border: 1px solid ${rule}; background: ${off}; border-radius: 16px; padding: 24px 28px; color: ${ink2}; font-size: 15px; margin-bottom: 56px; }
+        .pv-s { padding-bottom: 56px; scroll-margin-top: 96px; }
+        .pv-s h2 { font-size: 28px; letter-spacing: -.03em; font-weight: 600; margin-bottom: 18px; display: flex; align-items: baseline; gap: 14px; }
+        .pv-s h2 span { font-family: var(--font-geist-mono), monospace; font-size: 12px; color: ${acc}; font-weight: 400; }
+        @media (max-width: 960px) { .pv { grid-template-columns: minmax(0,1fr); } .pv nav { display: none; } }
       `}</style>
 
-      <div style={{ background: BG }}>
-        <div className="pp-wrap">
-          <div className="pp-notice">
-            {t('notice')}
+      <Section>
+        <div className="pv">
+          <nav>
+            {sections.map((s, i) => <a key={s.title} href={`#p${i}`}>{s.title}</a>)}
+          </nav>
+          <div>
+            <Reveal><p className="pv-note">{t('notice')}</p></Reveal>
+            {sections.map((s, i) => (
+              <Reveal key={s.title} as="div" className="pv-s" id={`p${i}`}>
+                <h2><span>{String(i + 1).padStart(2, '0')}</span>{s.title}</h2>
+                <ChecksList items={s.items} neg={i === 1} />
+              </Reveal>
+            ))}
           </div>
-          {sections.map((s, i) => (
-            <div key={s.title} className="pp-card">
-              <div className="pp-card-head">
-                <div className="pp-icon">{sectionIcons[i % sectionIcons.length]}</div>
-                <h2 className="pp-card-title">{s.title}</h2>
-              </div>
-              <ul className="pp-list">
-                {s.items.map((item) => (
-                  <li key={item} className="pp-item">
-                    <span className="pp-bullet">✓</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
         </div>
-      </div>
+      </Section>
     </PageShell>
   );
 }

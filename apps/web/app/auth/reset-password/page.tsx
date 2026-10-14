@@ -8,21 +8,16 @@ import { getPasswordErrorMessage } from '@/lib/utils/auth-errors';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { RateLimitDisplay } from '@/components/auth/RateLimitDisplay';
 import Link from 'next/link';
+import { AuthShell } from '@/components/shell/AuthShell';
+import { SHELL_TOKENS } from '@/components/shell/Shell';
 
-const BG      = '#07070D';
-const SURF    = '#0F0F1B';
-const SURF2   = '#161628';
-const TEXT    = '#EDEEF6';
-const MUTED   = 'rgba(237,238,246,0.46)';
-const ACCENT  = 'oklch(0.68 0.24 260)';
-const ACCENT_DIM = 'rgba(80,110,255,0.12)';
-const RULE    = 'rgba(255,255,255,0.08)';
-const GRID    = 'rgba(255,255,255,0.04)';
+const { mute, acc } = SHELL_TOKENS;
 
 function ResetPasswordPageContent() {
   const t = useTranslations('resetPasswordPage');
   const tc = useTranslations('authCommon');
   const tErr = useTranslations('authErrors');
+  const tf = useTranslations('publicFooter');
 
   const [password, setPassword]               = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -70,124 +65,75 @@ function ResetPasswordPageContent() {
     }
   };
 
-  const Shell = ({ children }: { children: React.ReactNode }) => (
-    <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', position: 'relative', fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif' }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
-        *, *::before, *::after { box-sizing: border-box; }
-        .rp-input {
-          width: 100%; padding: 12px 14px; font-size: 15px; font-family: inherit;
-          background: ${SURF}; border: 1px solid ${RULE}; border-radius: 8px;
-          color: ${TEXT}; outline: none; transition: border-color .15s, box-shadow .15s; appearance: none;
-        }
-        .rp-input:focus { border-color: ${ACCENT}; box-shadow: 0 0 0 3px ${ACCENT_DIM}; }
-        .rp-input::placeholder { color: rgba(237,238,246,0.22); }
-        .rp-pw-wrap { position: relative; }
-        .rp-pw-wrap .rp-input { padding-right: 44px; }
-        .rp-pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: ${MUTED}; font-size: 13px; font-family: inherit; padding: 4px; }
-        .rp-btn { width: 100%; padding: 14px; background: ${TEXT}; color: ${BG}; font-size: 15px; font-weight: 700; font-family: inherit; border: none; border-radius: 999px; cursor: pointer; transition: opacity .15s; }
-        .rp-btn:hover:not(:disabled) { opacity: .85; }
-        .rp-btn:disabled { opacity: .5; cursor: not-allowed; }
-        .rp-btn-ghost { padding: 13px 24px; background: transparent; color: ${TEXT}; font-size: 15px; font-weight: 600; font-family: inherit; border: 1px solid ${RULE}; border-radius: 999px; cursor: pointer; text-decoration: none; transition: background .15s; display: inline-block; }
-        .rp-btn-ghost:hover { background: rgba(255,255,255,0.05); }
-        .rp-label { font-size: 13px; font-weight: 600; color: rgba(237,238,246,0.55); display: block; margin-bottom: 6px; }
-        .rp-error { background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.25); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: #f87171; }
-        .rp-success-box { background: rgba(22,163,74,0.1); border: 1px solid rgba(22,163,74,0.25); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: #4ade80; }
-      `}</style>
-      <div style={{
-        position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
-        backgroundImage: `linear-gradient(${GRID} 1px, transparent 1px), linear-gradient(90deg, ${GRID} 1px, transparent 1px)`,
-        backgroundSize: '90px 90px',
-        maskImage: 'radial-gradient(ellipse at 50% 30%, #000 40%, transparent 75%)',
-        WebkitMaskImage: 'radial-gradient(ellipse at 50% 30%, #000 40%, transparent 75%)',
-      }} />
-      <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
-        {children}
-      </div>
-    </div>
-  );
+  const quote = 'Discipline runs out. A well-built structure does not need it to.';
 
   if (validatingCode) {
     return (
-      <Shell>
-        <div style={{ textAlign: 'center', color: MUTED, fontSize: 16 }}>{t('validatingCode')}</div>
-      </Shell>
+      <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote="All In All The Time">
+        <p style={{ textAlign: 'center', color: mute, fontSize: 16 }}>{t('validatingCode')}</p>
+      </AuthShell>
     );
   }
 
   if (!isValidCode) {
     return (
-      <Shell>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'center' }}>
-          <div>
-            <h1 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 36, fontWeight: 800, color: TEXT, margin: '0 0 8px', lineHeight: 1 }}>{t('invalidLinkTitle')}</h1>
-            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>{t('invalidLinkSubtitle')}</p>
-          </div>
-          <div style={{ background: SURF2, border: `1px solid ${RULE}`, borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div className="rp-error">{t('invalidLinkError')}</div>
-            <Link href="/auth/login" className="rp-btn-ghost" style={{ textAlign: 'center' }}>{t('backToLogin')}</Link>
-          </div>
+      <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote="All In All The Time">
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{ fontSize: 'clamp(28px,3.2vw,36px)', letterSpacing: '-.03em', fontWeight: 600, margin: '0 0 8px' }}>{t('invalidLinkTitle')}</h1>
+          <p className="lede" style={{ margin: '0 auto' }}>{t('invalidLinkSubtitle')}</p>
         </div>
-      </Shell>
+        <p className="au-err" style={{ textAlign: 'center' }}>{t('invalidLinkError')}</p>
+        <Link href="/auth/login" className="btn btn-line" style={{ justifyContent: 'center' }}>{t('backToLogin')}</Link>
+      </AuthShell>
     );
   }
 
   if (success) {
     return (
-      <Shell>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'center' }}>
-          <div>
-            <h1 style={{ fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase', fontSize: 36, fontWeight: 800, color: TEXT, margin: '0 0 8px', lineHeight: 1 }}>{t('successTitle')}</h1>
-            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>{t('successSubtitle')}</p>
-          </div>
-          <div style={{ background: SURF2, border: `1px solid ${RULE}`, borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div className="rp-success-box">{t('successBox')}</div>
-            <Link href="/auth/login" className="rp-btn" style={{ textAlign: 'center', display: 'block' }}>{t('signIn')} →</Link>
-          </div>
+      <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote="All In All The Time">
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{ fontSize: 'clamp(28px,3.2vw,36px)', letterSpacing: '-.03em', fontWeight: 600, margin: '0 0 8px' }}>{t('successTitle')}</h1>
+          <p className="lede" style={{ margin: '0 auto' }}>{t('successSubtitle')}</p>
         </div>
-      </Shell>
+        <p style={{ textAlign: 'center', fontSize: 14, color: acc, fontWeight: 600 }}>{t('successBox')}</p>
+        <Link href="/auth/login" className="btn btn-dark au-submit" style={{ textAlign: 'center' }}>{t('signIn')} →</Link>
+      </AuthShell>
     );
   }
 
   return (
-    <Shell>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-        <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '0 0 6px', color: TEXT }}>{t('title')}</h1>
-          <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>{t('subtitle')}</p>
+    <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote="All In All The Time">
+      <h1 style={{ fontSize: 'clamp(28px,3.2vw,36px)', letterSpacing: '-.03em', fontWeight: 600, margin: 0 }}>{t('title')}</h1>
+      <p className="lede" style={{ fontSize: 16, marginTop: -6 }}>{t('subtitle')}</p>
+
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <RateLimitDisplay result={passwordResetRateLimit.result} message={passwordResetRateLimit.warningMessage} showProgress />
+        {error && <p className="au-err">{error}</p>}
+
+        <div className="f">
+          <label htmlFor="rp-password">{t('newPasswordLabel')}</label>
+          <div className="pw">
+            <input id="rp-password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" />
+            <button type="button" onClick={() => setShowPassword((v) => !v)}>{showPassword ? tc('hide') : tc('show')}</button>
+          </div>
         </div>
 
-        <div style={{ background: SURF2, border: `1px solid ${RULE}`, borderRadius: 16, padding: 28 }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <RateLimitDisplay result={passwordResetRateLimit.result} message={passwordResetRateLimit.warningMessage} showProgress />
-            {error && <div className="rp-error">{error}</div>}
-
-            <div>
-              <label className="rp-label" htmlFor="rp-password">{t('newPasswordLabel')}</label>
-              <div className="rp-pw-wrap">
-                <input id="rp-password" className="rp-input" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" />
-                <button type="button" className="rp-pw-toggle" onClick={() => setShowPassword(v => !v)}>{showPassword ? tc('hide') : tc('show')}</button>
-              </div>
-            </div>
-
-            <div>
-              <label className="rp-label" htmlFor="rp-confirm">{t('confirmNewPasswordLabel')}</label>
-              <div className="rp-pw-wrap">
-                <input id="rp-confirm" className="rp-input" type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required autoComplete="new-password" />
-                <button type="button" className="rp-pw-toggle" onClick={() => setShowConfirm(v => !v)}>{showConfirm ? tc('hide') : tc('show')}</button>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: 10 }}>
-              <Link href="/auth/login" className="rp-btn-ghost" style={{ flex: 1, textAlign: 'center' }}>{t('cancel')}</Link>
-              <button type="submit" className="rp-btn" disabled={loading} style={{ flex: 2 }}>
-                {loading ? t('resetting') : `${t('resetButton')} →`}
-              </button>
-            </div>
-          </form>
+        <div className="f">
+          <label htmlFor="rp-confirm">{t('confirmNewPasswordLabel')}</label>
+          <div className="pw">
+            <input id="rp-confirm" type={showConfirm ? 'text' : 'password'} placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required autoComplete="new-password" />
+            <button type="button" onClick={() => setShowConfirm((v) => !v)}>{showConfirm ? tc('hide') : tc('show')}</button>
+          </div>
         </div>
-      </div>
-    </Shell>
+
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Link href="/auth/login" className="btn btn-line" style={{ flex: 1, justifyContent: 'center' }}>{t('cancel')}</Link>
+          <button type="submit" className="btn btn-dark" disabled={loading} style={{ flex: 2 }}>
+            {loading ? t('resetting') : `${t('resetButton')} →`}
+          </button>
+        </div>
+      </form>
+    </AuthShell>
   );
 }
 
@@ -195,7 +141,7 @@ export default function ResetPasswordPage() {
   const t = useTranslations('resetPasswordPage');
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: '#07070D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui', color: 'rgba(237,238,246,0.46)', fontSize: 16 }}>
+      <div style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui', color: mute, fontSize: 16 }}>
         {t('loadingFallback')}
       </div>
     }>

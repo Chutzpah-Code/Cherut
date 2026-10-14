@@ -1347,7 +1347,7 @@
     "copyright": "© 2026 Cherut. Built with obsession.",
     "tagline2": "For the ones who refused to wait.",
     "disclaimer": "Cherut is a personal execution system. It is not therapy, medical care, or a substitute for professional mental health treatment.",
-    "poweredBy": "Powered by Problem Solver Foundation — on a mission to positively impact 1 billion lives by 2035. Be a problem solver."
+    "poweredBy": "Powered by Problem Solver Foundation"
   },
   "localeSwitcher": {
     "ariaLabel": "Change language"
@@ -1429,176 +1429,160 @@
       "description": "Turn ambition into one direction, daily execution, and a system that survives the hard days. Choose the system your direction requires."
     },
     "hero": {
-      "kicker": "Structured obsession",
-      "headlinePrefix": "The only thing that distorts time is",
-      "animatedWords": ["intensity", "speed", "focus", "obsession", "direction", "intensity"],
-      "sub": "You came from nothing but a desire to change. But obsession without structure burns out. Cherut gives it a direction, a system, and a method to keep going. That method is called All In All The Time.",
-      "ctaStart": "Start your system",
-      "ctaSystem": "See how it works",
-      "microcopy": "Choose the level of structure your direction requires."
+      "headlinePre": "The only thing that distorts time is",
+      "headlineAccent": "intensity.",
+      "obsessionLine": "Obsession without structure burns out.",
+      "structureLine": "Cherut gives it one.",
+      "ctaPrimary": "Start your system",
+      "ctaSecondary": "See how it works",
+      "note": "Choose the level of structure your direction requires.",
+      "mockCardA": { "label": "Streak · Read 20 pages", "value": "21 days" },
+      "mockCardB": { "label": "Key result", "value": "Run 300 km this quarter" }
     },
-    "problem": {
-      "kicker": "The pattern",
+    "pattern": {
       "heading": "You know what to do. You still don't keep the promises you make to yourself.",
-      "sub": "That gap is what wears down your trust in your own word. Cherut builds the structure that gets you out of the loop.",
-      "cycleHeading": "The same loop, every time",
-      "cycle": ["You set a goal", "You start with intensity", "You hit tiredness, fear, boredom, or a distraction", "You choose the immediate reward", "You drop the goal", "You feel the guilt", "You promise to restart", "You discover a magic method", "You repeat the loop"],
-      "loopCaption": "And the loop restarts — again, and again.",
-      "voicesHeading": "What it sounds like",
-      "voices": [
+      "lede": "That gap is what wears down your trust in your own word. Cherut builds the structure that gets you out of the loop.",
+      "nodes": [
+        "You set a goal",
+        "You start with intensity",
+        "You hit tiredness, fear, boredom, or a distraction",
+        "You choose the immediate reward",
+        "You drop the goal",
+        "You feel the guilt",
+        "You promise to restart",
+        "You discover a magic method",
+        "You repeat the loop"
+      ],
+      "ringLabel": "The same loop",
+      "ringSub": "Again, and again.",
+      "quotesLabel": "What it sounds like",
+      "quotes": [
         "I know what I need to do, but I keep doing something else.",
         "I'm always starting a new version of myself.",
         "I have potential, but my life doesn't show it.",
         "I don't trust my own word anymore.",
-        "I can't tell anymore if I'm resting or running.",
         "I'm tired of restarting, but I still haven't quit."
       ],
-      "note": "This isn't about discipline or laziness. It's about missing structure."
+      "footPre": "This isn't about discipline or laziness.",
+      "footBold": "It's about missing structure."
     },
-    "solution": {
-      "kicker": "The method",
+    "method": {
       "heading": "Your obsession is not the problem. It has no structure.",
-      "body": "Cherut concentrates your energy, connects your values, objectives and daily actions, and gives the hard days a structure to run on. Fall off, and you can review and pick back up — without starting over.",
-      "methodLabel": "The method behind Cherut",
-      "methodName": "All In All The Time",
-      "principles": [
-        { "n": "01", "title": "One Direction", "body": "Choose the one direction that matters most right now, not everything at once." },
-        { "n": "02", "title": "Structured Intensity", "body": "Turn intensity into actions, schedules and systems instead of short bursts." },
-        { "n": "03", "title": "Stay Through the Hard Moment", "body": "Move through boredom, fear and distraction instead of escaping automatically." },
-        { "n": "04", "title": "Return Without Starting Over", "body": "Come back after a bad day without turning it into an identity crisis." }
+      "lede": "Cherut concentrates your energy and connects your values, objectives and daily actions. Fall off, and you can review and pick back up without starting over.",
+      "badge": "All In All The Time",
+      "pillars": [
+        { "title": "One Direction", "body": "Choose the one direction that matters most right now, not everything at once." },
+        { "title": "Structured Intensity", "body": "Turn intensity into actions, schedules and systems instead of short bursts." },
+        { "title": "Stay Through the Hard Moment", "body": "Move through boredom, fear and distraction instead of escaping automatically." },
+        { "title": "Return Without Starting Over", "body": "Come back after a bad day without turning it into an identity crisis." }
       ],
-      "note": "All in does not mean all output. It means no disconnection from the direction."
+      "notePre": "All in does not mean all output.",
+      "noteBold": "It means no disconnection from the direction."
     },
-    "features": {
-      "kicker": "One system",
-      "heading1": "One system for the life",
-      "heading2": "you are actually trying to build.",
-      "sub": "You don't need five subscriptions and a spreadsheet to hold your life together. Cherut puts direction, action and reflection in one place.",
-      "items": [
-        { "tag": "Values & Dream Board", "title": "Connect your routine to the life you want", "body": "Define what matters, then pin the future it points to. Every habit and task can trace back to the dream that started it." },
-        { "tag": "Objectives & OKRs", "title": "Turn ambition into concrete results", "body": "Set a direction, break it into measurable outcomes, and review your progress instead of guessing at it." },
-        { "tag": "Tasks & Calendar", "title": "Put your priorities on a real day", "body": "One inbox, one agenda. What you commit to shows up next to the time you actually have." },
-        { "tag": "Habits", "title": "Build the behaviors that hold up your goals", "body": "Track streaks, intent and reflection — not just checkboxes. Habits that serve a direction, not habits for their own sake." },
-        { "tag": "Journal & Reflection", "title": "See your own patterns before they cost you", "body": "Morning intentions, evening reflections, and a searchable record — so escape, progress and inconsistency stop hiding from you." },
-        { "tag": "Finances", "title": "Organize money and net worth with the rest of your life", "body": "Accounts, transfers, budgets and investments tracked alongside your goals — not in a separate app you forget to open." }
+    "system": {
+      "heading": "One system for the life you are actually trying to build.",
+      "lede": "You don't need five subscriptions and a spreadsheet. Direction, action and reflection live in one place.",
+      "tabs": [
+        { "title": "Objectives & OKRs", "body": "Set a direction, break it into measurable outcomes, and review your progress instead of guessing at it.", "url": "app.cherut / objectives", "mock": "okrs" },
+        { "title": "Tasks & Calendar", "body": "One inbox, one agenda. What you commit to shows up next to the time you actually have.", "url": "app.cherut / tasks", "mock": "tasks" },
+        { "title": "Values & Dream Board", "body": "Define what matters, then pin the future it points to. Every habit and task traces back to the dream that started it.", "url": "app.cherut / dream-board", "mock": "dreams" },
+        { "title": "Habits", "body": "Track streaks, intent and reflection. Habits that serve a direction, not habits for their own sake.", "url": "app.cherut / habits", "mock": "habits" },
+        { "title": "Finances", "body": "Accounts, budgets and net worth tracked alongside your goals, not in a separate app you forget to open.", "url": "app.cherut / finances", "mock": "finances" },
+        { "title": "Journal & Reflection", "body": "Morning intentions, evening reflections, and a searchable record, so your patterns stop hiding from you.", "url": "app.cherut / journal", "mock": "journal" },
+        { "title": "Learning", "body": "The All In All The Time course, practical exercises and implementation templates, built into the same system you use every day.", "url": "app.cherut / learning", "mock": "learning" }
       ],
-      "banner": "Fewer subscriptions. Fewer disconnected systems. One direction."
+      "foot": "Fewer subscriptions. Fewer disconnected systems. One direction."
     },
     "how": {
-      "kicker": "How it works",
-      "heading1": "Start with one direction.",
-      "heading2": "Build from there.",
-      "sub": "Six steps. You do not need to set up your whole life to start.",
+      "heading": "Start with one direction. Build from there.",
+      "lede": "Six steps. You do not need to set up your whole life to start.",
       "steps": [
-        { "n": "01", "title": "Choose what matters now", "body": "Pick the one direction that deserves your energy today — not everything at once." },
-        { "n": "02", "title": "Define a concrete result", "body": "Turn that direction into an outcome you can actually measure." },
-        { "n": "03", "title": "Build the minimum system you need", "body": "Add only the habits, tasks and check-ins that result requires. Nothing more." },
-        { "n": "04", "title": "Execute the next step today", "body": "Not the whole plan. The next action, done now." },
-        { "n": "05", "title": "Review, adjust, and pick back up", "body": "Check what worked, correct what didn't, and return — even after a bad week." },
-        { "n": "06", "title": "Move to the next direction", "body": "Finish one loop, then choose the next direction and start again — without reconfiguring everything from scratch." }
-      ],
-      "note": "You do not need to set up your whole life to start. You only need to choose the next direction."
+        { "title": "Choose what matters now", "body": "Pick the one direction that deserves your energy today." },
+        { "title": "Define a concrete result", "body": "Turn that direction into an outcome you can actually measure." },
+        { "title": "Build the minimum system you need", "body": "Only the habits, tasks and check-ins that result requires." },
+        { "title": "Execute the next step today", "body": "Not the whole plan. The next action, done now." },
+        { "title": "Review, adjust, and pick back up", "body": "Check what worked, correct what didn't, and return, even after a bad week." },
+        { "title": "Move to the next direction", "body": "Finish one loop, then choose the next without reconfiguring everything." }
+      ]
     },
-    "benefits": {
-      "kicker": "The return",
+    "return": {
       "heading": "The return is not more tasks. It is more of your life moving in one direction.",
-      "sub": "What changes when your direction, your actions and your review live in one place:",
-      "items": [
-        "Fewer subscriptions — one system instead of five disconnected apps",
+      "checks": [
+        "One system instead of five disconnected apps",
         "Less time lost to planning and re-planning",
-        "Less context-switching between tools",
         "Fewer unnecessary decisions",
         "Tasks that connect back to a real objective",
         "More trust in your own word, one kept commitment at a time",
-        "Less time spent on activity disconnected from your direction",
         "One place to see what's working and what isn't"
       ],
-      "roiHeading": "A rough way to see it",
-      "roiFormula": "Hours saved per week × your hourly rate + subscriptions you no longer need − the cost of Cherut = potential value recovered.",
-      "roiDisclaimer": "An estimate to think with, not a guarantee."
-    },
-    "testimonials": {
-      "kicker": "Real stories",
-      "heading1": "From people who",
-      "heading2": "refused to settle.",
-      "sub": "We're collecting real stories from people using Cherut. Until this section has verified testimonials, here's the honest version.",
-      "placeholderLabel": "Testimonial placeholder",
-      "placeholderBody": "Real story — the problem before, the change after, a concrete result. Added once we have one, not before."
+      "formulaLabel": "A rough way to see it",
+      "formula": {
+        "a": "Hours saved per week × your hourly rate",
+        "b": "Subscriptions you no longer need",
+        "c": "The cost of Cherut",
+        "result": "Potential value recovered"
+      },
+      "formulaNote": "An estimate to think with, not a guarantee."
     },
     "pricing": {
-      "kicker": "Choose your level",
-      "heading1": "Structure has levels.",
-      "heading2": "Pick the one your direction needs.",
-      "sub": "No free plan, no trial. Every level is a paid commitment to the direction you choose.",
-      "monthly": "Monthly",
-      "annual": "Annual",
-      "saveBadge": "Save annually",
-      "mostPopular": "Most popular",
-      "toggleNote": "Annual billing costs less than monthly on every plan.",
-      "plans": {
-        "saas": {
-          "name": "Core",
-          "blurb": "For organizing your direction, your actions and your routine inside Cherut.",
-          "priceMonthly": "$12.50",
-          "priceAnnual": "$120",
-          "cadenceMonthly": "/month",
-          "cadenceAnnual": "/year",
-          "annualNote": "That's $10/month, billed annually",
+      "heading": "Structure has levels. Pick the one your direction needs.",
+      "lede": "No free plan, no trial. Every level is a paid commitment to the direction you choose.",
+      "billingMonthly": "Monthly",
+      "billingAnnual": "Annual",
+      "billingSaveTag": "Save annually",
+      "billNote": "Annual billing costs less than monthly on every plan.",
+      "plans": [
+        {
+          "title": "Core",
+          "monthly": ["$12.50", "/month", "Billed monthly"],
+          "annual": ["$120", "/year", "$10/month, billed annually"],
+          "desc": "For organizing your direction, your actions and your routine.",
           "features": ["Values, objectives and OKRs", "Habits, tasks and calendar", "Journal and reflection", "Finances and net worth", "Dream board"],
-          "cta": "Start the system"
+          "cta": "Start the system",
+          "href": "/auth/register"
         },
-        "course": {
-          "name": "Method",
-          "blurb": "For using the system and learning the method behind it.",
-          "priceMonthly": "$48",
-          "priceAnnual": "$480",
-          "cadenceMonthly": "/month",
-          "cadenceAnnual": "/year",
-          "annualNote": "That's $40/month, billed annually",
+        {
+          "title": "Method",
+          "tag": "Most popular",
+          "monthly": ["$48", "/month", "Billed monthly"],
+          "annual": ["$480", "/year", "$40/month, billed annually"],
+          "desc": "For using the system and learning the method behind it.",
           "features": ["Everything in Core", "All In All The Time course", "Practical exercises", "Guided 7- or 14-day path", "Implementation templates", "Direction, execution, discomfort and return practices"],
-          "cta": "Build the method"
+          "cta": "Build the method",
+          "href": "/auth/register"
         },
-        "mentorship": {
-          "name": "Mentorship",
-          "blurb": "For applying the method with guidance through a real change.",
-          "priceMonthly": "$100",
-          "priceAnnual": "$1,000",
-          "cadenceMonthly": "/month",
-          "cadenceAnnual": "/year",
-          "annualNote": "That's $83.33/month, billed annually",
+        {
+          "title": "Mentorship",
+          "monthly": ["$100", "/month", "Billed monthly"],
+          "annual": ["$1,000", "/year", "$83.33/month, billed annually"],
+          "desc": "For applying the method with guidance through a real change.",
           "features": ["Core", "All In All The Time course", "Individual mentorship", "Direction review", "Execution pattern analysis", "System adjustment", "Return plan"],
-          "cta": "Apply for mentorship"
+          "cta": "Apply for mentorship",
+          "href": "/contact"
         }
-      }
+      ]
     },
     "faq": {
-      "kicker": "Questions",
       "heading": "Direct answers.",
+      "lede": "Something else?",
+      "contactLink": "Talk to the team.",
       "items": [
         { "q": "Is Cherut just another productivity app?", "a": "No. Most productivity apps stop at a task list. Cherut connects your values, objectives and daily actions in one system, and gives you a structure for the days you don't feel like showing up." },
-        { "q": "I've already tried Notion, Todoist and others. Why would this be different?", "a": "Those are tools you configure yourself, piece by piece. Cherut ships as one connected system built around the All In All The Time method, so you're not the one holding it together." },
-        { "q": "Do I need to be disciplined to use Cherut?", "a": "No. Cherut is the structure — built for the days your discipline runs out, not just the days it doesn't." },
-        { "q": "Does All In All The Time mean working all the time?", "a": "No. It means staying connected to your direction the whole time, not maximizing hours worked. All in does not mean all output." },
-        { "q": "Does Cherut replace therapy or psychological treatment?", "a": "No. Cherut is a personal execution system, not therapy or medical treatment. If you're dealing with a mental health condition, work with a qualified professional." },
-        { "q": "Do I need to set up my entire life to get started?", "a": "No. Start with one direction and the minimum system it needs. Add modules as your system asks for them." },
-        { "q": "What happens if I stop using it for a few days?", "a": "Nothing is lost. Review what happened, adjust, and pick back up. Cherut is built to let you return without starting over." },
-        { "q": "Can I use only some of the features?", "a": "Yes. Turn on the modules your direction needs right now — Habits, Tasks, OKRs, Journal, Finances, Dream Board — and add the rest later." },
-        { "q": "Is there a free plan or freemium version?", "a": "No. There's no free tier and no free trial. Every plan is a paid plan from checkout." },
-        { "q": "How much does Core cost, monthly and annually?", "a": "$20 per month, or $200 per year — a $40 savings compared with paying monthly." },
-        { "q": "What's included in the Method plan?", "a": "Cherut plus the All In All The Time course — exercises, a guided 7- or 14-day path, and implementation templates — $50 per month, or $500 per year, a $100 savings." },
-        { "q": "What's included in the Mentorship plan?", "a": "Cherut, the course, and individual mentorship — direction review, execution pattern analysis, system adjustments and a return plan — $100 per month, or $1,000 per year, a $200 savings." },
-        { "q": "How do the plans work?", "a": "All three plans — Core, Method and Mentorship — bill monthly or annually. Annual billing saves two months' cost on every one." },
-        { "q": "How does the mentorship work?", "a": "It bills monthly or annually like the other plans, but it's not instant self-serve — apply, and we'll confirm it's a fit before you commit." },
-        { "q": "Can I cancel anytime?", "a": "Yes. Every plan — Core, Method and Mentorship — can be cancelled anytime through your account." }
+        { "q": "Do I need to be disciplined to use Cherut?", "a": "No. This isn't about discipline or laziness. It's about missing structure." },
+        { "q": "Does All In All The Time mean working all the time?", "a": "No. All in does not mean all output. It means no disconnection from the direction." },
+        { "q": "Do I need to set up my entire life to get started?", "a": "No. You only need to choose the next direction, and build the minimum system that result requires." },
+        { "q": "What happens if I stop using it for a few days?", "a": "You review and pick back up, without starting over." },
+        { "q": "Is there a free plan or freemium version?", "a": "No free plan, no trial. Every level is a paid commitment to the direction you choose." },
+        { "q": "How much does Core cost?", "a": "$120/year, which is $10/month billed annually." },
+        { "q": "Does Cherut replace therapy or psychological treatment?", "a": "No. Cherut is a personal execution system. It is not therapy, medical care, or a substitute for professional mental health treatment." }
       ]
     },
     "finalCta": {
-      "heading1": "You do not need",
-      "heading2": "another restart.",
-      "sub": "The life you want will not be built by a burst of motivation. It will be built by the direction you choose, the actions you repeat, and your ability to return when the hard days come. Your intensity already exists. Now give it a structure.",
-      "ctaStart": "Start All In All The Time",
-      "ctaTalk": "Talk to the team",
-      "microcopy": "Choose the level of commitment your direction requires."
+      "heading": "You do not need another restart.",
+      "body": "The life you want will be built by the direction you choose, the actions you repeat, and your ability to return when the hard days come. Your intensity already exists. Now give it a structure.",
+      "ctaPrimary": "Start All In All The Time",
+      "ctaSecondary": "Talk to the team",
+      "disclaimer": "Cherut is a personal execution system. It is not therapy, medical care, or a substitute for professional mental health treatment."
     }
   },
   "aboutPage": {
@@ -1721,6 +1705,8 @@
   },
   "helpCenterPage": {
     "hero": { "kicker": "Help Center", "title": "How can we help?", "lead": "Guides, answers and everything you need to get the most out of Cherut." },
+    "searchPlaceholder": "Search articles",
+    "noResults": "No articles match your search.",
     "categories": [
       { "title": "Getting started", "articles": [
         { "title": "What is Cherut?", "body": "Cherut is a personal operating system that connects your habits, tasks, OKRs, journal and vision board in one place. Start by setting up your Life Areas and creating your first Objective." },

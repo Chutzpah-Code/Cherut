@@ -1,10 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { SHELL_TOKENS } from '@/components/shell/Shell';
 
-const SURF = '#0F0F1B';
-const MUTED = 'rgba(237,238,246,0.4)';
-const RULE = 'rgba(255,255,255,0.08)';
+const { mute, rule } = SHELL_TOKENS;
 
 // Rendered immediately before <PublicFooter /> on every public page — both
 // call sites (Shell.tsx's PageShell and the landing page's own layout) sit
@@ -14,8 +13,8 @@ export function PublicDisclaimer() {
   const t = useTranslations('publicFooter');
 
   return (
-    <div style={{ background: SURF, borderTop: `1px solid ${RULE}`, padding: '18px 32px' }}>
-      <p style={{ maxWidth: 1280, margin: '0 auto', fontSize: 12.5, lineHeight: 1.6, color: MUTED, textAlign: 'center' }}>
+    <div style={{ padding: '40px 0', borderTop: `1px solid ${rule}`, textAlign: 'center' }}>
+      <p style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px', fontSize: 13, lineHeight: 1.6, color: mute }}>
         {t('disclaimer')}
       </p>
     </div>

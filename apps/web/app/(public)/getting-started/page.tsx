@@ -28,7 +28,7 @@ export default function GettingStarted() {
   const tips = t.raw('tips') as { title: string; body: string }[];
 
   return (
-    <PageShell kicker={t('hero.kicker')} title={t('hero.title')} lead={t('hero.lead')}>
+    <PageShell crumb={t('hero.kicker')} title={t('hero.title')} lead={t('hero.lead')}>
       <style>{`
         .gs-wrap  { max-width: 860px; margin: 0 auto; padding: 48px 20px 80px; }
         .gs-steps { display: flex; flex-direction: column; gap: 0; }

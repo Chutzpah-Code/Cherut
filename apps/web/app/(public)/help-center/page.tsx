@@ -1,80 +1,78 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { PageShell } from '@/components/shell/Shell';
+import { PageShell, SHELL_TOKENS } from '@/components/shell/Shell';
+import { Section, Reveal, FaqItem } from '@/components/shell/primitives';
 
-const BG      = '#07070D';
-const SURF    = '#0F0F1B';
-const SURF2   = '#161628';
-const TEXT    = '#EDEEF6';
-const MUTED   = 'rgba(237,238,246,0.46)';
-const ACCENT  = 'oklch(0.68 0.24 260)';
-const ACCENT_DIM = 'rgba(80,110,255,0.12)';
-const RULE    = 'rgba(255,255,255,0.08)';
-
-const categoryIcons = ['◐', '◇', '◯', '✦', '◈'];
+const { mute, rule, acc } = SHELL_TOKENS;
 
 export default function HelpCenterPage() {
   const t = useTranslations('helpCenterPage');
   const categories = t.raw('categories') as { title: string; articles: { title: string; body: string }[] }[];
+  const [query, setQuery] = useState('');
 
-  const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
-  const toggle = (key: string) => setOpenMap(prev => ({ ...prev, [key]: !prev[key] }));
+  const filtered = useMemo(() => {
+    const q = query.toLowerCase().trim();
+    if (!q) return categories;
+    return categories
+      .map((cat) => ({ ...cat, articles: cat.articles.filter((a) => `${a.title} ${a.body}`.toLowerCase().includes(q)) }))
+      .filter((cat) => cat.articles.length > 0);
+  }, [categories, query]);
 
   return (
-    <PageShell kicker={t('hero.kicker')} title={t('hero.title')} lead={t('hero.lead')}>
+    <PageShell
+      crumb={t('hero.kicker')}
+      title={t('hero.title')}
+      lead={t('hero.lead')}
+    >
       <style>{`
-        .hc-wrap { max-width: 860px; margin: 0 auto; padding: 48px 20px 80px; display: flex; flex-direction: column; gap: 32px; }
-        .hc-category { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 16px; overflow: hidden; }
-        .hc-cat-head { display: flex; align-items: center; gap: 14px; padding: 22px 24px; border-bottom: 1px solid ${RULE}; }
-        .hc-cat-icon { width: 38px; height: 38px; border-radius: 10px; background: ${ACCENT_DIM}; color: ${ACCENT}; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-        .hc-cat-title { font-size: 17px; font-weight: 700; color: ${TEXT}; margin: 0; letter-spacing: -0.01em; }
-        .hc-article { border-bottom: 1px solid ${RULE}; }
-        .hc-article:last-child { border-bottom: none; }
-        .hc-art-btn { width: 100%; text-align: left; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: none; border: none; cursor: pointer; font-family: inherit; font-size: 16px; font-weight: 600; color: ${TEXT}; transition: background .1s; }
-        .hc-art-btn:hover { background: rgba(255,255,255,0.04); }
-        .hc-art-chevron { font-size: 18px; color: ${ACCENT}; transition: transform .2s; flex-shrink: 0; display: inline-block; }
-        .hc-art-body { padding: 0 24px 18px; font-size: 16.5px; color: ${MUTED}; line-height: 1.65; }
-        .hc-cta { background: ${SURF2}; border: 1px solid ${RULE}; border-radius: 14px; padding: 28px 24px; text-align: center; }
-        @media (min-width: 640px)  { .hc-wrap { padding: 64px 32px 100px; } }
-        @media (min-width: 1024px) { .hc-wrap { padding: 80px 32px 120px; } }
+        .search { display: flex; align-items: center; gap: 12px; max-width: 560px; height: 56px; padding: 0 18px; border: 1px solid ${rule}; border-radius: 14px; background: #fff; box-shadow: 0 20px 50px -30px rgba(27,46,143,.35); margin-top: 32px; }
+        .search input { all: unset; flex: 1; font-size: 16px; }
+        .search svg { width: 18px; height: 18px; color: ${mute}; }
+        .hc { display: grid; grid-template-columns: 220px minmax(0,1fr); gap: 64px; }
+        .hc nav { position: sticky; top: 112px; align-self: start; display: flex; flex-direction: column; gap: 4px; }
+        .hc nav a { padding: 8px 12px; border-radius: 8px; font-size: 14px; color: ${SHELL_TOKENS.ink2}; }
+        .hc nav a:hover { background: ${SHELL_TOKENS.off}; color: ${SHELL_TOKENS.ink}; }
+        .hc-g { padding-bottom: 48px; scroll-margin-top: 96px; }
+        .hc-g h2 { font-size: 24px; letter-spacing: -.025em; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+        .hc-g h2 span { font-family: var(--font-geist-mono), monospace; font-size: 12px; color: ${acc}; font-weight: 400; }
+        @media (max-width: 960px) { .hc { grid-template-columns: minmax(0,1fr); } .hc nav { display: none; } }
       `}</style>
 
-      <div style={{ background: BG }}>
-        <div className="hc-wrap">
-          {categories.map((cat, ci) => (
-            <div key={cat.title} className="hc-category">
-              <div className="hc-cat-head">
-                <div className="hc-cat-icon">{categoryIcons[ci % categoryIcons.length]}</div>
-                <h2 className="hc-cat-title">{cat.title}</h2>
-              </div>
-              <div>
-                {cat.articles.map((art) => {
-                  const key = `${cat.title}::${art.title}`;
-                  const open = !!openMap[key];
-                  return (
-                    <div key={art.title} className="hc-article">
-                      <button className="hc-art-btn" onClick={() => toggle(key)}>
-                        <span>{art.title}</span>
-                        <span className="hc-art-chevron" style={{ transform: open ? 'rotate(45deg)' : 'rotate(0deg)' }}>+</span>
-                      </button>
-                      {open && <div className="hc-art-body">{art.body}</div>}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+      <Section padTop0 style={{ paddingBottom: 0 }}>
+        <label className="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+          <input placeholder={t('searchPlaceholder')} value={query} onChange={(e) => setQuery(e.target.value)} />
+        </label>
+      </Section>
 
-          <div className="hc-cta">
-            <p style={{ fontSize: 17, color: MUTED, margin: '0 0 16px', lineHeight: 1.55 }}>{t('notFound')}</p>
-            <a href="/contact" style={{ display: 'inline-block', background: TEXT, color: BG, fontSize: 14, fontWeight: 700, padding: '12px 22px', borderRadius: 999 }}>
-              {t('contactCta')} →
-            </a>
+      <Section>
+        <div className="hc">
+          <nav>
+            {categories.map((cat, i) => <a key={cat.title} href={`#g${i}`}>{cat.title}</a>)}
+          </nav>
+          <div>
+            {filtered.map((cat) => {
+              const i = categories.findIndex((c) => c.title === cat.title);
+              return (
+                <Reveal key={cat.title} as="div" className="hc-g" id={`g${i}`}>
+                  <h2><span>{String(i + 1).padStart(2, '0')}</span>{cat.title}</h2>
+                  {cat.articles.map((art, ai) => <FaqItem key={art.title} q={art.title} a={art.body} open={ai === 0} />)}
+                </Reveal>
+              );
+            })}
+            {filtered.length === 0 && <p style={{ color: mute }}>{t('noResults')}</p>}
+
+            <Reveal>
+              <div className="band" style={{ marginTop: 32 }}>
+                <div><h2 className="h2">{t('notFound')}</h2></div>
+                <a href="/contact" className="btn btn-light">{t('contactCta')} →</a>
+              </div>
+            </Reveal>
           </div>
         </div>
-      </div>
+      </Section>
     </PageShell>
   );
 }
