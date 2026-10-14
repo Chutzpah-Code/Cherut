@@ -145,9 +145,8 @@ export default function CourseDetailPage() {
           </Box>
           {!course.locked && allLessons.length > 0 && (
             <Button
-              variant="gradient"
-              gradient={{ from: '#6D28D9', to: '#4F46E5', deg: 135 }}
               onClick={handleContinue}
+              style={{ backgroundColor: '#0052CC' }}
             >
               {t('continueLesson')}
             </Button>

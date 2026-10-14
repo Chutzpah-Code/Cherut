@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   learningApi,
+  Course,
   CreateCourseDto,
   UpdateCourseDto,
   CreateCourseModuleDto,
@@ -137,7 +138,29 @@ export const useToggleLessonProgress = () => {
   return useMutation({
     mutationFn: ({ lessonId }: { lessonId: string; courseId: string }) =>
       learningApi.toggleLessonProgress(lessonId),
-    onSuccess: (_data, { courseId }) => {
+    onMutate: async ({ lessonId, courseId }) => {
+      const queryKey = ['learning', 'courses', courseId];
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<Course>(queryKey);
+
+      queryClient.setQueryData<Course>(queryKey, (course) => {
+        if (!course?.modules) return course;
+        const modules = course.modules.map((m) => ({
+          ...m,
+          lessons: m.lessons?.map((l) => (l.id === lessonId ? { ...l, completed: !l.completed } : l)),
+        }));
+        const allLessons = modules.flatMap((m) => m.lessons ?? []);
+        const completedCount = allLessons.filter((l) => l.completed).length;
+        const percentComplete = allLessons.length > 0 ? Math.round((completedCount / allLessons.length) * 100) : 0;
+        return { ...course, modules, percentComplete };
+      });
+
+      return { previous, queryKey };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(context.queryKey, context.previous);
+    },
+    onSettled: (_data, _err, { courseId }) => {
       queryClient.invalidateQueries({ queryKey: ['learning', 'courses', courseId] });
       queryClient.invalidateQueries({ queryKey: ['learning', 'courses'] });
     },
