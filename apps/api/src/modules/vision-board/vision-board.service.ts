@@ -105,6 +105,21 @@ export class VisionBoardService {
     if (dto.dueDate !== undefined) itemData.dueDate = dto.dueDate;
     if (dto.order !== undefined) itemData.order = dto.order;
 
+    // Visualization practice ("Visualizar e agir")
+    if (dto.objectiveId !== undefined) itemData.objectiveId = dto.objectiveId;
+    if (dto.plannedPracticeDurationMinutes !== undefined) itemData.plannedPracticeDurationMinutes = dto.plannedPracticeDurationMinutes;
+    if (dto.currentEmotion !== undefined) itemData.currentEmotion = dto.currentEmotion;
+    if (dto.currentEnergy !== undefined) itemData.currentEnergy = dto.currentEnergy;
+    if (dto.currentConfidence !== undefined) itemData.currentConfidence = dto.currentConfidence;
+    if (dto.desiredState !== undefined) itemData.desiredState = dto.desiredState;
+    if (dto.empoweringBelief !== undefined) itemData.empoweringBelief = dto.empoweringBelief;
+    if (dto.outcomeVisualizationText !== undefined) itemData.outcomeVisualizationText = dto.outcomeVisualizationText;
+    if (dto.processVisualizationText !== undefined) itemData.processVisualizationText = dto.processVisualizationText;
+    if (dto.likelyObstacle !== undefined) itemData.likelyObstacle = dto.likelyObstacle;
+    if (dto.obstacleResponse !== undefined) itemData.obstacleResponse = dto.obstacleResponse;
+    if (dto.nextAction !== undefined) itemData.nextAction = dto.nextAction;
+    if (dto.nextActionDueDate !== undefined) itemData.nextActionDueDate = dto.nextActionDueDate;
+
     const docRef = await db.collection(this.COLLECTION_NAME).add(itemData);
     const doc = await docRef.get();
 
@@ -218,6 +233,21 @@ export class VisionBoardService {
       if (dto.order !== undefined) updateData.order = dto.order;
       if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
       if (dto.completed !== undefined) updateData.completed = dto.completed;
+
+      // Visualization practice ("Visualizar e agir")
+      if (dto.objectiveId !== undefined) updateData.objectiveId = dto.objectiveId;
+      if (dto.plannedPracticeDurationMinutes !== undefined) updateData.plannedPracticeDurationMinutes = dto.plannedPracticeDurationMinutes;
+      if (dto.currentEmotion !== undefined) updateData.currentEmotion = dto.currentEmotion;
+      if (dto.currentEnergy !== undefined) updateData.currentEnergy = dto.currentEnergy;
+      if (dto.currentConfidence !== undefined) updateData.currentConfidence = dto.currentConfidence;
+      if (dto.desiredState !== undefined) updateData.desiredState = dto.desiredState;
+      if (dto.empoweringBelief !== undefined) updateData.empoweringBelief = dto.empoweringBelief;
+      if (dto.outcomeVisualizationText !== undefined) updateData.outcomeVisualizationText = dto.outcomeVisualizationText;
+      if (dto.processVisualizationText !== undefined) updateData.processVisualizationText = dto.processVisualizationText;
+      if (dto.likelyObstacle !== undefined) updateData.likelyObstacle = dto.likelyObstacle;
+      if (dto.obstacleResponse !== undefined) updateData.obstacleResponse = dto.obstacleResponse;
+      if (dto.nextAction !== undefined) updateData.nextAction = dto.nextAction;
+      if (dto.nextActionDueDate !== undefined) updateData.nextActionDueDate = dto.nextActionDueDate;
 
       await docRef.update(updateData);
 

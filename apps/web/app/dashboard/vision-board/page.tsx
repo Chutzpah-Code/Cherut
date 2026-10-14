@@ -91,6 +91,19 @@ export default function VisionBoardPage() {
       dueDate?: string;
       imageUrl?: string;
       completed?: boolean;
+      objectiveId?: string;
+      plannedPracticeDurationMinutes?: 5 | 10 | 15;
+      currentEmotion?: string;
+      currentEnergy?: number;
+      currentConfidence?: number;
+      desiredState?: string;
+      empoweringBelief?: string;
+      outcomeVisualizationText?: string;
+      processVisualizationText?: string;
+      likelyObstacle?: string;
+      obstacleResponse?: string;
+      nextAction?: string;
+      nextActionDueDate?: string;
     },
   ) => {
     try {

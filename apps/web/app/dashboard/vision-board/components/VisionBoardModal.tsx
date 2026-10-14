@@ -16,11 +16,22 @@ import {
   Loader,
   Alert,
   Checkbox,
+  Select,
+  SegmentedControl,
+  Divider,
+  Slider,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
-import { Trash2, Upload, AlertCircle } from 'lucide-react';
+import { Trash2, Upload, AlertCircle, Sparkles } from 'lucide-react';
 import { VisionBoardItem } from '@/lib/api/services/vision-board';
 import { imageValidation } from '@/lib/api/services/vision-board';
+import { useObjectives } from '@/hooks/useObjectives';
+import { VisionBoardStateView } from './VisionBoardStateView';
+
+const FEELING_OPTIONS = [
+  'calm', 'confidence', 'courage', 'clarity', 'gratitude',
+  'motivation', 'security', 'freedom', 'focus', 'joy',
+] as const;
 
 interface VisionBoardModalProps {
   opened: boolean;
@@ -33,6 +44,19 @@ interface VisionBoardModalProps {
     dueDate?: string;
     imageUrl?: string;
     completed?: boolean;
+    objectiveId?: string;
+    plannedPracticeDurationMinutes?: 5 | 10 | 15;
+    currentEmotion?: string;
+    currentEnergy?: number;
+    currentConfidence?: number;
+    desiredState?: string;
+    empoweringBelief?: string;
+    outcomeVisualizationText?: string;
+    processVisualizationText?: string;
+    likelyObstacle?: string;
+    obstacleResponse?: string;
+    nextAction?: string;
+    nextActionDueDate?: string;
   }) => Promise<void>;
   onDelete: (id: string) => void;
   onUploadImage: (file: File) => Promise<{ imageUrl: string }>;
@@ -49,6 +73,7 @@ export function VisionBoardModal({
   isSaving,
 }: VisionBoardModalProps) {
   const t = useTranslations('visionBoard.editModal');
+  const { data: objectives } = useObjectives(undefined);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [fullDescription, setFullDescription] = useState('');
@@ -58,6 +83,23 @@ export function VisionBoardModal({
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Visualization practice ("Visualizar e agir") — state / belief /
+  // outcome+process / obstacle+response / action
+  const [objectiveId, setObjectiveId] = useState<string | undefined>(undefined);
+  const [plannedPracticeDurationMinutes, setPlannedPracticeDurationMinutes] = useState<5 | 10 | 15>(10);
+  const [currentEmotion, setCurrentEmotion] = useState<string | undefined>(undefined);
+  const [currentEnergy, setCurrentEnergy] = useState(5);
+  const [currentConfidence, setCurrentConfidence] = useState(5);
+  const [desiredState, setDesiredState] = useState('');
+  const [empoweringBelief, setEmpoweringBelief] = useState('');
+  const [outcomeVisualizationText, setOutcomeVisualizationText] = useState('');
+  const [processVisualizationText, setProcessVisualizationText] = useState('');
+  const [likelyObstacle, setLikelyObstacle] = useState('');
+  const [obstacleResponse, setObstacleResponse] = useState('');
+  const [nextAction, setNextAction] = useState('');
+  const [nextActionDueDateValue, setNextActionDueDateValue] = useState<Date | null>(null);
+  const [stateViewOpen, setStateViewOpen] = useState(false);
 
   useEffect(() => {
     if (item) {
@@ -74,6 +116,20 @@ export function VisionBoardModal({
       } else {
         setDueDateValue(null);
       }
+
+      setObjectiveId(item.objectiveId);
+      setPlannedPracticeDurationMinutes(item.plannedPracticeDurationMinutes ?? 10);
+      setCurrentEmotion(item.currentEmotion);
+      setCurrentEnergy(item.currentEnergy ?? 5);
+      setCurrentConfidence(item.currentConfidence ?? 5);
+      setDesiredState(item.desiredState || '');
+      setEmpoweringBelief(item.empoweringBelief || '');
+      setOutcomeVisualizationText(item.outcomeVisualizationText || '');
+      setProcessVisualizationText(item.processVisualizationText || '');
+      setLikelyObstacle(item.likelyObstacle || '');
+      setObstacleResponse(item.obstacleResponse || '');
+      setNextAction(item.nextAction || '');
+      setNextActionDueDateValue(item.nextActionDueDate ? new Date(item.nextActionDueDate + 'T00:00:00') : null);
     }
   }, [item]);
 
@@ -115,6 +171,19 @@ export function VisionBoardModal({
         dueDate: dueDateValue ? dueDateValue.toISOString().split('T')[0] : undefined,
         imageUrl: newImageUrl || undefined,
         completed,
+        objectiveId: objectiveId || undefined,
+        plannedPracticeDurationMinutes,
+        currentEmotion: currentEmotion || undefined,
+        currentEnergy,
+        currentConfidence,
+        desiredState: desiredState.trim() || undefined,
+        empoweringBelief: empoweringBelief.trim() || undefined,
+        outcomeVisualizationText: outcomeVisualizationText.trim() || undefined,
+        processVisualizationText: processVisualizationText.trim() || undefined,
+        likelyObstacle: likelyObstacle.trim() || undefined,
+        obstacleResponse: obstacleResponse.trim() || undefined,
+        nextAction: nextAction.trim() || undefined,
+        nextActionDueDate: nextActionDueDateValue ? nextActionDueDateValue.toISOString().split('T')[0] : undefined,
       });
     } catch (error: any) {
       let errorMessage = t('saveFailed');
@@ -429,6 +498,184 @@ export function VisionBoardModal({
           }}
         />
 
+        <Divider my={4} />
+
+        {/* Visualization practice ("Visualizar e agir") — state, belief,
+            outcome+process, obstacle+response, action — modeled after the
+            state/strategy structure from "Unlimited Power" rather than a
+            single feeling + a single affirmation. */}
+        <Box>
+          <Text
+            mb="sm"
+            style={{
+              fontFamily: 'Inter Display, sans-serif',
+              fontSize: '16px',
+              fontWeight: 700,
+              color: '#000000',
+            }}
+          >
+            {t('visualizationSectionTitle')}
+          </Text>
+
+          <Stack gap="md">
+            <Select
+              label={t('relatedObjective')}
+              placeholder={t('relatedObjectivePlaceholder')}
+              value={objectiveId ?? null}
+              onChange={(value) => setObjectiveId(value || undefined)}
+              data={objectives?.map((obj) => ({ value: obj.id, label: obj.title })) || []}
+              searchable
+              clearable
+              radius={8}
+            />
+
+            <Box>
+              <Text size="sm" fw={600} mb={6}>{t('practiceDuration')}</Text>
+              <SegmentedControl
+                fullWidth
+                value={String(plannedPracticeDurationMinutes)}
+                onChange={(v) => setPlannedPracticeDurationMinutes(Number(v) as 5 | 10 | 15)}
+                data={[
+                  { value: '5', label: t('duration5min') },
+                  { value: '10', label: t('duration10min') },
+                  { value: '15', label: t('duration15min') },
+                ]}
+                radius={8}
+              />
+            </Box>
+
+            <Divider label={t('stateGroupTitle')} labelPosition="left" />
+
+            <Select
+              label={t('currentEmotion')}
+              placeholder={t('currentEmotionPlaceholder')}
+              value={currentEmotion ?? null}
+              onChange={(value) => setCurrentEmotion(value || undefined)}
+              data={FEELING_OPTIONS.map((f) => ({ value: f, label: t(`feelings.${f}`) }))}
+              clearable
+              radius={8}
+            />
+
+            <Box>
+              <Text size="sm" fw={600} mb={6}>{t('currentEnergy')} — {currentEnergy}/10</Text>
+              <Slider min={1} max={10} step={1} value={currentEnergy} onChange={setCurrentEnergy} color="blue" />
+            </Box>
+
+            <Box>
+              <Text size="sm" fw={600} mb={6}>{t('currentConfidence')} — {currentConfidence}/10</Text>
+              <Slider min={1} max={10} step={1} value={currentConfidence} onChange={setCurrentConfidence} color="blue" />
+            </Box>
+
+            <Textarea
+              label={t('desiredState')}
+              placeholder={t('desiredStatePlaceholder')}
+              value={desiredState}
+              onChange={(e) => setDesiredState(e.target.value)}
+              autosize
+              minRows={1}
+              maxRows={3}
+              maxLength={500}
+              radius={8}
+            />
+
+            <Textarea
+              label={t('empoweringBelief')}
+              placeholder={t('empoweringBeliefPlaceholder')}
+              value={empoweringBelief}
+              onChange={(e) => setEmpoweringBelief(e.target.value)}
+              autosize
+              minRows={2}
+              maxRows={5}
+              maxLength={1000}
+              radius={8}
+            />
+
+            <Divider label={t('visualizationGroupTitle')} labelPosition="left" />
+
+            <Textarea
+              label={t('outcomeVisualizationText')}
+              placeholder={t('outcomeVisualizationTextPlaceholder')}
+              value={outcomeVisualizationText}
+              onChange={(e) => setOutcomeVisualizationText(e.target.value)}
+              autosize
+              minRows={3}
+              maxRows={8}
+              maxLength={2000}
+              radius={8}
+            />
+
+            <Textarea
+              label={t('processVisualizationText')}
+              placeholder={t('processVisualizationTextPlaceholder')}
+              value={processVisualizationText}
+              onChange={(e) => setProcessVisualizationText(e.target.value)}
+              autosize
+              minRows={2}
+              maxRows={6}
+              maxLength={2000}
+              radius={8}
+            />
+
+            <Textarea
+              label={t('likelyObstacle')}
+              placeholder={t('likelyObstaclePlaceholder')}
+              value={likelyObstacle}
+              onChange={(e) => setLikelyObstacle(e.target.value)}
+              autosize
+              minRows={2}
+              maxRows={5}
+              maxLength={1000}
+              radius={8}
+            />
+
+            <Textarea
+              label={t('obstacleResponse')}
+              placeholder={t('obstacleResponsePlaceholder')}
+              value={obstacleResponse}
+              onChange={(e) => setObstacleResponse(e.target.value)}
+              autosize
+              minRows={2}
+              maxRows={5}
+              maxLength={1000}
+              radius={8}
+            />
+
+            <Divider label={t('actionGroupTitle')} labelPosition="left" />
+
+            <Textarea
+              label={t('nextAction')}
+              placeholder={t('nextActionPlaceholder')}
+              value={nextAction}
+              onChange={(e) => setNextAction(e.target.value)}
+              autosize
+              minRows={1}
+              maxRows={4}
+              maxLength={500}
+              radius={8}
+            />
+
+            <DateInput
+              label={t('nextActionDueDate')}
+              placeholder={t('dueDatePlaceholder')}
+              value={nextActionDueDateValue}
+              onChange={setNextActionDueDateValue}
+              clearable
+              radius={8}
+            />
+
+            <Button
+              variant="light"
+              leftSection={<Sparkles size={16} />}
+              onClick={() => setStateViewOpen(true)}
+              disabled={!outcomeVisualizationText.trim()}
+              radius={8}
+              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
+            >
+              {t('enterState')}
+            </Button>
+          </Stack>
+        </Box>
+
         {/* Save Error Alert */}
         {saveError && (
           <Alert
@@ -532,6 +779,23 @@ export function VisionBoardModal({
           </Group>
         </Box>
     </Modal>
+
+    <VisionBoardStateView
+      opened={stateViewOpen}
+      onClose={() => setStateViewOpen(false)}
+      imageUrl={currentImageUrl}
+      title={title}
+      currentEmotion={currentEmotion ? t(`feelings.${currentEmotion}`) : undefined}
+      currentEnergy={currentEnergy}
+      currentConfidence={currentConfidence}
+      desiredState={desiredState}
+      empoweringBelief={empoweringBelief}
+      outcomeVisualizationText={outcomeVisualizationText}
+      processVisualizationText={processVisualizationText}
+      likelyObstacle={likelyObstacle}
+      obstacleResponse={obstacleResponse}
+      nextAction={nextAction}
+    />
     </>
   );
 }

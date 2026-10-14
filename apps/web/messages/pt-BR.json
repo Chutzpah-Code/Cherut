@@ -1198,7 +1198,70 @@
       "completed": "Marcar como concluído",
       "delete": "Excluir",
       "cancel": "Cancelar",
-      "saveChanges": "Salvar alterações"
+      "saveChanges": "Salvar alterações",
+      "visualizationSectionTitle": "Visualização",
+      "relatedObjective": "Meta relacionada",
+      "relatedObjectivePlaceholder": "Não vinculada",
+      "practiceDuration": "Duração da prática",
+      "duration5min": "5 min",
+      "duration10min": "10 min",
+      "duration15min": "15 min",
+      "stateGroupTitle": "Estado",
+      "currentEmotion": "Como estou me sentindo agora?",
+      "currentEmotionPlaceholder": "Selecione um sentimento",
+      "currentEnergy": "Nível de energia",
+      "currentConfidence": "Nível de confiança",
+      "desiredState": "Qual estado quero cultivar?",
+      "desiredStatePlaceholder": "Calmo, focado e confiante...",
+      "empoweringBelief": "Crença que quero fortalecer",
+      "empoweringBeliefPlaceholder": "Consigo desenvolver as competências e realizar ações consistentes...",
+      "visualizationGroupTitle": "Visualização",
+      "outcomeVisualizationText": "Como será quando essa meta for realizada?",
+      "outcomeVisualizationTextPlaceholder": "Descreva em detalhes o que quer alcançar...",
+      "processVisualizationText": "Quais passos vou me imaginar realizando até chegar lá?",
+      "processVisualizationTextPlaceholder": "Descreva as ações que você se imagina realizando...",
+      "likelyObstacle": "Qual obstáculo pode aparecer?",
+      "likelyObstaclePlaceholder": "Descreva um obstáculo provável...",
+      "obstacleResponse": "Como vou responder a esse obstáculo?",
+      "obstacleResponsePlaceholder": "Descreva como vai ajustar a estratégia e continuar...",
+      "actionGroupTitle": "Ação",
+      "nextAction": "Próxima ação concreta",
+      "nextActionPlaceholder": "O que você vai fazer hoje?",
+      "nextActionDueDate": "Prazo da ação",
+      "enterState": "Visualizar e agir",
+      "feelings": {
+        "calm": "Calma",
+        "confidence": "Confiança",
+        "courage": "Coragem",
+        "clarity": "Clareza",
+        "gratitude": "Gratidão",
+        "motivation": "Motivação",
+        "security": "Segurança",
+        "freedom": "Liberdade",
+        "focus": "Foco",
+        "joy": "Alegria"
+      }
+    },
+    "stateView": {
+      "close": "Fechar",
+      "stepCounter": "Passo {current} de {total}",
+      "continue": "Continuar",
+      "finish": "Concluir",
+      "state": {
+        "prompt": "Respire e escolha o estado que deseja cultivar",
+        "currentEmotionLabel": "Agora",
+        "energyLabel": "Energia",
+        "confidenceLabel": "Confiança"
+      },
+      "outcome": {
+        "prompt": "Imagine a meta como realizada"
+      },
+      "process": {
+        "prompt": "Agora imagine você realizando os próximos passos",
+        "obstacleLabel": "Obstáculo provável",
+        "responseLabel": "Minha resposta",
+        "actionLabel": "Próxima ação"
+      }
     },
     "createModal": {
       "title": "Adicionar ao quadro dos sonhos",

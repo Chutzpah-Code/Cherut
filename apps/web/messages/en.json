@@ -1198,7 +1198,70 @@
       "completed": "Mark as completed",
       "delete": "Delete",
       "cancel": "Cancel",
-      "saveChanges": "Save Changes"
+      "saveChanges": "Save Changes",
+      "visualizationSectionTitle": "Visualization",
+      "relatedObjective": "Related goal",
+      "relatedObjectivePlaceholder": "Not linked",
+      "practiceDuration": "Practice duration",
+      "duration5min": "5 min",
+      "duration10min": "10 min",
+      "duration15min": "15 min",
+      "stateGroupTitle": "State",
+      "currentEmotion": "How are you feeling right now?",
+      "currentEmotionPlaceholder": "Select a feeling",
+      "currentEnergy": "Energy level",
+      "currentConfidence": "Confidence level",
+      "desiredState": "What state do you want to cultivate?",
+      "desiredStatePlaceholder": "Calm, focused and confident...",
+      "empoweringBelief": "Belief you want to strengthen",
+      "empoweringBeliefPlaceholder": "I'm capable of developing the skills and taking consistent action...",
+      "visualizationGroupTitle": "Visualization",
+      "outcomeVisualizationText": "What will it look like when this goal is achieved?",
+      "outcomeVisualizationTextPlaceholder": "Describe in detail what you want to achieve...",
+      "processVisualizationText": "What steps do you see yourself taking to get there?",
+      "processVisualizationTextPlaceholder": "Describe the actions you imagine yourself taking...",
+      "likelyObstacle": "What obstacle might come up?",
+      "likelyObstaclePlaceholder": "Describe a likely obstacle...",
+      "obstacleResponse": "How will you respond to it?",
+      "obstacleResponsePlaceholder": "Describe how you'll adjust and keep going...",
+      "actionGroupTitle": "Action",
+      "nextAction": "Next concrete action",
+      "nextActionPlaceholder": "What will you do today?",
+      "nextActionDueDate": "Action due date",
+      "enterState": "Visualize and act",
+      "feelings": {
+        "calm": "Calm",
+        "confidence": "Confidence",
+        "courage": "Courage",
+        "clarity": "Clarity",
+        "gratitude": "Gratitude",
+        "motivation": "Motivation",
+        "security": "Security",
+        "freedom": "Freedom",
+        "focus": "Focus",
+        "joy": "Joy"
+      }
+    },
+    "stateView": {
+      "close": "Close",
+      "stepCounter": "Step {current} of {total}",
+      "continue": "Continue",
+      "finish": "Finish",
+      "state": {
+        "prompt": "Breathe, and choose the state you want to cultivate",
+        "currentEmotionLabel": "Right now",
+        "energyLabel": "Energy",
+        "confidenceLabel": "Confidence"
+      },
+      "outcome": {
+        "prompt": "Imagine the goal as already achieved"
+      },
+      "process": {
+        "prompt": "Now imagine yourself taking the next steps",
+        "obstacleLabel": "Likely obstacle",
+        "responseLabel": "My response",
+        "actionLabel": "Next action"
+      }
     },
     "createModal": {
       "title": "Add to Vision Board",

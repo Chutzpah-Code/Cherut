@@ -1,6 +1,26 @@
 import { apiClient } from '../client';
 
-export interface VisionBoardItem {
+// Visualization practice fields ("Visualizar e agir") — optional, shared by
+// the item itself and both DTOs since they're saved directly on the item.
+// State/outcome/process/action structure (see VisionBoardModal.tsx for the
+// "why" behind this shape).
+interface VisualizationPracticeFields {
+  objectiveId?: string;
+  plannedPracticeDurationMinutes?: 5 | 10 | 15;
+  currentEmotion?: string;
+  currentEnergy?: number;
+  currentConfidence?: number;
+  desiredState?: string;
+  empoweringBelief?: string;
+  outcomeVisualizationText?: string;
+  processVisualizationText?: string;
+  likelyObstacle?: string;
+  obstacleResponse?: string;
+  nextAction?: string;
+  nextActionDueDate?: string;
+}
+
+export interface VisionBoardItem extends VisualizationPracticeFields {
   id: string;
   userId: string;
   title: string;
@@ -15,7 +35,7 @@ export interface VisionBoardItem {
   updatedAt: string;
 }
 
-export interface CreateVisionBoardItemDto {
+export interface CreateVisionBoardItemDto extends VisualizationPracticeFields {
   title: string;
   description?: string;
   fullDescription?: string;
@@ -26,7 +46,7 @@ export interface CreateVisionBoardItemDto {
   completed?: boolean;
 }
 
-export interface UpdateVisionBoardItemDto {
+export interface UpdateVisionBoardItemDto extends VisualizationPracticeFields {
   title?: string;
   description?: string;
   fullDescription?: string;
