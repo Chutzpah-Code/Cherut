@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { PublicLocaleSwitcher } from '@/i18n/PublicLocaleSwitcher';
 import CherutLogo from '@/components/ui/CherutLogo';
 import { SHELL_TOKENS } from '@/components/shell/tokens';
+import { useAuth } from '@/contexts/AuthContext';
 
 const { ink, ink2, mute, rule } = SHELL_TOKENS;
 
@@ -17,6 +18,8 @@ interface PublicHeaderProps {
 
 export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
   const t = useTranslations('publicHeader');
+  const { user, isAdmin } = useAuth();
+  const dashboardHref = isAdmin ? '/admin' : '/dashboard';
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navInnerRef = useRef<HTMLDivElement>(null);
@@ -100,8 +103,14 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
 
           <div className="nav-r">
             <span className="nav-lang"><PublicLocaleSwitcher color={mute} /></span>
-            <Link href="/auth/login" className="btn btn-line btn-sm">{t('login')}</Link>
-            <Link href="/auth/register" className="btn btn-dark btn-sm">{t('startBuilding')}</Link>
+            {user ? (
+              <Link href={dashboardHref} className="btn btn-dark btn-sm">{t('goToDashboard')}</Link>
+            ) : (
+              <>
+                <Link href="/auth/login" className="btn btn-line btn-sm">{t('login')}</Link>
+                <Link href="/auth/register" className="btn btn-dark btn-sm">{t('startBuilding')}</Link>
+              </>
+            )}
           </div>
 
           <button
@@ -121,8 +130,14 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
           ))}
           <div className="nav-mobile-ctas">
             <PublicLocaleSwitcher color={ink} />
-            <Link href="/auth/login" className="btn btn-line btn-sm" style={{ flex: 1, textAlign: 'center' }}>{t('login')}</Link>
-            <Link href="/auth/register" className="btn btn-dark btn-sm" style={{ flex: 1, textAlign: 'center' }}>{t('startBuilding')}</Link>
+            {user ? (
+              <Link href={dashboardHref} className="btn btn-dark btn-sm" style={{ flex: 1, textAlign: 'center' }}>{t('goToDashboard')}</Link>
+            ) : (
+              <>
+                <Link href="/auth/login" className="btn btn-line btn-sm" style={{ flex: 1, textAlign: 'center' }}>{t('login')}</Link>
+                <Link href="/auth/register" className="btn btn-dark btn-sm" style={{ flex: 1, textAlign: 'center' }}>{t('startBuilding')}</Link>
+              </>
+            )}
           </div>
         </div>
       </header>

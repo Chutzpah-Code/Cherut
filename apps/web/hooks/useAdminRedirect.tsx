@@ -79,12 +79,12 @@ export function useAdminRedirect(options: UseAdminRedirectOptions = {}) {
       return;
     }
 
-    // 3. Se está na página inicial (/) após login, redirecionar para área apropriada
-    if (pathname === '/' && user) {
-      const targetUrl = isAdmin ? adminFallback : userFallback;
-      router.replace(targetUrl);
-      return;
-    }
+    // Nota: propositalmente NÃO redirecionamos automaticamente um usuário
+    // logado que visita "/" — forçar isso quebra a expectativa de quem
+    // digitou a URL de propósito (ex: pegar um link, ver a landing) e pode
+    // expor a conta logada para quem divide o computador. Em vez disso, o
+    // header mostra um CTA de "Ir para o Dashboard" quando há sessão ativa
+    // (ver components/ui/Header.tsx), mantendo o usuário no controle.
 
     // 4. Verificar query parameter 'redirect' para redirecionamento customizado
     if (typeof window !== 'undefined') {
