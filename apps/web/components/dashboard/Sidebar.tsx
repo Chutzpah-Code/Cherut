@@ -194,21 +194,6 @@ export default function Sidebar({ onClose }: SidebarProps) {
           }
         }
 
-        .premium-logo-container {
-          padding: 24px 16px 16px 16px;
-          transition: transform 200ms ease;
-          overflow: hidden;
-        }
-
-        .premium-logo-container:hover {
-          transform: scale(1.02);
-        }
-
-        .premium-logo-container.compact {
-          padding: 16px 8px;
-          text-align: center;
-        }
-
         .premium-nav-item.compact {
           justify-content: center;
           padding: 0 8px;
