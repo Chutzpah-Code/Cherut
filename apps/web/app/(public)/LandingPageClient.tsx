@@ -9,7 +9,7 @@ import { PublicFooter } from '@/components/ui/PublicFooter';
 import CherutLogo from '@/components/ui/CherutLogo';
 import { SHELL_TOKENS } from '@/components/shell/Shell';
 import { SiteStyles, Wrap, Section, Reveal, FaqItem } from '@/components/shell/primitives';
-import { AppMock, AppMockFrame, MockStyles, type AppMockKind } from '@/components/shell/AppMock';
+import { AppMock, AppMockFrame, MockStyles, TasksCarouselFrame, type AppMockKind } from '@/components/shell/AppMock';
 import { geistSans, geistMono } from '@/lib/fonts';
 
 const { ink, ink2, mute, paper, off, rule, ruleD, acc, accSoft, accLight, ease } = SHELL_TOKENS;
@@ -351,9 +351,13 @@ export default function LandingPageClient() {
                 ))}
               </div>
               <div className="stage">
-                <AppMockFrame label={tabs[activeTab]?.url ?? ''}>
-                  <AppMock kind={tabs[activeTab]?.mock ?? 'okrs'} />
-                </AppMockFrame>
+                {activeTab === 1 ? (
+                  <TasksCarouselFrame label={tabs[1]?.url ?? ''} />
+                ) : (
+                  <AppMockFrame label={tabs[activeTab]?.url ?? ''}>
+                    <AppMock kind={tabs[activeTab]?.mock ?? 'okrs'} />
+                  </AppMockFrame>
+                )}
               </div>
             </div>
           </Reveal>

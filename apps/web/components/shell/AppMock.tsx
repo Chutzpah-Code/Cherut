@@ -110,6 +110,55 @@ export function MockStyles() {
       .mk-learn-play { position: absolute; left: 50%; top: 44%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; background: rgba(255,255,255,.95); display: flex; align-items: center; justify-content: center; }
       .mk-learn-time { position: absolute; right: 20px; bottom: 20px; font-size: 12px; opacity: .75; }
       .mk-learn-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 20px; margin-top: 20px; }
+      .mk-ctl { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+      .mk-seg { display: flex; background: #F3F4F8; border-radius: 8px; padding: 3px; gap: 2px; }
+      .mk-seg span { padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; color: #5B6075; }
+      .mk-seg span.on { background: #fff; color: #14141C; box-shadow: 0 1px 2px rgba(20,20,40,.08); }
+      .mk-nav { display: flex; gap: 6px; align-items: center; }
+      .mk-nav i { width: 28px; height: 28px; border: 1px solid #E6E8F0; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-style: normal; color: #5B6075; }
+      .mk-nav b { margin-left: 8px; font-size: 15px; }
+      .mk-wk { display: grid; grid-template-columns: 44px repeat(7,1fr); margin-top: 12px; border: 1px solid #E6E8F0; border-radius: 12px; overflow: hidden; position: relative; }
+      .mk-wk .hd { padding: 8px 0; text-align: center; font-size: 11px; font-weight: 600; color: #6B7085; border-bottom: 1px solid #E6E8F0; border-left: 1px solid #EEF0F5; background: #FAFBFD; }
+      .mk-wk .hd b { display: block; font-size: 17px; color: #14141C; margin-top: 2px; }
+      .mk-wk .hd.td b { background: #3B5BF6; color: #fff; width: 28px; height: 28px; line-height: 28px; border-radius: 50%; margin: 2px auto 0; }
+      .mk-wk .hr { font-size: 10.5px; color: #9AA0B4; text-align: right; padding: 2px 6px 0 0; height: 46px; }
+      .mk-wk .cl { border-left: 1px solid #EEF0F5; position: relative; background-image: linear-gradient(#EEF0F5 1px,transparent 1px); background-size: 100% 46px; }
+      .mk-wk .cl.td { background-color: #F6F8FF; }
+      .mk-ev { position: absolute; left: 4px; right: 4px; border-radius: 7px; padding: 5px 7px; font-size: 11px; font-weight: 600; line-height: 1.25; overflow: hidden; border-left: 3px solid; }
+      .mk-ev small { display: block; font-weight: 400; opacity: .75; font-size: 10px; }
+      .ev-b { background: #E8EDFF; color: #2441C9; border-color: #3B5BF6; }
+      .ev-g { background: #E3F5EC; color: #1A7F55; border-color: #22A06B; }
+      .ev-a { background: #FFF3DF; color: #9A5B00; border-color: #F0A020; }
+      .ev-v { background: #F0EBFF; color: #5B3FC4; border-color: #8B6CF0; }
+      .mk-now { position: absolute; left: 44px; right: 0; height: 2px; background: #E5484D; z-index: 2; }
+      .mk-now::before { content: ""; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: #E5484D; }
+      .mk-run { display: flex; align-items: center; justify-content: space-between; border: 1px solid #E6E8F0; border-radius: 14px; padding: 18px 22px; margin-top: 16px; background: linear-gradient(90deg,#F6F8FF,#fff 60%); }
+      .mk-run .l { display: flex; align-items: center; gap: 12px; }
+      .mk-pulse { width: 10px; height: 10px; border-radius: 50%; background: #3B5BF6; box-shadow: 0 0 0 5px #E8EDFF; display: block; }
+      .mk-clock { font-family: var(--font-geist-mono), monospace; font-size: 30px; font-weight: 500; letter-spacing: -.02em; }
+      .mk-stop { background: #14141C; color: #fff; font-weight: 600; font-size: 12.5px; padding: 9px 16px; border-radius: 8px; margin-left: 16px; }
+      .mk-two { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; margin-top: 16px; }
+      .mk-log { border: 1px solid #E6E8F0; border-radius: 12px; overflow: hidden; }
+      .mk-log .g { display: flex; justify-content: space-between; padding: 8px 14px; background: #FAFBFD; font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #6B7085; border-bottom: 1px solid #EEF0F5; }
+      .mk-log .r { display: grid; grid-template-columns: 12px 1fr 90px 52px; gap: 10px; align-items: center; padding: 9px 14px; border-bottom: 1px solid #EEF0F5; font-size: 12.5px; }
+      .mk-log .r i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+      .mk-log .r span:nth-child(3) { color: #6B7085; font-size: 11.5px; }
+      .mk-log .r b { text-align: right; }
+      .mk-dim { position: absolute; inset: 0; background: rgba(14,16,30,.38); backdrop-filter: blur(2px); z-index: 3; }
+      .mk-modal { position: absolute; z-index: 4; left: 50%; top: 50%; width: 760px; transform: translate(-50%,-50%); background: #fff; border-radius: 16px; box-shadow: 0 40px 90px -20px rgba(10,12,40,.5); overflow: hidden; }
+      .mk-modal .top { padding: 18px 24px; border-bottom: 1px solid #EEF0F5; display: flex; justify-content: space-between; }
+      .mk-modal .bd { display: grid; grid-template-columns: 1.25fr 1fr; }
+      .mk-modal .bd > div { padding: 18px 24px; }
+      .mk-modal .bd > div + div { border-left: 1px solid #EEF0F5; background: #FCFCFE; }
+      .mk-in { border: 1px solid #E6E8F0; border-radius: 8px; padding: 9px 12px; font-size: 13px; margin-top: 6px; }
+      .mk-fl { font-size: 12px; font-weight: 600; color: #3A3D4E; margin-top: 14px; }
+      .mk-tt { border: 1px solid #E6E8F0; border-radius: 12px; padding: 14px; margin-top: 14px; background: #FAFBFD; }
+      .mk-cl { display: flex; align-items: center; gap: 9px; padding: 6px 0; font-size: 12.5px; }
+      .mk-cl i { width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid #B6BACB; display: block; }
+      .mk-cl i.y { background: #3B5BF6; border-color: #3B5BF6; }
+      .mk-cl s { color: #9AA0B4; }
+      .mk-modal .ft { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 24px; border-top: 1px solid #EEF0F5; }
+      .mk-ghost { border: 1px solid #E6E8F0; border-radius: 8px; padding: 8px 14px; font-weight: 600; font-size: 12.5px; display: inline-block; }
     `}</style>
   );
 }
@@ -169,11 +218,12 @@ function MockSidebar({ on }: { on: number }) {
   );
 }
 
-function Shell({ on, children }: { on: number; children: React.ReactNode }) {
+function Shell({ on, children, overlay }: { on: number; children: React.ReactNode; overlay?: React.ReactNode }) {
   return (
     <div className="mk-c">
       <MockSidebar on={on} />
       <div className="mk-m"><div className="mk-p">{children}</div></div>
+      {overlay}
     </div>
   );
 }
@@ -239,15 +289,204 @@ function OkrsMock() {
   );
 }
 
-function TasksMock() {
+// Mini in-app nav shown at the top of Tasks/Calendar/Timer mocks (Board ·
+// Calendar · Time), distinct from the carousel's own frame-bar pills.
+function MiniTabs({ active }: { active: 0 | 1 | 2 }) {
+  const t = useTranslations('appMock.tasks');
+  return (
+    <div className="mk-tabs">
+      <span className={active === 0 ? 'on' : ''}>{t('tabs.board')}</span>
+      <span className={active === 1 ? 'on' : ''}>{t('tabs.calendar')}</span>
+      <span className={active === 2 ? 'on' : ''}>{t('tabs.time')}</span>
+    </div>
+  );
+}
+
+function TasksBoardBody() {
   const t = useTranslations('appMock.tasks');
   const columns = t.raw('columns') as { title: string; items: string[] }[];
   return (
-    <Shell on={6}>
+    <>
       <div className="mk-h1">{t('boardName')}</div>
-      <div className="mk-tabs"><span className="on">{t('tabs.board')}</span><span>{t('tabs.calendar')}</span><span>{t('tabs.time')}</span></div>
+      <MiniTabs active={0} />
       <div className="mk-kan">
         {columns.map((col) => <Col key={col.title} t={col.title} items={col.items} />)}
+      </div>
+    </>
+  );
+}
+
+function TasksMock() {
+  return (
+    <Shell on={6}>
+      <TasksBoardBody />
+    </Shell>
+  );
+}
+
+// Day index -> [hourStart, hourEnd, colorKey]. Titles/subtitles come from
+// i18n (appMock.calendar.events), kept parallel by index.
+const CALENDAR_EVENT_SLOTS: [number, number, number, 'b' | 'g' | 'a' | 'v'][][] = [
+  [[7, 8, 0, 'g'], [9, 11.5, 1, 'b'], [13, 14, 2, 'v']],
+  [[8, 9, 0, 'a'], [10, 12, 1, 'b'], [14, 15, 2, 'v']],
+  [[7, 8, 0, 'g'], [9, 11, 1, 'b'], [12, 13, 2, 'a'], [13.5, 15, 3, 'v']],
+  [[9, 12, 0, 'b'], [13, 14, 1, 'g']],
+  [[7, 8, 0, 'g'], [10, 11, 1, 'a'], [14, 15.5, 2, 'v']],
+  [[9, 10.5, 0, 'g']],
+  [[10, 11, 0, 'b']],
+];
+const CALENDAR_HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15];
+const TODAY_COLUMN = 2;
+
+function CalendarMock() {
+  const t = useTranslations('appMock.calendar');
+  const days = t.raw('days') as [string, number][];
+  const eventTexts = t.raw('events') as [string, string][][];
+  return (
+    <Shell on={6}>
+      <MiniTabs active={1} />
+      <div className="mk-ctl">
+        <div className="mk-nav"><i>‹</i><i>›</i><b>{t('range')}</b></div>
+        <div className="mk-seg"><span>{t('segMonth')}</span><span className="on">{t('segWeek')}</span><span>{t('segDay')}</span></div>
+      </div>
+      <div className="mk-wk">
+        <div className="hd" style={{ borderLeft: 0 }} />
+        {days.map(([d, n], i) => <div key={d} className={`hd${i === TODAY_COLUMN ? ' td' : ''}`}>{d}<b>{n}</b></div>)}
+        <div>{CALENDAR_HOURS.map((h) => <div key={h} className="hr">{String(h).padStart(2, '0')}:00</div>)}</div>
+        {CALENDAR_EVENT_SLOTS.map((dayEvents, dayIdx) => (
+          <div key={dayIdx} className={`cl${dayIdx === TODAY_COLUMN ? ' td' : ''}`}>
+            {dayEvents.map(([s, e, textIdx, color], i) => {
+              const [title, sub] = eventTexts[dayIdx][textIdx];
+              return (
+                <div key={i} className={`mk-ev ev-${color}`} style={{ top: (s - 7) * 46 + 2, height: (e - s) * 46 - 4 }}>
+                  {title}{sub && <small>{sub}</small>}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+        <div className="mk-now" style={{ top: 62 + 3.6 * 46 }} />
+      </div>
+    </Shell>
+  );
+}
+
+function TaskDetailMock() {
+  const t = useTranslations('appMock.taskDetail');
+  const checklist = t.raw('checklistItems') as string[];
+  const priorities = t.raw('priorityOptions') as string[];
+  const dueOptions = t.raw('dueDateOptions') as string[];
+  return (
+    <Shell
+      on={6}
+      overlay={
+        <>
+          <div className="mk-dim" />
+          <div className="mk-modal">
+            <div className="top">
+              <div>
+                <b style={{ fontSize: 16 }}>{t('modalTitle')}</b>
+                <div className="mk-sub"><span className="mk-pill gray">{t('metaPill')}</span> · {t('metaCreated')}</div>
+              </div>
+              <span style={{ color: '#9AA0B4', fontSize: 18 }}>×</span>
+            </div>
+            <div className="bd">
+              <div>
+                <div className="mk-in" style={{ fontWeight: 600, fontSize: 14, marginTop: 0 }}>{t('taskTitle')}</div>
+                <div className="mk-fl">{t('descriptionLabel')}</div>
+                <div className="mk-in" style={{ color: '#5B6075', minHeight: 46 }}>{t('description')}</div>
+                <div className="mk-tt">
+                  <div className="mk-row">
+                    <div><span className="mk-lbl">{t('timeTrackedLabel')}</span><div style={{ fontSize: 20, fontWeight: 600, marginTop: 2 }}>{t('timeTrackedValue')}</div></div>
+                    <span className="mk-btn">{t('startBtn')}</span>
+                  </div>
+                  <div className="mk-row" style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #E6E8F0' }}>
+                    <div><span className="mk-lbl">{t('pomodorosLabel')}</span><div className="mk-dots" style={{ width: 110, marginTop: 6 }}><i className="y" /><i className="y" /><i /></div></div>
+                    <b>{t('pomodorosValue')}</b>
+                  </div>
+                </div>
+                <div className="mk-row" style={{ marginTop: 14 }}>
+                  <span className="mk-fl" style={{ margin: 0 }}>{t('checklistLabel')}</span>
+                  <span className="mk-sub" style={{ margin: 0 }}>{t('checklistProgress')}</span>
+                </div>
+                {checklist.map((item, i) => (
+                  <div className="mk-cl" key={item}>
+                    <i className={i === 0 ? 'y' : ''} />
+                    {i === 0 ? <s>{item}</s> : item}
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div className="mk-fl" style={{ marginTop: 0 }}>{t('priorityLabel')}</div>
+                <div className="mk-seg" style={{ marginTop: 6 }}>
+                  {priorities.map((p, i) => <span key={p} className={i === 2 ? 'on' : ''}>{p}</span>)}
+                </div>
+                <div className="mk-fl">{t('dueDateLabel')}</div>
+                <div className="mk-seg" style={{ marginTop: 6 }}>
+                  {dueOptions.map((d, i) => <span key={d} className={i === 0 ? 'on' : ''}>{d}</span>)}
+                </div>
+                <div className="mk-fl">{t('lifeAreaLabel')}</div>
+                <div className="mk-in">{t('lifeAreaValue')}</div>
+                <div className="mk-fl">{t('objectiveLabel')}</div>
+                <div className="mk-in">{t('objectiveValue')}</div>
+                <div className="mk-fl">{t('keyResultLabel')}</div>
+                <div className="mk-in">{t('keyResultValue')}</div>
+              </div>
+            </div>
+            <div className="ft">
+              <span className="mk-ghost">{t('cancelBtn')}</span>
+              <span className="mk-btn">{t('saveBtn')}</span>
+            </div>
+          </div>
+        </>
+      }
+    >
+      <TasksBoardBody />
+    </Shell>
+  );
+}
+
+function TimerMock() {
+  const t = useTranslations('appMock.timer');
+  const todayEntries = t.raw('sessionLog.todayEntries') as [string, string, string, string][];
+  const yesterdayEntries = t.raw('sessionLog.yesterdayEntries') as [string, string, string, string][];
+  const weekdayLabels = t.raw('weekdayLabels') as string[];
+  return (
+    <Shell on={6}>
+      <MiniTabs active={2} />
+      <div className="mk-run">
+        <div className="l">
+          <span className="mk-pulse" />
+          <b>{t('inProgress')}</b>
+          <span style={{ color: '#6B7085' }}>{t('taskName')}</span>
+          <span className="mk-pill gray">{t('tag')}</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span className="mk-clock">{t('clock')}</span>
+          <span className="mk-stop">{t('stopBtn')}</span>
+        </div>
+      </div>
+      <div className="mk-two">
+        <div>
+          <div className="mk-stats" style={{ gridTemplateColumns: 'repeat(3,1fr)', marginTop: 0 }}>
+            <div className="mk-stat"><span className="mk-lbl">{t('stats.today.label')}</span><b>{t('stats.today.value')}</b><small>{t('stats.today.sub')}</small></div>
+            <div className="mk-stat"><span className="mk-lbl">{t('stats.thisWeek.label')}</span><b>{t('stats.thisWeek.value')}</b><small>{t('stats.thisWeek.sub')}</small></div>
+            <div className="mk-stat"><span className="mk-lbl">{t('stats.pomodoros.label')}</span><b>{t('stats.pomodoros.value')}</b><small>{t('stats.pomodoros.sub')}</small></div>
+          </div>
+          <div className="mk-t" style={{ marginTop: 18 }}>{t('focusByDay')}</div>
+          <Bars values={[55, 72, 64, 88, 40, 30, 22]} hi={[3]} />
+          <div className="mk-row mk-sub">{weekdayLabels.map((d) => <span key={d}>{d}</span>)}</div>
+        </div>
+        <div className="mk-log">
+          <div className="g"><span>{t('sessionLog.todayLabel')}</span><span>{t('sessionLog.todayTotal')}</span></div>
+          {todayEntries.map(([c, title, range, duration]) => (
+            <div className="r" key={title}><i style={{ background: c }} /><span>{title}</span><span>{range}</span><b>{duration}</b></div>
+          ))}
+          <div className="g"><span>{t('sessionLog.yesterdayLabel')}</span><span>{t('sessionLog.yesterdayTotal')}</span></div>
+          {yesterdayEntries.map(([c, title, range, duration]) => (
+            <div className="r" key={title}><i style={{ background: c }} /><span>{title}</span><span>{range}</span><b>{duration}</b></div>
+          ))}
+        </div>
       </div>
     </Shell>
   );
@@ -417,7 +656,7 @@ function JournalMock() {
   );
 }
 
-export type AppMockKind = 'dashboard' | 'okrs' | 'tasks' | 'dreams' | 'habits' | 'finances' | 'learning' | 'journal';
+export type AppMockKind = 'dashboard' | 'okrs' | 'tasks' | 'dreams' | 'habits' | 'finances' | 'learning' | 'journal' | 'calendar' | 'taskdetail' | 'timer';
 
 const MOCKS: Record<AppMockKind, () => React.ReactElement> = {
   dashboard: DashboardMock,
@@ -428,6 +667,9 @@ const MOCKS: Record<AppMockKind, () => React.ReactElement> = {
   finances: FinancesMock,
   learning: LearningMock,
   journal: JournalMock,
+  calendar: CalendarMock,
+  taskdetail: TaskDetailMock,
+  timer: TimerMock,
 };
 
 // Scales the fixed W×H mock canvas to fit its container, matching the
@@ -479,6 +721,110 @@ export function AppMockFrame({ label, children, dark }: { label: string; childre
       <div className={`amf${dark ? ' dark' : ''}`}>
         <div className="amf-bar"><i /><i /><i /><span>{label}</span></div>
         {children}
+      </div>
+    </>
+  );
+}
+
+const CAROUSEL_SLIDES: { kind: AppMockKind; pill: string; path: string }[] = [
+  { kind: 'tasks', pill: 'Board', path: 'board' },
+  { kind: 'calendar', pill: 'Calendar', path: 'calendar' },
+  { kind: 'taskdetail', pill: 'Task', path: 'task' },
+  { kind: 'timer', pill: 'Timer', path: 'timer' },
+];
+
+const CAROUSEL_SLIDE_MS = 4200;
+
+// "Tasks & Calendar" tab's own frame: a 4-slide autoplaying carousel
+// (Board/Calendar/Task/Timer) replacing the plain AppMockFrame+AppMock
+// pairing used by every other "One system" tab. Mount/unmount this with the
+// tab's active state — the autoplay loop only exists while mounted.
+export function TasksCarouselFrame({ label }: { label: string }) {
+  const [index, setIndex] = useState(0);
+  const indexRef = useRef(0);
+  const hoverRef = useRef(false);
+  const startRef = useRef(0);
+  const progressRef = useRef(0);
+  const barRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) return;
+
+    startRef.current = performance.now();
+    let raf = requestAnimationFrame(tick);
+    function tick(now: number) {
+      if (!hoverRef.current) {
+        const frac = Math.min((now - startRef.current) / CAROUSEL_SLIDE_MS, 1);
+        progressRef.current = frac;
+        if (barRef.current) barRef.current.style.width = `${frac * 100}%`;
+        if (frac >= 1) {
+          const next = (indexRef.current + 1) % CAROUSEL_SLIDES.length;
+          indexRef.current = next;
+          setIndex(next);
+          startRef.current = now;
+          progressRef.current = 0;
+          if (barRef.current) barRef.current.style.width = '0%';
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const goTo = (i: number) => {
+    indexRef.current = i;
+    setIndex(i);
+    startRef.current = performance.now();
+    progressRef.current = 0;
+    if (barRef.current) barRef.current.style.width = '0%';
+  };
+
+  const current = CAROUSEL_SLIDES[index];
+
+  return (
+    <>
+      <style>{`
+        .slc { background: #fff; border: 1px solid rgba(11,11,16,.09); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(11,11,16,.04), 0 30px 80px -30px rgba(11,11,16,.25); }
+        .slc-bar { height: 44px; display: flex; align-items: center; gap: 6px; padding: 0 14px; border-bottom: 1px solid rgba(11,11,16,.09); background: #F6F6F4; }
+        .slc-bar i { width: 9px; height: 9px; border-radius: 50%; background: rgba(11,11,16,.14); display: block; flex-shrink: 0; }
+        .slc-path { margin-left: 14px; flex: 1; min-width: 0; font-family: var(--font-geist-mono), monospace; font-size: 11px; color: #6B6B76; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .slc-pills { display: flex; gap: 4px; flex-shrink: 0; }
+        .slc-pill { font-family: var(--font-geist-sans), system-ui, sans-serif; font-size: 11px; font-weight: 500; padding: 5px 10px; border-radius: 6px; color: #6B6B76; background: transparent; border: 1px solid transparent; cursor: pointer; transition: background .15s, color .15s; }
+        .slc-pill:hover { background: rgba(11,11,16,.05); }
+        .slc-pill.on { background: #fff; color: #14141C; border-color: rgba(11,11,16,.09); box-shadow: 0 1px 2px rgba(11,11,16,.06); }
+        .slc-slides { position: relative; overflow: hidden; }
+        .slc-slides-t { display: flex; width: 400%; transition: transform .8s cubic-bezier(.23,1,.32,1); }
+        .slc-slides-t > div { width: 25%; flex-shrink: 0; }
+        .slc-prog { height: 2px; background: rgba(11,11,16,.06); }
+        .slc-prog span { display: block; height: 100%; width: 0%; background: #3B5BF6; }
+        @media (max-width: 640px) { .slc-path { display: none; } }
+      `}</style>
+      <div
+        className="slc"
+        onMouseEnter={() => { hoverRef.current = true; }}
+        onMouseLeave={() => {
+          hoverRef.current = false;
+          startRef.current = performance.now() - progressRef.current * CAROUSEL_SLIDE_MS;
+        }}
+      >
+        <div className="slc-bar">
+          <i /><i /><i />
+          <span className="slc-path">{label} / {current.path}</span>
+          <div className="slc-pills">
+            {CAROUSEL_SLIDES.map((s, i) => (
+              <button key={s.kind} type="button" className={`slc-pill${i === index ? ' on' : ''}`} onClick={() => goTo(i)}>
+                {s.pill}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="slc-slides">
+          <div className="slc-slides-t" style={{ transform: `translateX(-${index * 100}%)` }}>
+            {CAROUSEL_SLIDES.map((s) => <div key={s.kind}><AppMock kind={s.kind} /></div>)}
+          </div>
+        </div>
+        <div className="slc-prog"><span ref={barRef} /></div>
       </div>
     </>
   );
