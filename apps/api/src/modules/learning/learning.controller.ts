@@ -13,10 +13,6 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-// Side-effect-only import so this file reliably resolves the ambient
-// `Express.Multer.File` global declared by @types/multer, regardless of
-// whether the package was otherwise pulled into this compilation unit.
-import type {} from 'multer';
 import { LearningService } from './learning.service';
 import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
 import { AdminOnly } from '../auth/guards/admin.guard';

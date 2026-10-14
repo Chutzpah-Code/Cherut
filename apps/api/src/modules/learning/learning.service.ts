@@ -1,10 +1,6 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { FirebaseService } from '../../config/firebase.service';
 import { CloudinaryService } from '../../config/cloudinary.service';
-// Side-effect-only import so this file reliably resolves the ambient
-// `Express.Multer.File` global declared by @types/multer, regardless of
-// whether the package was otherwise pulled into this compilation unit.
-import type {} from 'multer';
 import {
   CreateCourseDto,
   UpdateCourseDto,
