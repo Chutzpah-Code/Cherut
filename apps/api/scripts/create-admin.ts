@@ -35,14 +35,25 @@ async function createInitialAdmin() {
     const auth = firebaseService.getAuth();
     const db = firebaseService.getFirestore();
 
+    let existingUser: import('firebase-admin/auth').UserRecord | null = null;
     try {
-      const existingUser = await auth.getUserByEmail(adminEmail);
+      existingUser = await auth.getUserByEmail(adminEmail);
+    } catch (lookupError: any) {
+      if (lookupError?.code !== 'auth/user-not-found') {
+        // Erro real (ex: rede, credenciais, emulador inacessível) — não assumir que o usuário não existe
+        throw lookupError;
+      }
+      console.log('👤 Usuário não existe, criando novo...');
+    }
+
+    if (existingUser) {
       console.log(`⚠️  Usuário já existe no Firebase Auth: ${existingUser.uid}`);
 
-      // Verificar se já é admin no Firestore
+      // Verificar se já é admin no Firestore + custom claim
       const userDoc = await db.collection('users').doc(existingUser.uid).get();
-      if (userDoc.exists && userDoc.data()?.role === 'admin') {
-        console.log('✅ Usuário já é administrador');
+      const existingClaims = (await auth.getUser(existingUser.uid)).customClaims;
+      if (userDoc.exists && userDoc.data()?.role === 'admin' && existingClaims?.role === 'admin') {
+        console.log('✅ Usuário já é administrador (Firestore + custom claim)');
         process.exit(0);
       }
 
@@ -54,11 +65,13 @@ async function createInitialAdmin() {
         updatedAt: new Date().toISOString(),
       });
 
-      console.log('✅ Usuário existente promovido para administrador');
+      // Custom claim — é isto que o frontend lê (getIdTokenResult().claims.role),
+      // não o campo role do Firestore. Sem isto o usuário nunca é reconhecido como admin.
+      await auth.setCustomUserClaims(existingUser.uid, { role: 'admin' });
+
+      console.log('✅ Usuário existente promovido para administrador (Firestore + custom claim)');
+      console.log('⚠️  O usuário precisa deslogar e logar novamente para o novo token refletir a claim.');
       process.exit(0);
-    } catch (userNotFoundError) {
-      // Usuário não existe, vamos criar
-      console.log('👤 Usuário não existe, criando novo...');
     }
 
     // 2. Criar usuário no Firebase Auth
@@ -102,6 +115,11 @@ async function createInitialAdmin() {
     await db.collection('users').doc(userRecord.uid).set(userData);
 
     console.log('✅ Documento criado no Firestore com role admin');
+
+    // Custom claim — é isto que o frontend lê (getIdTokenResult().claims.role),
+    // não o campo role do Firestore. Sem isto o usuário nunca é reconhecido como admin.
+    await auth.setCustomUserClaims(userRecord.uid, { role: 'admin' });
+    console.log('✅ Custom claim role=admin definida no Firebase Auth');
 
     // 4. Resumo final
     console.log('\n🎉 ADMINISTRADOR CRIADO COM SUCESSO!');
