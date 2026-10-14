@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { useAdminRedirect } from '@/hooks/useAdminRedirect';
 import { PublicHeader } from '@/components/ui/Header';
 import { PublicFooter } from '@/components/ui/PublicFooter';
-import { PublicDisclaimer } from '@/components/ui/PublicDisclaimer';
 import CherutLogo from '@/components/ui/CherutLogo';
 import { SHELL_TOKENS } from '@/components/shell/Shell';
 import { SiteStyles, Wrap, Section, Reveal, FaqItem } from '@/components/shell/primitives';
@@ -105,14 +104,15 @@ export default function LandingPageClient() {
         .dark { background: ${ink}; color: #fff; }
         .dark .mute { color: rgba(255,255,255,.62); }
         .loop { padding: 128px 0; }
-        .loop-head { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); gap: 56px; align-items: end; margin-bottom: 88px; }
-        .loop-head .lede { color: rgba(255,255,255,.62); }
+        .loop-stack { display: flex; flex-direction: column; align-items: center; gap: 80px; text-align: center; }
+        .loop-stack .h2 { max-width: 760px; }
+        .loop-stack .lede, .loop-stack .quotes-block { max-width: 640px; margin: 0 auto; color: rgba(255,255,255,.62); }
+        .loop-stack .quotes-block { text-align: left; }
         .ring { --s: min(520px,100vw - 64px); position: relative; width: var(--s); aspect-ratio: 1; margin: 0 auto; }
         .ring::before, .orbit { position: absolute; top: calc(var(--s)*.14); left: calc(var(--s)*.14); width: calc(var(--s)*.72); height: calc(var(--s)*.72); }
         .ring::before { content: ""; border: 3px solid rgba(255,255,255,.28); border-radius: 50%; }
         .orbit { border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 62%, rgba(143,166,255,.15) 75%, ${accLight} 99.6%, transparent 0); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px)); mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px)); }
         .orbit i { position: absolute; left: 50%; top: -4px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 5px rgba(143,166,255,.35), 0 0 24px 6px rgba(143,166,255,.7); display: block; }
-        .ring-c svg { width: 44px; height: 44px; color: ${accLight}; margin-bottom: 6px; }
         .ring-c { position: absolute; top: 0; left: 0; width: var(--s); height: var(--s); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 10px; padding: 22%; }
         .ring-c .mono { white-space: nowrap; }
         .ring-c b { font-size: clamp(22px,2.6vw,30px); font-weight: 600; letter-spacing: -.03em; line-height: 1.1; }
@@ -123,7 +123,6 @@ export default function LandingPageClient() {
         .node p { transition: opacity .3s; opacity: .7; font-size: 14px; line-height: 1.3; color: #fff; text-wrap: balance; margin: 0; }
         .node.on span { color: ${accLight}; }
         .node.on p { opacity: 1; }
-        .loop-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 56px; align-items: center; max-width: 640px; margin: 0 auto; }
         .quotes { display: flex; flex-direction: column; gap: 0; border-top: 1px solid ${ruleD}; padding: 0; margin: 18px 0 0; }
         .quotes li { list-style: none; padding: 18px 0; border-bottom: 1px solid ${ruleD}; font-size: 19px; letter-spacing: -.01em; color: rgba(255,255,255,.88); }
         .loop-foot { margin-top: 28px; font-size: 18px; }
@@ -197,7 +196,8 @@ export default function LandingPageClient() {
 
         @media (max-width: 960px) {
           .hero { padding-top: 64px; }
-          .hero-top, .loop-head, .loop-grid, .method, .how-head, .ret, .faq { grid-template-columns: minmax(0,1fr); gap: 36px; }
+          .hero-top, .method, .how-head, .ret, .faq { grid-template-columns: minmax(0,1fr); gap: 36px; }
+          .loop-stack { gap: 56px; }
           .hero-mark { width: 220px; height: 220px; right: -70px; top: -10px; opacity: .9; }
           .showcase { padding: 28px 20px 0; border-radius: 18px; }
           .fc { display: none; }
@@ -210,7 +210,6 @@ export default function LandingPageClient() {
         @media (max-width: 640px) {
           .ring { --s: min(340px,100vw - 40px); aspect-ratio: auto; padding-top: calc(var(--s) + 28px); display: flex; flex-direction: column; }
           .ring-c b { font-size: 22px; }
-          .ring-c svg { width: 30px; height: 30px; }
           .node { position: static; transform: none !important; margin: 0; width: auto; text-align: left; display: flex; gap: 14px; align-items: baseline; padding: 12px 0; border-top: 1px solid ${ruleD}; }
           .node span { margin: 0; flex: none; width: 22px; }
           .hero-mark { opacity: .12; }
@@ -265,13 +264,9 @@ export default function LandingPageClient() {
       {/* The pattern */}
       <section className="dark loop">
         <Wrap>
-          <Reveal as="div" style={{ display: 'contents' }}>
-            <div className="loop-head">
-              <div><h2 className="h2" style={{ color: '#fff' }}>{t('pattern.heading')}</h2></div>
-              <p className="lede">{t('pattern.lede')}</p>
-            </div>
-          </Reveal>
-          <div className="loop-grid">
+          <div className="loop-stack">
+            <Reveal><h2 className="h2" style={{ color: '#fff' }}>{t('pattern.heading')}</h2></Reveal>
+
             <Reveal>
               <div className="ring">
                 {nodes.map((text, i) => (
@@ -283,14 +278,16 @@ export default function LandingPageClient() {
                 <div className="orbit" ref={orbitRef}><i /></div>
                 {nodes.map((_, i) => <span key={i} className={`tick${active === i ? ' on' : ''}`} style={{ transform: `rotate(${i * 40}deg) translateY(calc(var(--s)*-.36 + 1.5px))` }} />)}
                 <div className="ring-c">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66" /><path d="M20 4v4h-4" /></svg>
                   <span className="mono mute">{t('pattern.ringLabel')}</span>
                   <b>{t('pattern.ringSub')}</b>
                 </div>
               </div>
             </Reveal>
+
+            <Reveal><p className="lede">{t('pattern.lede')}</p></Reveal>
+
             <Reveal>
-              <div>
+              <div className="quotes-block">
                 <span className="mono mute">{t('pattern.quotesLabel')}</span>
                 <ul className="quotes">
                   {quotes.map((q) => <li key={q}>&ldquo;{q}&rdquo;</li>)}
@@ -309,7 +306,7 @@ export default function LandingPageClient() {
             <div className="method-l">
               <h2 className="h2">{t('method.heading')}</h2>
               <p className="lede">{t('method.lede')}</p>
-              <span className="aiatt"><CherutLogo viewBox="200 279 108 132" width={14} height={14} fillColor={acc} />{t('method.badge')}</span>
+              <span className="aiatt"><CherutLogo viewBox="200 279 338 132" width={36} height={14} fillColor={acc} />{t('method.badge')}</span>
             </div>
           </Reveal>
           <Reveal>
@@ -468,7 +465,7 @@ export default function LandingPageClient() {
       <section className="dark final">
         <Reveal>
           <Wrap>
-            <CherutLogo viewBox="200 279 108 132" width={88} height={88} fillColor="#fff" style={{ margin: '0 auto 40px' }} />
+            <CherutLogo viewBox="200 279 338 132" width={176} height={68} fillColor="#fff" style={{ margin: '0 auto 40px' }} />
             <h2>{t('finalCta.heading')}</h2>
             <p className="mute">{t('finalCta.body')}</p>
             <div className="ctas">
@@ -480,7 +477,6 @@ export default function LandingPageClient() {
         </Reveal>
       </section>
 
-      <PublicDisclaimer />
       <PublicFooter />
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { PublicLocaleSwitcher } from '@/i18n/PublicLocaleSwitcher';
@@ -19,6 +19,8 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
   const t = useTranslations('publicHeader');
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const navInnerRef = useRef<HTMLDivElement>(null);
+  const [navHeight, setNavHeight] = useState(0);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -33,6 +35,24 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  // position: sticky is unreliable here — html/body carry overflow-x: hidden
+  // (components/shell/Shell.tsx and LandingPageClient.tsx both set it, to
+  // clip decorative bleed elements elsewhere on these pages), and per the
+  // CSS overflow spec, setting only overflow-x forces the browser to
+  // compute overflow-y: auto too. That silently turns body into its own
+  // scroll container, which breaks sticky positioning relative to the
+  // viewport in several browsers (notably Safari/iOS). position: fixed
+  // isn't affected by ancestor scroll-container status, so we use that
+  // instead and measure the bar's own height to reserve equivalent space —
+  // measuring the inner row only (not the mobile dropdown) so the mobile
+  // menu can still overlay page content instead of pushing it down.
+  useEffect(() => {
+    const measure = () => setNavHeight(navInnerRef.current?.offsetHeight ?? 0);
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
   const prefix = variant === 'home' ? '#' : '/#';
   const navItems: [string, string][] = [
     [`${prefix}features`, t('features')],
@@ -43,7 +63,7 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
   return (
     <>
       <style>{`
-        .nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.82); backdrop-filter: saturate(180%) blur(14px); -webkit-backdrop-filter: saturate(180%) blur(14px); border-bottom: 1px solid ${rule}; transition: background .25s; }
+        .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(255,255,255,.82); backdrop-filter: saturate(180%) blur(14px); -webkit-backdrop-filter: saturate(180%) blur(14px); border-bottom: 1px solid ${rule}; transition: background .25s; }
         .nav-in { max-width: 1200px; margin: 0 auto; padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 40px; }
         .nav-links { display: flex; gap: 28px; font-size: 14px; color: ${ink2}; }
         .nav-links a { transition: color .12s; }
@@ -69,7 +89,7 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
       `}</style>
 
       <header className="nav" style={{ background: scrolled ? 'rgba(255,255,255,.82)' : 'rgba(255,255,255,.4)' }}>
-        <div className="nav-in">
+        <div className="nav-in" ref={navInnerRef}>
           <Link href="/" aria-label="Cherut" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <CherutLogo viewBox="200 279 338 132" width={88} height={34} fillColor={ink} />
           </Link>
@@ -106,6 +126,7 @@ export function PublicHeader({ variant = 'page' }: PublicHeaderProps) {
           </div>
         </div>
       </header>
+      <div style={{ height: navHeight }} aria-hidden="true" />
     </>
   );
 }
