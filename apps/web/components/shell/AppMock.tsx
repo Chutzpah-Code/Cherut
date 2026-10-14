@@ -820,7 +820,7 @@ export function TasksCarouselFrame({ label }: { label: string }) {
           </div>
         </div>
         <div className="slc-slides">
-          <div className="slc-slides-t" style={{ transform: `translateX(-${index * 100}%)` }}>
+          <div className="slc-slides-t" style={{ transform: `translateX(-${index * (100 / CAROUSEL_SLIDES.length)}%)` }}>
             {CAROUSEL_SLIDES.map((s) => <div key={s.kind}><AppMock kind={s.kind} /></div>)}
           </div>
         </div>
