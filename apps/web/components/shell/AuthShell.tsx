@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import CherutLogo from '@/components/ui/CherutLogo';
-import { SHELL_TOKENS } from './Shell';
+import { SHELL_TOKENS } from './tokens';
 import { SiteStyles } from './primitives';
 import { AppMock, AppMockFrame, MockStyles } from './AppMock';
 import { geistSans, geistMono } from '@/lib/fonts';

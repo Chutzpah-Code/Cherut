@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { PublicLocaleSwitcher } from '@/i18n/PublicLocaleSwitcher';
 import CherutLogo from '@/components/ui/CherutLogo';
-import { SHELL_TOKENS } from '@/components/shell/Shell';
+import { SHELL_TOKENS } from '@/components/shell/tokens';
 
 const { ink, ink2, mute, rule } = SHELL_TOKENS;
 

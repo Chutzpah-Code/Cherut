@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { SHELL_TOKENS } from '@/components/shell/Shell';
+import { SHELL_TOKENS } from '@/components/shell/tokens';
 
 const { mute, rule } = SHELL_TOKENS;
 

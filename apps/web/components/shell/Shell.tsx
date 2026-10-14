@@ -5,24 +5,13 @@ import { PublicFooter } from '@/components/ui/PublicFooter';
 import { PublicDisclaimer } from '@/components/ui/PublicDisclaimer';
 import { geistSans, geistMono } from '@/lib/fonts';
 import { SiteStyles } from './primitives';
+import { SHELL_TOKENS } from './tokens';
 
-// Design tokens extracted from docs/rebranding/site.css — the public site's
-// light "Geist" rebrand. Shared by every component under components/shell
-// and components/ui/{Header,PublicFooter,PublicDisclaimer}.tsx.
-export const SHELL_TOKENS = {
-  ink: '#0B0B10',
-  ink2: '#3A3A44',
-  mute: '#6B6B76',
-  paper: '#FFFFFF',
-  off: '#F6F6F4',
-  rule: 'rgba(11,11,16,.09)',
-  ruleD: 'rgba(255,255,255,.12)',
-  acc: '#3B5BF6',
-  accSoft: '#E8EDFF',
-  accLight: '#8FA6FF',
-  ease: 'cubic-bezier(.23,1,.32,1)',
-  max: 1200,
-} as const;
+// Re-exported so existing `import { PageShell, SHELL_TOKENS } from
+// '@/components/shell/Shell'` call sites keep working — the tokens
+// themselves live in ./tokens.ts to avoid a circular import (see that
+// file's comment).
+export { SHELL_TOKENS };
 
 const { ink, mute, paper, rule, acc, max } = SHELL_TOKENS;
 

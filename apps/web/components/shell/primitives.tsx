@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { SHELL_TOKENS } from './Shell';
+import { SHELL_TOKENS } from './tokens';
 
 const { ink, ink2, mute, paper, off, rule, ruleD, acc, accSoft, ease, max } = SHELL_TOKENS;
 
