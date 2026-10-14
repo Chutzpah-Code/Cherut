@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTranslations } from 'next-intl';
 import { Bell, Moon, Users } from 'lucide-react';
 import { Group, Burger, Text, ActionIcon, Avatar, Box, useMantineColorScheme, useComputedColorScheme, Badge, Stack, Indicator, Tooltip } from '@mantine/core';
-import { CherutLockup } from '@/components/ui/CherutLockup';
+import CherutLogo from '@/components/ui/CherutLogo';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
@@ -66,10 +66,9 @@ export default function Header({ mobileOpened, toggleMobile }: HeaderProps) {
 
   return (
     <Group h="100%" px="md" justify="space-between">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@700&family=Noto+Sans+Hebrew:wght@800&display=swap');`}</style>
       <Group gap="md">
         <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="lg" size="sm" />
-        <CherutLockup />
+        <CherutLogo viewBox="200 279 338 132" width={80} height={31} />
       </Group>
 
       <Group gap="xs">
