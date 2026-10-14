@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import CherutLogo from '@/components/ui/CherutLogo';
 import { SHELL_TOKENS } from './tokens';
 import { SiteStyles } from './primitives';
@@ -19,6 +20,8 @@ interface AuthShellProps {
 // Shared shell for /auth/login, /auth/register and /auth/reset-password —
 // only the JSX/styling lives here, no auth logic (that stays in each page).
 export function AuthShell({ children, footer, quote, quoteNote }: AuthShellProps) {
+  const tc = useTranslations('authCommon');
+
   return (
     <div className={`${geistSans.variable} ${geistMono.variable}`} style={{ fontFamily: 'var(--font-geist-sans), system-ui, sans-serif', minHeight: '100vh', background: paper }}>
       <style>{`
@@ -65,7 +68,7 @@ export function AuthShell({ children, footer, quote, quoteNote }: AuthShellProps
             <Link href="/" aria-label="Cherut" style={{ display: 'flex', alignItems: 'center' }}>
               <CherutLogo viewBox="200 279 338 132" width={88} height={34} fillColor={ink} />
             </Link>
-            <Link href="/" className="back">{'←'} Back to home</Link>
+            <Link href="/" className="back">{tc('backToHome')}</Link>
           </div>
 
           <div className="au-form-wrap">

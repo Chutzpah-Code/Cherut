@@ -56,8 +56,8 @@ export default function RegisterPage() {
   return (
     <AuthShell
       footer={tf('disclaimer')}
-      quote="Motivation is not a strategy. Structure is."
-      quoteNote="All In All The Time"
+      quote={t('quote')}
+      quoteNote={t('quoteNote')}
     >
       <h1 style={{ fontSize: 'clamp(34px,3.6vw,44px)', letterSpacing: '-.04em', fontWeight: 600, lineHeight: 1.02, margin: 0 }}>{t('title')}</h1>
       <p className="lede" style={{ fontSize: 16, marginTop: -6 }}>{t('subtitle')}</p>

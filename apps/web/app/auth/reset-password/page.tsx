@@ -65,11 +65,12 @@ function ResetPasswordPageContent() {
     }
   };
 
-  const quote = 'Discipline runs out. A well-built structure does not need it to.';
+  const quote = t('quote');
+  const quoteNote = t('quoteNote');
 
   if (validatingCode) {
     return (
-      <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote="All In All The Time">
+      <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote={quoteNote}>
         <p style={{ textAlign: 'center', color: mute, fontSize: 16 }}>{t('validatingCode')}</p>
       </AuthShell>
     );
@@ -77,7 +78,7 @@ function ResetPasswordPageContent() {
 
   if (!isValidCode) {
     return (
-      <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote="All In All The Time">
+      <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote={quoteNote}>
         <div style={{ textAlign: 'center' }}>
           <h1 style={{ fontSize: 'clamp(28px,3.2vw,36px)', letterSpacing: '-.03em', fontWeight: 600, margin: '0 0 8px' }}>{t('invalidLinkTitle')}</h1>
           <p className="lede" style={{ margin: '0 auto' }}>{t('invalidLinkSubtitle')}</p>
@@ -90,7 +91,7 @@ function ResetPasswordPageContent() {
 
   if (success) {
     return (
-      <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote="All In All The Time">
+      <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote={quoteNote}>
         <div style={{ textAlign: 'center' }}>
           <h1 style={{ fontSize: 'clamp(28px,3.2vw,36px)', letterSpacing: '-.03em', fontWeight: 600, margin: '0 0 8px' }}>{t('successTitle')}</h1>
           <p className="lede" style={{ margin: '0 auto' }}>{t('successSubtitle')}</p>
@@ -102,7 +103,7 @@ function ResetPasswordPageContent() {
   }
 
   return (
-    <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote="All In All The Time">
+    <AuthShell footer={tf('disclaimer')} quote={quote} quoteNote={quoteNote}>
       <h1 style={{ fontSize: 'clamp(28px,3.2vw,36px)', letterSpacing: '-.03em', fontWeight: 600, margin: 0 }}>{t('title')}</h1>
       <p className="lede" style={{ fontSize: 16, marginTop: -6 }}>{t('subtitle')}</p>
 

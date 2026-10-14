@@ -1816,6 +1816,8 @@
   "loginPage": {
     "title": "Bem-vindo de volta",
     "subtitle": "Entre para continuar sua jornada",
+    "quote": "Um dia ruim não é um veredito sobre quem você é. É um dia para revisar e retomar.",
+    "quoteNote": "All In All The Time",
     "passwordLabel": "Senha",
     "signingIn": "Entrando…",
     "signIn": "Entrar",
@@ -1836,6 +1838,8 @@
   "registerPage": {
     "title": "Crie sua conta",
     "subtitle": "Comece a construir seu sistema hoje",
+    "quote": "Motivação não é uma estratégia. Estrutura é.",
+    "quoteNote": "All In All The Time",
     "passwordLabel": "Senha",
     "confirmPasswordLabel": "Confirmar senha",
     "creatingAccount": "Criando conta…",
@@ -1846,6 +1850,8 @@
     "passwordTooShort": "A senha deve ter pelo menos 6 caracteres"
   },
   "resetPasswordPage": {
+    "quote": "Disciplina se esgota. Uma estrutura bem construída não depende dela.",
+    "quoteNote": "All In All The Time",
     "loadingFallback": "Carregando…",
     "validatingCode": "Validando código de redefinição…",
     "invalidLinkTitle": "Link inválido",
@@ -1867,6 +1873,251 @@
     "invalidCode": "Código de redefinição inválido",
     "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
     "passwordMismatch": "As senhas não coincidem"
+  },
+  "adminCoursesPage": {
+    "loading": "Carregando cursos...",
+    "title": "Cursos",
+    "subtitle": "Crie cursos, módulos e lições",
+    "newCourse": "Novo curso",
+    "table": {
+      "title": "Título",
+      "status": "Status",
+      "requiredPlan": "Plano necessário",
+      "lessons": "Lições",
+      "actions": "Ações"
+    },
+    "status": {
+      "published": "Publicado",
+      "draft": "Rascunho"
+    },
+    "plan": {
+      "any": "Qualquer um"
+    },
+    "actions": {
+      "edit": "Editar",
+      "delete": "Excluir",
+      "manage": "Gerenciar módulos e lições"
+    },
+    "empty": "Nenhum curso ainda",
+    "confirmDelete": "Excluir o curso \"{title}\"? Isso também exclui seus módulos e lições.",
+    "modal": {
+      "editTitle": "Editar curso",
+      "newTitle": "Novo curso"
+    },
+    "cover": {
+      "label": "Imagem de capa",
+      "change": "Trocar",
+      "upload": "Clique para enviar uma imagem de capa",
+      "saveFirst": "Salve o curso primeiro para adicionar uma imagem de capa.",
+      "errorType": "Apenas imagens JPEG, PNG ou WebP são permitidas",
+      "errorSize": "A imagem deve ter no máximo 2MB",
+      "errorUpload": "Falha ao enviar a imagem de capa"
+    },
+    "form": {
+      "titleLabel": "Título",
+      "titlePlaceholder": "All In All The Time",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Descrição curta do curso",
+      "requiredPlanLabel": "Plano necessário",
+      "requiredPlanDesc": "Plano mínimo necessário para desbloquear este curso",
+      "statusLabel": "Status",
+      "cancel": "Cancelar",
+      "save": "Salvar"
+    },
+    "planOptions": {
+      "any": "Qualquer plano",
+      "core": "Core",
+      "method": "Method",
+      "mentorship": "Mentorship"
+    }
+  },
+  "adminCourseEditorPage": {
+    "backToCourses": "Voltar para cursos",
+    "newModule": "Novo módulo",
+    "noModules": "Nenhum módulo ainda. Crie o primeiro.",
+    "noLessons": "Nenhuma lição ainda.",
+    "addLesson": "Adicionar lição",
+    "editModule": "Editar módulo",
+    "deleteModule": "Excluir módulo",
+    "editLesson": "Editar lição",
+    "deleteLesson": "Excluir lição",
+    "confirmDeleteModule": "Excluir o módulo \"{title}\"? Isso também exclui suas lições.",
+    "confirmDeleteLesson": "Excluir a lição \"{title}\"?",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "moduleModal": {
+      "editTitle": "Editar módulo",
+      "newTitle": "Novo módulo",
+      "titleLabel": "Título",
+      "titlePlaceholder": "Uma Direção",
+      "descriptionLabel": "Descrição"
+    },
+    "lessonModal": {
+      "editTitle": "Editar lição",
+      "newTitle": "Nova lição",
+      "titleLabel": "Título",
+      "contentLabel": "Conteúdo",
+      "videoUrlLabel": "URL do vídeo",
+      "videoUrlPlaceholder": "https://youtube.com/...",
+      "exerciseLabel": "Exercício",
+      "templateLabel": "Template"
+    }
+  },
+  "appMock": {
+    "dashboard": {
+      "greeting": "Bom dia, Alex",
+      "subGreeting": "Quarta-feira, 14 de outubro · 5 itens precisam de atenção",
+      "stats": {
+        "overdue": { "label": "Atrasadas", "sub": "A mais antiga está 3 dias atrasada" },
+        "dueToday": { "label": "Para hoje", "sub": "Próxima às 10:30" },
+        "habits": { "label": "Hábitos", "sub": "71% nos últimos 14 dias" },
+        "netWorth": { "label": "Patrimônio", "sub": "+2,4% este mês" }
+      },
+      "balance": { "title": "Saldo", "link": "Finanças", "sub": "Últimos 30 dias · contas correntes" },
+      "taskProductivity": { "title": "Produtividade de tarefas", "link": "Tarefas", "sub": "Concluídas por semana · últimas 8 semanas", "weeksAgo": "8 semanas atrás", "thisWeek": "Esta semana" },
+      "habitConsistency": { "title": "Consistência de hábitos", "link": "Hábitos", "sub": "Últimos 14 dias" },
+      "habitNames": ["Corrida matinal", "Ler 20 páginas", "Trabalho focado 2h", "Meditar", "Sem açúcar", "Diário noturno"]
+    },
+    "okrs": {
+      "title": "Objetivos",
+      "subtitle": "3 objetivos ativos · 11 resultados-chave · T4",
+      "newObjective": "+ Novo objetivo",
+      "active": "Ativo",
+      "progress": "Progresso",
+      "objectives": [
+        {
+          "title": "Lançar o projeto paralelo",
+          "progress": 42,
+          "krLabel": "Resultados-chave (4)",
+          "krs": [
+            { "t": "Lançar a primeira versão", "s": "1/1 lançamento (100%)", "done": true },
+            { "t": "Conseguir 50 usuários beta", "s": "21/50 usuários (42%)" },
+            { "t": "Publicar 8 diários de construção", "s": "3/8 posts (37%)" }
+          ]
+        },
+        {
+          "title": "Correr uma meia maratona",
+          "progress": 60,
+          "krLabel": "Resultados-chave (3)",
+          "krs": [
+            { "t": "Correr 300 km neste trimestre", "s": "186/300 km (62%)" },
+            { "t": "Corrida longa de 18 km", "s": "1/1 corrida (100%)", "done": true },
+            { "t": "Sessões de força", "s": "14/24 sessões (58%)" }
+          ]
+        },
+        {
+          "title": "Montar uma reserva de emergência",
+          "progress": 25,
+          "krLabel": "Resultados-chave (4)",
+          "krs": [
+            { "t": "Economizar US$ 6.000", "s": "1.500/6.000 USD (25%)" },
+            { "t": "Cancelar 3 assinaturas", "s": "2/3 canceladas (66%)" },
+            { "t": "Revisão financeira semanal", "s": "5/12 revisões (41%)" }
+          ]
+        }
+      ]
+    },
+    "tasks": {
+      "boardName": "Pessoal",
+      "tabs": { "board": "Quadro", "calendar": "Calendário", "time": "Tempo" },
+      "columns": [
+        { "title": "Backlog", "items": ["Planejar o próximo trimestre", "Renovar passaporte", "Pesquisar tênis de corrida", "Organizar biblioteca de fotos", "Marcar dentista"] },
+        { "title": "Esta semana", "items": ["Redigir texto da landing page", "Ligar para o banco", "Preparar revisão do time", "Fazer compras"] },
+        { "title": "Hoje", "items": ["Escrever 500 palavras", "30 min de espanhol", "Responder e-mail do cliente"] },
+        { "title": "Fazendo", "items": ["Editar capítulo 2", "Atualizar orçamento"] },
+        { "title": "Concluído", "items": ["Corrida matinal", "Revisão semanal"] }
+      ]
+    },
+    "dreams": {
+      "title": "Meu quadro dos sonhos",
+      "subtitle": "Arraste e solte para organizar suas metas",
+      "addGoal": "+ Adicionar meta",
+      "active": "Ativo",
+      "archived": "Arquivado",
+      "items": [
+        { "t": "Morar à beira-mar", "s": "Um ano trabalhando remotamente no litoral", "pill": "78 dias" },
+        { "t": "Correr uma maratona", "s": "Terminar 42 km em menos de 4 horas", "pill": "120 dias" },
+        { "t": "Uma casa para meus pais", "s": "Ajudá-los a se mudar para um lugar tranquilo", "pill": "2 anos" },
+        { "t": "Abrir meu próprio estúdio", "s": "Independente e lucrativo", "pill": "Atrasado" }
+      ]
+    },
+    "habits": {
+      "title": "Hábitos",
+      "subtitle": "6 hábitos · últimos 30 dias · 71% no geral",
+      "newHabit": "+ Novo hábito",
+      "names": ["Corrida matinal", "Ler 20 páginas", "Trabalho focado 2h", "Meditar 10 min", "Sem açúcar", "Diário noturno", "Dormir antes das 23h"],
+      "stats": {
+        "bestStreak": { "label": "Melhor sequência", "value": "21 dias" },
+        "today": { "label": "Hoje", "sub": "3 restantes" },
+        "thisWeek": { "label": "Esta semana", "sub": "+6% vs. semana passada" },
+        "needsAttention": { "label": "Precisa de atenção", "sub": "Perdeu 3 de 7" }
+      }
+    },
+    "finances": {
+      "totalBalance": "Saldo total",
+      "monthDelta": "+US$ 640 este mês",
+      "income": "Receita",
+      "expenses": "Despesas",
+      "saved": "Poupado",
+      "spendingByCategory": "Gastos por categoria",
+      "accountsAndCards": "Contas e cartões",
+      "addAccount": "Adicionar conta",
+      "transactionsTitle": "Transações",
+      "categories": [
+        ["Moradia", 72, "US$ 1.800"],
+        ["Mercado", 38, "US$ 620"],
+        ["Transporte", 22, "US$ 310"],
+        ["Educação", 14, "US$ 180"],
+        ["Lazer", 26, "US$ 390"]
+      ],
+      "accounts": [
+        ["Conta corrente principal", "Conta corrente", "US$ 3.240,00"],
+        ["Poupança", "Poupança", "US$ 9.240,00"],
+        ["Cartão de crédito", "Cartão", "−US$ 412,30"]
+      ],
+      "transactions": [
+        ["14 out", "Mercado", "Mercado", "−US$ 84,20"],
+        ["13 out", "Salário", "Receita", "+US$ 2.600,00"],
+        ["12 out", "Curso online", "Educação", "−US$ 49,00"],
+        ["11 out", "Cartão de metrô", "Transporte", "−US$ 30,00"],
+        ["10 out", "Aluguel", "Moradia", "−US$ 1.800,00"]
+      ]
+    },
+    "learning": {
+      "courseName": "All In All The Time",
+      "subtitle": "Curso · 18 lições · 4 módulos · Dia 9 do seu percurso de 14 dias",
+      "continueLesson": "Continuar lição →",
+      "moduleLessonLabel": "Módulo 03 · Lição 2",
+      "lessonTitle": "Nomeando a fuga antes que ela aconteça",
+      "exercise": "Exercício: escreva as três fugas que você mais recorre",
+      "openExercise": "Abrir exercício",
+      "modulesTitle": "Módulos",
+      "percentComplete": "58% concluído",
+      "modules": [
+        ["Uma Direção", "4 lições · 32 min"],
+        ["Intensidade Estruturada", "5 lições · 41 min"],
+        ["Atravessar o Momento Difícil", "5 lições · 38 min"],
+        ["Voltar Sem Recomeçar do Zero", "4 lições · 29 min"]
+      ],
+      "templates": { "label": "Templates", "sub": "Prontos para aplicar" },
+      "streak": { "label": "Sequência de prática", "value": "9 dias", "sub": "Mantenha o percurso" }
+    },
+    "journal": {
+      "title": "Diário",
+      "subtitle": "Intenções matinais e reflexões noturnas",
+      "newEntry": "+ Nova entrada",
+      "days": [
+        ["Hoje", "Quarta-feira, 14 de out"],
+        ["Ontem", "Terça-feira, 13 de out"],
+        ["Segunda", "12 de out"],
+        ["Domingo", "Revisão semanal · 11 de out"],
+        ["Sábado", "10 de out"]
+      ],
+      "entries": [
+        { "label": "Intenção matinal", "body": "Uma coisa que move o projeto paralelo: terminar o fluxo de onboarding antes do almoço. Todo o resto espera.", "tags": ["Focado", "Dormiu 7h"] },
+        { "label": "Reflexão noturna", "body": "Terminei o fluxo, pulei a corrida. Percebi que pegava o celular toda vez que uma tarefa parecia pouco clara. Amanhã: escrever o próximo passo antes de começar.", "tags": ["Calmo", "Cumpriu 3 de 4 compromissos"] }
+      ]
+    }
   },
   "notFoundPage": {
     "title": "Página não encontrada",

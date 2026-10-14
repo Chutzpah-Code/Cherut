@@ -1816,6 +1816,8 @@
   "loginPage": {
     "title": "Welcome back",
     "subtitle": "Sign in to continue your journey",
+    "quote": "A bad day is not a verdict on who you are. It is a day to review and return from.",
+    "quoteNote": "All In All The Time",
     "passwordLabel": "Password",
     "signingIn": "Signing in…",
     "signIn": "Sign in",
@@ -1836,6 +1838,8 @@
   "registerPage": {
     "title": "Create your account",
     "subtitle": "Start building your system today",
+    "quote": "Motivation is not a strategy. Structure is.",
+    "quoteNote": "All In All The Time",
     "passwordLabel": "Password",
     "confirmPasswordLabel": "Confirm password",
     "creatingAccount": "Creating account…",
@@ -1846,6 +1850,8 @@
     "passwordTooShort": "Password must be at least 6 characters"
   },
   "resetPasswordPage": {
+    "quote": "Discipline runs out. A well-built structure does not need it to.",
+    "quoteNote": "All In All The Time",
     "loadingFallback": "Loading…",
     "validatingCode": "Validating reset code…",
     "invalidLinkTitle": "Invalid link",
@@ -1867,6 +1873,251 @@
     "invalidCode": "Invalid reset code",
     "passwordTooShort": "Password must be at least 6 characters long",
     "passwordMismatch": "Passwords do not match"
+  },
+  "adminCoursesPage": {
+    "loading": "Loading courses...",
+    "title": "Courses",
+    "subtitle": "Author courses, modules and lessons",
+    "newCourse": "New Course",
+    "table": {
+      "title": "Title",
+      "status": "Status",
+      "requiredPlan": "Required Plan",
+      "lessons": "Lessons",
+      "actions": "Actions"
+    },
+    "status": {
+      "published": "Published",
+      "draft": "Draft"
+    },
+    "plan": {
+      "any": "Any"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "manage": "Manage modules & lessons"
+    },
+    "empty": "No courses yet",
+    "confirmDelete": "Delete course \"{title}\"? This also deletes its modules and lessons.",
+    "modal": {
+      "editTitle": "Edit Course",
+      "newTitle": "New Course"
+    },
+    "cover": {
+      "label": "Cover Image",
+      "change": "Change",
+      "upload": "Click to upload a cover image",
+      "saveFirst": "Save the course first to add a cover image.",
+      "errorType": "Only JPEG, PNG or WebP images are allowed",
+      "errorSize": "Image must be under 2MB",
+      "errorUpload": "Failed to upload cover image"
+    },
+    "form": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "All In All The Time",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Short description of the course",
+      "requiredPlanLabel": "Required Plan",
+      "requiredPlanDesc": "Minimum plan needed to unlock this course",
+      "statusLabel": "Status",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "planOptions": {
+      "any": "Any plan",
+      "core": "Core",
+      "method": "Method",
+      "mentorship": "Mentorship"
+    }
+  },
+  "adminCourseEditorPage": {
+    "backToCourses": "Back to courses",
+    "newModule": "New Module",
+    "noModules": "No modules yet. Create the first one.",
+    "noLessons": "No lessons yet.",
+    "addLesson": "Add Lesson",
+    "editModule": "Edit module",
+    "deleteModule": "Delete module",
+    "editLesson": "Edit lesson",
+    "deleteLesson": "Delete lesson",
+    "confirmDeleteModule": "Delete module \"{title}\"? This also deletes its lessons.",
+    "confirmDeleteLesson": "Delete lesson \"{title}\"?",
+    "cancel": "Cancel",
+    "save": "Save",
+    "moduleModal": {
+      "editTitle": "Edit Module",
+      "newTitle": "New Module",
+      "titleLabel": "Title",
+      "titlePlaceholder": "One Direction",
+      "descriptionLabel": "Description"
+    },
+    "lessonModal": {
+      "editTitle": "Edit Lesson",
+      "newTitle": "New Lesson",
+      "titleLabel": "Title",
+      "contentLabel": "Content",
+      "videoUrlLabel": "Video URL",
+      "videoUrlPlaceholder": "https://youtube.com/...",
+      "exerciseLabel": "Exercise",
+      "templateLabel": "Template"
+    }
+  },
+  "appMock": {
+    "dashboard": {
+      "greeting": "Good morning, Alex",
+      "subGreeting": "Wednesday, October 14 · 5 items need attention",
+      "stats": {
+        "overdue": { "label": "Overdue", "sub": "Oldest is 3 days late" },
+        "dueToday": { "label": "Due today", "sub": "Next at 10:30" },
+        "habits": { "label": "Habits", "sub": "71% in the last 14 days" },
+        "netWorth": { "label": "Net worth", "sub": "+2.4% this month" }
+      },
+      "balance": { "title": "Balance", "link": "Finances", "sub": "Last 30 days · checking accounts" },
+      "taskProductivity": { "title": "Task productivity", "link": "Tasks", "sub": "Completed per week · last 8 weeks", "weeksAgo": "8 weeks ago", "thisWeek": "This week" },
+      "habitConsistency": { "title": "Habit consistency", "link": "Habits", "sub": "Last 14 days" },
+      "habitNames": ["Morning run", "Read 20 pages", "Deep work 2h", "Meditate", "No sugar", "Evening journal"]
+    },
+    "okrs": {
+      "title": "Objectives",
+      "subtitle": "3 active objectives · 11 key results · Q4",
+      "newObjective": "+ New objective",
+      "active": "Active",
+      "progress": "Progress",
+      "objectives": [
+        {
+          "title": "Launch the side project",
+          "progress": 42,
+          "krLabel": "Key results (4)",
+          "krs": [
+            { "t": "Ship the first version", "s": "1/1 release (100%)", "done": true },
+            { "t": "Get 50 beta users", "s": "21/50 users (42%)" },
+            { "t": "Publish 8 build logs", "s": "3/8 posts (37%)" }
+          ]
+        },
+        {
+          "title": "Run a half marathon",
+          "progress": 60,
+          "krLabel": "Key results (3)",
+          "krs": [
+            { "t": "Run 300 km this quarter", "s": "186/300 km (62%)" },
+            { "t": "Long run of 18 km", "s": "1/1 run (100%)", "done": true },
+            { "t": "Strength sessions", "s": "14/24 sessions (58%)" }
+          ]
+        },
+        {
+          "title": "Build an emergency fund",
+          "progress": 25,
+          "krLabel": "Key results (4)",
+          "krs": [
+            { "t": "Save $6,000", "s": "1,500/6,000 USD (25%)" },
+            { "t": "Cut 3 subscriptions", "s": "2/3 cancelled (66%)" },
+            { "t": "Weekly money review", "s": "5/12 reviews (41%)" }
+          ]
+        }
+      ]
+    },
+    "tasks": {
+      "boardName": "Personal",
+      "tabs": { "board": "Board", "calendar": "Calendar", "time": "Time" },
+      "columns": [
+        { "title": "Backlog", "items": ["Plan the next quarter", "Renew passport", "Research running shoes", "Clean up photo library", "Book dentist"] },
+        { "title": "This week", "items": ["Draft landing page copy", "Call the bank", "Prepare team review", "Grocery run"] },
+        { "title": "Today", "items": ["Write 500 words", "30 min Spanish", "Reply to client email"] },
+        { "title": "Doing", "items": ["Edit chapter 2", "Update budget"] },
+        { "title": "Done", "items": ["Morning run", "Weekly review"] }
+      ]
+    },
+    "dreams": {
+      "title": "My dream board",
+      "subtitle": "Drag and drop to organize your goals",
+      "addGoal": "+ Add goal",
+      "active": "Active",
+      "archived": "Archived",
+      "items": [
+        { "t": "Live by the sea", "s": "A year working remotely from the coast", "pill": "78 days" },
+        { "t": "Run a marathon", "s": "Finish 42 km under 4 hours", "pill": "120 days" },
+        { "t": "A home for my parents", "s": "Help them move somewhere calm", "pill": "2 years" },
+        { "t": "Open my own studio", "s": "Independent and profitable", "pill": "Overdue" }
+      ]
+    },
+    "habits": {
+      "title": "Habits",
+      "subtitle": "6 habits · last 30 days · 71% overall",
+      "newHabit": "+ New habit",
+      "names": ["Morning run", "Read 20 pages", "Deep work 2h", "Meditate 10 min", "No sugar", "Evening journal", "Sleep before 23:00"],
+      "stats": {
+        "bestStreak": { "label": "Best streak", "value": "21 days" },
+        "today": { "label": "Today", "sub": "3 remaining" },
+        "thisWeek": { "label": "This week", "sub": "+6% vs last week" },
+        "needsAttention": { "label": "Needs attention", "sub": "Missed 3 of 7" }
+      }
+    },
+    "finances": {
+      "totalBalance": "Total balance",
+      "monthDelta": "+$640 this month",
+      "income": "Income",
+      "expenses": "Expenses",
+      "saved": "Saved",
+      "spendingByCategory": "Spending by category",
+      "accountsAndCards": "Accounts & cards",
+      "addAccount": "Add account",
+      "transactionsTitle": "Transactions",
+      "categories": [
+        ["Housing", 72, "$1,800"],
+        ["Groceries", 38, "$620"],
+        ["Transport", 22, "$310"],
+        ["Learning", 14, "$180"],
+        ["Leisure", 26, "$390"]
+      ],
+      "accounts": [
+        ["Main checking", "Checking", "$3,240.00"],
+        ["Savings", "Savings", "$9,240.00"],
+        ["Credit card", "Card", "−$412.30"]
+      ],
+      "transactions": [
+        ["Oct 14", "Grocery store", "Groceries", "−$84.20"],
+        ["Oct 13", "Salary", "Income", "+$2,600.00"],
+        ["Oct 12", "Online course", "Learning", "−$49.00"],
+        ["Oct 11", "Metro card", "Transport", "−$30.00"],
+        ["Oct 10", "Rent", "Housing", "−$1,800.00"]
+      ]
+    },
+    "learning": {
+      "courseName": "All In All The Time",
+      "subtitle": "Course · 18 lessons · 4 modules · Day 9 of your 14-day path",
+      "continueLesson": "Continue lesson →",
+      "moduleLessonLabel": "Module 03 · Lesson 2",
+      "lessonTitle": "Naming the escape before it happens",
+      "exercise": "Exercise: write the three escapes you reach for most",
+      "openExercise": "Open exercise",
+      "modulesTitle": "Modules",
+      "percentComplete": "58% complete",
+      "modules": [
+        ["One Direction", "4 lessons · 32 min"],
+        ["Structured Intensity", "5 lessons · 41 min"],
+        ["Stay Through the Hard Moment", "5 lessons · 38 min"],
+        ["Return Without Starting Over", "4 lessons · 29 min"]
+      ],
+      "templates": { "label": "Templates", "sub": "Ready to apply" },
+      "streak": { "label": "Practice streak", "value": "9 days", "sub": "Keep the path" }
+    },
+    "journal": {
+      "title": "Journal",
+      "subtitle": "Morning intentions and evening reflections",
+      "newEntry": "+ New entry",
+      "days": [
+        ["Today", "Wednesday, Oct 14"],
+        ["Yesterday", "Tuesday, Oct 13"],
+        ["Monday", "Oct 12"],
+        ["Sunday", "Weekly review · Oct 11"],
+        ["Saturday", "Oct 10"]
+      ],
+      "entries": [
+        { "label": "Morning intention", "body": "One thing that moves the side project: finish the onboarding flow before lunch. Everything else waits.", "tags": ["Focused", "Slept 7h"] },
+        { "label": "Evening reflection", "body": "Finished the flow, skipped the run. Noticed I reached for my phone every time a task felt unclear. Tomorrow: write the next step down before starting.", "tags": ["Calm", "Kept 3 of 4 commitments"] }
+      ]
+    }
   },
   "notFoundPage": {
     "title": "Page not found",

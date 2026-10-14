@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   Title,
   Table,
@@ -32,13 +33,6 @@ import { Course, CreateCourseDto, RequiredPlan } from '@/lib/api/services/learni
 const MAX_COVER_SIZE = 2 * 1024 * 1024;
 const ALLOWED_COVER_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
-const PLAN_OPTIONS = [
-  { value: '', label: 'Any plan' },
-  { value: 'core', label: 'Core' },
-  { value: 'method', label: 'Method' },
-  { value: 'mentorship', label: 'Mentorship' },
-];
-
 const emptyForm: CreateCourseDto = {
   title: '',
   description: '',
@@ -47,12 +41,20 @@ const emptyForm: CreateCourseDto = {
 };
 
 export default function AdminCoursesPage() {
+  const t = useTranslations('adminCoursesPage');
   const router = useRouter();
   const { data: courses, isLoading } = useCourses();
   const createCourse = useCreateCourse();
   const updateCourse = useUpdateCourse();
   const deleteCourse = useDeleteCourse();
   const uploadCover = useUploadCourseCover();
+
+  const planOptions = [
+    { value: '', label: t('planOptions.any') },
+    { value: 'core', label: t('planOptions.core') },
+    { value: 'method', label: t('planOptions.method') },
+    { value: 'mentorship', label: t('planOptions.mentorship') },
+  ];
 
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure();
   const [editing, setEditing] = useState<Course | null>(null);
@@ -79,7 +81,7 @@ export default function AdminCoursesPage() {
   }
 
   async function handleDelete(course: Course) {
-    if (!window.confirm(`Delete course "${course.title}"? This also deletes its modules and lessons.`)) return;
+    if (!window.confirm(t('confirmDelete', { title: course.title }))) return;
     await deleteCourse.mutateAsync(course.id);
   }
 
@@ -87,18 +89,18 @@ export default function AdminCoursesPage() {
     if (!file || !editing) return;
     setCoverError(null);
     if (!ALLOWED_COVER_TYPES.includes(file.type)) {
-      setCoverError('Only JPEG, PNG or WebP images are allowed');
+      setCoverError(t('cover.errorType'));
       return;
     }
     if (file.size > MAX_COVER_SIZE) {
-      setCoverError('Image must be under 2MB');
+      setCoverError(t('cover.errorSize'));
       return;
     }
     try {
       const updated = await uploadCover.mutateAsync({ id: editing.id, file });
       setEditing(updated);
     } catch {
-      setCoverError('Failed to upload cover image');
+      setCoverError(t('cover.errorUpload'));
     }
   }
 
@@ -119,7 +121,7 @@ export default function AdminCoursesPage() {
     return (
       <Stack align="center" mt="xl">
         <Loader size="lg" />
-        <Text>Loading courses...</Text>
+        <Text>{t('loading')}</Text>
       </Stack>
     );
   }
@@ -128,11 +130,11 @@ export default function AdminCoursesPage() {
     <Surface p={{ base: 'md', sm: 'xl' }}>
       <Group justify="space-between" mb="xl" wrap="wrap">
         <div>
-          <Title order={1}>Courses</Title>
-          <Text c="dimmed">Author courses, modules and lessons</Text>
+          <Title order={1}>{t('title')}</Title>
+          <Text c="dimmed">{t('subtitle')}</Text>
         </div>
         <Button leftSection={<IconPlus size={16} />} onClick={handleCreate}>
-          New Course
+          {t('newCourse')}
         </Button>
       </Group>
 
@@ -141,11 +143,11 @@ export default function AdminCoursesPage() {
           <Table>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Title</Table.Th>
-                <Table.Th>Status</Table.Th>
-                <Table.Th>Required Plan</Table.Th>
-                <Table.Th>Lessons</Table.Th>
-                <Table.Th>Actions</Table.Th>
+                <Table.Th>{t('table.title')}</Table.Th>
+                <Table.Th>{t('table.status')}</Table.Th>
+                <Table.Th>{t('table.requiredPlan')}</Table.Th>
+                <Table.Th>{t('table.lessons')}</Table.Th>
+                <Table.Th>{t('table.actions')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -168,28 +170,28 @@ export default function AdminCoursesPage() {
                   </Table.Td>
                   <Table.Td>
                     <Badge color={course.isPublished ? 'green' : 'gray'} variant="light">
-                      {course.isPublished ? 'Published' : 'Draft'}
+                      {course.isPublished ? t('status.published') : t('status.draft')}
                     </Badge>
                   </Table.Td>
                   <Table.Td>
                     <Badge color="blue" variant="outline">
-                      {course.requiredPlan ? course.requiredPlan : 'Any'}
+                      {course.requiredPlan ? course.requiredPlan : t('plan.any')}
                     </Badge>
                   </Table.Td>
                   <Table.Td>{course.totalLessons}</Table.Td>
                   <Table.Td onClick={(e) => e.stopPropagation()}>
                     <Group gap="xs">
-                      <Tooltip label="Edit">
+                      <Tooltip label={t('actions.edit')}>
                         <ActionIcon variant="light" size="sm" color="blue" onClick={() => handleEdit(course)}>
                           <IconEdit size={16} />
                         </ActionIcon>
                       </Tooltip>
-                      <Tooltip label="Delete">
+                      <Tooltip label={t('actions.delete')}>
                         <ActionIcon variant="light" size="sm" color="red" onClick={() => handleDelete(course)}>
                           <IconTrash size={16} />
                         </ActionIcon>
                       </Tooltip>
-                      <Tooltip label="Manage modules & lessons">
+                      <Tooltip label={t('actions.manage')}>
                         <ActionIcon variant="light" size="sm" onClick={() => router.push(`/admin/courses/${course.id}`)}>
                           <IconChevronRight size={16} />
                         </ActionIcon>
@@ -204,16 +206,16 @@ export default function AdminCoursesPage() {
 
         {(courses ?? []).length === 0 && (
           <Text ta="center" c="dimmed" py="xl">
-            No courses yet
+            {t('empty')}
           </Text>
         )}
       </Card>
 
-      <Modal opened={modalOpened} onClose={closeModal} title={editing ? 'Edit Course' : 'New Course'} size="md">
+      <Modal opened={modalOpened} onClose={closeModal} title={editing ? t('modal.editTitle') : t('modal.newTitle')} size="md">
         <Stack>
           {editing ? (
             <Box>
-              <Text size="sm" fw={500} mb={6}>Cover Image</Text>
+              <Text size="sm" fw={500} mb={6}>{t('cover.label')}</Text>
               {coverError && (
                 <Alert color="red" icon={<IconAlertCircle size={16} />} mb="xs" onClose={() => setCoverError(null)} withCloseButton>
                   {coverError}
@@ -225,7 +227,7 @@ export default function AdminCoursesPage() {
                   <FileButton onChange={handleCoverUpload} accept="image/jpeg,image/png,image/webp">
                     {(props) => (
                       <Button {...props} variant="white" size="xs" pos="absolute" bottom={8} right={8} loading={uploadCover.isPending}>
-                        Change
+                        {t('cover.change')}
                       </Button>
                     )}
                   </FileButton>
@@ -248,7 +250,7 @@ export default function AdminCoursesPage() {
                       ) : (
                         <Stack align="center" gap={4}>
                           <IconPhoto size={24} color="#94A3B8" />
-                          <Text size="sm" c="dimmed">Click to upload a cover image</Text>
+                          <Text size="sm" c="dimmed">{t('cover.upload')}</Text>
                         </Stack>
                       )}
                     </Box>
@@ -258,47 +260,47 @@ export default function AdminCoursesPage() {
             </Box>
           ) : (
             <Alert color="gray" variant="light" icon={<IconAlertCircle size={16} />}>
-              Save the course first to add a cover image.
+              {t('cover.saveFirst')}
             </Alert>
           )}
 
           <TextInput
-            label="Title"
-            placeholder="All In All The Time"
+            label={t('form.titleLabel')}
+            placeholder={t('form.titlePlaceholder')}
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             required
           />
           <Textarea
-            label="Description"
-            placeholder="Short description of the course"
+            label={t('form.descriptionLabel')}
+            placeholder={t('form.descriptionPlaceholder')}
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             autosize
             minRows={2}
           />
           <Select
-            label="Required Plan"
-            description="Minimum plan needed to unlock this course"
+            label={t('form.requiredPlanLabel')}
+            description={t('form.requiredPlanDesc')}
             value={form.requiredPlan || ''}
             onChange={(value) => setForm({ ...form, requiredPlan: (value || undefined) as RequiredPlan | undefined })}
-            data={PLAN_OPTIONS}
+            data={planOptions}
           />
           <Select
-            label="Status"
+            label={t('form.statusLabel')}
             value={form.isPublished ? 'published' : 'draft'}
             onChange={(value) => setForm({ ...form, isPublished: value === 'published' })}
             data={[
-              { value: 'draft', label: 'Draft' },
-              { value: 'published', label: 'Published' },
+              { value: 'draft', label: t('status.draft') },
+              { value: 'published', label: t('status.published') },
             ]}
           />
           <Group justify="flex-end" mt="md">
             <Button variant="light" onClick={closeModal}>
-              Cancel
+              {t('form.cancel')}
             </Button>
             <Button onClick={handleSave} disabled={!form.title.trim()}>
-              Save
+              {t('form.save')}
             </Button>
           </Group>
         </Stack>
