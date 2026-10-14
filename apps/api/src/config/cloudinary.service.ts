@@ -174,6 +174,40 @@ export class CloudinaryService {
   }
 
   /**
+   * Faz upload da imagem de capa de um curso (Learning module)
+   *
+   * @param fileBuffer - Buffer da imagem
+   * @param courseId - ID do curso (para organizar as imagens)
+   * @returns URL pública da imagem
+   */
+  async uploadCourseCover(fileBuffer: Buffer, courseId: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: `cherut/learning/courses/${courseId}`,
+          resource_type: 'image',
+          transformation: [
+            { width: 1280, height: 720, crop: 'fill', quality: 'auto:good', fetch_format: 'auto' },
+          ],
+        },
+        (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
+          if (error) {
+            this.logger.error('Error uploading course cover to Cloudinary', error);
+            return reject(error);
+          }
+          if (!result) {
+            this.logger.error('No result from Cloudinary upload');
+            return reject(new Error('Upload failed: no result'));
+          }
+          this.logger.log(`Course cover uploaded successfully: ${result.public_id}`);
+          resolve(result.secure_url);
+        },
+      );
+      uploadStream.end(fileBuffer);
+    });
+  }
+
+  /**
    * Extrai o public_id de uma URL do Cloudinary
    */
   private extractPublicId(url: string): string | null {

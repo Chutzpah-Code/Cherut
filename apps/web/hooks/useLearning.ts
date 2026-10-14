@@ -57,6 +57,17 @@ export const useDeleteCourse = () => {
   });
 };
 
+export const useUploadCourseCover = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, file }: { id: string; file: File }) => learningApi.uploadCourseCover(id, file),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['learning', 'courses'] });
+      queryClient.invalidateQueries({ queryKey: ['learning', 'courses', id] });
+    },
+  });
+};
+
 // ── Admin authoring — modules ─────────────────────────────────────────────────
 
 export const useCreateModule = () => {

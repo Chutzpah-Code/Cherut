@@ -8,7 +8,11 @@ import {
   Param,
   Request,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { LearningService } from './learning.service';
 import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
 import { AdminOnly } from '../auth/guards/admin.guard';
@@ -61,6 +65,25 @@ export class LearningController {
   @AdminOnly()
   deleteCourse(@Param('id') id: string) {
     return this.learningService.deleteCourse(id);
+  }
+
+  @Post('courses/:id/cover')
+  @AdminOnly()
+  @UseInterceptors(
+    FileInterceptor('cover', {
+      limits: { fileSize: 2 * 1024 * 1024, files: 1 },
+      fileFilter: (_req, file, cb) => {
+        const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        cb(
+          allowed.includes(file.mimetype) ? null : new BadRequestException('Only JPEG, PNG or WebP images are allowed'),
+          allowed.includes(file.mimetype),
+        );
+      },
+    }),
+  )
+  uploadCourseCover(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('No file uploaded');
+    return this.learningService.uploadCourseCover(id, file);
   }
 
   // ─── Modules — admin authoring ───────────────────────────────────────────

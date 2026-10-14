@@ -1304,12 +1304,20 @@
       "pace": "Ritmo",
       "pace7": "7 dias",
       "pace14": "14 dias",
-      "targetDate": "Data alvo: {date}",
-      "watchVideo": "Ver vídeo",
       "exercise": "Exercício",
       "template": "Template",
-      "noLessons": "Nenhuma lição ainda.",
-      "noModules": "Nenhum módulo ainda."
+      "noModules": "Nenhum módulo ainda.",
+      "summaryLine": "Curso · {lessons} lições · {modules} módulos",
+      "dayOfPath": "Dia {day} do seu percurso de {pace} dias",
+      "continueLesson": "Continuar lição...",
+      "moduleLessonLabel": "Módulo {module} · Lição {lesson}",
+      "markComplete": "Marcar como concluída",
+      "openExercise": "Abrir exercício",
+      "close": "Fechar",
+      "modules": "Módulos",
+      "complete": "concluído",
+      "lessonCount": "{count} lições",
+      "templatesReady": "Prontos para aplicar"
     }
   },
   "publicHeader": {

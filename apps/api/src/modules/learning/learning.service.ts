@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { FirebaseService } from '../../config/firebase.service';
+import { CloudinaryService } from '../../config/cloudinary.service';
 import {
   CreateCourseDto,
   UpdateCourseDto,
@@ -36,7 +37,10 @@ export class LearningService {
   private readonly enrollmentsCollection = 'courseEnrollments';
   private readonly progressCollection = 'lessonProgress';
 
-  constructor(private readonly firebaseService: FirebaseService) {}
+  constructor(
+    private readonly firebaseService: FirebaseService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   // ─── Courses — admin authoring ──────────────────────────────────────────
 
@@ -65,6 +69,20 @@ export class LearningService {
     await db.collection(this.coursesCollection).doc(id).update(updates);
 
     this.logger.log(`Course updated: ${id}`);
+    return this.getCourseRaw(id);
+  }
+
+  async uploadCourseCover(id: string, file: Express.Multer.File) {
+    const db = this.firebaseService.getFirestore();
+    await this.getCourseDocOrThrow(id);
+
+    const coverImageUrl = await this.cloudinaryService.uploadCourseCover(file.buffer, id);
+    await db.collection(this.coursesCollection).doc(id).update({
+      coverImageUrl,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Course cover uploaded for ${id}`);
     return this.getCourseRaw(id);
   }
 

@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Title, Text, Stack, Box, SimpleGrid, Card, Group, Progress, Badge, Loader, Center } from '@mantine/core';
+import { Title, Text, Stack, Box, SimpleGrid, Card, Group, Progress, Badge, Loader, Center, Image } from '@mantine/core';
 import { Lock, GraduationCap } from 'lucide-react';
 import { Surface } from '@/components/ui/Surface';
 import { useCourses } from '@/hooks/useLearning';
@@ -60,10 +60,15 @@ export default function LearningPage() {
                 radius="lg"
                 withBorder
                 padding="md"
-                style={{ cursor: 'pointer', opacity: course.locked ? 0.7 : 1 }}
+                style={{ cursor: 'pointer', opacity: course.locked ? 0.7 : 1, overflow: 'hidden' }}
                 onClick={() => router.push(`/dashboard/learning/${course.id}`)}
               >
-                <Stack gap="sm">
+                {course.coverImageUrl && (
+                  <Card.Section>
+                    <Image src={course.coverImageUrl} h={120} fit="cover" />
+                  </Card.Section>
+                )}
+                <Stack gap="sm" mt={course.coverImageUrl ? 'sm' : 0}>
                   <Group justify="space-between" align="flex-start" wrap="nowrap">
                     <Text fw={700} size="md" style={{ fontFamily: 'Inter Display, sans-serif' }}>
                       {course.title}

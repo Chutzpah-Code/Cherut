@@ -1304,12 +1304,20 @@
       "pace": "Pace",
       "pace7": "7 days",
       "pace14": "14 days",
-      "targetDate": "Target date: {date}",
-      "watchVideo": "Watch video",
       "exercise": "Exercise",
       "template": "Template",
-      "noLessons": "No lessons yet.",
-      "noModules": "No modules yet."
+      "noModules": "No modules yet.",
+      "summaryLine": "Course · {lessons} lessons · {modules} modules",
+      "dayOfPath": "Day {day} of your {pace}-day path",
+      "continueLesson": "Continue lesson...",
+      "moduleLessonLabel": "Module {module} · Lesson {lesson}",
+      "markComplete": "Mark complete",
+      "openExercise": "Open exercise",
+      "close": "Close",
+      "modules": "Modules",
+      "complete": "complete",
+      "lessonCount": "{count} lessons",
+      "templatesReady": "Ready to apply"
     }
   },
   "publicHeader": {

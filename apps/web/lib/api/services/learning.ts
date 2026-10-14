@@ -42,6 +42,7 @@ export interface Course {
   description?: string;
   isPublished: boolean;
   requiredPlan?: RequiredPlan;
+  coverImageUrl?: string;
   order: number;
   locked: boolean;
   totalLessons: number;
@@ -106,6 +107,16 @@ export const learningApi = {
 
   deleteCourse: async (id: string): Promise<void> => {
     await apiClient.delete(`/learning/courses/${id}`);
+  },
+
+  uploadCourseCover: async (id: string, file: File): Promise<Course> => {
+    const form = new FormData();
+    form.append('cover', file);
+    const { data } = await apiClient.post(`/learning/courses/${id}/cover`, form, {
+      headers: { 'Content-Type': undefined },
+      timeout: 30000,
+    });
+    return data;
   },
 
   // Admin authoring — modules
