@@ -369,6 +369,45 @@ export class AdminService {
   }
 
   /**
+   * 🕒 ATIVIDADE RECENTE — eventos reais (cadastros + lições concluídas),
+   * não um feed fabricado. Sem uma coleção de eventos dedicada, isso é a
+   * melhor aproximação real disponível hoje.
+   */
+  async getRecentActivity(limit = 8) {
+    const db = this.firebaseService.getFirestore();
+    // Single-field orderBy only (no composite index to deploy) — completedAt
+    // is only ever set on docs where completed=true, and null sorts last in
+    // a descending query, so this naturally surfaces real completions first.
+    const [usersSnap, progressSnap] = await Promise.all([
+      db.collection('users').orderBy('createdAt', 'desc').limit(limit).get(),
+      db.collection('lessonProgress').orderBy('completedAt', 'desc').limit(limit).get(),
+    ]);
+
+    const signups = usersSnap.docs.map((doc) => {
+      const data = doc.data() as any;
+      return { type: 'signup' as const, name: data.displayName || data.email, at: data.createdAt };
+    });
+
+    const completionUserIds = [...new Set(progressSnap.docs.map((d) => (d.data() as any).userId))];
+    const completionUsers = completionUserIds.length
+      ? await db.getAll(...completionUserIds.map((id) => db.collection('users').doc(id)))
+      : [];
+    const nameByUserId = new Map(
+      completionUsers.filter((d) => d.exists).map((d) => [d.id, (d.data() as any).displayName || (d.data() as any).email]),
+    );
+
+    const completions = progressSnap.docs.map((doc) => {
+      const data = doc.data() as any;
+      return { type: 'lessonCompleted' as const, name: nameByUserId.get(data.userId) ?? 'A user', at: data.completedAt };
+    });
+
+    return [...signups, ...completions]
+      .filter((e) => !!e.at)
+      .sort((a, b) => (b.at > a.at ? 1 : -1))
+      .slice(0, limit);
+  }
+
+  /**
    * 🪜 FUNIL DE ATIVAÇÃO — estágios reais derivados de users/matrículas/progresso
    */
   async getActivationFunnel() {
@@ -471,12 +510,13 @@ export class AdminService {
       const totalAdmins = users.filter(user => user.role === 'admin').length;
       const activeSubscriptions = activePlans.length;
 
-      // Plan distribution
+      // Plan distribution — over ALL users (not just active subscriptions),
+      // so it matches the totalUsers denominator shown alongside it.
       const planDistribution = {
-        free: activePlans.filter(user => user.subscription?.plan === 'free').length,
-        core: activePlans.filter(user => user.subscription?.plan === 'core').length,
-        pro: activePlans.filter(user => user.subscription?.plan === 'pro').length,
-        elite: activePlans.filter(user => user.subscription?.plan === 'elite').length,
+        free: users.filter(user => (user.subscription?.plan ?? 'free') === 'free').length,
+        core: users.filter(user => user.subscription?.plan === 'core').length,
+        pro: users.filter(user => user.subscription?.plan === 'pro').length,
+        elite: users.filter(user => user.subscription?.plan === 'elite').length,
       };
 
       // New users in last 30 days

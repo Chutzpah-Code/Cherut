@@ -101,6 +101,11 @@ export class AdminController {
     return this.adminService.updateUser(uid, dto);
   }
 
+  @Get('activity')
+  async getRecentActivity() {
+    return this.adminService.getRecentActivity();
+  }
+
   /**
    * 🪜 FUNIL DE ATIVAÇÃO E USO POR CURSO
    */
