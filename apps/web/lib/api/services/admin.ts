@@ -71,6 +71,7 @@ export interface AdminUser {
   subscription?: { plan: 'free' | 'core' | 'pro' | 'elite'; status: 'active' | 'inactive' | 'cancelled' };
   createdAt: string;
   onboardingCompleted?: boolean;
+  suspended?: boolean;
 }
 
 export interface UserFilters {
@@ -103,8 +104,14 @@ export const adminApi = {
   createAdmin: async (dto: { email: string; password: string; displayName?: string }) =>
     (await apiClient.post('/admin/users/create', dto)).data,
   promoteUser: async (dto: { email: string }) => (await apiClient.post('/admin/users/promote', dto)).data,
-  updateUser: async (uid: string, dto: { displayName?: string; email?: string; role?: 'user' | 'admin' }): Promise<AdminUser> =>
-    (await apiClient.patch(`/admin/users/${uid}`, dto)).data,
+  updateUser: async (
+    uid: string,
+    dto: { displayName?: string; email?: string; role?: 'user' | 'admin'; plan?: 'free' | 'core' | 'pro' | 'elite' },
+  ): Promise<AdminUser> => (await apiClient.patch(`/admin/users/${uid}`, dto)).data,
+  generatePasswordResetLink: async (uid: string): Promise<{ link: string }> =>
+    (await apiClient.post(`/admin/users/${uid}/reset-password-link`)).data,
+  suspendUser: async (uid: string): Promise<AdminUser> => (await apiClient.post(`/admin/users/${uid}/suspend`)).data,
+  reactivateUser: async (uid: string): Promise<AdminUser> => (await apiClient.post(`/admin/users/${uid}/reactivate`)).data,
 
   getSettings: async (): Promise<SystemSettings> => (await apiClient.get('/admin/settings')).data,
   updateSettings: async (dto: Partial<SystemSettings>): Promise<SystemSettings> =>

@@ -1957,6 +1957,84 @@
       }
     }
   },
+  "adminUsersPage": {
+    "crumb": "Admin / Usuários",
+    "title": "Usuários",
+    "subtitle": "Gerencie contas, papéis e planos.",
+    "promoteUser": "Promover usuário",
+    "createAdmin": "Criar admin",
+    "searchPlaceholder": "Buscar por nome, email ou ID",
+    "loading": "Carregando usuários…",
+    "empty": "Nenhum usuário corresponde a esses filtros.",
+    "more": "Mais",
+    "count": "{shown} de {total}",
+    "filters": {
+      "allRoles": "Todos os papéis",
+      "allPlans": "Todos os planos",
+      "anyOnboarding": "Qualquer onboarding"
+    },
+    "table": {
+      "user": "Usuário",
+      "role": "Papel",
+      "plan": "Plano",
+      "status": "Status",
+      "onboarding": "Onboarding",
+      "joined": "Cadastro"
+    },
+    "pills": {
+      "role": { "user": "Usuário", "admin": "Admin" },
+      "plan": { "free": "Free", "core": "Core", "pro": "Pro", "elite": "Elite" },
+      "status": { "active": "Ativo", "inactive": "Inativo", "cancelled": "Cancelado" },
+      "onboarding": { "complete": "Completo", "pending": "Pendente" }
+    },
+    "drawer": {
+      "close": "Fechar",
+      "account": "Conta",
+      "userId": "ID do usuário",
+      "displayName": "Nome de exibição",
+      "email": "Email",
+      "joined": "Cadastro",
+      "onboarding": "Onboarding",
+      "subscription": "Assinatura",
+      "plan": "Plano",
+      "planFree": "Free",
+      "planCore": "Core",
+      "planPro": "Pro",
+      "planElite": "Elite",
+      "role": "Papel",
+      "roleUser": "Usuário",
+      "roleAdmin": "Admin",
+      "save": "Salvar",
+      "resetPassword": "Redefinir senha",
+      "suspend": "Suspender",
+      "reactivate": "Reativar",
+      "toastUpdated": "Usuário atualizado",
+      "toastResetLinkCopied": "Link de redefinição copiado",
+      "toastSuspended": "Usuário suspenso",
+      "toastReactivated": "Usuário reativado",
+      "toastIdCopied": "ID copiado"
+    },
+    "promoteModal": {
+      "title": "Promover usuário a admin",
+      "description": "Admins podem gerenciar usuários, conteúdo e configurações.",
+      "emailLabel": "Email do usuário",
+      "cancel": "Cancelar",
+      "submit": "Promover",
+      "toastSuccess": "Usuário promovido",
+      "error": "Não foi possível promover esse usuário. Confira o email e tente de novo."
+    },
+    "createAdminModal": {
+      "title": "Criar admin",
+      "description": "Cria uma nova conta de admin imediatamente, com a senha que você definir.",
+      "nameLabel": "Nome",
+      "emailLabel": "Email",
+      "passwordLabel": "Senha",
+      "cancel": "Cancelar",
+      "submit": "Criar admin",
+      "toastSuccess": "Conta de admin criada",
+      "error": "Não foi possível criar essa conta. O email já pode estar em uso."
+    }
+  },
   "adminShell": {
     "verifying": "Verificando acesso administrativo…",
     "accessDenied": "Você não tem permissões administrativas.",

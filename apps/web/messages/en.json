@@ -1957,6 +1957,84 @@
       }
     }
   },
+  "adminUsersPage": {
+    "crumb": "Admin / Users",
+    "title": "Users",
+    "subtitle": "Manage accounts, roles and plans.",
+    "promoteUser": "Promote user",
+    "createAdmin": "Create admin",
+    "searchPlaceholder": "Search by name, email or ID",
+    "loading": "Loading users…",
+    "empty": "No users match these filters.",
+    "more": "More",
+    "count": "{shown} of {total}",
+    "filters": {
+      "allRoles": "All roles",
+      "allPlans": "All plans",
+      "anyOnboarding": "Any onboarding"
+    },
+    "table": {
+      "user": "User",
+      "role": "Role",
+      "plan": "Plan",
+      "status": "Status",
+      "onboarding": "Onboarding",
+      "joined": "Joined"
+    },
+    "pills": {
+      "role": { "user": "User", "admin": "Admin" },
+      "plan": { "free": "Free", "core": "Core", "pro": "Pro", "elite": "Elite" },
+      "status": { "active": "Active", "inactive": "Inactive", "cancelled": "Cancelled" },
+      "onboarding": { "complete": "Complete", "pending": "Pending" }
+    },
+    "drawer": {
+      "close": "Close",
+      "account": "Account",
+      "userId": "User ID",
+      "displayName": "Display name",
+      "email": "Email",
+      "joined": "Joined",
+      "onboarding": "Onboarding",
+      "subscription": "Subscription",
+      "plan": "Plan",
+      "planFree": "Free",
+      "planCore": "Core",
+      "planPro": "Pro",
+      "planElite": "Elite",
+      "role": "Role",
+      "roleUser": "User",
+      "roleAdmin": "Admin",
+      "save": "Save",
+      "resetPassword": "Reset password",
+      "suspend": "Suspend",
+      "reactivate": "Reactivate",
+      "toastUpdated": "User updated",
+      "toastResetLinkCopied": "Reset link copied to clipboard",
+      "toastSuspended": "User suspended",
+      "toastReactivated": "User reactivated",
+      "toastIdCopied": "ID copied"
+    },
+    "promoteModal": {
+      "title": "Promote user to admin",
+      "description": "Admins can manage users, content and settings.",
+      "emailLabel": "User email",
+      "cancel": "Cancel",
+      "submit": "Promote",
+      "toastSuccess": "User promoted",
+      "error": "Could not promote this user. Check the email and try again."
+    },
+    "createAdminModal": {
+      "title": "Create admin",
+      "description": "Creates a new admin account immediately with the password you set.",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "cancel": "Cancel",
+      "submit": "Create admin",
+      "toastSuccess": "Admin account created",
+      "error": "Could not create this account. The email may already be in use."
+    }
+  },
   "adminShell": {
     "verifying": "Verifying administrative access…",
     "accessDenied": "You do not have administrative permissions.",

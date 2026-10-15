@@ -44,8 +44,32 @@ export const usePromoteUser = () => {
 export const useUpdateAdminUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ uid, dto }: { uid: string; dto: { displayName?: string; email?: string; role?: 'user' | 'admin' } }) =>
-      adminApi.updateUser(uid, dto),
+    mutationFn: ({
+      uid,
+      dto,
+    }: {
+      uid: string;
+      dto: { displayName?: string; email?: string; role?: 'user' | 'admin'; plan?: 'free' | 'core' | 'pro' | 'elite' };
+    }) => adminApi.updateUser(uid, dto),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
+  });
+};
+
+export const useGeneratePasswordResetLink = () =>
+  useMutation({ mutationFn: (uid: string) => adminApi.generatePasswordResetLink(uid) });
+
+export const useSuspendUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (uid: string) => adminApi.suspendUser(uid),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
+  });
+};
+
+export const useReactivateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (uid: string) => adminApi.reactivateUser(uid),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
   });
 };

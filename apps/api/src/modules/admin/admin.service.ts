@@ -249,6 +249,10 @@ export class AdminService {
     if (dto.displayName !== undefined) updates.displayName = dto.displayName;
     if (dto.email !== undefined) updates.email = dto.email;
     if (dto.role !== undefined) updates.role = dto.role;
+    if (dto.plan !== undefined) {
+      const existing = doc.data() as any;
+      updates.subscription = { ...existing.subscription, plan: dto.plan };
+    }
 
     await docRef.update(updates);
 
@@ -265,6 +269,41 @@ export class AdminService {
     }
 
     this.logger.log(`User updated: ${uid}`);
+    const updated = await docRef.get();
+    return { id: updated.id, ...updated.data() };
+  }
+
+  /**
+   * Gera um link real de redefinição de senha (Firebase Admin SDK) para o
+   * admin copiar e enviar manualmente — não há serviço de e-mail
+   * configurado neste projeto para disparo automático.
+   */
+  async generatePasswordResetLink(uid: string) {
+    const db = this.firebaseService.getFirestore();
+    const doc = await db.collection('users').doc(uid).get();
+    if (!doc.exists) throw new NotFoundException(`User ${uid} not found`);
+
+    const email = (doc.data() as any).email;
+    const auth = this.firebaseService.getAuth();
+    const link = await auth.generatePasswordResetLink(email);
+    return { link };
+  }
+
+  /**
+   * Suspende/reativa um usuário de verdade (desabilita no Firebase Auth,
+   * não só um toast decorativo).
+   */
+  async setUserSuspended(uid: string, suspended: boolean) {
+    const db = this.firebaseService.getFirestore();
+    const docRef = db.collection('users').doc(uid);
+    const doc = await docRef.get();
+    if (!doc.exists) throw new NotFoundException(`User ${uid} not found`);
+
+    const auth = this.firebaseService.getAuth();
+    await auth.updateUser(uid, { disabled: suspended });
+    await docRef.update({ suspended, updatedAt: new Date().toISOString() });
+
+    this.logger.log(`User ${uid} ${suspended ? 'suspended' : 'reactivated'}`);
     const updated = await docRef.get();
     return { id: updated.id, ...updated.data() };
   }

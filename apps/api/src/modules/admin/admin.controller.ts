@@ -106,6 +106,21 @@ export class AdminController {
     return this.adminService.getRecentActivity();
   }
 
+  @Post('users/:uid/reset-password-link')
+  async generatePasswordResetLink(@Param('uid') uid: string) {
+    return this.adminService.generatePasswordResetLink(uid);
+  }
+
+  @Post('users/:uid/suspend')
+  async suspendUser(@Param('uid') uid: string) {
+    return this.adminService.setUserSuspended(uid, true);
+  }
+
+  @Post('users/:uid/reactivate')
+  async reactivateUser(@Param('uid') uid: string) {
+    return this.adminService.setUserSuspended(uid, false);
+  }
+
   /**
    * 🪜 FUNIL DE ATIVAÇÃO E USO POR CURSO
    */
