@@ -1909,6 +1909,7 @@
     "crumb": "Admin / Visão geral",
     "title": "Visão geral",
     "subtitle": "Como o Cherut está indo agora.",
+    "export": "Exportar",
     "kpis": {
       "totalUsers": "Total de usuários",
       "newInLast30": "{count} novos nos últimos 30 dias",
@@ -2052,8 +2053,14 @@
   "adminCoursesPage": {
     "loading": "Carregando cursos...",
     "title": "Cursos",
-    "subtitle": "Crie cursos, módulos e lições",
+    "subtitle": "Crie cursos, módulos e lições para o módulo de Aprendizado.",
+    "crumb": "Admin / Cursos",
     "newCourse": "Novo curso",
+    "card": {
+      "enrolled": "Inscritos",
+      "avgProgress": "Progresso médio",
+      "lessons": "{count} lições"
+    },
     "table": {
       "title": "Título",
       "status": "Status",
@@ -2107,11 +2114,16 @@
     }
   },
   "adminCourseEditorPage": {
+    "loading": "Carregando curso…",
     "backToCourses": "Voltar para cursos",
     "newModule": "Novo módulo",
     "noModules": "Nenhum módulo ainda. Crie o primeiro.",
     "noLessons": "Nenhuma lição ainda.",
     "addLesson": "Adicionar lição",
+    "lessonCount": "{count} lições",
+    "status": { "published": "Publicado", "draft": "Rascunho" },
+    "plan": { "any": "Qualquer plano" },
+    "planOptions": { "any": "Qualquer plano", "core": "Core", "method": "Method", "mentorship": "Mentorship" },
     "editModule": "Editar módulo",
     "deleteModule": "Excluir módulo",
     "editLesson": "Editar lição",

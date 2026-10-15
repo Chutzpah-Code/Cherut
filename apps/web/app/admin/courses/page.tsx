@@ -1,62 +1,43 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import {
-  Title,
-  Table,
-  Badge,
-  Group,
-  Text,
-  Button,
-  TextInput,
-  Textarea,
-  Select,
-  Card,
-  Stack,
-  Loader,
-  Modal,
-  ActionIcon,
-  Tooltip,
-  FileButton,
-  Image,
-  Box,
-  Alert,
-} from '@mantine/core';
-import { IconPlus, IconEdit, IconTrash, IconChevronRight, IconPhoto, IconAlertCircle } from '@tabler/icons-react';
-import { useDisclosure } from '@mantine/hooks';
-import { Surface } from '@/components/ui/Surface';
+import { Plus, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { useCourses, useCreateCourse, useUpdateCourse, useDeleteCourse, useUploadCourseCover } from '@/hooks/useLearning';
+import { useAdminModuleUsage } from '@/hooks/useAdmin';
 import { Course, CreateCourseDto, RequiredPlan } from '@/lib/api/services/learning';
 
 const MAX_COVER_SIZE = 2 * 1024 * 1024;
 const ALLOWED_COVER_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
-const emptyForm: CreateCourseDto = {
-  title: '',
-  description: '',
-  isPublished: false,
-  requiredPlan: undefined,
-};
+const COVER_GRADIENTS = [
+  'linear-gradient(135deg,#3E63F5,#1B2E8F)',
+  'linear-gradient(135deg,#14141C,#3A3D4E)',
+  'linear-gradient(135deg,#1F9D6B,#0E5C3E)',
+];
+
+function gradientFor(id: string): string {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  return COVER_GRADIENTS[hash % COVER_GRADIENTS.length];
+}
+
+const emptyForm: CreateCourseDto = { title: '', description: '', isPublished: false, requiredPlan: undefined };
 
 export default function AdminCoursesPage() {
   const t = useTranslations('adminCoursesPage');
   const router = useRouter();
   const { data: courses, isLoading } = useCourses();
+  const { data: usage } = useAdminModuleUsage();
   const createCourse = useCreateCourse();
   const updateCourse = useUpdateCourse();
   const deleteCourse = useDeleteCourse();
   const uploadCover = useUploadCourseCover();
 
-  const planOptions = [
-    { value: '', label: t('planOptions.any') },
-    { value: 'core', label: t('planOptions.core') },
-    { value: 'method', label: t('planOptions.method') },
-    { value: 'mentorship', label: t('planOptions.mentorship') },
-  ];
+  const usageByCourse = useMemo(() => new Map((usage ?? []).map((u) => [u.id, u])), [usage]);
 
-  const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure();
+  const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Course | null>(null);
   const [form, setForm] = useState<CreateCourseDto>(emptyForm);
   const [coverError, setCoverError] = useState<string | null>(null);
@@ -65,37 +46,22 @@ export default function AdminCoursesPage() {
     setEditing(null);
     setForm(emptyForm);
     setCoverError(null);
-    openModal();
+    setModalOpen(true);
   }
 
-  function handleEdit(course: Course) {
+  function handleEdit(course: Course, e: React.MouseEvent) {
+    e.stopPropagation();
     setEditing(course);
-    setForm({
-      title: course.title,
-      description: course.description || '',
-      isPublished: course.isPublished,
-      requiredPlan: course.requiredPlan,
-    });
+    setForm({ title: course.title, description: course.description || '', isPublished: course.isPublished, requiredPlan: course.requiredPlan });
     setCoverError(null);
-    openModal();
-  }
-
-  async function handleDelete(course: Course) {
-    if (!window.confirm(t('confirmDelete', { title: course.title }))) return;
-    await deleteCourse.mutateAsync(course.id);
+    setModalOpen(true);
   }
 
   async function handleCoverUpload(file: File | null) {
     if (!file || !editing) return;
     setCoverError(null);
-    if (!ALLOWED_COVER_TYPES.includes(file.type)) {
-      setCoverError(t('cover.errorType'));
-      return;
-    }
-    if (file.size > MAX_COVER_SIZE) {
-      setCoverError(t('cover.errorSize'));
-      return;
-    }
+    if (!ALLOWED_COVER_TYPES.includes(file.type)) return setCoverError(t('cover.errorType'));
+    if (file.size > MAX_COVER_SIZE) return setCoverError(t('cover.errorSize'));
     try {
       const updated = await uploadCover.mutateAsync({ id: editing.id, file });
       setEditing(updated);
@@ -105,206 +71,127 @@ export default function AdminCoursesPage() {
   }
 
   async function handleSave() {
-    const dto: CreateCourseDto = {
-      ...form,
-      requiredPlan: form.requiredPlan || undefined,
-    };
-    if (editing) {
-      await updateCourse.mutateAsync({ id: editing.id, dto });
-    } else {
-      await createCourse.mutateAsync(dto);
-    }
-    closeModal();
+    const dto: CreateCourseDto = { ...form, requiredPlan: form.requiredPlan || undefined };
+    if (editing) await updateCourse.mutateAsync({ id: editing.id, dto });
+    else await createCourse.mutateAsync(dto);
+    setModalOpen(false);
   }
 
-  if (isLoading) {
-    return (
-      <Stack align="center" mt="xl">
-        <Loader size="lg" />
-        <Text>{t('loading')}</Text>
-      </Stack>
-    );
+  async function handleDelete() {
+    if (!editing) return;
+    if (!window.confirm(t('confirmDelete', { title: editing.title }))) return;
+    await deleteCourse.mutateAsync(editing.id);
+    setModalOpen(false);
   }
+
+  if (isLoading) return <p className="adm-sub">{t('loading')}</p>;
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }}>
-      <Group justify="space-between" mb="xl" wrap="wrap">
+    <div>
+      <div className="adm-top">
         <div>
-          <Title order={1}>{t('title')}</Title>
-          <Text c="dimmed">{t('subtitle')}</Text>
+          <div className="adm-crumb adm-mono">{t('crumb')}</div>
+          <h1 className="adm-h1">{t('title')}</h1>
+          <p className="adm-sub">{t('subtitle')}</p>
         </div>
-        <Button leftSection={<IconPlus size={16} />} onClick={handleCreate}>
-          {t('newCourse')}
-        </Button>
-      </Group>
+        <button type="button" className="adm-btn adm-btn-acc" onClick={handleCreate}><Plus size={15} />{t('newCourse')}</button>
+      </div>
 
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Table.ScrollContainer minWidth={600}>
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>{t('table.title')}</Table.Th>
-                <Table.Th>{t('table.status')}</Table.Th>
-                <Table.Th>{t('table.requiredPlan')}</Table.Th>
-                <Table.Th>{t('table.lessons')}</Table.Th>
-                <Table.Th>{t('table.actions')}</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {(courses ?? []).map((course) => (
-                <Table.Tr key={course.id} style={{ cursor: 'pointer' }} onClick={() => router.push(`/admin/courses/${course.id}`)}>
-                  <Table.Td>
-                    <Group gap="sm" wrap="nowrap">
-                      {course.coverImageUrl ? (
-                        <Image src={course.coverImageUrl} w={48} h={32} radius={4} fit="cover" />
-                      ) : (
-                        <Box w={48} h={32} style={{ borderRadius: 4, background: '#F1F5F9', flexShrink: 0 }} />
-                      )}
-                      <div>
-                        <Text fw={500}>{course.title}</Text>
-                        {course.description && (
-                          <Text size="sm" c="dimmed" lineClamp={1}>{course.description}</Text>
-                        )}
-                      </div>
-                    </Group>
-                  </Table.Td>
-                  <Table.Td>
-                    <Badge color={course.isPublished ? 'green' : 'gray'} variant="light">
-                      {course.isPublished ? t('status.published') : t('status.draft')}
-                    </Badge>
-                  </Table.Td>
-                  <Table.Td>
-                    <Badge color="blue" variant="outline">
-                      {course.requiredPlan ? course.requiredPlan : t('plan.any')}
-                    </Badge>
-                  </Table.Td>
-                  <Table.Td>{course.totalLessons}</Table.Td>
-                  <Table.Td onClick={(e) => e.stopPropagation()}>
-                    <Group gap="xs">
-                      <Tooltip label={t('actions.edit')}>
-                        <ActionIcon variant="light" size="sm" color="blue" onClick={() => handleEdit(course)}>
-                          <IconEdit size={16} />
-                        </ActionIcon>
-                      </Tooltip>
-                      <Tooltip label={t('actions.delete')}>
-                        <ActionIcon variant="light" size="sm" color="red" onClick={() => handleDelete(course)}>
-                          <IconTrash size={16} />
-                        </ActionIcon>
-                      </Tooltip>
-                      <Tooltip label={t('actions.manage')}>
-                        <ActionIcon variant="light" size="sm" onClick={() => router.push(`/admin/courses/${course.id}`)}>
-                          <IconChevronRight size={16} />
-                        </ActionIcon>
-                      </Tooltip>
-                    </Group>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Table.ScrollContainer>
+      <div className="adm-courses">
+        {(courses ?? []).map((course) => {
+          const u = usageByCourse.get(course.id);
+          return (
+            <div key={course.id} className="adm-course" onClick={() => router.push(`/admin/courses/${course.id}`)}>
+              <div
+                className="adm-cv"
+                style={{ background: course.coverImageUrl ? `url(${course.coverImageUrl}) center/cover` : gradientFor(course.id) }}
+              >
+                <span className="adm-mono">{course.requiredPlan ? t(`planOptions.${course.requiredPlan}`) : t('plan.any')}</span>
+                <b>{course.title}</b>
+              </div>
+              <div className="adm-cb">
+                <small style={{ color: 'var(--adm-mute)' }}>{t('card.lessons', { count: course.totalLessons })}</small>
+                <div className="adm-cstats">
+                  <div><b>{u?.enrolled ?? 0}</b>{t('card.enrolled')}</div>
+                  <div><b>{u ? `${u.averageProgress}%` : '—'}</b>{t('card.avgProgress')}</div>
+                </div>
+                <div className="adm-bar"><i style={{ width: `${u?.averageProgress ?? 0}%` }} /></div>
+                <div className="adm-cf">
+                  <span className={`adm-pill${course.isPublished ? ' ok' : ''}`}>{course.isPublished ? t('status.published') : t('status.draft')}</span>
+                  <button type="button" className="adm-btn adm-btn-l" style={{ height: 32 }} onClick={(e) => handleEdit(course, e)}>{t('actions.edit')}</button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        <button type="button" className="adm-course adm-course-add" onClick={handleCreate}>
+          <Plus size={18} />{t('newCourse')}
+        </button>
+      </div>
 
-        {(courses ?? []).length === 0 && (
-          <Text ta="center" c="dimmed" py="xl">
-            {t('empty')}
-          </Text>
-        )}
-      </Card>
+      {(courses ?? []).length === 0 && <p className="adm-empty">{t('empty')}</p>}
 
-      <Modal opened={modalOpened} onClose={closeModal} title={editing ? t('modal.editTitle') : t('modal.newTitle')} size="md">
-        <Stack>
-          {editing ? (
-            <Box>
-              <Text size="sm" fw={500} mb={6}>{t('cover.label')}</Text>
-              {coverError && (
-                <Alert color="red" icon={<IconAlertCircle size={16} />} mb="xs" onClose={() => setCoverError(null)} withCloseButton>
-                  {coverError}
-                </Alert>
-              )}
-              {editing.coverImageUrl ? (
-                <Box pos="relative">
-                  <Image src={editing.coverImageUrl} radius="md" h={140} fit="cover" />
-                  <FileButton onChange={handleCoverUpload} accept="image/jpeg,image/png,image/webp">
-                    {(props) => (
-                      <Button {...props} variant="white" size="xs" pos="absolute" bottom={8} right={8} loading={uploadCover.isPending}>
-                        {t('cover.change')}
-                      </Button>
-                    )}
-                  </FileButton>
-                </Box>
-              ) : (
-                <FileButton onChange={handleCoverUpload} accept="image/jpeg,image/png,image/webp">
-                  {(props) => (
-                    <Box
-                      {...props}
-                      style={{
-                        border: '2px dashed #CBD5E1',
-                        borderRadius: 8,
-                        padding: 24,
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {uploadCover.isPending ? (
-                        <Loader size="sm" mx="auto" />
-                      ) : (
-                        <Stack align="center" gap={4}>
-                          <IconPhoto size={24} color="#94A3B8" />
-                          <Text size="sm" c="dimmed">{t('cover.upload')}</Text>
-                        </Stack>
-                      )}
-                    </Box>
+      {modalOpen && (
+        <div className="adm-modal-ov on" onClick={() => setModalOpen(false)}>
+          <div className="adm-box" onClick={(e) => e.stopPropagation()}>
+            <h3>{editing ? t('modal.editTitle') : t('modal.newTitle')}</h3>
+
+            {editing ? (
+              <label>
+                {t('cover.label')}
+                {coverError && <p style={{ color: 'var(--adm-bad)', fontSize: 12.5, margin: '4px 0' }}>{coverError}</p>}
+                <div
+                  className="adm-cover"
+                  style={editing.coverImageUrl ? { backgroundImage: `url(${editing.coverImageUrl})` } : undefined}
+                >
+                  {!editing.coverImageUrl && (
+                    uploadCover.isPending ? <span>…</span> : <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}><ImageIcon size={20} />{t('cover.upload')}</span>
                   )}
-                </FileButton>
-              )}
-            </Box>
-          ) : (
-            <Alert color="gray" variant="light" icon={<IconAlertCircle size={16} />}>
-              {t('cover.saveFirst')}
-            </Alert>
-          )}
+                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleCoverUpload(e.target.files?.[0] ?? null)} />
+                  {editing.coverImageUrl && <span className="adm-btn adm-btn-l" style={{ position: 'absolute', right: 10, bottom: 10, height: 30, pointerEvents: 'none' }}>{t('cover.change')}</span>}
+                </div>
+              </label>
+            ) : (
+              <p style={{ display: 'flex', gap: 8, alignItems: 'flex-start', background: 'var(--adm-soft)', border: '1px solid var(--adm-line)', borderRadius: 10, padding: 10, fontSize: 12.5, color: 'var(--adm-mute)' }}>
+                <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />{t('cover.saveFirst')}
+              </p>
+            )}
 
-          <TextInput
-            label={t('form.titleLabel')}
-            placeholder={t('form.titlePlaceholder')}
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            required
-          />
-          <Textarea
-            label={t('form.descriptionLabel')}
-            placeholder={t('form.descriptionPlaceholder')}
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            autosize
-            minRows={2}
-          />
-          <Select
-            label={t('form.requiredPlanLabel')}
-            description={t('form.requiredPlanDesc')}
-            value={form.requiredPlan || ''}
-            onChange={(value) => setForm({ ...form, requiredPlan: (value || undefined) as RequiredPlan | undefined })}
-            data={planOptions}
-          />
-          <Select
-            label={t('form.statusLabel')}
-            value={form.isPublished ? 'published' : 'draft'}
-            onChange={(value) => setForm({ ...form, isPublished: value === 'published' })}
-            data={[
-              { value: 'draft', label: t('status.draft') },
-              { value: 'published', label: t('status.published') },
-            ]}
-          />
-          <Group justify="flex-end" mt="md">
-            <Button variant="light" onClick={closeModal}>
-              {t('form.cancel')}
-            </Button>
-            <Button onClick={handleSave} disabled={!form.title.trim()}>
-              {t('form.save')}
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
-    </Surface>
+            <label>
+              {t('form.titleLabel')} <span className="adm-req">*</span>
+              <input className="adm-in" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={t('form.titlePlaceholder')} />
+            </label>
+            <label>
+              {t('form.descriptionLabel')}
+              <textarea className="adm-in" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder={t('form.descriptionPlaceholder')} />
+            </label>
+            <div className="adm-two">
+              <label>
+                {t('form.requiredPlanLabel')}
+                <select className="adm-in" value={form.requiredPlan ?? ''} onChange={(e) => setForm({ ...form, requiredPlan: (e.target.value || undefined) as RequiredPlan | undefined })}>
+                  <option value="">{t('planOptions.any')}</option>
+                  <option value="core">{t('planOptions.core')}</option>
+                  <option value="method">{t('planOptions.method')}</option>
+                  <option value="mentorship">{t('planOptions.mentorship')}</option>
+                </select>
+              </label>
+              <label>
+                {t('form.statusLabel')}
+                <select className="adm-in" value={form.isPublished ? 'published' : 'draft'} onChange={(e) => setForm({ ...form, isPublished: e.target.value === 'published' })}>
+                  <option value="draft">{t('status.draft')}</option>
+                  <option value="published">{t('status.published')}</option>
+                </select>
+              </label>
+            </div>
+
+            <div className="adm-f">
+              {editing && <button type="button" className="adm-btn adm-btn-bad" style={{ marginRight: 'auto' }} onClick={handleDelete}>{t('actions.delete')}</button>}
+              <button type="button" className="adm-btn adm-btn-l" onClick={() => setModalOpen(false)}>{t('form.cancel')}</button>
+              <button type="button" className="adm-btn adm-btn-acc" disabled={!form.title.trim()} onClick={handleSave}>{t('form.save')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

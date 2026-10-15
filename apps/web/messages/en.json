@@ -1909,6 +1909,7 @@
     "crumb": "Admin / Overview",
     "title": "Overview",
     "subtitle": "How Cherut is doing right now.",
+    "export": "Export",
     "kpis": {
       "totalUsers": "Total users",
       "newInLast30": "{count} new in 30 days",
@@ -2052,8 +2053,14 @@
   "adminCoursesPage": {
     "loading": "Loading courses...",
     "title": "Courses",
-    "subtitle": "Author courses, modules and lessons",
+    "subtitle": "Create courses, modules and lessons for the Learning module.",
+    "crumb": "Admin / Courses",
     "newCourse": "New Course",
+    "card": {
+      "enrolled": "Enrolled",
+      "avgProgress": "Avg. progress",
+      "lessons": "{count} lessons"
+    },
     "table": {
       "title": "Title",
       "status": "Status",
@@ -2107,11 +2114,16 @@
     }
   },
   "adminCourseEditorPage": {
+    "loading": "Loading course…",
     "backToCourses": "Back to courses",
     "newModule": "New Module",
     "noModules": "No modules yet. Create the first one.",
     "noLessons": "No lessons yet.",
     "addLesson": "Add Lesson",
+    "lessonCount": "{count} lessons",
+    "status": { "published": "Published", "draft": "Draft" },
+    "plan": { "any": "Any plan" },
+    "planOptions": { "any": "Any plan", "core": "Core", "method": "Method", "mentorship": "Mentorship" },
     "editModule": "Edit module",
     "deleteModule": "Delete module",
     "editLesson": "Edit lesson",

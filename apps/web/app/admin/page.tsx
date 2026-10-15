@@ -2,8 +2,10 @@
 
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Download } from 'lucide-react';
 import { useAdminOverview, useAdminSales, useAdminAnalytics, useAdminActivity, useAdminServicesStatus } from '@/hooks/useAdmin';
 import { ServiceStatus } from '@/lib/api/services/admin';
+import { downloadCsv } from './lib/exportCsv';
 
 const PLAN_COLORS: Record<string, string> = { free: '#D7DAE4', core: '#8FA6FF', pro: '#3B5BF6', elite: '#14141C' };
 
@@ -38,6 +40,21 @@ export default function AdminOverviewPage() {
     }));
   }, [overview]);
 
+  function handleExport() {
+    downloadCsv('cherut-overview.csv', [
+      { metric: 'totalUsers', value: overview!.overview.totalUsers },
+      { metric: 'totalAdmins', value: overview!.overview.totalAdmins },
+      { metric: 'activeSubscriptions', value: overview!.overview.activeSubscriptions },
+      { metric: 'newUsersLast30Days', value: overview!.overview.newUsersLast30Days },
+      { metric: 'onboardingCompletionRate', value: overview!.overview.onboardingCompletionRate },
+      ...(sales ? [
+        { metric: 'monthlyRevenue', value: sales.monthlyRevenue },
+        { metric: 'totalPaidUsers', value: sales.totalPaidUsers },
+        { metric: 'conversionRate', value: sales.conversionRate },
+      ] : []),
+    ]);
+  }
+
   if (loadingOverview) return <p className="adm-sub">{t('loading')}</p>;
   if (!overview) return null;
 
@@ -49,10 +66,13 @@ export default function AdminOverviewPage() {
           <h1 className="adm-h1">{t('title')}</h1>
           <p className="adm-sub">{t('subtitle')}</p>
         </div>
-        <div className="adm-seg">
-          {(['7d', '30d', '90d'] as const).map((r) => (
-            <button key={r} type="button" className={range === r ? 'on' : ''} onClick={() => setRange(r)}>{r}</button>
-          ))}
+        <div className="adm-acts">
+          <div className="adm-seg">
+            {(['7d', '30d', '90d'] as const).map((r) => (
+              <button key={r} type="button" className={range === r ? 'on' : ''} onClick={() => setRange(r)}>{r}</button>
+            ))}
+          </div>
+          <button type="button" className="adm-btn adm-btn-l" onClick={handleExport}><Download size={14} />{t('export')}</button>
         </div>
       </div>
 

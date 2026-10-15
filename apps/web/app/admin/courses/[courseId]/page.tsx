@@ -3,25 +3,7 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import {
-  Title,
-  Text,
-  Stack,
-  Box,
-  Group,
-  Accordion,
-  Button,
-  TextInput,
-  Textarea,
-  Modal,
-  ActionIcon,
-  Tooltip,
-  Loader,
-  Center,
-} from '@mantine/core';
-import { IconPlus, IconEdit, IconTrash, IconArrowLeft } from '@tabler/icons-react';
-import { useDisclosure } from '@mantine/hooks';
-import { Surface } from '@/components/ui/Surface';
+import { ArrowLeft, Plus, Edit2, Trash2, ChevronDown, Play } from 'lucide-react';
 import {
   useCourse,
   useCreateModule,
@@ -50,236 +32,196 @@ export default function AdminCourseDetailPage() {
   const updateLesson = useUpdateLesson();
   const deleteLesson = useDeleteLesson();
 
-  const [moduleModalOpened, { open: openModuleModal, close: closeModuleModal }] = useDisclosure();
+  const [openModules, setOpenModules] = useState<Set<string>>(new Set());
+  const [moduleModalOpen, setModuleModalOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<CourseModule | null>(null);
   const [moduleForm, setModuleForm] = useState<CreateCourseModuleDto>(emptyModuleForm);
 
-  const [lessonModalOpened, { open: openLessonModal, close: closeLessonModal }] = useDisclosure();
+  const [lessonModalOpen, setLessonModalOpen] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [lessonModuleId, setLessonModuleId] = useState<string | null>(null);
   const [lessonForm, setLessonForm] = useState<CreateLessonDto>(emptyLessonForm);
 
+  function toggleModule(id: string) {
+    setOpenModules((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
   function handleCreateModule() {
     setEditingModule(null);
     setModuleForm(emptyModuleForm);
-    openModuleModal();
+    setModuleModalOpen(true);
   }
 
-  function handleEditModule(courseModule: CourseModule) {
+  function handleEditModule(courseModule: CourseModule, e: React.MouseEvent) {
+    e.stopPropagation();
     setEditingModule(courseModule);
     setModuleForm({ title: courseModule.title, description: courseModule.description || '' });
-    openModuleModal();
+    setModuleModalOpen(true);
   }
 
-  async function handleDeleteModule(courseModule: CourseModule) {
+  async function handleDeleteModule(courseModule: CourseModule, e: React.MouseEvent) {
+    e.stopPropagation();
     if (!window.confirm(t('confirmDeleteModule', { title: courseModule.title }))) return;
     await deleteModule.mutateAsync({ id: courseModule.id, courseId });
   }
 
   async function handleSaveModule() {
-    if (editingModule) {
-      await updateModule.mutateAsync({ id: editingModule.id, courseId, dto: moduleForm });
-    } else {
-      await createModule.mutateAsync({ courseId, dto: moduleForm });
-    }
-    closeModuleModal();
+    if (editingModule) await updateModule.mutateAsync({ id: editingModule.id, courseId, dto: moduleForm });
+    else await createModule.mutateAsync({ courseId, dto: moduleForm });
+    setModuleModalOpen(false);
   }
 
   function handleCreateLesson(moduleId: string) {
     setEditingLesson(null);
     setLessonModuleId(moduleId);
     setLessonForm(emptyLessonForm);
-    openLessonModal();
-  }
-
-  function handleEditLesson(lesson: Lesson) {
-    setEditingLesson(lesson);
-    setLessonModuleId(lesson.moduleId);
-    setLessonForm({
-      title: lesson.title,
-      content: lesson.content || '',
-      videoUrl: lesson.videoUrl || '',
-      exerciseText: lesson.exerciseText || '',
-      templateText: lesson.templateText || '',
-    });
-    openLessonModal();
+    setLessonModalOpen(true);
   }
 
   async function handleDeleteLesson(lesson: Lesson) {
-    if (!window.confirm(t('confirmDeleteLesson', { title: lesson.title }))) return;
     await deleteLesson.mutateAsync({ id: lesson.id, courseId });
   }
 
   async function handleSaveLesson() {
     if (!lessonModuleId) return;
-    if (editingLesson) {
-      await updateLesson.mutateAsync({ id: editingLesson.id, courseId, dto: lessonForm });
-    } else {
-      await createLesson.mutateAsync({ moduleId: lessonModuleId, courseId, dto: lessonForm });
-    }
-    closeLessonModal();
+    if (editingLesson) await updateLesson.mutateAsync({ id: editingLesson.id, courseId, dto: lessonForm });
+    else await createLesson.mutateAsync({ moduleId: lessonModuleId, courseId, dto: lessonForm });
+    setLessonModalOpen(false);
   }
 
-  if (isLoading) {
-    return (
-      <Surface p="xl">
-        <Center py="xl">
-          <Loader size="sm" />
-        </Center>
-      </Surface>
-    );
-  }
-
+  if (isLoading) return <p className="adm-sub">{t('loading') ?? '…'}</p>;
   if (!course) return null;
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }}>
-      <Stack gap="xl">
-        <Group gap="xs">
-          <Button variant="subtle" size="xs" leftSection={<IconArrowLeft size={14} />} onClick={() => router.push('/admin/courses')}>
-            {t('backToCourses')}
-          </Button>
-        </Group>
+    <div>
+      <button type="button" className="adm-back" onClick={() => router.push('/admin/courses')}>
+        <ArrowLeft size={14} />{t('backToCourses')}
+      </button>
 
-        <Group justify="space-between" wrap="wrap">
-          <Box>
-            <Title order={1}>{course.title}</Title>
-            {course.description && <Text c="dimmed">{course.description}</Text>}
-          </Box>
-          <Button leftSection={<IconPlus size={16} />} onClick={handleCreateModule}>
-            {t('newModule')}
-          </Button>
-        </Group>
+      <div className="adm-chead">
+        <div
+          className="adm-cv"
+          style={{ background: course.coverImageUrl ? `url(${course.coverImageUrl}) center/cover` : 'radial-gradient(110% 110% at 0% 0%,#3E63F5 0%,#1B2E8F 60%,#0A0D1E 100%)' }}
+        />
+        <div>
+          <h1 className="adm-h1">{course.title}</h1>
+          <p className="adm-sub">{course.description || t('noModules')}</p>
+          <div className="adm-cmeta">
+            <span className={`adm-pill${course.isPublished ? ' ok' : ''}`}>{course.isPublished ? t('status.published') : t('status.draft')}</span>
+            <span className="adm-pill acc">{course.requiredPlan ? t(`planOptions.${course.requiredPlan}`) : t('plan.any')}</span>
+          </div>
+        </div>
+        <div className="adm-acts">
+          <button type="button" className="adm-btn adm-btn-acc" onClick={handleCreateModule}><Plus size={15} />{t('newModule')}</button>
+        </div>
+      </div>
 
-        <Accordion variant="separated" radius="md">
-          {(course.modules ?? []).map((courseModule) => (
-            <Accordion.Item key={courseModule.id} value={courseModule.id}>
-              <Accordion.Control>
-                <Group justify="space-between" wrap="nowrap" pr="sm">
-                  <Box>
-                    <Text fw={600}>{courseModule.title}</Text>
-                    {courseModule.description && <Text size="xs" c="dimmed">{courseModule.description}</Text>}
-                  </Box>
-                  <Group gap="xs" onClick={(e) => e.stopPropagation()}>
-                    <Tooltip label={t('editModule')}>
-                      <ActionIcon variant="light" size="sm" color="blue" onClick={() => handleEditModule(courseModule)}>
-                        <IconEdit size={14} />
-                      </ActionIcon>
-                    </Tooltip>
-                    <Tooltip label={t('deleteModule')}>
-                      <ActionIcon variant="light" size="sm" color="red" onClick={() => handleDeleteModule(courseModule)}>
-                        <IconTrash size={14} />
-                      </ActionIcon>
-                    </Tooltip>
-                  </Group>
-                </Group>
-              </Accordion.Control>
-              <Accordion.Panel>
-                <Stack gap="sm">
-                  {(courseModule.lessons ?? []).map((lesson) => (
-                    <Group key={lesson.id} justify="space-between" wrap="nowrap" style={{ borderLeft: '2px solid #E2E8F0', paddingLeft: 12 }}>
-                      <Text size="sm">{lesson.title}</Text>
-                      <Group gap="xs">
-                        <Tooltip label={t('editLesson')}>
-                          <ActionIcon variant="light" size="sm" color="blue" onClick={() => handleEditLesson(lesson)}>
-                            <IconEdit size={14} />
-                          </ActionIcon>
-                        </Tooltip>
-                        <Tooltip label={t('deleteLesson')}>
-                          <ActionIcon variant="light" size="sm" color="red" onClick={() => handleDeleteLesson(lesson)}>
-                            <IconTrash size={14} />
-                          </ActionIcon>
-                        </Tooltip>
-                      </Group>
-                    </Group>
-                  ))}
-                  {(courseModule.lessons ?? []).length === 0 && (
-                    <Text size="sm" c="dimmed">{t('noLessons')}</Text>
-                  )}
-                  <Button
-                    variant="light"
-                    size="xs"
-                    leftSection={<IconPlus size={14} />}
-                    onClick={() => handleCreateLesson(courseModule.id)}
-                    style={{ alignSelf: 'flex-start' }}
-                  >
-                    {t('addLesson')}
-                  </Button>
-                </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-          ))}
-        </Accordion>
+      {(course.modules ?? []).length === 0 ? (
+        <div className="adm-mempty">
+          <b style={{ color: 'var(--adm-ink)' }}>{t('noModules')}</b>
+          <button type="button" className="adm-btn adm-btn-acc" onClick={handleCreateModule}><Plus size={15} />{t('newModule')}</button>
+        </div>
+      ) : (
+        (course.modules ?? []).map((courseModule, idx) => {
+          const isOpen = openModules.has(courseModule.id);
+          return (
+            <div key={courseModule.id} className={`adm-mod${isOpen ? ' open' : ''}`}>
+              <div className="adm-mod-h" onClick={() => toggleModule(courseModule.id)}>
+                <span className="adm-n">{String(idx + 1).padStart(2, '0')}</span>
+                <div>
+                  <b>{courseModule.title}</b>
+                  <small>{t('lessonCount', { count: (courseModule.lessons ?? []).length })}{courseModule.description ? ' · ' + courseModule.description : ''}</small>
+                </div>
+                <div className="adm-mod-a">
+                  <button type="button" className="adm-ia" aria-label={t('editModule')} onClick={(e) => handleEditModule(courseModule, e)}><Edit2 size={14} /></button>
+                  <button type="button" className="adm-ia" aria-label={t('deleteModule')} onClick={(e) => handleDeleteModule(courseModule, e)}><Trash2 size={14} /></button>
+                </div>
+                <ChevronDown size={16} className="adm-chev" />
+              </div>
+              <div className="adm-mod-b">
+                <div>
+                  <div className="adm-lessons">
+                    {(courseModule.lessons ?? []).map((lesson) => (
+                      <div key={lesson.id} className="adm-les">
+                        <span className="adm-k"><Play size={11} /></span>
+                        <span>{lesson.title}</span>
+                        <button
+                          type="button"
+                          className="adm-ia del"
+                          aria-label={t('deleteLesson')}
+                          onClick={() => handleDeleteLesson(lesson)}
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    ))}
+                    {(courseModule.lessons ?? []).length === 0 && <p className="adm-nol">{t('noLessons')}</p>}
+                    <button type="button" className="adm-addl" onClick={() => handleCreateLesson(courseModule.id)}>
+                      <Plus size={14} />{t('addLesson')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })
+      )}
 
-        {(course.modules ?? []).length === 0 && (
-          <Text c="dimmed" ta="center" py="xl">{t('noModules')}</Text>
-        )}
-      </Stack>
+      {moduleModalOpen && (
+        <div className="adm-modal-ov on" onClick={() => setModuleModalOpen(false)}>
+          <div className="adm-box" onClick={(e) => e.stopPropagation()}>
+            <h3>{editingModule ? t('moduleModal.editTitle') : t('moduleModal.newTitle')}</h3>
+            <label>
+              {t('moduleModal.titleLabel')} <span className="adm-req">*</span>
+              <input className="adm-in" value={moduleForm.title} onChange={(e) => setModuleForm({ ...moduleForm, title: e.target.value })} placeholder={t('moduleModal.titlePlaceholder')} />
+            </label>
+            <label>
+              {t('moduleModal.descriptionLabel')}
+              <textarea className="adm-in" value={moduleForm.description} onChange={(e) => setModuleForm({ ...moduleForm, description: e.target.value })} />
+            </label>
+            <div className="adm-f">
+              <button type="button" className="adm-btn adm-btn-l" onClick={() => setModuleModalOpen(false)}>{t('cancel')}</button>
+              <button type="button" className="adm-btn adm-btn-acc" disabled={!moduleForm.title.trim()} onClick={handleSaveModule}>{t('save')}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <Modal opened={moduleModalOpened} onClose={closeModuleModal} title={editingModule ? t('moduleModal.editTitle') : t('moduleModal.newTitle')}>
-        <Stack>
-          <TextInput
-            label={t('moduleModal.titleLabel')}
-            placeholder={t('moduleModal.titlePlaceholder')}
-            value={moduleForm.title}
-            onChange={(e) => setModuleForm({ ...moduleForm, title: e.target.value })}
-            required
-          />
-          <Textarea
-            label={t('moduleModal.descriptionLabel')}
-            value={moduleForm.description}
-            onChange={(e) => setModuleForm({ ...moduleForm, description: e.target.value })}
-            autosize
-            minRows={2}
-          />
-          <Group justify="flex-end" mt="md">
-            <Button variant="light" onClick={closeModuleModal}>{t('cancel')}</Button>
-            <Button onClick={handleSaveModule} disabled={!moduleForm.title.trim()}>{t('save')}</Button>
-          </Group>
-        </Stack>
-      </Modal>
-
-      <Modal opened={lessonModalOpened} onClose={closeLessonModal} title={editingLesson ? t('lessonModal.editTitle') : t('lessonModal.newTitle')} size="lg">
-        <Stack>
-          <TextInput
-            label={t('lessonModal.titleLabel')}
-            value={lessonForm.title}
-            onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
-            required
-          />
-          <Textarea
-            label={t('lessonModal.contentLabel')}
-            value={lessonForm.content}
-            onChange={(e) => setLessonForm({ ...lessonForm, content: e.target.value })}
-            autosize
-            minRows={3}
-          />
-          <TextInput
-            label={t('lessonModal.videoUrlLabel')}
-            placeholder={t('lessonModal.videoUrlPlaceholder')}
-            value={lessonForm.videoUrl}
-            onChange={(e) => setLessonForm({ ...lessonForm, videoUrl: e.target.value })}
-          />
-          <Textarea
-            label={t('lessonModal.exerciseLabel')}
-            value={lessonForm.exerciseText}
-            onChange={(e) => setLessonForm({ ...lessonForm, exerciseText: e.target.value })}
-            autosize
-            minRows={2}
-          />
-          <Textarea
-            label={t('lessonModal.templateLabel')}
-            value={lessonForm.templateText}
-            onChange={(e) => setLessonForm({ ...lessonForm, templateText: e.target.value })}
-            autosize
-            minRows={2}
-          />
-          <Group justify="flex-end" mt="md">
-            <Button variant="light" onClick={closeLessonModal}>{t('cancel')}</Button>
-            <Button onClick={handleSaveLesson} disabled={!lessonForm.title.trim()}>{t('save')}</Button>
-          </Group>
-        </Stack>
-      </Modal>
-    </Surface>
+      {lessonModalOpen && (
+        <div className="adm-modal-ov on" onClick={() => setLessonModalOpen(false)}>
+          <div className="adm-box" onClick={(e) => e.stopPropagation()}>
+            <h3>{editingLesson ? t('lessonModal.editTitle') : t('lessonModal.newTitle')}</h3>
+            <label>
+              {t('lessonModal.titleLabel')} <span className="adm-req">*</span>
+              <input className="adm-in" value={lessonForm.title} onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })} />
+            </label>
+            <label>
+              {t('lessonModal.contentLabel')}
+              <textarea className="adm-in" value={lessonForm.content} onChange={(e) => setLessonForm({ ...lessonForm, content: e.target.value })} />
+            </label>
+            <label>
+              {t('lessonModal.videoUrlLabel')}
+              <input className="adm-in" value={lessonForm.videoUrl} onChange={(e) => setLessonForm({ ...lessonForm, videoUrl: e.target.value })} placeholder={t('lessonModal.videoUrlPlaceholder')} />
+            </label>
+            <label>
+              {t('lessonModal.exerciseLabel')}
+              <textarea className="adm-in" value={lessonForm.exerciseText} onChange={(e) => setLessonForm({ ...lessonForm, exerciseText: e.target.value })} />
+            </label>
+            <label>
+              {t('lessonModal.templateLabel')}
+              <textarea className="adm-in" value={lessonForm.templateText} onChange={(e) => setLessonForm({ ...lessonForm, templateText: e.target.value })} />
+            </label>
+            <div className="adm-f">
+              <button type="button" className="adm-btn adm-btn-l" onClick={() => setLessonModalOpen(false)}>{t('cancel')}</button>
+              <button type="button" className="adm-btn adm-btn-acc" disabled={!lessonForm.title.trim()} onClick={handleSaveLesson}>{t('save')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
