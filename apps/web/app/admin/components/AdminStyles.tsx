@@ -50,8 +50,6 @@ export function AdminStyles() {
       .adm-me div { min-width: 0; }
       .adm-me b { display: block; font-size: 13px; }
       .adm-me small { display: block; color: var(--adm-mute); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .adm-exit { margin-left: auto; width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--adm-mute); background: none; border: none; cursor: pointer; }
-      .adm-exit:hover { background: var(--adm-line-2); color: var(--adm-ink); }
       .adm-main { padding: 28px 32px 48px; }
       .adm-panel { background: #fff; border-radius: 16px; border: 1px solid var(--adm-line); min-height: calc(100vh - 32px); padding: 32px 36px 48px; }
       .adm-mob { display: none; }

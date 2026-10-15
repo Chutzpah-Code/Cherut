@@ -1945,8 +1945,10 @@
       "title": "Sistema",
       "loading": "Verificando serviços…",
       "service": {
+        "frontend": "Frontend (Vercel)",
         "api": "Backend / API",
         "database": "Banco de dados",
+        "auth": "Autenticador",
         "imageService": "Serviço de imagens (Cloudinary)",
         "backgroundJobs": "Jobs em segundo plano"
       },
@@ -2034,6 +2036,114 @@
       "submit": "Criar admin",
       "toastSuccess": "Conta de admin criada",
       "error": "Não foi possível criar essa conta. O email já pode estar em uso."
+    }
+  },
+  "adminAnalyticsPage": {
+    "loading": "Carregando analytics…",
+    "crumb": "Admin / Analytics",
+    "title": "Analytics",
+    "subtitle": "Engajamento, retenção e conversão.",
+    "exportCsv": "Exportar CSV",
+    "notTracked": "—",
+    "notTrackedNote": "Ainda não rastreado",
+    "kpis": {
+      "dailyActive": "Ativos diários",
+      "dauMau": "DAU / MAU {pct}%",
+      "weeklyActive": "Ativos semanais",
+      "avgSession": "Sessão média",
+      "monthlyActive": "Ativos mensais",
+      "churn": "churn {rate}%"
+    },
+    "funnel": {
+      "title": "Funil de ativação",
+      "subtitle": "Usuários que chegaram em cada etapa",
+      "empty": "Ainda não há atividade suficiente para montar um funil.",
+      "stage": {
+        "signedUp": "Cadastrados",
+        "onboarded": "Onboarding concluído",
+        "enrolled": "Matriculados em um curso",
+        "completedLesson": "Concluíram uma lição"
+      }
+    },
+    "moduleUsage": {
+      "title": "Uso por curso",
+      "empty": "Ainda não há cursos."
+    },
+    "retention": {
+      "title": "Retenção por coorte",
+      "empty": "Ainda não rastreado — isso exige um histórico de sessões que o app não registra."
+    }
+  },
+  "adminSettingsPage": {
+    "loading": "Carregando configurações…",
+    "crumb": "Admin / Configurações",
+    "title": "Configurações",
+    "subtitle": "Configuração da plataforma. As mudanças valem depois de salvar.",
+    "unsavedChanges": "Alterações não salvas",
+    "discard": "Descartar",
+    "saveChanges": "Salvar alterações",
+    "toastSaved": "Configurações salvas",
+    "toastCacheCleared": "Cache local limpo",
+    "toastCleanedUp": "{count} contas removidas",
+    "tabs": {
+      "general": "Geral",
+      "security": "Segurança",
+      "email": "Email",
+      "notifications": "Notificações",
+      "maintenance": "Manutenção"
+    },
+    "general": {
+      "subtitle": "Identidade pública e acesso à plataforma.",
+      "siteName": "Nome do site",
+      "siteNameDesc": "Nome de exibição da sua plataforma",
+      "siteDescription": "Descrição do site",
+      "siteDescriptionDesc": "Mostrada em resultados de busca e prévias de link",
+      "supportEmail": "Email de suporte",
+      "supportEmailDesc": "Para onde vão os pedidos de suporte",
+      "language": "Idioma",
+      "languageDesc": "Idioma em que este painel de admin é exibido",
+      "maintenanceMode": "Modo de manutenção",
+      "maintenanceModeDesc": "Bloqueia temporariamente o acesso de quem não é admin"
+    },
+    "security": {
+      "subtitle": "Regras de autenticação e sessão.",
+      "requireVerification": "Exigir verificação de email",
+      "requireVerificationDesc": "Novas contas precisam verificar o email antes de usar",
+      "sessionTimeout": "Timeout de sessão (minutos)",
+      "sessionTimeoutDesc": "Por quanto tempo uma sessão fica válida sem atividade",
+      "maxLoginAttempts": "Máximo de tentativas de login",
+      "maxLoginAttemptsDesc": "Tentativas falhas permitidas antes de um bloqueio temporário"
+    },
+    "email": {
+      "subtitle": "Identidade dos emails enviados.",
+      "fromName": "Nome do remetente",
+      "fromNameDesc": "Nome exibido nos emails enviados",
+      "fromEmail": "Email do remetente",
+      "fromEmailDesc": "Endereço de resposta nos emails enviados",
+      "notificationsEnabled": "Notificações por email habilitadas",
+      "notificationsEnabledDesc": "Chave geral para todos os emails de notificação"
+    },
+    "notifications": {
+      "subtitle": "Sobre o que os admins são notificados.",
+      "newUserSignup": "Novo cadastro de usuário",
+      "newUserSignupDesc": "Notifica admins quando alguém se cadastra",
+      "newSubscription": "Nova assinatura",
+      "newSubscriptionDesc": "Notifica admins sobre uma nova assinatura paga",
+      "weeklyDigest": "Resumo semanal",
+      "weeklyDigestDesc": "Um resumo semanal da atividade da plataforma"
+    },
+    "maintenance": {
+      "subtitle": "Operações que podem afetar a performance.",
+      "clearCache": "Limpar cache",
+      "clearCacheDesc": "Limpa os dados do app em cache neste navegador",
+      "cleanupTitle": "Limpar usuários inativos",
+      "cleanupDesc": "Remove cadastros abandonados: nunca fizeram onboarding, sem assinatura ativa, criados há mais de 90 dias",
+      "cleanupButton": "Limpar",
+      "cleanupConfirmTitle": "Limpar usuários inativos?",
+      "cleanupConfirmBody": "Isso exclui permanentemente contas que nunca terminaram o onboarding, não têm assinatura ativa e foram criadas há mais de 90 dias. Isso não pode ser desfeito.",
+      "cleanupTypeDelete": "Digite DELETE para confirmar",
+      "cleanupCancel": "Cancelar",
+      "cleanupConfirmButton": "Excluir contas"
     }
   },
   "adminShell": {

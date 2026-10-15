@@ -174,6 +174,13 @@ export default function AdminOverviewPage() {
             <p className="adm-empty">{t('system.loading')}</p>
           ) : (
             <div className="adm-health">
+              {/* Real, not fabricated: if this page rendered at all, the
+                  Vercel-hosted frontend is serving — same logic the
+                  backend uses for its own "api" row. */}
+              <div>
+                <span>{t('system.service.frontend')}</span>
+                <StatusDot status="online" />
+              </div>
               {health.services.map((s) => (
                 <div key={s.name}>
                   <span>{t(`system.service.${s.name}`)}</span>

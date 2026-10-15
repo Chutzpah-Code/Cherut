@@ -1,479 +1,240 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
-import {
-  Title,
-  Card,
-  Text,
-  Badge,
-  Group,
-  Stack,
-  Switch,
-  TextInput,
-  NumberInput,
-  Select,
-  Button,
-  Tabs,
-  Divider,
-  Alert,
-  Loader,
-  ActionIcon,
-  Tooltip,
-  Box,
-  SimpleGrid,
-} from '@mantine/core';
-import { Surface } from '@/components/ui/Surface';
-import {
-  IconSettings,
-  IconDatabase,
-  IconShield,
-  IconMail,
-  IconBell,
-  IconUsers,
-  IconDeviceFloppy,
-  IconRefresh,
-  IconAlertTriangle,
-} from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
+import { useQueryClient } from '@tanstack/react-query';
+import { Settings as SettingsIcon, Shield, Mail, Bell, Database } from 'lucide-react';
+import { useAdminSettings, useUpdateAdminSettings, useCleanupInactiveUsers } from '@/hooks/useAdmin';
+import { SystemSettings } from '@/lib/api/services/admin';
+import { PublicLocaleSwitcher } from '@/i18n/PublicLocaleSwitcher';
+import { useAdminToast } from '../components/Toast';
+import { Switch } from './components/Switch';
 
-/**
- * Admin Settings Dashboard
- *
- * FEATURES:
- * - System configuration
- * - Security settings
- * - Email configuration
- * - Notification settings
- * - User management settings
- * - Database maintenance
- */
-
-interface SystemSettings {
-  general: {
-    siteName: string;
-    siteDescription: string;
-    maintenanceMode: boolean;
-    registrationEnabled: boolean;
-    emailVerificationRequired: boolean;
-  };
-  security: {
-    sessionTimeout: number;
-    maxLoginAttempts: number;
-    passwordMinLength: number;
-    requireTwoFactor: boolean;
-    allowedDomains: string[];
-  };
-  email: {
-    provider: string;
-    smtpHost: string;
-    smtpPort: number;
-    smtpSecure: boolean;
-    fromEmail: string;
-    fromName: string;
-  };
-  notifications: {
-    emailNotifications: boolean;
-    pushNotifications: boolean;
-    slackWebhook: string;
-    discordWebhook: string;
-  };
-}
+type Tab = 'general' | 'security' | 'email' | 'notifications' | 'maintenance';
 
 export default function AdminSettingsPage() {
-  const { user } = useAuth();
-  const [settings, setSettings] = useState<SystemSettings | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('general');
+  const t = useTranslations('adminSettingsPage');
+  const { data: settings, isLoading } = useAdminSettings();
+  const updateSettings = useUpdateAdminSettings();
+  const cleanup = useCleanupInactiveUsers();
+  const queryClient = useQueryClient();
+  const { showToast, toastNode } = useAdminToast();
+
+  const [tab, setTab] = useState<Tab>('general');
+  const [form, setForm] = useState<SystemSettings | null>(null);
+  const [baseline, setBaseline] = useState<SystemSettings | null>(null);
+  const [cleanupOpen, setCleanupOpen] = useState(false);
+  const [cleanupConfirmText, setCleanupConfirmText] = useState('');
 
   useEffect(() => {
-    async function loadSettings() {
-      if (!user) return;
-
-      try {
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // TODO: replace with real /admin/settings API call
-        setSettings({
-          general: {
-            siteName: 'Cherut',
-            siteDescription: 'Strategic Life Management Platform',
-            maintenanceMode: false,
-            registrationEnabled: true,
-            emailVerificationRequired: true,
-          },
-          security: {
-            sessionTimeout: 1440,
-            maxLoginAttempts: 5,
-            passwordMinLength: 8,
-            requireTwoFactor: false,
-            allowedDomains: ['cherut.com'],
-          },
-          email: {
-            provider: 'smtp',
-            smtpHost: 'smtp.gmail.com',
-            smtpPort: 587,
-            smtpSecure: true,
-            fromEmail: 'contact@hanielrolemberg.com',
-            fromName: 'Cherut Platform',
-          },
-          notifications: {
-            emailNotifications: true,
-            pushNotifications: true,
-            slackWebhook: '',
-            discordWebhook: '',
-          },
-        });
-      } finally {
-        setLoading(false);
-      }
+    if (settings && !form) {
+      setForm(settings);
+      setBaseline(settings);
     }
+  }, [settings, form]);
 
-    loadSettings();
-  }, [user]);
+  const dirty = form && baseline && JSON.stringify(form) !== JSON.stringify(baseline);
 
-  async function saveSettings() {
-    if (!user || !settings) return;
-
-    try {
-      setSaving(true);
-
-      // TODO: replace with real /admin/settings API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      setError(null);
-    } catch (err) {
-      console.error('Save error:', err);
-      setError(`Error saving settings: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setSaving(false);
-    }
+  function update<K extends keyof SystemSettings>(section: K, patch: Partial<SystemSettings[K]>) {
+    setForm((prev) => (prev ? { ...prev, [section]: { ...prev[section], ...patch } } : prev));
   }
 
-  function updateSetting(section: keyof SystemSettings, key: string, value: any) {
-    if (!settings) return;
+  function handleSave() {
+    if (!form) return;
+    updateSettings.mutate(form, {
+      onSuccess: (saved) => { setBaseline(saved); setForm(saved); showToast(t('toastSaved')); },
+    });
+  }
 
-    setSettings({
-      ...settings,
-      [section]: {
-        ...settings[section],
-        [key]: value,
+  function handleDiscard() {
+    setForm(baseline);
+  }
+
+  function handleClearCache() {
+    queryClient.clear();
+    showToast(t('toastCacheCleared'));
+  }
+
+  function handleCleanup() {
+    cleanup.mutate(undefined, {
+      onSuccess: ({ deletedCount }) => {
+        setCleanupOpen(false);
+        setCleanupConfirmText('');
+        showToast(t('toastCleanedUp', { count: deletedCount }));
       },
     });
   }
 
-  if (loading) {
-    return (
-      <Stack align="center" mt="xl">
-        <Loader size="lg" />
-        <Text>Loading settings...</Text>
-      </Stack>
-    );
-  }
+  if (isLoading || !form) return <p className="adm-sub">{t('loading')}</p>;
 
-  if (!settings) {
-    return (
-      <Alert color="red" title="Error">
-        Unable to load settings.
-      </Alert>
-    );
-  }
+  const tabs: { key: Tab; icon: typeof SettingsIcon; label: string }[] = [
+    { key: 'general', icon: SettingsIcon, label: t('tabs.general') },
+    { key: 'security', icon: Shield, label: t('tabs.security') },
+    { key: 'email', icon: Mail, label: t('tabs.email') },
+    { key: 'notifications', icon: Bell, label: t('tabs.notifications') },
+    { key: 'maintenance', icon: Database, label: t('tabs.maintenance') },
+  ];
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }}>
-      {/* Header */}
-      <Group justify="space-between" mb="xl" wrap="wrap">
+    <div>
+      <div className="adm-top">
         <div>
-          <Title order={1}>System Settings</Title>
-          <Text c="dimmed">Configure platform settings and preferences</Text>
+          <div className="adm-crumb adm-mono">{t('crumb')}</div>
+          <h1 className="adm-h1">{t('title')}</h1>
+          <p className="adm-sub">{t('subtitle')}</p>
         </div>
+      </div>
 
-        <Group>
-          <Badge
-            size="lg"
-            variant="filled"
-            color="blue"
-            leftSection={<IconSettings size={16} />}
-          >
-            Settings
-          </Badge>
+      <div className="adm-st">
+        <nav>
+          {tabs.map((tb) => (
+            <button key={tb.key} type="button" className={tab === tb.key ? 'on' : ''} onClick={() => setTab(tb.key)}>
+              <tb.icon size={16} />{tb.label}
+            </button>
+          ))}
+        </nav>
 
-          <Button
-            leftSection={<IconDeviceFloppy size={16} />}
-            onClick={saveSettings}
-            loading={saving}
-            color="green"
-          >
-            Save Changes
-          </Button>
-        </Group>
-      </Group>
+        <div>
+          {tab === 'general' && (
+            <div className="adm-sp on">
+              <h2>{t('tabs.general')}</h2>
+              <p>{t('general.subtitle')}</p>
+              <div className="adm-rows">
+                <div className="adm-row">
+                  <div><b>{t('general.siteName')}</b><small>{t('general.siteNameDesc')}</small></div>
+                  <input className="adm-in" value={form.general.appName} onChange={(e) => update('general', { appName: e.target.value })} />
+                </div>
+                <div className="adm-row">
+                  <div><b>{t('general.siteDescription')}</b><small>{t('general.siteDescriptionDesc')}</small></div>
+                  <input className="adm-in" value={form.general.description} onChange={(e) => update('general', { description: e.target.value })} />
+                </div>
+                <div className="adm-row">
+                  <div><b>{t('general.supportEmail')}</b><small>{t('general.supportEmailDesc')}</small></div>
+                  <input className="adm-in" type="email" value={form.general.supportEmail} onChange={(e) => update('general', { supportEmail: e.target.value })} />
+                </div>
+                <div className="adm-row">
+                  <div><b>{t('general.language')}</b><small>{t('general.languageDesc')}</small></div>
+                  <div className="adm-r"><PublicLocaleSwitcher color="var(--adm-ink)" /></div>
+                </div>
+                <div className="adm-row">
+                  <div><b>{t('general.maintenanceMode')}</b><small>{t('general.maintenanceModeDesc')}</small></div>
+                  <Switch checked={form.general.maintenanceMode} onChange={(v) => update('general', { maintenanceMode: v })} />
+                </div>
+              </div>
+            </div>
+          )}
 
-      {error && (
-        <Alert color="red" mb="lg" onClose={() => setError(null)}>
-          {error}
-        </Alert>
+          {tab === 'security' && (
+            <div className="adm-sp on">
+              <h2>{t('tabs.security')}</h2>
+              <p>{t('security.subtitle')}</p>
+              <div className="adm-rows">
+                <div className="adm-row">
+                  <div><b>{t('security.requireVerification')}</b><small>{t('security.requireVerificationDesc')}</small></div>
+                  <Switch checked={form.security.requireEmailVerification} onChange={(v) => update('security', { requireEmailVerification: v })} />
+                </div>
+                <div className="adm-row">
+                  <div><b>{t('security.sessionTimeout')}</b><small>{t('security.sessionTimeoutDesc')}</small></div>
+                  <input className="adm-in" type="number" min={5} value={form.security.sessionTimeoutMinutes} onChange={(e) => update('security', { sessionTimeoutMinutes: Number(e.target.value) })} />
+                </div>
+                <div className="adm-row">
+                  <div><b>{t('security.maxLoginAttempts')}</b><small>{t('security.maxLoginAttemptsDesc')}</small></div>
+                  <input className="adm-in" type="number" min={1} value={form.security.maxLoginAttempts} onChange={(e) => update('security', { maxLoginAttempts: Number(e.target.value) })} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {tab === 'email' && (
+            <div className="adm-sp on">
+              <h2>{t('tabs.email')}</h2>
+              <p>{t('email.subtitle')}</p>
+              <div className="adm-rows">
+                <div className="adm-row">
+                  <div><b>{t('email.fromName')}</b><small>{t('email.fromNameDesc')}</small></div>
+                  <input className="adm-in" value={form.email.fromName} onChange={(e) => update('email', { fromName: e.target.value })} />
+                </div>
+                <div className="adm-row">
+                  <div><b>{t('email.fromEmail')}</b><small>{t('email.fromEmailDesc')}</small></div>
+                  <input className="adm-in" type="email" value={form.email.fromEmail} onChange={(e) => update('email', { fromEmail: e.target.value })} />
+                </div>
+                <div className="adm-row">
+                  <div><b>{t('email.notificationsEnabled')}</b><small>{t('email.notificationsEnabledDesc')}</small></div>
+                  <Switch checked={form.email.notificationsEnabled} onChange={(v) => update('email', { notificationsEnabled: v })} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {tab === 'notifications' && (
+            <div className="adm-sp on">
+              <h2>{t('tabs.notifications')}</h2>
+              <p>{t('notifications.subtitle')}</p>
+              <div className="adm-rows">
+                <div className="adm-row">
+                  <div><b>{t('notifications.newUserSignup')}</b><small>{t('notifications.newUserSignupDesc')}</small></div>
+                  <Switch checked={form.notifications.newUserSignup} onChange={(v) => update('notifications', { newUserSignup: v })} />
+                </div>
+                <div className="adm-row">
+                  <div><b>{t('notifications.newSubscription')}</b><small>{t('notifications.newSubscriptionDesc')}</small></div>
+                  <Switch checked={form.notifications.newSubscription} onChange={(v) => update('notifications', { newSubscription: v })} />
+                </div>
+                <div className="adm-row">
+                  <div><b>{t('notifications.weeklyDigest')}</b><small>{t('notifications.weeklyDigestDesc')}</small></div>
+                  <Switch checked={form.notifications.weeklyDigest} onChange={(v) => update('notifications', { weeklyDigest: v })} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {tab === 'maintenance' && (
+            <div className="adm-sp on">
+              <h2>{t('tabs.maintenance')}</h2>
+              <p>{t('maintenance.subtitle')}</p>
+              <div className="adm-rows">
+                <div className="adm-row">
+                  <div><b>{t('maintenance.clearCache')}</b><small>{t('maintenance.clearCacheDesc')}</small></div>
+                  <button type="button" className="adm-btn adm-btn-l r" style={{ justifySelf: 'end' }} onClick={handleClearCache}>{t('maintenance.clearCache')}</button>
+                </div>
+              </div>
+
+              <div className="adm-danger">
+                <div className="adm-row">
+                  <div><b style={{ color: 'var(--adm-bad)' }}>{t('maintenance.cleanupTitle')}</b><small>{t('maintenance.cleanupDesc')}</small></div>
+                  <button type="button" className="adm-btn adm-btn-bad r" style={{ justifySelf: 'end' }} onClick={() => setCleanupOpen(true)}>{t('maintenance.cleanupButton')}</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className={`adm-save${dirty ? ' on' : ''}`}>
+        <span>{t('unsavedChanges')}</span>
+        <button type="button" className="adm-btn adm-btn-l" onClick={handleDiscard}>{t('discard')}</button>
+        <button type="button" className="adm-btn adm-btn-acc" disabled={updateSettings.isPending} onClick={handleSave}>{t('saveChanges')}</button>
+      </div>
+
+      {cleanupOpen && (
+        <div className="adm-modal-ov on" onClick={() => setCleanupOpen(false)}>
+          <div className="adm-box" onClick={(e) => e.stopPropagation()}>
+            <h3>{t('maintenance.cleanupConfirmTitle')}</h3>
+            <p>{t('maintenance.cleanupConfirmBody')}</p>
+            <label>
+              {t('maintenance.cleanupTypeDelete')}
+              <input className="adm-in" value={cleanupConfirmText} onChange={(e) => setCleanupConfirmText(e.target.value)} />
+            </label>
+            <div className="adm-f">
+              <button type="button" className="adm-btn adm-btn-l" onClick={() => setCleanupOpen(false)}>{t('maintenance.cleanupCancel')}</button>
+              <button type="button" className="adm-btn adm-btn-bad" disabled={cleanupConfirmText !== 'DELETE' || cleanup.isPending} onClick={handleCleanup}>
+                {t('maintenance.cleanupConfirmButton')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* Settings Tabs */}
-      <Tabs value={activeTab} onChange={(value) => setActiveTab(value || 'general')}>
-        <Box style={{ overflowX: 'auto' }} className="scroll-x-hidden">
-          <Tabs.List style={{ flexWrap: 'nowrap' }}>
-            <Tabs.Tab value="general" leftSection={<IconSettings size={16} />} style={{ whiteSpace: 'nowrap' }}>
-              General
-            </Tabs.Tab>
-            <Tabs.Tab value="security" leftSection={<IconShield size={16} />} style={{ whiteSpace: 'nowrap' }}>
-              Security
-            </Tabs.Tab>
-            <Tabs.Tab value="email" leftSection={<IconMail size={16} />} style={{ whiteSpace: 'nowrap' }}>
-              Email
-            </Tabs.Tab>
-            <Tabs.Tab value="notifications" leftSection={<IconBell size={16} />} style={{ whiteSpace: 'nowrap' }}>
-              Notifications
-            </Tabs.Tab>
-            <Tabs.Tab value="maintenance" leftSection={<IconDatabase size={16} />} style={{ whiteSpace: 'nowrap' }}>
-              Maintenance
-            </Tabs.Tab>
-          </Tabs.List>
-        </Box>
-
-        {/* General Settings */}
-        <Tabs.Panel value="general" pt="lg">
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3} mb="md">General Settings</Title>
-
-            <Stack gap="lg">
-              <TextInput
-                label="Site Name"
-                description="Display name for your platform"
-                value={settings.general.siteName}
-                onChange={(e) => updateSetting('general', 'siteName', e.target.value)}
-              />
-
-              <TextInput
-                label="Site Description"
-                description="Brief description of your platform"
-                value={settings.general.siteDescription}
-                onChange={(e) => updateSetting('general', 'siteDescription', e.target.value)}
-              />
-
-              <Divider />
-
-              <Switch
-                label="Maintenance Mode"
-                description="Temporarily disable access to the platform"
-                checked={settings.general.maintenanceMode}
-                onChange={(e) => updateSetting('general', 'maintenanceMode', e.currentTarget.checked)}
-                color="red"
-              />
-
-              <Switch
-                label="User Registration"
-                description="Allow new users to register"
-                checked={settings.general.registrationEnabled}
-                onChange={(e) => updateSetting('general', 'registrationEnabled', e.currentTarget.checked)}
-              />
-
-              <Switch
-                label="Email Verification Required"
-                description="Require email verification for new accounts"
-                checked={settings.general.emailVerificationRequired}
-                onChange={(e) => updateSetting('general', 'emailVerificationRequired', e.currentTarget.checked)}
-              />
-            </Stack>
-          </Card>
-        </Tabs.Panel>
-
-        {/* Security Settings */}
-        <Tabs.Panel value="security" pt="lg">
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3} mb="md">Security Settings</Title>
-
-            <Stack gap="lg">
-              <NumberInput
-                label="Session Timeout (minutes)"
-                description="Automatically log out users after this time"
-                value={settings.security.sessionTimeout}
-                onChange={(value) => updateSetting('security', 'sessionTimeout', value)}
-                min={15}
-                max={10080}
-              />
-
-              <NumberInput
-                label="Max Login Attempts"
-                description="Number of failed login attempts before account lockout"
-                value={settings.security.maxLoginAttempts}
-                onChange={(value) => updateSetting('security', 'maxLoginAttempts', value)}
-                min={3}
-                max={10}
-              />
-
-              <NumberInput
-                label="Password Minimum Length"
-                description="Minimum characters required for passwords"
-                value={settings.security.passwordMinLength}
-                onChange={(value) => updateSetting('security', 'passwordMinLength', value)}
-                min={6}
-                max={32}
-              />
-
-              <Switch
-                label="Require Two-Factor Authentication"
-                description="Force all users to enable 2FA"
-                checked={settings.security.requireTwoFactor}
-                onChange={(e) => updateSetting('security', 'requireTwoFactor', e.currentTarget.checked)}
-              />
-            </Stack>
-          </Card>
-        </Tabs.Panel>
-
-        {/* Email Settings */}
-        <Tabs.Panel value="email" pt="lg">
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3} mb="md">Email Configuration</Title>
-
-            <Stack gap="lg">
-              <Select
-                label="Email Provider"
-                description="Choose your email service provider"
-                value={settings.email.provider}
-                onChange={(value) => updateSetting('email', 'provider', value)}
-                data={[
-                  { value: 'smtp', label: 'SMTP' },
-                  { value: 'sendgrid', label: 'SendGrid' },
-                  { value: 'mailgun', label: 'Mailgun' },
-                  { value: 'ses', label: 'Amazon SES' },
-                ]}
-              />
-
-              <SimpleGrid cols={{ base: 1, sm: 2 }}>
-                <TextInput
-                  label="SMTP Host"
-                  value={settings.email.smtpHost}
-                  onChange={(e) => updateSetting('email', 'smtpHost', e.target.value)}
-                />
-
-                <NumberInput
-                  label="SMTP Port"
-                  value={settings.email.smtpPort}
-                  onChange={(value) => updateSetting('email', 'smtpPort', value)}
-                />
-              </SimpleGrid>
-
-              <Switch
-                label="SMTP Secure"
-                description="Use SSL/TLS encryption"
-                checked={settings.email.smtpSecure}
-                onChange={(e) => updateSetting('email', 'smtpSecure', e.currentTarget.checked)}
-              />
-
-              <SimpleGrid cols={{ base: 1, sm: 2 }}>
-                <TextInput
-                  label="From Email"
-                  value={settings.email.fromEmail}
-                  onChange={(e) => updateSetting('email', 'fromEmail', e.target.value)}
-                />
-
-                <TextInput
-                  label="From Name"
-                  value={settings.email.fromName}
-                  onChange={(e) => updateSetting('email', 'fromName', e.target.value)}
-                />
-              </SimpleGrid>
-            </Stack>
-          </Card>
-        </Tabs.Panel>
-
-        {/* Notifications Settings */}
-        <Tabs.Panel value="notifications" pt="lg">
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3} mb="md">Notification Settings</Title>
-
-            <Stack gap="lg">
-              <Switch
-                label="Email Notifications"
-                description="Send system notifications via email"
-                checked={settings.notifications.emailNotifications}
-                onChange={(e) => updateSetting('notifications', 'emailNotifications', e.currentTarget.checked)}
-              />
-
-              <Switch
-                label="Push Notifications"
-                description="Send browser push notifications"
-                checked={settings.notifications.pushNotifications}
-                onChange={(e) => updateSetting('notifications', 'pushNotifications', e.currentTarget.checked)}
-              />
-
-              <TextInput
-                label="Slack Webhook URL"
-                description="Send notifications to Slack channel"
-                placeholder="https://hooks.slack.com/services/..."
-                value={settings.notifications.slackWebhook}
-                onChange={(e) => updateSetting('notifications', 'slackWebhook', e.target.value)}
-              />
-
-              <TextInput
-                label="Discord Webhook URL"
-                description="Send notifications to Discord channel"
-                placeholder="https://discord.com/api/webhooks/..."
-                value={settings.notifications.discordWebhook}
-                onChange={(e) => updateSetting('notifications', 'discordWebhook', e.target.value)}
-              />
-            </Stack>
-          </Card>
-        </Tabs.Panel>
-
-        {/* Maintenance */}
-        <Tabs.Panel value="maintenance" pt="lg">
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3} mb="md">System Maintenance</Title>
-
-            <Stack gap="lg">
-              <Alert color="yellow" icon={<IconAlertTriangle size={16} />}>
-                These operations may affect system performance. Use with caution.
-              </Alert>
-
-              <Group>
-                <Button
-                  leftSection={<IconRefresh size={16} />}
-                  variant="light"
-                  color="blue"
-                >
-                  Clear Cache
-                </Button>
-
-                <Button
-                  leftSection={<IconDatabase size={16} />}
-                  variant="light"
-                  color="orange"
-                >
-                  Optimize Database
-                </Button>
-
-                <Button
-                  leftSection={<IconUsers size={16} />}
-                  variant="light"
-                  color="green"
-                >
-                  Cleanup Inactive Users
-                </Button>
-              </Group>
-
-              <Divider />
-
-              <Text size="sm" c="dimmed">
-                System Status: All services operational
-              </Text>
-            </Stack>
-          </Card>
-        </Tabs.Panel>
-      </Tabs>
-
-      {/* Footer */}
-      <Text size="xs" c="dimmed" ta="center" mt="xl">
-        Changes are saved automatically. Critical settings require system restart.
-      </Text>
-    </Surface>
+      {toastNode}
+    </div>
   );
 }

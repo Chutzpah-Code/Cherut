@@ -1945,8 +1945,10 @@
       "title": "System",
       "loading": "Checking services…",
       "service": {
+        "frontend": "Frontend (Vercel)",
         "api": "Backend / API",
         "database": "Database",
+        "auth": "Authenticator",
         "imageService": "Image service (Cloudinary)",
         "backgroundJobs": "Background jobs"
       },
@@ -2034,6 +2036,114 @@
       "submit": "Create admin",
       "toastSuccess": "Admin account created",
       "error": "Could not create this account. The email may already be in use."
+    }
+  },
+  "adminAnalyticsPage": {
+    "loading": "Loading analytics…",
+    "crumb": "Admin / Analytics",
+    "title": "Analytics",
+    "subtitle": "Engagement, retention and conversion.",
+    "exportCsv": "Export CSV",
+    "notTracked": "—",
+    "notTrackedNote": "Not tracked yet",
+    "kpis": {
+      "dailyActive": "Daily active",
+      "dauMau": "DAU / MAU {pct}%",
+      "weeklyActive": "Weekly active",
+      "avgSession": "Avg. session",
+      "monthlyActive": "Monthly active",
+      "churn": "churn {rate}%"
+    },
+    "funnel": {
+      "title": "Activation funnel",
+      "subtitle": "Users who reached each step",
+      "empty": "No activity yet to build a funnel from.",
+      "stage": {
+        "signedUp": "Signed up",
+        "onboarded": "Onboarding done",
+        "enrolled": "Enrolled in a course",
+        "completedLesson": "Completed a lesson"
+      }
+    },
+    "moduleUsage": {
+      "title": "Usage by course",
+      "empty": "No courses yet."
+    },
+    "retention": {
+      "title": "Retention by cohort",
+      "empty": "Not tracked yet — this needs session history the app doesn't record."
+    }
+  },
+  "adminSettingsPage": {
+    "loading": "Loading settings…",
+    "crumb": "Admin / Settings",
+    "title": "Settings",
+    "subtitle": "Platform configuration. Changes apply after you save.",
+    "unsavedChanges": "Unsaved changes",
+    "discard": "Discard",
+    "saveChanges": "Save changes",
+    "toastSaved": "Settings saved",
+    "toastCacheCleared": "Local cache cleared",
+    "toastCleanedUp": "{count} accounts removed",
+    "tabs": {
+      "general": "General",
+      "security": "Security",
+      "email": "Email",
+      "notifications": "Notifications",
+      "maintenance": "Maintenance"
+    },
+    "general": {
+      "subtitle": "Public identity and access to the platform.",
+      "siteName": "Site name",
+      "siteNameDesc": "Display name for your platform",
+      "siteDescription": "Site description",
+      "siteDescriptionDesc": "Shown in search results and link previews",
+      "supportEmail": "Support email",
+      "supportEmailDesc": "Where support requests are sent",
+      "language": "Language",
+      "languageDesc": "Language this admin panel is displayed in",
+      "maintenanceMode": "Maintenance mode",
+      "maintenanceModeDesc": "Temporarily block non-admin access to the app"
+    },
+    "security": {
+      "subtitle": "Authentication and session rules.",
+      "requireVerification": "Require email verification",
+      "requireVerificationDesc": "New accounts must verify their email before use",
+      "sessionTimeout": "Session timeout (minutes)",
+      "sessionTimeoutDesc": "How long a session stays valid when idle",
+      "maxLoginAttempts": "Max login attempts",
+      "maxLoginAttemptsDesc": "Failed attempts allowed before a temporary lockout"
+    },
+    "email": {
+      "subtitle": "Outgoing email identity.",
+      "fromName": "From name",
+      "fromNameDesc": "Display name on outgoing emails",
+      "fromEmail": "From email",
+      "fromEmailDesc": "Reply-to address on outgoing emails",
+      "notificationsEnabled": "Email notifications enabled",
+      "notificationsEnabledDesc": "Master switch for all outgoing notification emails"
+    },
+    "notifications": {
+      "subtitle": "What admins get notified about.",
+      "newUserSignup": "New user signup",
+      "newUserSignupDesc": "Notify admins when someone signs up",
+      "newSubscription": "New subscription",
+      "newSubscriptionDesc": "Notify admins on a new paid subscription",
+      "weeklyDigest": "Weekly digest",
+      "weeklyDigestDesc": "A weekly summary of platform activity"
+    },
+    "maintenance": {
+      "subtitle": "Operations that can affect performance.",
+      "clearCache": "Clear cache",
+      "clearCacheDesc": "Clears this browser's cached app data",
+      "cleanupTitle": "Clean up inactive users",
+      "cleanupDesc": "Remove abandoned signups: never onboarded, no active subscription, created 90+ days ago",
+      "cleanupButton": "Clean up",
+      "cleanupConfirmTitle": "Clean up inactive users?",
+      "cleanupConfirmBody": "This permanently deletes accounts that never finished onboarding, have no active subscription, and were created 90+ days ago. This cannot be undone.",
+      "cleanupTypeDelete": "Type DELETE to confirm",
+      "cleanupCancel": "Cancel",
+      "cleanupConfirmButton": "Delete accounts"
     }
   },
   "adminShell": {

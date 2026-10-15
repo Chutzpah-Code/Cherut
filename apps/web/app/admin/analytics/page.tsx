@@ -1,341 +1,121 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
-import { useEffect, useState } from 'react';
-import { Surface } from '@/components/ui/Surface';
-import {
-  Title,
-  Grid,
-  Card,
-  Text,
-  Badge,
-  Group,
-  Stack,
-  Loader,
-  Alert,
-  SimpleGrid,
-  Progress,
-} from '@mantine/core';
-import {
-  IconChartPie,
-  IconTrendingUp,
-  IconUsers,
-  IconCurrencyDollar,
-  IconChartBar,
-} from '@tabler/icons-react';
-
-// Utility function for secure API URL handling
-const getSecureApiUrl = (): string => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
-    throw new Error('API URL not configured. Please set NEXT_PUBLIC_API_URL environment variable.');
-  }
-  return apiUrl;
-};
-
-/**
- * Admin Analytics Dashboard
- *
- * FEATURES:
- * - User growth analytics
- * - Revenue trends
- * - Subscription analytics
- * - Usage metrics
- * - Performance indicators
- */
-
-interface AnalyticsData {
-  userGrowth: {
-    daily: Array<{ date: string; users: number }>;
-    monthly: Array<{ month: string; users: number }>;
-  };
-  revenue: {
-    daily: Array<{ date: string; amount: number }>;
-    monthly: Array<{ month: string; amount: number }>;
-    byPlan: Array<{ plan: string; amount: number; count: number }>;
-  };
-  engagement: {
-    dailyActiveUsers: number;
-    weeklyActiveUsers: number;
-    monthlyActiveUsers: number;
-    averageSessionDuration: number;
-    retentionRate: number;
-  };
-  subscriptions: {
-    conversions: Array<{ plan: string; conversions: number }>;
-    churnRate: number;
-    lifetime: Array<{ plan: string; value: number }>;
-  };
-}
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Download } from 'lucide-react';
+import { useAdminAnalytics, useAdminFunnel, useAdminModuleUsage } from '@/hooks/useAdmin';
+import { downloadCsv } from '../lib/exportCsv';
 
 export default function AdminAnalyticsPage() {
-  const { user } = useAuth();
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const t = useTranslations('adminAnalyticsPage');
+  const { data: analytics, isLoading } = useAdminAnalytics();
+  const { data: funnel } = useAdminFunnel();
+  const { data: moduleUsage } = useAdminModuleUsage();
+  const [range, setRange] = useState<'7d' | '30d' | '90d'>('30d');
 
-  useEffect(() => {
-    async function loadAnalyticsData() {
-      if (!user) return;
+  const maxFunnel = Math.max(1, ...(funnel?.stages.map((s) => s.count) ?? [1]));
 
-      try {
-        const token = await user.getIdToken();
-        const apiUrl = getSecureApiUrl();
-
-        const response = await fetch(`${apiUrl}/admin/analytics`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to load analytics data');
-        }
-
-        const data = await response.json();
-        setAnalyticsData(data);
-      } catch (err) {
-        console.error('Analytics error:', err);
-        setError('Error loading analytics data');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadAnalyticsData();
-  }, [user]);
-
-  if (loading) {
-    return (
-      <Stack align="center" mt="xl">
-        <Loader size="lg" />
-        <Text>Loading analytics...</Text>
-      </Stack>
-    );
+  function handleExport() {
+    if (!funnel) return;
+    downloadCsv('cherut-analytics.csv', [
+      ...funnel.stages.map((s) => ({ metric: `funnel.${s.key}`, value: s.count })),
+      ...(moduleUsage ?? []).map((m) => ({ metric: `course.${m.title}.enrolled`, value: m.enrolled })),
+      { metric: 'churnRate', value: analytics?.subscriptions.churnRate ?? '' },
+      { metric: 'monthlyActiveUsers', value: analytics?.engagement.monthlyActiveUsers ?? '' },
+    ]);
   }
 
-  if (error) {
-    return (
-      <Alert color="red" title="Error">
-        {error}
-      </Alert>
-    );
-  }
+  if (isLoading) return <p className="adm-sub">{t('loading')}</p>;
+  if (!analytics) return null;
 
-  if (!analyticsData) {
-    return (
-      <Alert color="yellow" title="No Data">
-        Unable to load analytics data.
-      </Alert>
-    );
-  }
-
-  // Use real data from analytics
-  const userGrowth = analyticsData?.userGrowth?.monthly || [];
-  const revenueData = analyticsData?.revenue?.monthly || [];
-
-  // Calculate plan distribution percentages based on real data
-  const planDistribution = [
-    { name: 'Free', value: 45, color: 'gray' }, // Will be calculated from real data when available
-    { name: 'Core', value: 30, color: 'green' },
-    { name: 'Pro', value: 20, color: 'blue' },
-    { name: 'Elite', value: 5, color: 'violet' },
-  ];
+  const { engagement, subscriptions } = analytics;
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }}>
-      {/* Header */}
-      <Group justify="space-between" mb="xl">
+    <div>
+      <div className="adm-top">
         <div>
-          <Title order={1}>Analytics Dashboard</Title>
-          <Text c="dimmed">Comprehensive system analytics and insights</Text>
+          <div className="adm-crumb adm-mono">{t('crumb')}</div>
+          <h1 className="adm-h1">{t('title')}</h1>
+          <p className="adm-sub">{t('subtitle')}</p>
         </div>
-        <Badge
-          size="lg"
-          variant="filled"
-          color="blue"
-          leftSection={<IconChartBar size={16} />}
-        >
-          Analytics
-        </Badge>
-      </Group>
+        <div className="adm-acts">
+          <div className="adm-seg">
+            {(['7d', '30d', '90d'] as const).map((r) => (
+              <button key={r} type="button" className={range === r ? 'on' : ''} onClick={() => setRange(r)}>{r}</button>
+            ))}
+          </div>
+          <button type="button" className="adm-btn adm-btn-l" onClick={handleExport}><Download size={14} />{t('exportCsv')}</button>
+        </div>
+      </div>
 
-      {/* Key Metrics */}
-      <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} mb="xl">
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Group justify="space-between" mb="xs">
-            <Text size="sm" c="dimmed" fw={500}>
-              Daily Active Users
-            </Text>
-            <IconUsers size={20} color="var(--mantine-color-blue-6)" />
-          </Group>
-          <Text size="xl" fw={700} c="blue">
-            {analyticsData?.engagement?.dailyActiveUsers?.toLocaleString('en-US') || '0'}
-          </Text>
-          <Text size="xs" c="dimmed" mt="xs">
-            Active users today
-          </Text>
-        </Card>
+      <div className="adm-kpis">
+        <div className="adm-kpi">
+          <span>{t('kpis.dailyActive')}</span>
+          <b>{engagement.dailyActiveUsers ?? t('notTracked')}</b>
+          <small>{engagement.dailyActiveUsers === null ? t('notTrackedNote') : t('kpis.dauMau', { pct: Math.round((engagement.dailyActiveUsers / Math.max(1, engagement.monthlyActiveUsers)) * 100) })}</small>
+        </div>
+        <div className="adm-kpi">
+          <span>{t('kpis.weeklyActive')}</span>
+          <b>{engagement.weeklyActiveUsers ?? t('notTracked')}</b>
+          <small>{engagement.weeklyActiveUsers === null && t('notTrackedNote')}</small>
+        </div>
+        <div className="adm-kpi">
+          <span>{t('kpis.avgSession')}</span>
+          <b>{engagement.averageSessionDuration === null ? t('notTracked') : `${Math.round(engagement.averageSessionDuration / 60)}m`}</b>
+          <small>{engagement.averageSessionDuration === null && t('notTrackedNote')}</small>
+        </div>
+        <div className="adm-kpi">
+          <span>{t('kpis.monthlyActive')}</span>
+          <b>{engagement.monthlyActiveUsers}</b>
+          <small>{t('kpis.churn', { rate: subscriptions.churnRate })}</small>
+        </div>
+      </div>
 
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Group justify="space-between" mb="xs">
-            <Text size="sm" c="dimmed" fw={500}>
-              Monthly Revenue
-            </Text>
-            <IconCurrencyDollar size={20} color="var(--mantine-color-green-6)" />
-          </Group>
-          <Text size="xl" fw={700} c="green">
-            ${revenueData.reduce((sum, month) => sum + month.amount, 0).toLocaleString('en-US')}
-          </Text>
-          <Text size="xs" c="dimmed" mt="xs">
-            Total from last 6 months
-          </Text>
-        </Card>
+      <div className="adm-card" style={{ marginTop: 20 }}>
+        <div className="adm-card-h">
+          <div>
+            <h3>{t('funnel.title')}</h3>
+            <small>{t('funnel.subtitle')}</small>
+          </div>
+        </div>
+        {!funnel || funnel.stages.every((s) => s.count === 0) ? (
+          <p className="adm-empty">{t('funnel.empty')}</p>
+        ) : (
+          <div className="adm-funnel">
+            {funnel.stages.map((s) => (
+              <div key={s.key}>
+                <span>{t(`funnel.stage.${s.key}`)}</span>
+                <div className="adm-bar"><i style={{ width: `${(s.count / maxFunnel) * 100}%` }} /></div>
+                <span>{s.count}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Group justify="space-between" mb="xs">
-            <Text size="sm" c="dimmed" fw={500}>
-              Conversion Rate
-            </Text>
-            <IconTrendingUp size={20} color="var(--mantine-color-violet-6)" />
-          </Group>
-          <Text size="xl" fw={700} c="violet">
-            {analyticsData?.subscriptions?.churnRate || 0}%
-          </Text>
-          <Text size="xs" c="dimmed" mt="xs">
-            Current churn rate
-          </Text>
-        </Card>
-
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Group justify="space-between" mb="xs">
-            <Text size="sm" c="dimmed" fw={500}>
-              Retention Rate
-            </Text>
-            <IconChartPie size={20} color="var(--mantine-color-orange-6)" />
-          </Group>
-          <Text size="xl" fw={700} c="orange">
-            {analyticsData?.engagement?.retentionRate || 0}%
-          </Text>
-          <Text size="xs" c="dimmed" mt="xs">
-            User retention rate
-          </Text>
-        </Card>
-      </SimpleGrid>
-
-      {/* Analytics Grid */}
-      <Grid>
-        <Grid.Col span={{ base: 12, md: 8 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder mb="lg">
-            <Title order={3} mb="md">User Growth</Title>
-            <Text size="sm" c="dimmed" mb="lg">Monthly user registration trends</Text>
-
-            <Stack gap="md">
-              {userGrowth.length > 0 ? userGrowth.map((item, index) => {
-                const maxUsers = Math.max(...userGrowth.map(u => u.users));
-                return (
-                  <div key={item.month}>
-                    <Group justify="space-between" mb="xs">
-                      <Text size="sm">{item.month}</Text>
-                      <Text size="sm" fw={500}>{item.users} users</Text>
-                    </Group>
-                    <Progress
-                      value={(item.users / maxUsers) * 100}
-                      color="blue"
-                      size="sm"
-                    />
-                  </div>
-                );
-              }) : (
-                <Text size="sm" c="dimmed">No user growth data available</Text>
-              )}
-            </Stack>
-          </Card>
-
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3} mb="md">Revenue Trends</Title>
-            <Text size="sm" c="dimmed" mb="lg">Monthly revenue growth</Text>
-
-            <Stack gap="md">
-              {revenueData.length > 0 ? revenueData.map((item, index) => {
-                const maxRevenue = Math.max(...revenueData.map(r => r.amount));
-                return (
-                  <div key={item.month}>
-                    <Group justify="space-between" mb="xs">
-                      <Text size="sm">{item.month}</Text>
-                      <Text size="sm" fw={500}>${item.amount.toLocaleString('en-US')}</Text>
-                    </Group>
-                    <Progress
-                      value={(item.amount / maxRevenue) * 100}
-                      color="green"
-                      size="sm"
-                    />
-                  </div>
-                );
-              }) : (
-                <Text size="sm" c="dimmed">No revenue data available</Text>
-              )}
-            </Stack>
-          </Card>
-        </Grid.Col>
-
-        <Grid.Col span={{ base: 12, md: 4 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder mb="lg">
-            <Title order={3} mb="md">Plan Distribution</Title>
-
-            <Stack gap="lg">
-              {planDistribution.map((plan) => (
-                <div key={plan.name}>
-                  <Group justify="space-between" mb="xs">
-                    <Text size="sm">{plan.name}</Text>
-                    <Badge color={plan.color} variant="light">{plan.value}%</Badge>
-                  </Group>
-                  <Progress value={plan.value} color={plan.color} />
+      <div className="adm-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
+        <div className="adm-card">
+          <div className="adm-card-h"><h3>{t('moduleUsage.title')}</h3></div>
+          {!moduleUsage || moduleUsage.length === 0 ? (
+            <p className="adm-empty">{t('moduleUsage.empty')}</p>
+          ) : (
+            <div className="adm-leg">
+              {moduleUsage.map((m) => (
+                <div key={m.id} style={{ gridTemplateColumns: '90px minmax(0,1fr) 44px' }}>
+                  <span>{m.title}</span>
+                  <div className="adm-bar"><i style={{ width: `${m.averageProgress}%` }} /></div>
+                  <b style={{ textAlign: 'right' }}>{m.averageProgress}%</b>
                 </div>
               ))}
-            </Stack>
-          </Card>
+            </div>
+          )}
+        </div>
 
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3} mb="md">Engagement Metrics</Title>
-            <Stack gap="lg">
-              <div>
-                <Text size="sm" c="dimmed">Session Duration</Text>
-                <Group justify="space-between">
-                  <Text size="lg" fw={700}>
-                    {Math.floor((analyticsData?.engagement?.averageSessionDuration || 0) / 60)}m{' '}
-                    {(analyticsData?.engagement?.averageSessionDuration || 0) % 60}s
-                  </Text>
-                  <Badge color="blue" variant="light">Avg</Badge>
-                </Group>
-              </div>
-
-              <div>
-                <Text size="sm" c="dimmed">Weekly Active Users</Text>
-                <Group justify="space-between">
-                  <Text size="lg" fw={700}>{analyticsData?.engagement?.weeklyActiveUsers?.toLocaleString('en-US') || '0'}</Text>
-                  <Badge color="green" variant="light">Active</Badge>
-                </Group>
-              </div>
-
-              <div>
-                <Text size="sm" c="dimmed">Monthly Active Users</Text>
-                <Group justify="space-between" mb="xs">
-                  <Text size="lg" fw={700}>{analyticsData?.engagement?.monthlyActiveUsers?.toLocaleString('en-US') || '0'}</Text>
-                  <Badge color="blue" variant="light">MAU</Badge>
-                </Group>
-                <Progress
-                  value={analyticsData?.engagement?.retentionRate || 0}
-                  color="blue"
-                />
-              </div>
-            </Stack>
-          </Card>
-        </Grid.Col>
-      </Grid>
-
-      {/* Footer */}
-      <Text size="xs" c="dimmed" ta="center" mt="xl">
-        Analytics data updated every hour
-      </Text>
-    </Surface>
+        <div className="adm-card">
+          <div className="adm-card-h"><h3>{t('retention.title')}</h3></div>
+          <p className="adm-empty">{t('retention.empty')}</p>
+        </div>
+      </div>
+    </div>
   );
 }

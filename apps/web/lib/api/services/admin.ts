@@ -84,7 +84,7 @@ export interface UserFilters {
 }
 
 export interface SystemSettings {
-  general: { appName: string; supportEmail: string; maintenanceMode: boolean };
+  general: { appName: string; description: string; supportEmail: string; maintenanceMode: boolean };
   security: { requireEmailVerification: boolean; sessionTimeoutMinutes: number; maxLoginAttempts: number };
   email: { fromName: string; fromEmail: string; notificationsEnabled: boolean };
   notifications: { newUserSignup: boolean; newSubscription: boolean; weeklyDigest: boolean };

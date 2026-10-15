@@ -12,7 +12,12 @@ import {
 } from './dto/admin.dto';
 
 const DEFAULT_SETTINGS = {
-  general: { appName: 'Cherut', supportEmail: 'contact@hanielrolemberg.com', maintenanceMode: false },
+  general: {
+    appName: 'Cherut',
+    description: 'Strategic Life Management',
+    supportEmail: 'contact@hanielrolemberg.com',
+    maintenanceMode: false,
+  },
   security: { requireEmailVerification: true, sessionTimeoutMinutes: 60, maxLoginAttempts: 5 },
   email: { fromName: 'Cherut', fromEmail: 'contact@hanielrolemberg.com', notificationsEnabled: true },
   notifications: { newUserSignup: true, newSubscription: true, weeklyDigest: false },
@@ -333,13 +338,24 @@ export class AdminService {
       }
     };
 
-    const [database, imageService] = await Promise.all([checkDatabase(), checkImageService()]);
+    const checkAuth = async () => {
+      const start = Date.now();
+      try {
+        await this.firebaseService.getAuth().listUsers(1);
+        return { name: 'auth', status: 'online' as const, latencyMs: Date.now() - start };
+      } catch {
+        return { name: 'auth', status: 'down' as const, latencyMs: null };
+      }
+    };
+
+    const [database, imageService, auth] = await Promise.all([checkDatabase(), checkImageService(), checkAuth()]);
 
     return {
       services: [
         // If this request is executing at all, the API process is up.
         { name: 'api', status: 'online' as const, latencyMs: 0 },
         database,
+        auth,
         imageService,
         // No job queue/scheduler exists in this stack today — report that
         // honestly instead of inventing a status for something that isn't

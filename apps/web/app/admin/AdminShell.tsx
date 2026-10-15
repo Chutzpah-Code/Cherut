@@ -10,6 +10,7 @@ import { logoutUser } from '@/lib/firebase/auth';
 import { useAdminOverview } from '@/hooks/useAdmin';
 import { useCourses } from '@/hooks/useLearning';
 import CherutLogo from '@/components/ui/CherutLogo';
+import { PublicLocaleSwitcher } from '@/i18n/PublicLocaleSwitcher';
 import { AdminStyles } from './components/AdminStyles';
 import { geistSans, geistMono } from '@/lib/fonts';
 
@@ -124,6 +125,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             Cherut
             <span className="adm-pill ink adm-mono adm-tag" style={{ height: 20, fontSize: 10 }}>{t('adminBadge')}</span>
           </div>
+          <div style={{ padding: '0 10px 14px' }}>
+            <PublicLocaleSwitcher color="var(--adm-mute)" />
+          </div>
           <nav>
             {navItems.map((item) => (
               <Link key={item.href} href={item.href} className={item.active ? 'on' : ''} onClick={() => setMobileNavOpen(false)}>
@@ -132,6 +136,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 {item.count !== null && <span className="adm-n">{item.count}</span>}
               </Link>
             ))}
+            <button type="button" onClick={handleLogout}>
+              <LogOut size={17} />
+              {t('exitAdmin')}
+            </button>
           </nav>
           <div className="adm-me">
             <span className="adm-av">{initials(adminUser.displayName || adminUser.email)}</span>
@@ -139,9 +147,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <b>{adminUser.displayName || t('adminBadge')}</b>
               <small>{adminUser.email}</small>
             </div>
-            <button type="button" className="adm-exit" title={t('exitAdmin')} onClick={handleLogout}>
-              <LogOut size={16} />
-            </button>
           </div>
         </aside>
 
