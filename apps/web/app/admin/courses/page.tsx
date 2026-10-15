@@ -7,6 +7,7 @@ import { Plus, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { useCourses, useCreateCourse, useUpdateCourse, useDeleteCourse, useUploadCourseCover } from '@/hooks/useLearning';
 import { useAdminModuleUsage } from '@/hooks/useAdmin';
 import { Course, CreateCourseDto, RequiredPlan } from '@/lib/api/services/learning';
+import { EnrolleesModal } from './components/EnrolleesModal';
 
 const MAX_COVER_SIZE = 2 * 1024 * 1024;
 const ALLOWED_COVER_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -41,6 +42,7 @@ export default function AdminCoursesPage() {
   const [editing, setEditing] = useState<Course | null>(null);
   const [form, setForm] = useState<CreateCourseDto>(emptyForm);
   const [coverError, setCoverError] = useState<string | null>(null);
+  const [enrolleesCourse, setEnrolleesCourse] = useState<Course | null>(null);
 
   function handleCreate() {
     setEditing(null);
@@ -112,7 +114,12 @@ export default function AdminCoursesPage() {
               <div className="adm-cb">
                 <small style={{ color: 'var(--adm-mute)' }}>{t('card.lessons', { count: course.totalLessons })}</small>
                 <div className="adm-cstats">
-                  <div><b>{u?.enrolled ?? 0}</b>{t('card.enrolled')}</div>
+                  <div
+                    onClick={(e) => { e.stopPropagation(); setEnrolleesCourse(course); }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <b>{u?.enrolled ?? 0}</b>{t('card.enrolled')}
+                  </div>
                   <div><b>{u ? `${u.averageProgress}%` : '—'}</b>{t('card.avgProgress')}</div>
                 </div>
                 <div className="adm-bar"><i style={{ width: `${u?.averageProgress ?? 0}%` }} /></div>
@@ -130,6 +137,14 @@ export default function AdminCoursesPage() {
       </div>
 
       {(courses ?? []).length === 0 && <p className="adm-empty">{t('empty')}</p>}
+
+      {enrolleesCourse && (
+        <EnrolleesModal
+          courseId={enrolleesCourse.id}
+          courseTitle={enrolleesCourse.title}
+          onClose={() => setEnrolleesCourse(null)}
+        />
+      )}
 
       {modalOpen && (
         <div className="adm-modal-ov on" onClick={() => setModalOpen(false)}>

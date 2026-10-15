@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Copy, X } from 'lucide-react';
 import { AdminUser } from '@/lib/api/services/admin';
 import { useUpdateAdminUser, useGeneratePasswordResetLink, useSuspendUser, useReactivateUser } from '@/hooks/useAdmin';
-import { RolePill, PlanPill, StatusPill, OnboardingPill } from './pills';
+import { RolePill, PlanPill, StatusPill } from './pills';
 
 function initials(nameOrEmail: string): string {
   const base = nameOrEmail.includes('@') ? nameOrEmail.split('@')[0] : nameOrEmail;
@@ -89,8 +89,6 @@ export function UserDrawer({ user, onClose, onToast }: UserDrawerProps) {
               <dd>{user.email}</dd>
               <dt>{t('joined')}</dt>
               <dd>{new Date(user.createdAt).toLocaleDateString()}</dd>
-              <dt>{t('onboarding')}</dt>
-              <dd><OnboardingPill complete={user.onboardingCompleted} /></dd>
             </dl>
           </div>
 

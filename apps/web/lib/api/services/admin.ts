@@ -6,7 +6,6 @@ export interface DashboardOverview {
     totalAdmins: number;
     activeSubscriptions: number;
     newUsersLast30Days: number;
-    onboardingCompletionRate: number;
   };
   planDistribution: { free: number; core: number; pro: number; elite: number };
   lastUpdated: string;
@@ -44,7 +43,7 @@ export interface ActivityEvent {
 }
 
 export interface FunnelStage {
-  key: 'signedUp' | 'onboarded' | 'enrolled' | 'completedLesson';
+  key: 'signedUp' | 'enrolled' | 'completedLesson';
   count: number;
 }
 
@@ -53,6 +52,14 @@ export interface ModuleUsage {
   title: string;
   enrolled: number;
   averageProgress: number;
+}
+
+export interface CourseEnrollee {
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+  percentComplete: number;
+  enrolledAt: string;
 }
 
 export type ServiceStatus = 'online' | 'degraded' | 'down' | 'not_configured';
@@ -70,7 +77,6 @@ export interface AdminUser {
   role: 'user' | 'admin';
   subscription?: { plan: 'free' | 'core' | 'pro' | 'elite'; status: 'active' | 'inactive' | 'cancelled' };
   createdAt: string;
-  onboardingCompleted?: boolean;
   suspended?: boolean;
 }
 
@@ -97,6 +103,8 @@ export const adminApi = {
   getActivity: async (): Promise<ActivityEvent[]> => (await apiClient.get('/admin/activity')).data,
   getFunnel: async (): Promise<{ stages: FunnelStage[] }> => (await apiClient.get('/admin/funnel')).data,
   getModuleUsage: async (): Promise<ModuleUsage[]> => (await apiClient.get('/admin/module-usage')).data,
+  getCourseEnrollments: async (courseId: string): Promise<CourseEnrollee[]> =>
+    (await apiClient.get(`/admin/courses/${courseId}/enrollments`)).data,
   getServicesStatus: async (): Promise<ServiceHealth> => (await apiClient.get('/admin/services-status')).data,
 
   getUsers: async (filters: UserFilters): Promise<{ users: AdminUser[]; total: number }> =>

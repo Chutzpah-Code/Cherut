@@ -1914,7 +1914,7 @@
       "totalUsers": "Total de usuários",
       "newInLast30": "{count} novos nos últimos 30 dias",
       "activeUsers": "Assinaturas ativas",
-      "onboardingRate": "{rate}% de onboarding",
+      "ofTotalUsers": "{rate}% do total de usuários",
       "monthlyRevenue": "Receita mensal",
       "arpu": "${amount} ARPU",
       "paidConversion": "Conversão paga",
@@ -1973,22 +1973,19 @@
     "count": "{shown} de {total}",
     "filters": {
       "allRoles": "Todos os papéis",
-      "allPlans": "Todos os planos",
-      "anyOnboarding": "Qualquer onboarding"
+      "allPlans": "Todos os planos"
     },
     "table": {
       "user": "Usuário",
       "role": "Papel",
       "plan": "Plano",
       "status": "Status",
-      "onboarding": "Onboarding",
       "joined": "Cadastro"
     },
     "pills": {
       "role": { "user": "Usuário", "admin": "Admin" },
       "plan": { "free": "Free", "core": "Core", "pro": "Pro", "elite": "Elite" },
-      "status": { "active": "Ativo", "inactive": "Inativo", "cancelled": "Cancelado" },
-      "onboarding": { "complete": "Completo", "pending": "Pendente" }
+      "status": { "active": "Ativo", "inactive": "Inativo", "cancelled": "Cancelado" }
     },
     "drawer": {
       "close": "Fechar",
@@ -1997,7 +1994,6 @@
       "displayName": "Nome de exibição",
       "email": "Email",
       "joined": "Cadastro",
-      "onboarding": "Onboarding",
       "subscription": "Assinatura",
       "plan": "Plano",
       "planFree": "Free",
@@ -2060,7 +2056,6 @@
       "empty": "Ainda não há atividade suficiente para montar um funil.",
       "stage": {
         "signedUp": "Cadastrados",
-        "onboarded": "Onboarding concluído",
         "enrolled": "Matriculados em um curso",
         "completedLesson": "Concluíram uma lição"
       }
@@ -2170,6 +2165,13 @@
       "enrolled": "Inscritos",
       "avgProgress": "Progresso médio",
       "lessons": "{count} lições"
+    },
+    "enrollees": {
+      "title": "Usuários inscritos",
+      "close": "Fechar",
+      "loading": "Carregando inscritos…",
+      "empty": "Ninguém está inscrito neste curso ainda.",
+      "unknownUser": "Usuário desconhecido"
     },
     "table": {
       "title": "Título",

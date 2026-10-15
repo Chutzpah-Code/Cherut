@@ -1914,7 +1914,7 @@
       "totalUsers": "Total users",
       "newInLast30": "{count} new in 30 days",
       "activeUsers": "Active subscriptions",
-      "onboardingRate": "{rate}% onboarding",
+      "ofTotalUsers": "{rate}% of total users",
       "monthlyRevenue": "Monthly revenue",
       "arpu": "${amount} ARPU",
       "paidConversion": "Paid conversion",
@@ -1973,22 +1973,19 @@
     "count": "{shown} of {total}",
     "filters": {
       "allRoles": "All roles",
-      "allPlans": "All plans",
-      "anyOnboarding": "Any onboarding"
+      "allPlans": "All plans"
     },
     "table": {
       "user": "User",
       "role": "Role",
       "plan": "Plan",
       "status": "Status",
-      "onboarding": "Onboarding",
       "joined": "Joined"
     },
     "pills": {
       "role": { "user": "User", "admin": "Admin" },
       "plan": { "free": "Free", "core": "Core", "pro": "Pro", "elite": "Elite" },
-      "status": { "active": "Active", "inactive": "Inactive", "cancelled": "Cancelled" },
-      "onboarding": { "complete": "Complete", "pending": "Pending" }
+      "status": { "active": "Active", "inactive": "Inactive", "cancelled": "Cancelled" }
     },
     "drawer": {
       "close": "Close",
@@ -1997,7 +1994,6 @@
       "displayName": "Display name",
       "email": "Email",
       "joined": "Joined",
-      "onboarding": "Onboarding",
       "subscription": "Subscription",
       "plan": "Plan",
       "planFree": "Free",
@@ -2060,7 +2056,6 @@
       "empty": "No activity yet to build a funnel from.",
       "stage": {
         "signedUp": "Signed up",
-        "onboarded": "Onboarding done",
         "enrolled": "Enrolled in a course",
         "completedLesson": "Completed a lesson"
       }
@@ -2170,6 +2165,13 @@
       "enrolled": "Enrolled",
       "avgProgress": "Avg. progress",
       "lessons": "{count} lessons"
+    },
+    "enrollees": {
+      "title": "Enrolled users",
+      "close": "Close",
+      "loading": "Loading enrollees…",
+      "empty": "No one is enrolled in this course yet.",
+      "unknownUser": "Unknown user"
     },
     "table": {
       "title": "Title",

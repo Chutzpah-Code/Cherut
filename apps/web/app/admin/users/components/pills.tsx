@@ -1,6 +1,6 @@
-// Shared pill-color mapping for the real role/plan/status/onboarding
-// values this app actually has (free/core/pro/elite, active/inactive/
-// cancelled) — not the prototype's fictional Core/Method/Mentorship tiers.
+// Shared pill-color mapping for the real role/plan/status values this
+// app actually has (free/core/pro/elite, active/inactive/cancelled) —
+// not the prototype's fictional Core/Method/Mentorship tiers.
 import { useTranslations } from 'next-intl';
 import { AdminUser } from '@/lib/api/services/admin';
 
@@ -20,9 +20,4 @@ export function StatusPill({ status }: { status: NonNullable<AdminUser['subscrip
   const s = status ?? 'inactive';
   const cls = s === 'active' ? 'ok' : s === 'cancelled' ? 'bad' : '';
   return <span className={`adm-pill${cls ? ' ' + cls : ''}`}>{t(`status.${s}`)}</span>;
-}
-
-export function OnboardingPill({ complete }: { complete: boolean | undefined }) {
-  const t = useTranslations('adminUsersPage.pills');
-  return <span className={`adm-pill${complete ? ' ok' : ' warn'}`}>{t(complete ? 'onboarding.complete' : 'onboarding.pending')}</span>;
 }

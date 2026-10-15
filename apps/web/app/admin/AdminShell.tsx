@@ -10,7 +10,6 @@ import { logoutUser } from '@/lib/firebase/auth';
 import { useAdminOverview } from '@/hooks/useAdmin';
 import { useCourses } from '@/hooks/useLearning';
 import CherutLogo from '@/components/ui/CherutLogo';
-import { PublicLocaleSwitcher } from '@/i18n/PublicLocaleSwitcher';
 import { AdminStyles } from './components/AdminStyles';
 import { geistSans, geistMono } from '@/lib/fonts';
 
@@ -121,12 +120,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className={`adm-scrim${mobileNavOpen ? ' on' : ''}`} onClick={() => setMobileNavOpen(false)} aria-hidden="true" />
         <aside className={`adm-sb${mobileNavOpen ? ' on' : ''}`}>
           <div className="adm-brand">
-            <CherutLogo viewBox="200 279 108 132" width={24} height={24} fillColor="#3B5BF6" />
-            Cherut
+            <CherutLogo viewBox="200 279 338 132" width={80} height={31} fillColor="#14141C" />
             <span className="adm-pill ink adm-mono adm-tag" style={{ height: 20, fontSize: 10 }}>{t('adminBadge')}</span>
-          </div>
-          <div style={{ padding: '0 10px 14px' }}>
-            <PublicLocaleSwitcher color="var(--adm-mute)" />
           </div>
           <nav>
             {navItems.map((item) => (

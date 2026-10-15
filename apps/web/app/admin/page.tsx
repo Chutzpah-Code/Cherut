@@ -46,7 +46,6 @@ export default function AdminOverviewPage() {
       { metric: 'totalAdmins', value: overview!.overview.totalAdmins },
       { metric: 'activeSubscriptions', value: overview!.overview.activeSubscriptions },
       { metric: 'newUsersLast30Days', value: overview!.overview.newUsersLast30Days },
-      { metric: 'onboardingCompletionRate', value: overview!.overview.onboardingCompletionRate },
       ...(sales ? [
         { metric: 'monthlyRevenue', value: sales.monthlyRevenue },
         { metric: 'totalPaidUsers', value: sales.totalPaidUsers },
@@ -85,7 +84,7 @@ export default function AdminOverviewPage() {
         <div className="adm-kpi">
           <span>{t('kpis.activeUsers')}</span>
           <b>{overview.overview.activeSubscriptions.toLocaleString()}</b>
-          <small>{t('kpis.onboardingRate', { rate: overview.overview.onboardingCompletionRate })}</small>
+          <small>{t('kpis.ofTotalUsers', { rate: overview.overview.totalUsers > 0 ? Math.round((overview.overview.activeSubscriptions / overview.overview.totalUsers) * 100) : 0 })}</small>
         </div>
         <div className="adm-kpi">
           <span>{t('kpis.monthlyRevenue')}</span>

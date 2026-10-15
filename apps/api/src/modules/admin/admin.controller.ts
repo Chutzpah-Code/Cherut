@@ -135,6 +135,11 @@ export class AdminController {
     return this.adminService.getModuleUsage();
   }
 
+  @Get('courses/:courseId/enrollments')
+  async getCourseEnrollments(@Param('courseId') courseId: string) {
+    return this.adminService.getCourseEnrollments(courseId);
+  }
+
   /**
    * ⚙️ CONFIGURAÇÕES DO SISTEMA
    */

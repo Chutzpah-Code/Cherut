@@ -6,7 +6,7 @@ import { Search, MoreHorizontal } from 'lucide-react';
 import { useAdminUsers } from '@/hooks/useAdmin';
 import { AdminUser } from '@/lib/api/services/admin';
 import { useAdminToast } from '../components/Toast';
-import { RolePill, PlanPill, StatusPill, OnboardingPill } from './components/pills';
+import { RolePill, PlanPill, StatusPill } from './components/pills';
 import { UserDrawer } from './components/UserDrawer';
 import { PromoteUserModal } from './components/PromoteUserModal';
 import { CreateAdminModal } from './components/CreateAdminModal';
@@ -24,7 +24,6 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('');
   const [plan, setPlan] = useState('');
-  const [onboarding, setOnboarding] = useState('');
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [modal, setModal] = useState<'promote' | 'create' | null>(null);
 
@@ -34,11 +33,9 @@ export default function AdminUsersPage() {
       if (q && !`${u.displayName ?? ''}${u.email}${u.uid}`.toLowerCase().includes(q)) return false;
       if (role && u.role !== role) return false;
       if (plan && (u.subscription?.plan ?? 'free') !== plan) return false;
-      if (onboarding === 'complete' && !u.onboardingCompleted) return false;
-      if (onboarding === 'pending' && u.onboardingCompleted) return false;
       return true;
     });
-  }, [data, search, role, plan, onboarding]);
+  }, [data, search, role, plan]);
 
   return (
     <div>
@@ -71,11 +68,6 @@ export default function AdminUsersPage() {
           <option value="pro">{t('pills.plan.pro')}</option>
           <option value="elite">{t('pills.plan.elite')}</option>
         </select>
-        <select value={onboarding} onChange={(e) => setOnboarding(e.target.value)}>
-          <option value="">{t('filters.anyOnboarding')}</option>
-          <option value="complete">{t('pills.onboarding.complete')}</option>
-          <option value="pending">{t('pills.onboarding.pending')}</option>
-        </select>
         <span className="adm-cnt">{t('count', { shown: filtered.length, total: data?.users.length ?? 0 })}</span>
       </div>
 
@@ -90,7 +82,6 @@ export default function AdminUsersPage() {
                 <th>{t('table.role')}</th>
                 <th>{t('table.plan')}</th>
                 <th>{t('table.status')}</th>
-                <th>{t('table.onboarding')}</th>
                 <th>{t('table.joined')}</th>
                 <th />
               </tr>
@@ -107,7 +98,6 @@ export default function AdminUsersPage() {
                   <td><RolePill role={u.role} /></td>
                   <td><PlanPill plan={u.subscription?.plan ?? 'free'} /></td>
                   <td><StatusPill status={u.subscription?.status} /></td>
-                  <td><OnboardingPill complete={u.onboardingCompleted} /></td>
                   <td className="adm-num">{new Date(u.createdAt).toLocaleDateString()}</td>
                   <td onClick={(e) => e.stopPropagation()}><button type="button" className="adm-ia" aria-label={t('more')}><MoreHorizontal size={16} /></button></td>
                 </tr>

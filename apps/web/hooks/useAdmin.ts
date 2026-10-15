@@ -19,6 +19,14 @@ export const useAdminFunnel = () =>
 export const useAdminModuleUsage = () =>
   useQuery({ queryKey: ['admin', 'module-usage'], queryFn: adminApi.getModuleUsage, staleTime: 60 * 1000 });
 
+export const useAdminCourseEnrollments = (courseId: string | null) =>
+  useQuery({
+    queryKey: ['admin', 'course-enrollments', courseId],
+    queryFn: () => adminApi.getCourseEnrollments(courseId!),
+    enabled: !!courseId,
+    staleTime: 30 * 1000,
+  });
+
 export const useAdminServicesStatus = () =>
   useQuery({ queryKey: ['admin', 'services-status'], queryFn: adminApi.getServicesStatus, staleTime: 30 * 1000 });
 

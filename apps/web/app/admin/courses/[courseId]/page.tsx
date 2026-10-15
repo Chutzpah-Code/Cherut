@@ -82,7 +82,22 @@ export default function AdminCourseDetailPage() {
     setLessonModalOpen(true);
   }
 
-  async function handleDeleteLesson(lesson: Lesson) {
+  function handleEditLesson(lesson: Lesson) {
+    setEditingLesson(lesson);
+    setLessonModuleId(lesson.moduleId);
+    setLessonForm({
+      title: lesson.title,
+      content: lesson.content || '',
+      videoUrl: lesson.videoUrl || '',
+      exerciseText: lesson.exerciseText || '',
+      templateText: lesson.templateText || '',
+    });
+    setLessonModalOpen(true);
+  }
+
+  async function handleDeleteLesson(lesson: Lesson, e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!window.confirm(t('confirmDeleteLesson', { title: lesson.title }))) return;
     await deleteLesson.mutateAsync({ id: lesson.id, courseId });
   }
 
@@ -146,17 +161,27 @@ export default function AdminCourseDetailPage() {
                 <div>
                   <div className="adm-lessons">
                     {(courseModule.lessons ?? []).map((lesson) => (
-                      <div key={lesson.id} className="adm-les">
+                      <div key={lesson.id} className="adm-les" onClick={() => handleEditLesson(lesson)} style={{ cursor: 'pointer' }}>
                         <span className="adm-k"><Play size={11} /></span>
                         <span>{lesson.title}</span>
-                        <button
-                          type="button"
-                          className="adm-ia del"
-                          aria-label={t('deleteLesson')}
-                          onClick={() => handleDeleteLesson(lesson)}
-                        >
-                          <Trash2 size={13} />
-                        </button>
+                        <div style={{ display: 'flex', gap: 2 }}>
+                          <button
+                            type="button"
+                            className="adm-ia"
+                            aria-label={t('editLesson')}
+                            onClick={(e) => { e.stopPropagation(); handleEditLesson(lesson); }}
+                          >
+                            <Edit2 size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            className="adm-ia del"
+                            aria-label={t('deleteLesson')}
+                            onClick={(e) => handleDeleteLesson(lesson, e)}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
                       </div>
                     ))}
                     {(courseModule.lessons ?? []).length === 0 && <p className="adm-nol">{t('noLessons')}</p>}

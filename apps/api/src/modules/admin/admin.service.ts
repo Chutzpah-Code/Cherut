@@ -474,14 +474,12 @@ export class AdminService {
     ]);
 
     const signedUp = usersSnap.size;
-    const onboarded = usersSnap.docs.filter((d) => (d.data() as any).onboardingCompleted).length;
     const enrolledUserIds = new Set(enrollmentsSnap.docs.map((d) => (d.data() as any).userId));
     const completedUserIds = new Set(progressSnap.docs.map((d) => (d.data() as any).userId));
 
     return {
       stages: [
         { key: 'signedUp', count: signedUp },
-        { key: 'onboarded', count: onboarded },
         { key: 'enrolled', count: enrolledUserIds.size },
         { key: 'completedLesson', count: completedUserIds.size },
       ],
@@ -541,6 +539,47 @@ export class AdminService {
   }
 
   /**
+   * Quem está matriculado num curso específico, com o progresso real de
+   * cada um — não só a contagem.
+   */
+  async getCourseEnrollments(courseId: string) {
+    const db = this.firebaseService.getFirestore();
+    const [enrollmentsSnap, lessonsSnap, progressSnap] = await Promise.all([
+      db.collection('courseEnrollments').where('courseId', '==', courseId).get(),
+      db.collection('lessons').where('courseId', '==', courseId).get(),
+      db.collection('lessonProgress').where('courseId', '==', courseId).where('completed', '==', true).get(),
+    ]);
+
+    if (enrollmentsSnap.empty) return [];
+
+    const totalLessons = lessonsSnap.size;
+    const completedByUser = new Map<string, number>();
+    progressSnap.docs.forEach((d) => {
+      const userId = (d.data() as any).userId;
+      completedByUser.set(userId, (completedByUser.get(userId) ?? 0) + 1);
+    });
+
+    const userIds = enrollmentsSnap.docs.map((d) => (d.data() as any).userId);
+    const userDocs = await db.getAll(...userIds.map((id) => db.collection('users').doc(id)));
+    const userById = new Map(userDocs.filter((d) => d.exists).map((d) => [d.id, d.data() as any]));
+
+    return enrollmentsSnap.docs.map((doc) => {
+      const enrollment = doc.data() as any;
+      const user = userById.get(enrollment.userId);
+      const completed = completedByUser.get(enrollment.userId) ?? 0;
+      const percentComplete = totalLessons > 0 ? Math.round((completed / totalLessons) * 100) : 0;
+
+      return {
+        uid: enrollment.userId,
+        displayName: user?.displayName ?? null,
+        email: user?.email ?? null,
+        percentComplete,
+        enrolledAt: enrollment.startedAt,
+      };
+    });
+  }
+
+  /**
    * 📊 ANALYTICS E MÉTRICAS
    */
 
@@ -578,16 +617,12 @@ export class AdminService {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       const newUsers = users.filter(user => user.createdAt && user.createdAt > thirtyDaysAgo).length;
 
-      // Users who completed onboarding
-      const onboardingCompleted = users.filter(user => user.onboardingCompleted).length;
-
       return {
         overview: {
           totalUsers,
           totalAdmins,
           activeSubscriptions,
           newUsersLast30Days: newUsers,
-          onboardingCompletionRate: Math.round((onboardingCompleted / totalUsers) * 100),
         },
         planDistribution,
         lastUpdated: new Date().toISOString(),
