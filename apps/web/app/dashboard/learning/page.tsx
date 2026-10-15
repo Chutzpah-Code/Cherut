@@ -1,106 +1,92 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Title, Text, Stack, Box, SimpleGrid, Card, Group, Progress, Badge, Loader, Center, Image } from '@mantine/core';
-import { Lock, GraduationCap } from 'lucide-react';
-import { Surface } from '@/components/ui/Surface';
-import { useCourses } from '@/hooks/useLearning';
-import { RequiredPlan } from '@/lib/api/services/learning';
-
-const PLAN_LABEL: Record<RequiredPlan, string> = {
-  core: 'Core',
-  method: 'Method',
-  mentorship: 'Mentorship',
-};
+import { GraduationCap } from 'lucide-react';
+import { useCourses, useCourse } from '@/hooks/useLearning';
+import { CourseCard } from './components/CourseCard';
+import { CourseFilters, CourseFilter } from './components/CourseFilters';
+import { ResumeCard } from './components/ResumeCard';
+import { resolveCurrentLesson } from './lib/resolveCurrentLesson';
 
 export default function LearningPage() {
   const t = useTranslations('learning.page');
   const router = useRouter();
   const { data: courses, isLoading } = useCourses();
+  const [filter, setFilter] = useState<CourseFilter>('all');
+
+  // Resume target: the enrolled, in-progress course most recently touched.
+  const resumeCourseId = useMemo(() => {
+    const inProgress = (courses ?? []).filter((c) => !c.locked && c.percentComplete > 0 && c.percentComplete < 100);
+    if (inProgress.length === 0) return null;
+    return inProgress.sort((a, b) => (b.lastActivityAt ?? '').localeCompare(a.lastActivityAt ?? ''))[0].id;
+  }, [courses]);
+
+  const { data: resumeCourseDetail } = useCourse(resumeCourseId ?? '');
+
+  const resumeLesson = useMemo(() => {
+    if (!resumeCourseDetail?.modules) return undefined;
+    return resolveCurrentLesson(resumeCourseDetail.modules.flatMap((m) => m.lessons ?? []));
+  }, [resumeCourseDetail]);
+
+  const resumeModule = useMemo(
+    () => resumeCourseDetail?.modules?.find((m) => m.id === resumeLesson?.moduleId),
+    [resumeCourseDetail, resumeLesson],
+  );
+
+  const filteredCourses = useMemo(() => {
+    return (courses ?? []).filter((c) => {
+      if (filter === 'all') return true;
+      if (filter === 'completed') return c.percentComplete === 100;
+      if (filter === 'notStarted') return c.percentComplete === 0;
+      return c.percentComplete > 0 && c.percentComplete < 100;
+    });
+  }, [courses, filter]);
+
+  if (isLoading) {
+    return (
+      <div className="lrn">
+        <p className="lrn-sub">{t('loading')}</p>
+      </div>
+    );
+  }
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }} style={{ fontFamily: 'Inter, sans-serif' }}>
-      <Stack gap="xl">
-        <Box>
-          <Title
-            order={1}
-            mb="xs"
-            style={{
-              fontFamily: 'Inter Display, sans-serif',
-              fontSize: 'clamp(22px, 5vw, 32px)',
-              fontWeight: 700,
-              color: '#000000',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            {t('title')}
-          </Title>
-          <Text size="md" c="dimmed">
-            {t('subtitle')}
-          </Text>
-        </Box>
+    <div className="lrn">
+      <h1 className="lrn-h1">{t('title')}</h1>
+      <p className="lrn-sub">{t('subtitle')}</p>
 
-        {isLoading ? (
-          <Center py="xl">
-            <Loader size="sm" color="#4686FE" />
-          </Center>
-        ) : !courses || courses.length === 0 ? (
-          <Center py="xl">
-            <Stack align="center" gap="xs">
-              <GraduationCap size={32} color="#94A3B8" />
-              <Text c="dimmed" size="sm">{t('empty')}</Text>
-            </Stack>
-          </Center>
-        ) : (
-          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-            {courses.map((course) => (
-              <Card
-                key={course.id}
-                radius="lg"
-                withBorder
-                padding="md"
-                style={{ cursor: 'pointer', opacity: course.locked ? 0.7 : 1, overflow: 'hidden' }}
-                onClick={() => router.push(`/dashboard/learning/${course.id}`)}
-              >
-                {course.coverImageUrl && (
-                  <Card.Section>
-                    <Image src={course.coverImageUrl} h={120} fit="cover" />
-                  </Card.Section>
-                )}
-                <Stack gap="sm" mt={course.coverImageUrl ? 'sm' : 0}>
-                  <Group justify="space-between" align="flex-start" wrap="nowrap">
-                    <Text fw={700} size="md" style={{ fontFamily: 'Inter Display, sans-serif' }}>
-                      {course.title}
-                    </Text>
-                    {course.locked && <Lock size={16} color="#94A3B8" style={{ flexShrink: 0 }} />}
-                  </Group>
+      {resumeCourseDetail && resumeLesson && resumeModule && (
+        <ResumeCard
+          course={resumeCourseDetail}
+          moduleTitle={resumeModule.title}
+          lessonTitle={resumeLesson.title}
+          onContinue={() => router.push(`/dashboard/learning/${resumeCourseDetail.id}`)}
+        />
+      )}
 
-                  {course.description && (
-                    <Text size="sm" c="dimmed" lineClamp={2}>
-                      {course.description}
-                    </Text>
-                  )}
+      <div className="lrn-sec-h">
+        <h3>{t('sectionTitle')}</h3>
+        <CourseFilters value={filter} onChange={setFilter} />
+      </div>
 
-                  {course.locked ? (
-                    <Badge variant="light" color="gray" size="sm" style={{ alignSelf: 'flex-start' }}>
-                      {t('availableOnPlan', { plan: PLAN_LABEL[course.requiredPlan!] })}
-                    </Badge>
-                  ) : (
-                    <Stack gap={4}>
-                      <Group justify="space-between">
-                        <Text size="xs" c="dimmed">{t('progress')}</Text>
-                        <Text size="xs" fw={600}>{course.percentComplete}%</Text>
-                      </Group>
-                      <Progress value={course.percentComplete} size={6} radius={4} color="#4686FE" />
-                    </Stack>
-                  )}
-                </Stack>
-              </Card>
-            ))}
-          </SimpleGrid>
-        )}
-      </Stack>
-    </Surface>
+      {!courses || courses.length === 0 ? (
+        <div className="lrn-empty">
+          <GraduationCap size={28} color="var(--lrn-faint)" />
+          <p>{t('empty')}</p>
+        </div>
+      ) : filteredCourses.length === 0 ? (
+        <div className="lrn-empty">
+          <p>{t('noMatch')}</p>
+        </div>
+      ) : (
+        <div className="lrn-grid">
+          {filteredCourses.map((course) => (
+            <CourseCard key={course.id} course={course} onClick={() => router.push(`/dashboard/learning/${course.id}`)} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

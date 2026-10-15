@@ -13,6 +13,8 @@ export interface Lesson {
   templateText?: string;
   order: number;
   completed?: boolean; // only present on course-detail reads
+  exerciseAnswer?: string; // only present on course-detail reads
+  notes?: string; // only present on course-detail reads
   createdAt: string;
   updatedAt: string;
 }
@@ -47,6 +49,7 @@ export interface Course {
   locked: boolean;
   totalLessons: number;
   percentComplete: number;
+  lastActivityAt?: string | null; // only present on course-list reads
   modules?: CourseModule[]; // only present on course-detail reads
   enrollment?: CourseEnrollment | null; // only present on course-detail reads
   createdAt: string;
@@ -157,6 +160,14 @@ export const learningApi = {
 
   enroll: async (courseId: string, pace: 7 | 14): Promise<CourseEnrollment> => {
     const { data } = await apiClient.post(`/learning/courses/${courseId}/enroll`, { pace });
+    return data;
+  },
+
+  saveLessonProgressNotes: async (
+    lessonId: string,
+    dto: { exerciseAnswer?: string; notes?: string },
+  ): Promise<{ exerciseAnswer?: string; notes?: string }> => {
+    const { data } = await apiClient.patch(`/learning/lessons/${lessonId}/progress-notes`, dto);
     return data;
   },
 };

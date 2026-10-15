@@ -1292,32 +1292,60 @@
     "page": {
       "title": "Learning",
       "subtitle": "Courses and guided practices to go further.",
+      "loading": "Loading your courses…",
       "empty": "No courses available yet.",
+      "noMatch": "No courses match this filter.",
       "availableOnPlan": "Available on {plan}",
-      "progress": "Progress"
+      "sectionTitle": "Your courses",
+      "resume": {
+        "label": "Continue where you left off",
+        "cta": "Continue lesson",
+        "meta": "{percent}% complete · {lessons} lessons"
+      },
+      "filters": {
+        "all": "All",
+        "inProgress": "In progress",
+        "completed": "Completed",
+        "notStarted": "Not started"
+      },
+      "card": {
+        "notStarted": "Not started",
+        "completed": "Completed",
+        "lessons": "{count} lessons"
+      }
     },
     "course": {
       "back": "Back",
       "availableOnPlan": "Available on {plan}",
       "lockedBody": "Upgrade your plan to unlock this course's content.",
-      "overallProgress": "Overall progress",
       "pace": "Pace",
       "pace7": "7 days",
       "pace14": "14 days",
-      "exercise": "Exercise",
-      "template": "Template",
       "noModules": "No modules yet.",
       "summaryLine": "Course · {lessons} lessons · {modules} modules",
-      "dayOfPath": "Day {day} of your {pace}-day path",
-      "continueLesson": "Continue lesson...",
+      "continueLesson": "Continue lesson",
       "moduleLessonLabel": "Module {module} · Lesson {lesson}",
-      "markComplete": "Mark complete",
+      "markComplete": "Mark as complete",
+      "completed": "Completed",
       "openExercise": "Open exercise",
-      "close": "Close",
       "modules": "Modules",
       "complete": "complete",
       "lessonCount": "{count} lessons",
-      "templatesReady": "Ready to apply"
+      "tabs": {
+        "overview": "Overview",
+        "exercise": "Exercise",
+        "notes": "Notes"
+      },
+      "overviewEmpty": "No description for this lesson yet.",
+      "exerciseEmpty": "No exercise for this lesson yet.",
+      "exercisePlaceholder": "Write your answer…",
+      "saveAnswer": "Save answer",
+      "saved": "Saved",
+      "notesSubtitle": "Private. Only you can see them.",
+      "notesPlaceholder": "Take a note…",
+      "saveNote": "Save note",
+      "previous": "Previous",
+      "next": "Next"
     }
   },
   "publicHeader": {

@@ -143,10 +143,17 @@ export class LearningService {
     });
 
     const completedCountByCourse = new Map<string, number>();
+    const lastActivityByCourse = new Map<string, string>();
     progressSnap.docs.forEach((doc) => {
       const data = doc.data() as any;
       if (data.completed) {
         completedCountByCourse.set(data.courseId, (completedCountByCourse.get(data.courseId) ?? 0) + 1);
+      }
+      if (data.completedAt) {
+        const current = lastActivityByCourse.get(data.courseId);
+        if (!current || data.completedAt > current) {
+          lastActivityByCourse.set(data.courseId, data.completedAt);
+        }
       }
     });
 
@@ -155,8 +162,9 @@ export class LearningService {
       const totalLessons = lessonCountByCourse.get(course.id) ?? 0;
       const completedLessons = completedCountByCourse.get(course.id) ?? 0;
       const percentComplete = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+      const lastActivityAt = lastActivityByCourse.get(course.id) ?? null;
 
-      return { ...course, locked, totalLessons, percentComplete };
+      return { ...course, locked, totalLessons, percentComplete, lastActivityAt };
     });
   }
 
@@ -183,12 +191,22 @@ export class LearningService {
       db.collection(this.enrollmentsCollection).where('userId', '==', userId).where('courseId', '==', courseId).limit(1).get(),
     ]);
 
-    const completedLessonIds = new Set(
-      progressSnap.docs.filter((doc) => (doc.data() as any).completed).map((doc) => (doc.data() as any).lessonId),
-    );
+    const progressByLessonId = new Map<string, any>();
+    progressSnap.docs.forEach((doc) => {
+      const data = doc.data() as any;
+      progressByLessonId.set(data.lessonId, data);
+    });
 
     const lessons = sortByOrder(lessonsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as any)).map(
-      (lesson) => ({ ...lesson, completed: completedLessonIds.has(lesson.id) }),
+      (lesson) => {
+        const progress = progressByLessonId.get(lesson.id);
+        return {
+          ...lesson,
+          completed: !!progress?.completed,
+          exerciseAnswer: progress?.exerciseAnswer,
+          notes: progress?.notes,
+        };
+      },
     );
 
     const lessonsByModule = new Map<string, any[]>();
@@ -203,7 +221,8 @@ export class LearningService {
     );
 
     const totalLessons = lessons.length;
-    const percentComplete = totalLessons > 0 ? Math.round((completedLessonIds.size / totalLessons) * 100) : 0;
+    const completedCount = lessons.filter((l) => l.completed).length;
+    const percentComplete = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
     const enrollment = enrollmentSnap.empty ? null : { id: enrollmentSnap.docs[0].id, ...enrollmentSnap.docs[0].data() };
 
     return { ...course, locked: false, modules, totalLessons, percentComplete, enrollment };
@@ -343,6 +362,37 @@ export class LearningService {
     const updates = { completed, completedAt: completed ? now : null };
     await doc.ref.update(updates);
 
+    return { id: doc.id, ...doc.data(), ...updates };
+  }
+
+  async updateLessonProgressNotes(
+    userId: string,
+    lessonId: string,
+    dto: { exerciseAnswer?: string; notes?: string },
+  ) {
+    const db = this.firebaseService.getFirestore();
+    const lessonDoc = await db.collection(this.lessonsCollection).doc(lessonId).get();
+    if (!lessonDoc.exists) throw new NotFoundException(`Lesson ${lessonId} not found`);
+
+    const courseId = (lessonDoc.data() as any).courseId;
+
+    const existingSnap = await db
+      .collection(this.progressCollection)
+      .where('userId', '==', userId)
+      .where('lessonId', '==', lessonId)
+      .limit(1)
+      .get();
+
+    const updates = cleanDto(dto);
+
+    if (existingSnap.empty) {
+      const progress = { userId, lessonId, courseId, completed: false, completedAt: null, ...updates };
+      const ref = await db.collection(this.progressCollection).add(progress);
+      return { id: ref.id, ...progress };
+    }
+
+    const doc = existingSnap.docs[0];
+    await doc.ref.update(updates);
     return { id: doc.id, ...doc.data(), ...updates };
   }
 

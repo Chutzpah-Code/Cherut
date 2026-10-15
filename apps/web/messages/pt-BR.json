@@ -1292,32 +1292,60 @@
     "page": {
       "title": "Aprendizado",
       "subtitle": "Cursos e práticas guiadas para ir mais além.",
+      "loading": "Carregando seus cursos…",
       "empty": "Nenhum curso disponível ainda.",
+      "noMatch": "Nenhum curso corresponde a esse filtro.",
       "availableOnPlan": "Disponível no plano {plan}",
-      "progress": "Progresso"
+      "sectionTitle": "Seus cursos",
+      "resume": {
+        "label": "Continue de onde parou",
+        "cta": "Continuar lição",
+        "meta": "{percent}% concluído · {lessons} lições"
+      },
+      "filters": {
+        "all": "Todos",
+        "inProgress": "Em andamento",
+        "completed": "Concluídos",
+        "notStarted": "Não iniciados"
+      },
+      "card": {
+        "notStarted": "Não iniciado",
+        "completed": "Concluído",
+        "lessons": "{count} lições"
+      }
     },
     "course": {
       "back": "Voltar",
       "availableOnPlan": "Disponível no plano {plan}",
       "lockedBody": "Faça upgrade do seu plano para desbloquear o conteúdo deste curso.",
-      "overallProgress": "Progresso geral",
       "pace": "Ritmo",
       "pace7": "7 dias",
       "pace14": "14 dias",
-      "exercise": "Exercício",
-      "template": "Template",
       "noModules": "Nenhum módulo ainda.",
       "summaryLine": "Curso · {lessons} lições · {modules} módulos",
-      "dayOfPath": "Dia {day} do seu percurso de {pace} dias",
-      "continueLesson": "Continuar lição...",
+      "continueLesson": "Continuar lição",
       "moduleLessonLabel": "Módulo {module} · Lição {lesson}",
       "markComplete": "Marcar como concluída",
+      "completed": "Concluída",
       "openExercise": "Abrir exercício",
-      "close": "Fechar",
       "modules": "Módulos",
       "complete": "concluído",
       "lessonCount": "{count} lições",
-      "templatesReady": "Prontos para aplicar"
+      "tabs": {
+        "overview": "Visão geral",
+        "exercise": "Exercício",
+        "notes": "Notas"
+      },
+      "overviewEmpty": "Ainda não há descrição para esta lição.",
+      "exerciseEmpty": "Ainda não há exercício para esta lição.",
+      "exercisePlaceholder": "Escreva sua resposta…",
+      "saveAnswer": "Salvar resposta",
+      "saved": "Salvo",
+      "notesSubtitle": "Privado. Só você pode ver.",
+      "notesPlaceholder": "Faça uma anotação…",
+      "saveNote": "Salvar nota",
+      "previous": "Anterior",
+      "next": "Próxima"
     }
   },
   "publicHeader": {

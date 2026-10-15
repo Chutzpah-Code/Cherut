@@ -24,6 +24,7 @@ import {
   CreateLessonDto,
   UpdateLessonDto,
   EnrollDto,
+  UpdateLessonProgressNotesDto,
 } from './dto';
 
 @Controller('learning')
@@ -136,5 +137,10 @@ export class LearningController {
   @Post('courses/:id/enroll')
   enroll(@Request() req, @Param('id') courseId: string, @Body() dto: EnrollDto) {
     return this.learningService.enrollInCourse(req.user.uid, courseId, dto.pace);
+  }
+
+  @Patch('lessons/:id/progress-notes')
+  updateLessonProgressNotes(@Request() req, @Param('id') lessonId: string, @Body() dto: UpdateLessonProgressNotesDto) {
+    return this.learningService.updateLessonProgressNotes(req.user.uid, lessonId, dto);
   }
 }

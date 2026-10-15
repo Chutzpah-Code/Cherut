@@ -175,3 +175,19 @@ export const useEnroll = () => {
       queryClient.invalidateQueries({ queryKey: ['learning', 'courses', courseId] }),
   });
 };
+
+export const useSaveLessonProgressNotes = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      lessonId,
+      dto,
+    }: {
+      lessonId: string;
+      courseId: string;
+      dto: { exerciseAnswer?: string; notes?: string };
+    }) => learningApi.saveLessonProgressNotes(lessonId, dto),
+    onSuccess: (_data, { courseId }) =>
+      queryClient.invalidateQueries({ queryKey: ['learning', 'courses', courseId] }),
+  });
+};
