@@ -1,322 +1,169 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
-import { useEffect, useState } from 'react';
-import { Surface } from '@/components/ui/Surface';
-import {
-  Title,
-  Grid,
-  Card,
-  Text,
-  Badge,
-  Group,
-  Stack,
-  Loader,
-  Alert,
-  Progress,
-  SimpleGrid,
-} from '@mantine/core';
-import {
-  IconUsers,
-  IconUserCheck,
-  IconCurrencyDollar,
-  IconTrendingUp,
-  IconShieldCheck,
-} from '@tabler/icons-react';
+import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useAdminOverview, useAdminSales, useAdminAnalytics, useAdminActivity, useAdminServicesStatus } from '@/hooks/useAdmin';
+import { ServiceStatus } from '@/lib/api/services/admin';
 
-// Utility function for secure API URL handling
-const getSecureApiUrl = (): string => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
-    throw new Error('API URL not configured. Please set NEXT_PUBLIC_API_URL environment variable.');
-  }
-  return apiUrl;
-};
+const PLAN_COLORS: Record<string, string> = { free: '#D7DAE4', core: '#8FA6FF', pro: '#3B5BF6', elite: '#14141C' };
 
-/**
- * Dashboard principal do administrador
- *
- * MÉTRICAS EXIBIDAS:
- * - Total de usuários
- * - Usuários ativos (com assinatura)
- * - Revenue mensal
- * - Taxa de conversão
- * - Distribuição de planos
- * - Usuários recentes
- */
-
-interface DashboardData {
-  overview: {
-    totalUsers: number;
-    totalAdmins: number;
-    activeSubscriptions: number;
-    newUsersLast30Days: number;
-    onboardingCompletionRate: number;
-  };
-  planDistribution: {
-    free: number;
-    core: number;
-    pro: number;
-    elite: number;
-  };
-  lastUpdated: string;
+function StatusDot({ status }: { status: ServiceStatus }) {
+  const t = useTranslations('adminDashboardPage.system');
+  const cls = status === 'online' ? '' : status === 'degraded' ? 'w' : status === 'down' ? 'b' : 'n';
+  return <span className={`adm-dot ${cls}`}>{t(`status.${status}`)}</span>;
 }
 
-interface SalesData {
-  monthlyRevenue: number;
-  salesByPlan: {
-    core: number;
-    pro: number;
-    elite: number;
-  };
-  totalPaidUsers: number;
-  averageRevenuePerUser: number;
-  conversionRate: number;
-}
+export default function AdminOverviewPage() {
+  const t = useTranslations('adminDashboardPage');
+  const { data: overview, isLoading: loadingOverview } = useAdminOverview();
+  const { data: sales } = useAdminSales();
+  const { data: analytics } = useAdminAnalytics();
+  const { data: activity } = useAdminActivity();
+  const { data: health } = useAdminServicesStatus();
 
-export default function AdminDashboard() {
-  const { user } = useAuth();
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const [salesData, setSalesData] = useState<SalesData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [range, setRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const [series, setSeries] = useState<'users' | 'revenue'>('users');
 
-  useEffect(() => {
-    async function loadDashboardData() {
-      if (!user) return;
+  const months = series === 'users' ? analytics?.userGrowth.monthly ?? [] : analytics?.revenue.monthly ?? [];
+  const maxValue = Math.max(1, ...months.map((m) => ('users' in m ? m.users : m.amount)));
 
-      try {
-        const token = await user.getIdToken();
-        const apiUrl = getSecureApiUrl();
+  const planEntries = useMemo(() => {
+    if (!overview) return [];
+    const total = Object.values(overview.planDistribution).reduce((a, b) => a + b, 0) || 1;
+    return (Object.entries(overview.planDistribution) as [keyof typeof overview.planDistribution, number][]).map(([plan, count]) => ({
+      plan,
+      count,
+      pct: Math.round((count / total) * 100),
+      color: PLAN_COLORS[plan],
+    }));
+  }, [overview]);
 
-        // Carregar dados em paralelo
-        const [overviewResponse, salesResponse] = await Promise.all([
-          fetch(`${apiUrl}/admin/overview`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch(`${apiUrl}/admin/sales`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-
-        if (!overviewResponse.ok || !salesResponse.ok) {
-          throw new Error('Failed to load dashboard data');
-        }
-
-        const [overview, sales] = await Promise.all([
-          overviewResponse.json(),
-          salesResponse.json(),
-        ]);
-
-        setDashboardData(overview);
-        setSalesData(sales);
-      } catch (err) {
-        console.error('Dashboard error:', err);
-        setError('Error loading dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadDashboardData();
-  }, [user]);
-
-  if (loading) {
-    return (
-      <Stack align="center" mt="xl">
-        <Loader size="lg" />
-        <Text>Loading dashboard...</Text>
-      </Stack>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert color="red" title="Error">
-        {error}
-      </Alert>
-    );
-  }
-
-  if (!dashboardData || !salesData) {
-    return (
-      <Alert color="yellow" title="No Data">
-        Unable to load dashboard data.
-      </Alert>
-    );
-  }
-
-  const { overview, planDistribution } = dashboardData;
-
-  // Cards de métricas principais
-  const metrics = [
-    {
-      title: 'Total Users',
-      value: overview.totalUsers.toLocaleString('en-US'),
-      icon: IconUsers,
-      color: 'blue',
-      description: `${overview.newUsersLast30Days} new in last 30 days`,
-    },
-    {
-      title: 'Active Users',
-      value: overview.activeSubscriptions.toLocaleString('en-US'),
-      icon: IconUserCheck,
-      color: 'green',
-      description: `${Math.round((overview.activeSubscriptions / overview.totalUsers) * 100)}% activation rate`,
-    },
-    {
-      title: 'Monthly Revenue',
-      value: `$${salesData.monthlyRevenue.toLocaleString('en-US')}`,
-      icon: IconCurrencyDollar,
-      color: 'yellow',
-      description: `$${salesData.averageRevenuePerUser.toFixed(2)} ARPU`,
-    },
-    {
-      title: 'Conversion Rate',
-      value: `${salesData.conversionRate}%`,
-      icon: IconTrendingUp,
-      color: 'violet',
-      description: `${salesData.totalPaidUsers} paying users`,
-    },
-  ];
+  if (loadingOverview) return <p className="adm-sub">{t('loading')}</p>;
+  if (!overview) return null;
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }}>
-      {/* Header */}
-      <Group justify="space-between" mb="xl">
+    <div>
+      <div className="adm-top">
         <div>
-          <Title order={1}>Admin Dashboard</Title>
-          <Text c="dimmed">Cherut system overview</Text>
+          <div className="adm-crumb adm-mono">{t('crumb')}</div>
+          <h1 className="adm-h1">{t('title')}</h1>
+          <p className="adm-sub">{t('subtitle')}</p>
         </div>
-        <Badge
-          size="lg"
-          variant="filled"
-          color="blue"
-          leftSection={<IconShieldCheck size={16} />}
-        >
-          Admin Access
-        </Badge>
-      </Group>
+        <div className="adm-seg">
+          {(['7d', '30d', '90d'] as const).map((r) => (
+            <button key={r} type="button" className={range === r ? 'on' : ''} onClick={() => setRange(r)}>{r}</button>
+          ))}
+        </div>
+      </div>
 
-      {/* Métricas principais */}
-      <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} mb="xl">
-        {metrics.map((metric) => (
-          <Card key={metric.title} shadow="sm" padding="lg" radius="md" withBorder>
-            <Group justify="space-between" mb="xs">
-              <Text size="sm" c="dimmed" fw={500}>
-                {metric.title}
-              </Text>
-              <metric.icon size={20} color={`var(--mantine-color-${metric.color}-6)`} />
-            </Group>
+      <div className="adm-kpis">
+        <div className="adm-kpi">
+          <span>{t('kpis.totalUsers')}</span>
+          <b>{overview.overview.totalUsers.toLocaleString()}</b>
+          <small>{t('kpis.newInLast30', { count: overview.overview.newUsersLast30Days })}</small>
+        </div>
+        <div className="adm-kpi">
+          <span>{t('kpis.activeUsers')}</span>
+          <b>{overview.overview.activeSubscriptions.toLocaleString()}</b>
+          <small>{t('kpis.onboardingRate', { rate: overview.overview.onboardingCompletionRate })}</small>
+        </div>
+        <div className="adm-kpi">
+          <span>{t('kpis.monthlyRevenue')}</span>
+          <b>${sales?.monthlyRevenue.toLocaleString() ?? '—'}</b>
+          <small>{sales && t('kpis.arpu', { amount: sales.averageRevenuePerUser.toFixed(2) })}</small>
+        </div>
+        <div className="adm-kpi">
+          <span>{t('kpis.paidConversion')}</span>
+          <b>{sales ? `${sales.conversionRate}%` : '—'}</b>
+          <small>{sales && t('kpis.payingUsers', { count: sales.totalPaidUsers })}</small>
+        </div>
+      </div>
 
-            <Text size="xl" fw={700} c={metric.color}>
-              {metric.value}
-            </Text>
-
-            <Text size="xs" c="dimmed" mt="xs">
-              {metric.description}
-            </Text>
-          </Card>
-        ))}
-      </SimpleGrid>
-
-      {/* Distribuição de Planos e Detalhes */}
-      <Grid>
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3} mb="md">Plan Distribution</Title>
-
-            <Stack gap="md">
-              <div>
-                <Group justify="space-between" mb="xs">
-                  <Text size="sm">Free</Text>
-                  <Text size="sm" fw={500}>{planDistribution.free}</Text>
-                </Group>
-                <Progress
-                  value={(planDistribution.free / overview.totalUsers) * 100}
-                  color="gray"
-                />
+      <div className="adm-grid2" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginTop: 20 }}>
+        <div className="adm-card">
+          <div className="adm-card-h">
+            <div>
+              <h3>{series === 'users' ? t('chart.newUsers') : t('chart.revenue')}</h3>
+              <small>{series === 'users' ? t('chart.signupsPerMonth') : t('chart.mrrPerMonth')}</small>
+            </div>
+            <div className="adm-seg">
+              <button type="button" className={series === 'users' ? 'on' : ''} onClick={() => setSeries('users')}>{t('chart.users')}</button>
+              <button type="button" className={series === 'revenue' ? 'on' : ''} onClick={() => setSeries('revenue')}>{t('chart.revenue')}</button>
+            </div>
+          </div>
+          {months.length === 0 ? (
+            <p className="adm-empty">{t('chart.empty')}</p>
+          ) : (
+            <>
+              <div className="adm-chart" style={{ gridTemplateColumns: `repeat(${months.length},minmax(0,1fr))` }}>
+                {months.map((m, i) => {
+                  const value = 'users' in m ? m.users : m.amount;
+                  return (
+                    <div key={m.month + i} className={i === months.length - 1 ? 'cur' : ''}>
+                      <i style={{ height: `${(value / maxValue) * 88}%` }} />
+                    </div>
+                  );
+                })}
               </div>
-
-              <div>
-                <Group justify="space-between" mb="xs">
-                  <Text size="sm">Core</Text>
-                  <Text size="sm" fw={500}>{planDistribution.core}</Text>
-                </Group>
-                <Progress
-                  value={(planDistribution.core / overview.totalUsers) * 100}
-                  color="green"
-                />
+              <div className="adm-xl" style={{ gridTemplateColumns: `repeat(${months.length},minmax(0,1fr))` }}>
+                {months.map((m, i) => <span key={m.month + i}>{m.month}</span>)}
               </div>
+            </>
+          )}
+        </div>
 
-              <div>
-                <Group justify="space-between" mb="xs">
-                  <Text size="sm">Pro</Text>
-                  <Text size="sm" fw={500}>{planDistribution.pro}</Text>
-                </Group>
-                <Progress
-                  value={(planDistribution.pro / overview.totalUsers) * 100}
-                  color="blue"
-                />
+        <div className="adm-card">
+          <div className="adm-card-h"><h3>{t('plans.title')}</h3></div>
+          <div className="adm-dist">
+            {planEntries.map((p) => <i key={p.plan} style={{ flex: p.count || 0.001, background: p.color }} />)}
+          </div>
+          <div className="adm-leg">
+            {planEntries.map((p) => (
+              <div key={p.plan}>
+                <em style={{ background: p.color }} />
+                <span>{t(`plans.${p.plan}`)}</span>
+                <b>{p.count}</b>
+                <small>{p.pct}%</small>
               </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-              <div>
-                <Group justify="space-between" mb="xs">
-                  <Text size="sm">Elite</Text>
-                  <Text size="sm" fw={500}>{planDistribution.elite}</Text>
-                </Group>
-                <Progress
-                  value={(planDistribution.elite / overview.totalUsers) * 100}
-                  color="violet"
-                />
-              </div>
-            </Stack>
-          </Card>
-        </Grid.Col>
+      <div className="adm-grid2" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginTop: 16 }}>
+        <div className="adm-card">
+          <div className="adm-card-h"><h3>{t('activity.title')}</h3></div>
+          {!activity || activity.length === 0 ? (
+            <p className="adm-empty">{t('activity.empty')}</p>
+          ) : (
+            <div className="adm-feed">
+              {activity.map((e, i) => (
+                <div key={i}>
+                  <span className="adm-av">{e.name.slice(0, 2).toUpperCase()}</span>
+                  <p><b>{e.name}</b> {e.type === 'signup' ? t('activity.signedUp') : t('activity.completedLesson')}</p>
+                  <small>{new Date(e.at).toLocaleDateString()}</small>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3} mb="md">Business Metrics</Title>
-
-            <Stack gap="lg">
-              <div>
-                <Text size="sm" c="dimmed">Onboarding Rate</Text>
-                <Group justify="space-between">
-                  <Text size="lg" fw={700}>{overview.onboardingCompletionRate}%</Text>
-                  <Badge color="green" variant="light">
-                    {Math.round((overview.onboardingCompletionRate / 100) * overview.totalUsers)} completed
-                  </Badge>
-                </Group>
-              </div>
-
-              <div>
-                <Text size="sm" c="dimmed">Administrators</Text>
-                <Group justify="space-between">
-                  <Text size="lg" fw={700}>{overview.totalAdmins}</Text>
-                  <Badge color="red" variant="light">
-                    {Math.round((overview.totalAdmins / overview.totalUsers) * 100)}% of total
-                  </Badge>
-                </Group>
-              </div>
-
-              <div>
-                <Text size="sm" c="dimmed">Growth (30d)</Text>
-                <Group justify="space-between">
-                  <Text size="lg" fw={700}>+{overview.newUsersLast30Days}</Text>
-                  <Badge color="blue" variant="light">
-                    {Math.round((overview.newUsersLast30Days / overview.totalUsers) * 100)}% growth
-                  </Badge>
-                </Group>
-              </div>
-            </Stack>
-          </Card>
-        </Grid.Col>
-      </Grid>
-
-      {/* Footer com timestamp */}
-      <Text size="xs" c="dimmed" ta="center" mt="xl">
-        Last updated: {new Date(dashboardData.lastUpdated).toLocaleString('en-US')}
-      </Text>
-    </Surface>
+        <div className="adm-card">
+          <div className="adm-card-h"><h3>{t('system.title')}</h3></div>
+          {!health ? (
+            <p className="adm-empty">{t('system.loading')}</p>
+          ) : (
+            <div className="adm-health">
+              {health.services.map((s) => (
+                <div key={s.name}>
+                  <span>{t(`system.service.${s.name}`)}</span>
+                  <StatusDot status={s.status} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

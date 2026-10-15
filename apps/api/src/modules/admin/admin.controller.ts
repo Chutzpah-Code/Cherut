@@ -144,10 +144,14 @@ export class AdminController {
   }
 
   /**
-   * GET /admin/health/services
-   * Status real de cada serviço (não fabricado)
+   * GET /admin/services-status
+   * Status real de cada serviço (não fabricado). Deliberately NOT named
+   * with "health" in the path — apiClient's request interceptor skips
+   * attaching the auth token for any URL containing that substring
+   * (meant for the public /health check), which would 401 this
+   * @AdminOnly() route.
    */
-  @Get('health/services')
+  @Get('services-status')
   async getServicesHealth() {
     return this.adminService.getServicesHealth();
   }

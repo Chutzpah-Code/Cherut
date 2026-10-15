@@ -1904,6 +1904,73 @@
     "passwordTooShort": "Password must be at least 6 characters long",
     "passwordMismatch": "Passwords do not match"
   },
+  "adminDashboardPage": {
+    "loading": "Loading dashboard…",
+    "crumb": "Admin / Overview",
+    "title": "Overview",
+    "subtitle": "How Cherut is doing right now.",
+    "kpis": {
+      "totalUsers": "Total users",
+      "newInLast30": "{count} new in 30 days",
+      "activeUsers": "Active subscriptions",
+      "onboardingRate": "{rate}% onboarding",
+      "monthlyRevenue": "Monthly revenue",
+      "arpu": "${amount} ARPU",
+      "paidConversion": "Paid conversion",
+      "payingUsers": "{count} paying users"
+    },
+    "chart": {
+      "newUsers": "New users",
+      "revenue": "Revenue",
+      "signupsPerMonth": "Sign-ups per month",
+      "mrrPerMonth": "MRR per month",
+      "users": "Users",
+      "empty": "Not enough history yet."
+    },
+    "plans": {
+      "title": "Plan distribution",
+      "free": "Free",
+      "core": "Core",
+      "pro": "Pro",
+      "elite": "Elite"
+    },
+    "activity": {
+      "title": "Recent activity",
+      "empty": "No recent activity yet.",
+      "signedUp": "signed up",
+      "completedLesson": "completed a lesson"
+    },
+    "system": {
+      "title": "System",
+      "loading": "Checking services…",
+      "service": {
+        "api": "Backend / API",
+        "database": "Database",
+        "imageService": "Image service (Cloudinary)",
+        "backgroundJobs": "Background jobs"
+      },
+      "status": {
+        "online": "Online",
+        "degraded": "Degraded",
+        "down": "Down",
+        "not_configured": "Not configured"
+      }
+    }
+  },
+  "adminShell": {
+    "verifying": "Verifying administrative access…",
+    "accessDenied": "You do not have administrative permissions.",
+    "adminBadge": "Admin",
+    "exitAdmin": "Exit admin",
+    "menu": "Menu",
+    "nav": {
+      "overview": "Overview",
+      "users": "Users",
+      "courses": "Courses",
+      "analytics": "Analytics",
+      "settings": "Settings"
+    }
+  },
   "adminCoursesPage": {
     "loading": "Loading courses...",
     "title": "Courses",

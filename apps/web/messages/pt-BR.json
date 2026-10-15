@@ -1904,6 +1904,73 @@
     "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
     "passwordMismatch": "As senhas não coincidem"
   },
+  "adminDashboardPage": {
+    "loading": "Carregando painel…",
+    "crumb": "Admin / Visão geral",
+    "title": "Visão geral",
+    "subtitle": "Como o Cherut está indo agora.",
+    "kpis": {
+      "totalUsers": "Total de usuários",
+      "newInLast30": "{count} novos nos últimos 30 dias",
+      "activeUsers": "Assinaturas ativas",
+      "onboardingRate": "{rate}% de onboarding",
+      "monthlyRevenue": "Receita mensal",
+      "arpu": "${amount} ARPU",
+      "paidConversion": "Conversão paga",
+      "payingUsers": "{count} usuários pagantes"
+    },
+    "chart": {
+      "newUsers": "Novos usuários",
+      "revenue": "Receita",
+      "signupsPerMonth": "Cadastros por mês",
+      "mrrPerMonth": "MRR por mês",
+      "users": "Usuários",
+      "empty": "Ainda não há histórico suficiente."
+    },
+    "plans": {
+      "title": "Distribuição por plano",
+      "free": "Free",
+      "core": "Core",
+      "pro": "Pro",
+      "elite": "Elite"
+    },
+    "activity": {
+      "title": "Atividade recente",
+      "empty": "Ainda não há atividade recente.",
+      "signedUp": "se cadastrou",
+      "completedLesson": "concluiu uma lição"
+    },
+    "system": {
+      "title": "Sistema",
+      "loading": "Verificando serviços…",
+      "service": {
+        "api": "Backend / API",
+        "database": "Banco de dados",
+        "imageService": "Serviço de imagens (Cloudinary)",
+        "backgroundJobs": "Jobs em segundo plano"
+      },
+      "status": {
+        "online": "Online",
+        "degraded": "Degradado",
+        "down": "Fora do ar",
+        "not_configured": "Não configurado"
+      }
+    }
+  },
+  "adminShell": {
+    "verifying": "Verificando acesso administrativo…",
+    "accessDenied": "Você não tem permissões administrativas.",
+    "adminBadge": "Admin",
+    "exitAdmin": "Sair do admin",
+    "menu": "Menu",
+    "nav": {
+      "overview": "Visão geral",
+      "users": "Usuários",
+      "courses": "Cursos",
+      "analytics": "Analytics",
+      "settings": "Configurações"
+    }
+  },
   "adminCoursesPage": {
     "loading": "Carregando cursos...",
     "title": "Cursos",
