@@ -1,6 +1,27 @@
 import { Injectable, BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { FirebaseService } from '../../config/firebase.service';
-import { CreateAdminDto, PromoteUserDto, UserFiltersDto, SubscriptionPlan, SubscriptionStatus } from './dto/admin.dto';
+import { CloudinaryService } from '../../config/cloudinary.service';
+import {
+  CreateAdminDto,
+  PromoteUserDto,
+  UserFiltersDto,
+  UpdateUserDto,
+  UpdateSystemSettingsDto,
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from './dto/admin.dto';
+
+const DEFAULT_SETTINGS = {
+  general: { appName: 'Cherut', supportEmail: 'contact@hanielrolemberg.com', maintenanceMode: false },
+  security: { requireEmailVerification: true, sessionTimeoutMinutes: 60, maxLoginAttempts: 5 },
+  email: { fromName: 'Cherut', fromEmail: 'contact@hanielrolemberg.com', notificationsEnabled: true },
+  notifications: { newUserSignup: true, newSubscription: true, weeklyDigest: false },
+};
+
+// Users considered abandoned signups, safe for the maintenance cleanup
+// action to remove: never finished onboarding, no paid/active subscription,
+// and created long enough ago that they're not just mid-signup right now.
+const INACTIVE_CLEANUP_THRESHOLD_DAYS = 90;
 
 /**
  * Admin Service
@@ -16,7 +37,10 @@ import { CreateAdminDto, PromoteUserDto, UserFiltersDto, SubscriptionPlan, Subsc
 export class AdminService {
   private readonly logger = new Logger(AdminService.name);
 
-  constructor(private readonly firebaseService: FirebaseService) {}
+  constructor(
+    private readonly firebaseService: FirebaseService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   /**
    * 👥 GESTÃO DE USUÁRIOS
@@ -210,6 +234,216 @@ export class AdminService {
 
       throw new BadRequestException('Failed to promote user');
     }
+  }
+
+  /**
+   * Atualiza o perfil/role de um usuário existente
+   */
+  async updateUser(uid: string, dto: UpdateUserDto) {
+    const db = this.firebaseService.getFirestore();
+    const docRef = db.collection('users').doc(uid);
+    const doc = await docRef.get();
+    if (!doc.exists) throw new NotFoundException(`User ${uid} not found`);
+
+    const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
+    if (dto.displayName !== undefined) updates.displayName = dto.displayName;
+    if (dto.email !== undefined) updates.email = dto.email;
+    if (dto.role !== undefined) updates.role = dto.role;
+
+    await docRef.update(updates);
+
+    // Keep the Auth record and JWT custom claims in sync with Firestore.
+    const auth = this.firebaseService.getAuth();
+    const authUpdates: Record<string, unknown> = {};
+    if (dto.displayName !== undefined) authUpdates.displayName = dto.displayName;
+    if (dto.email !== undefined) authUpdates.email = dto.email;
+    if (Object.keys(authUpdates).length > 0) {
+      await auth.updateUser(uid, authUpdates);
+    }
+    if (dto.role !== undefined) {
+      await auth.setCustomUserClaims(uid, { role: dto.role });
+    }
+
+    this.logger.log(`User updated: ${uid}`);
+    const updated = await docRef.get();
+    return { id: updated.id, ...updated.data() };
+  }
+
+  /**
+   * 🩺 SAÚDE DOS SERVIÇOS — checagens reais, não status fabricado
+   */
+  async getServicesHealth() {
+    const checkDatabase = async () => {
+      const start = Date.now();
+      try {
+        await this.firebaseService.getFirestore().collection('users').limit(1).get();
+        return { name: 'database', status: 'online' as const, latencyMs: Date.now() - start };
+      } catch {
+        return { name: 'database', status: 'down' as const, latencyMs: null };
+      }
+    };
+
+    const checkImageService = async () => {
+      const start = Date.now();
+      try {
+        const ok = await this.cloudinaryService.ping();
+        const status: 'online' | 'degraded' = ok ? 'online' : 'degraded';
+        return { name: 'imageService', status, latencyMs: Date.now() - start };
+      } catch {
+        return { name: 'imageService', status: 'down' as const, latencyMs: null };
+      }
+    };
+
+    const [database, imageService] = await Promise.all([checkDatabase(), checkImageService()]);
+
+    return {
+      services: [
+        // If this request is executing at all, the API process is up.
+        { name: 'api', status: 'online' as const, latencyMs: 0 },
+        database,
+        imageService,
+        // No job queue/scheduler exists in this stack today — report that
+        // honestly instead of inventing a status for something that isn't
+        // configured.
+        { name: 'backgroundJobs', status: 'not_configured' as const, latencyMs: null },
+      ],
+      checkedAt: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * ⚙️ CONFIGURAÇÕES DO SISTEMA — persistidas de verdade (não mock)
+   */
+  async getSettings() {
+    const db = this.firebaseService.getFirestore();
+    const doc = await db.collection('systemSettings').doc('global').get();
+    if (!doc.exists) return DEFAULT_SETTINGS;
+    return { ...DEFAULT_SETTINGS, ...doc.data() };
+  }
+
+  async updateSettings(dto: UpdateSystemSettingsDto) {
+    const db = this.firebaseService.getFirestore();
+    const docRef = db.collection('systemSettings').doc('global');
+    const current = (await docRef.get()).data() ?? DEFAULT_SETTINGS;
+
+    const updated = {
+      general: { ...current.general, ...dto.general },
+      security: { ...current.security, ...dto.security },
+      email: { ...current.email, ...dto.email },
+      notifications: { ...current.notifications, ...dto.notifications },
+      updatedAt: new Date().toISOString(),
+    };
+
+    await docRef.set(updated, { merge: true });
+    this.logger.log('System settings updated');
+    return updated;
+  }
+
+  /**
+   * 🧹 MANUTENÇÃO — remove cadastros abandonados (nunca completaram
+   * onboarding, sem assinatura ativa, criados há mais de
+   * INACTIVE_CLEANUP_THRESHOLD_DAYS dias). Nunca remove admins.
+   */
+  async cleanupInactiveUsers() {
+    const db = this.firebaseService.getFirestore();
+    const cutoff = new Date(Date.now() - INACTIVE_CLEANUP_THRESHOLD_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+    const snapshot = await db
+      .collection('users')
+      .where('onboardingCompleted', '==', false)
+      .get();
+
+    const toDelete = snapshot.docs.filter((doc) => {
+      const data = doc.data() as any;
+      return data.role !== 'admin' && data.createdAt && data.createdAt < cutoff && data.subscription?.status !== 'active';
+    });
+
+    const auth = this.firebaseService.getAuth();
+    const batch = db.batch();
+    toDelete.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+    await Promise.allSettled(toDelete.map((doc) => auth.deleteUser(doc.id)));
+
+    this.logger.log(`Cleanup: removed ${toDelete.length} inactive user(s)`);
+    return { deletedCount: toDelete.length };
+  }
+
+  /**
+   * 🪜 FUNIL DE ATIVAÇÃO — estágios reais derivados de users/matrículas/progresso
+   */
+  async getActivationFunnel() {
+    const db = this.firebaseService.getFirestore();
+    const [usersSnap, enrollmentsSnap, progressSnap] = await Promise.all([
+      db.collection('users').get(),
+      db.collection('courseEnrollments').get(),
+      db.collection('lessonProgress').where('completed', '==', true).get(),
+    ]);
+
+    const signedUp = usersSnap.size;
+    const onboarded = usersSnap.docs.filter((d) => (d.data() as any).onboardingCompleted).length;
+    const enrolledUserIds = new Set(enrollmentsSnap.docs.map((d) => (d.data() as any).userId));
+    const completedUserIds = new Set(progressSnap.docs.map((d) => (d.data() as any).userId));
+
+    return {
+      stages: [
+        { key: 'signedUp', count: signedUp },
+        { key: 'onboarded', count: onboarded },
+        { key: 'enrolled', count: enrolledUserIds.size },
+        { key: 'completedLesson', count: completedUserIds.size },
+      ],
+    };
+  }
+
+  /**
+   * 📚 USO POR MÓDULO/CURSO — matrículas e progresso médio reais
+   */
+  async getModuleUsage() {
+    const db = this.firebaseService.getFirestore();
+    const [coursesSnap, enrollmentsSnap, lessonsSnap, progressSnap] = await Promise.all([
+      db.collection('courses').get(),
+      db.collection('courseEnrollments').get(),
+      db.collection('lessons').get(),
+      db.collection('lessonProgress').where('completed', '==', true).get(),
+    ]);
+
+    const enrollmentsByCourse = new Map<string, number>();
+    enrollmentsSnap.docs.forEach((d) => {
+      const courseId = (d.data() as any).courseId;
+      enrollmentsByCourse.set(courseId, (enrollmentsByCourse.get(courseId) ?? 0) + 1);
+    });
+
+    const lessonCountByCourse = new Map<string, number>();
+    lessonsSnap.docs.forEach((d) => {
+      const courseId = (d.data() as any).courseId;
+      lessonCountByCourse.set(courseId, (lessonCountByCourse.get(courseId) ?? 0) + 1);
+    });
+
+    const completedByUserCourse = new Map<string, number>();
+    progressSnap.docs.forEach((d) => {
+      const data = d.data() as any;
+      const key = `${data.userId}::${data.courseId}`;
+      completedByUserCourse.set(key, (completedByUserCourse.get(key) ?? 0) + 1);
+    });
+
+    return coursesSnap.docs.map((doc) => {
+      const course = doc.data() as any;
+      const enrolled = enrollmentsByCourse.get(doc.id) ?? 0;
+      const totalLessons = lessonCountByCourse.get(doc.id) ?? 0;
+
+      let averageProgress = 0;
+      if (enrolled > 0 && totalLessons > 0) {
+        const enrolledUserIds = enrollmentsSnap.docs
+          .filter((d) => (d.data() as any).courseId === doc.id)
+          .map((d) => (d.data() as any).userId);
+        const totalPercent = enrolledUserIds.reduce((sum, userId) => {
+          const completed = completedByUserCourse.get(`${userId}::${doc.id}`) ?? 0;
+          return sum + Math.round((completed / totalLessons) * 100);
+        }, 0);
+        averageProgress = Math.round(totalPercent / enrolledUserIds.length);
+      }
+
+      return { id: doc.id, title: course.title, enrolled, averageProgress };
+    });
   }
 
   /**
@@ -440,16 +674,17 @@ export class AdminService {
    * Calcula métricas de engajamento
    */
   private calculateEngagementMetrics(users: any[]) {
-    const total = users.length;
     const activeUsers = users.filter(u => u.subscription?.status === 'active').length;
-    const completedOnboarding = users.filter(u => u.onboardingCompleted).length;
 
     return {
-      dailyActiveUsers: Math.round(activeUsers * 0.7), // Estimativa
-      weeklyActiveUsers: Math.round(activeUsers * 0.85), // Estimativa
+      // Real: users with an active subscription right now.
       monthlyActiveUsers: activeUsers,
-      averageSessionDuration: 755, // Em segundos - placeholder
-      retentionRate: Math.round((completedOnboarding / total) * 100),
+      // No session/login event tracking exists yet — report honestly as
+      // untracked instead of guessing from a multiplier.
+      dailyActiveUsers: null,
+      weeklyActiveUsers: null,
+      averageSessionDuration: null,
+      retentionByCohort: null,
     };
   }
 
@@ -457,6 +692,10 @@ export class AdminService {
    * Calcula métricas de assinatura
    */
   private calculateSubscriptionMetrics(users: any[]) {
+    const everSubscribed = users.filter(u => u.subscription?.plan && u.subscription.plan !== 'free').length;
+    const cancelled = users.filter(u => u.subscription?.status === 'cancelled').length;
+    const churnRate = everSubscribed > 0 ? Math.round((cancelled / everSubscribed) * 1000) / 10 : 0;
+
     const planCounts = {
       free: users.filter(u => u.subscription?.plan === 'free').length,
       core: users.filter(u => u.subscription?.plan === 'core').length,
@@ -484,7 +723,7 @@ export class AdminService {
           plan,
           conversions: count,
         })),
-      churnRate: 2.3, // Placeholder - implementar com dados reais
+      churnRate, // Real: cancelled ÷ ever-subscribed-to-a-paid-plan
       lifetime: Object.entries(planCounts)
         .filter(([plan]) => plan !== 'free')
         .map(([plan, count]) => ({

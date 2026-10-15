@@ -42,6 +42,40 @@ export class PromoteUserDto {
 }
 
 /**
+ * DTO for editing an existing user's profile/role
+ */
+export class UpdateUserDto {
+  @IsOptional()
+  @IsString()
+  displayName?: string;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
+}
+
+/**
+ * DTO for persisted system settings (General/Security/Email/Notifications)
+ */
+export class UpdateSystemSettingsDto {
+  @IsOptional()
+  general?: Record<string, unknown>;
+
+  @IsOptional()
+  security?: Record<string, unknown>;
+
+  @IsOptional()
+  email?: Record<string, unknown>;
+
+  @IsOptional()
+  notifications?: Record<string, unknown>;
+}
+
+/**
  * DTO for user search filters
  */
 export class UserFiltersDto {

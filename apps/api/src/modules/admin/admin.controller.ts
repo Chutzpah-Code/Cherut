@@ -1,7 +1,13 @@
-import { Controller, Get, Post, Body, Query, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminOnly } from '../auth/guards/admin.guard';
-import { CreateAdminDto, PromoteUserDto, UserFiltersDto } from './dto/admin.dto';
+import {
+  CreateAdminDto,
+  PromoteUserDto,
+  UserFiltersDto,
+  UpdateUserDto,
+  UpdateSystemSettingsDto,
+} from './dto/admin.dto';
 
 /**
  * Admin Controller
@@ -84,6 +90,61 @@ export class AdminController {
   @Post('users/promote')
   async promoteUser(@Body() promoteUserDto: PromoteUserDto) {
     return this.adminService.promoteUser(promoteUserDto);
+  }
+
+  /**
+   * PATCH /admin/users/:uid
+   * Atualiza displayName/email/role de um usuário existente
+   */
+  @Patch('users/:uid')
+  async updateUser(@Param('uid') uid: string, @Body() dto: UpdateUserDto) {
+    return this.adminService.updateUser(uid, dto);
+  }
+
+  /**
+   * 🪜 FUNIL DE ATIVAÇÃO E USO POR CURSO
+   */
+
+  @Get('funnel')
+  async getActivationFunnel() {
+    return this.adminService.getActivationFunnel();
+  }
+
+  @Get('module-usage')
+  async getModuleUsage() {
+    return this.adminService.getModuleUsage();
+  }
+
+  /**
+   * ⚙️ CONFIGURAÇÕES DO SISTEMA
+   */
+
+  @Get('settings')
+  async getSettings() {
+    return this.adminService.getSettings();
+  }
+
+  @Patch('settings')
+  async updateSettings(@Body() dto: UpdateSystemSettingsDto) {
+    return this.adminService.updateSettings(dto);
+  }
+
+  /**
+   * 🧹 MANUTENÇÃO
+   */
+
+  @Post('maintenance/cleanup-inactive-users')
+  async cleanupInactiveUsers() {
+    return this.adminService.cleanupInactiveUsers();
+  }
+
+  /**
+   * GET /admin/health/services
+   * Status real de cada serviço (não fabricado)
+   */
+  @Get('health/services')
+  async getServicesHealth() {
+    return this.adminService.getServicesHealth();
   }
 
   /**

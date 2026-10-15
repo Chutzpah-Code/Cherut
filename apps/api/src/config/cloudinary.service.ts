@@ -208,6 +208,15 @@ export class CloudinaryService {
   }
 
   /**
+   * Real liveness check against the Cloudinary Admin API — used by the
+   * admin services-health panel, not a canned/fabricated status.
+   */
+  async ping(): Promise<boolean> {
+    const result = await cloudinary.api.ping();
+    return result.status === 'ok';
+  }
+
+  /**
    * Extrai o public_id de uma URL do Cloudinary
    */
   private extractPublicId(url: string): string | null {
