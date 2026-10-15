@@ -59,6 +59,9 @@ export function LearningStyles() {
       .lrn-resume-r { position: relative; margin: 18px 18px 18px 0; border-radius: 12px; overflow: hidden; background: #0E1230; border: 1px solid rgba(255,255,255,.14); min-height: 200px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
       .lrn-resume-r .lrn-play { width: 56px; height: 56px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; transition: transform .25s var(--lrn-ease); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
       .lrn-resume-r:hover .lrn-play { transform: scale(1.06); }
+      .lrn-resume-r .lrn-meta { position: absolute; left: 16px; bottom: 14px; right: 16px; display: flex; justify-content: flex-end; font-size: 12px; color: rgba(255,255,255,.75); }
+      .lrn-resume-r .lrn-tl { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.15); }
+      .lrn-resume-r .lrn-tl i { display: block; height: 100%; background: #8FA6FF; }
       .lrn-play::after { content: ""; border-left: 15px solid var(--lrn-acc-d); border-top: 9px solid transparent; border-bottom: 9px solid transparent; margin-left: 4px; }
 
       /* Catalog — filters */

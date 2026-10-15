@@ -7,10 +7,12 @@ interface ResumeCardProps {
   course: Course;
   moduleTitle: string;
   lessonTitle: string;
+  lessonPosition: number;
+  totalLessons: number;
   onContinue: () => void;
 }
 
-export function ResumeCard({ course, moduleTitle, lessonTitle, onContinue }: ResumeCardProps) {
+export function ResumeCard({ course, moduleTitle, lessonTitle, lessonPosition, totalLessons, onContinue }: ResumeCardProps) {
   const t = useTranslations('learning.page.resume');
 
   return (
@@ -31,6 +33,10 @@ export function ResumeCard({ course, moduleTitle, lessonTitle, onContinue }: Res
         style={course.coverImageUrl ? { background: `url(${course.coverImageUrl}) center/cover` } : undefined}
       >
         <span className="lrn-play" />
+        <div className="lrn-meta">
+          <span>{t('lessonPosition', { position: lessonPosition, total: totalLessons })}</span>
+        </div>
+        <div className="lrn-tl"><i style={{ width: `${course.percentComplete}%` }} /></div>
       </div>
     </div>
   );

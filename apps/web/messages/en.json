@@ -1300,7 +1300,8 @@
       "resume": {
         "label": "Continue where you left off",
         "cta": "Continue lesson",
-        "meta": "{percent}% complete · {lessons} lessons"
+        "meta": "{percent}% complete · {lessons} lessons",
+        "lessonPosition": "Lesson {position} of {total}"
       },
       "filters": {
         "all": "All",

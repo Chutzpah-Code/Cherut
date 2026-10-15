@@ -25,15 +25,19 @@ export default function LearningPage() {
 
   const { data: resumeCourseDetail } = useCourse(resumeCourseId ?? '');
 
-  const resumeLesson = useMemo(() => {
-    if (!resumeCourseDetail?.modules) return undefined;
-    return resolveCurrentLesson(resumeCourseDetail.modules.flatMap((m) => m.lessons ?? []));
-  }, [resumeCourseDetail]);
+  const resumeAllLessons = useMemo(
+    () => resumeCourseDetail?.modules?.flatMap((m) => m.lessons ?? []) ?? [],
+    [resumeCourseDetail],
+  );
+
+  const resumeLesson = useMemo(() => resolveCurrentLesson(resumeAllLessons), [resumeAllLessons]);
 
   const resumeModule = useMemo(
     () => resumeCourseDetail?.modules?.find((m) => m.id === resumeLesson?.moduleId),
     [resumeCourseDetail, resumeLesson],
   );
+
+  const resumeLessonPosition = resumeAllLessons.findIndex((l) => l.id === resumeLesson?.id) + 1;
 
   const filteredCourses = useMemo(() => {
     return (courses ?? []).filter((c) => {
@@ -62,6 +66,8 @@ export default function LearningPage() {
           course={resumeCourseDetail}
           moduleTitle={resumeModule.title}
           lessonTitle={resumeLesson.title}
+          lessonPosition={resumeLessonPosition}
+          totalLessons={resumeAllLessons.length}
           onContinue={() => router.push(`/dashboard/learning/${resumeCourseDetail.id}`)}
         />
       )}
