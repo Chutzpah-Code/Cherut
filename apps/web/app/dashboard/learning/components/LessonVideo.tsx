@@ -1,7 +1,6 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Play } from 'lucide-react';
 import { Course, CourseModule, Lesson } from '@/lib/api/services/learning';
 
 function embedUrl(url: string): string | null {

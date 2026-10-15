@@ -1,7 +1,6 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Play } from 'lucide-react';
 import { Course } from '@/lib/api/services/learning';
 
 interface ResumeCardProps {
