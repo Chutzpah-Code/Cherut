@@ -124,9 +124,14 @@ export class BoardsService {
       db.collection(this.boardsCollection).where('memberUids', 'array-contains', userId).get(),
     ]);
 
+    const withMembers = (doc: FirebaseFirestore.QueryDocumentSnapshot) => {
+      const data = doc.data() as any;
+      return { id: doc.id, ...data, members: data.members ?? [] };
+    };
+
     const byId = new Map<string, any>();
-    ownedSnap.docs.forEach((doc) => byId.set(doc.id, { id: doc.id, ...doc.data() }));
-    memberSnap.docs.forEach((doc) => byId.set(doc.id, { id: doc.id, ...doc.data() }));
+    ownedSnap.docs.forEach((doc) => byId.set(doc.id, withMembers(doc)));
+    memberSnap.docs.forEach((doc) => byId.set(doc.id, withMembers(doc)));
 
     return Array.from(byId.values()).sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
   }
@@ -146,7 +151,7 @@ export class BoardsService {
       throw new NotFoundException('Board not found');
     }
 
-    return { id: doc.id, ...data };
+    return { id: doc.id, ...data, members: data!.members ?? [] };
   }
 
   async updateBoard(userId: string, boardId: string, dto: UpdateBoardDto) {

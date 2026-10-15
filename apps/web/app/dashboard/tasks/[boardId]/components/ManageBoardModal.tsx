@@ -50,7 +50,7 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
   const [inviteRole, setInviteRole] = useState<'editor' | 'collaborator'>('collaborator');
   const [inviteError, setInviteError] = useState<string | null>(null);
 
-  const memberUids = useMemo(() => board?.members.map((m) => m.uid) ?? [], [board?.members]);
+  const memberUids = useMemo(() => board?.members?.map((m) => m.uid) ?? [], [board?.members]);
   const { data: avatars } = useProfilesBatch(memberUids);
   const avatarByUid = useMemo(() => {
     const map = new Map<string, string | undefined>();
@@ -63,12 +63,12 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
   const myRole: BoardRole =
     board.userId === user?.uid
       ? 'owner'
-      : (board.members.find((m) => m.uid === user?.uid)?.role ?? 'collaborator');
+      : (board.members?.find((m) => m.uid === user?.uid)?.role ?? 'collaborator');
 
   const canInvite = myRole === 'owner' || myRole === 'editor';
   const canManage = myRole === 'owner';
 
-  const sortedMembers = [...board.members].sort((a, b) => ROLE_ORDER[a.role] - ROLE_ORDER[b.role]);
+  const sortedMembers = [...(board.members ?? [])].sort((a, b) => ROLE_ORDER[a.role] - ROLE_ORDER[b.role]);
 
   const roleLabel = (role: BoardRole) =>
     role === 'owner' ? t('roleOwner') : role === 'editor' ? t('roleEditor') : t('roleCollaborator');
