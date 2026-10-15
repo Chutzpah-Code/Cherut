@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { FirebaseService } from '../../config/firebase.service';
+import { CloudinaryService } from '../../config/cloudinary.service';
 
 describe('AdminService', () => {
   let service: AdminService;
@@ -27,6 +28,10 @@ describe('AdminService', () => {
     getAuth: jest.fn(() => mockAuth),
   };
 
+  const mockCloudinaryService = {
+    ping: jest.fn(),
+  };
+
   const snap = (items: { id: string; data: object; ref?: object }[]) => ({
     docs: items.map((d) => ({
       id: d.id,
@@ -41,6 +46,7 @@ describe('AdminService', () => {
       providers: [
         AdminService,
         { provide: FirebaseService, useValue: mockFirebaseService },
+        { provide: CloudinaryService, useValue: mockCloudinaryService },
       ],
     }).compile();
 
@@ -158,9 +164,9 @@ describe('AdminService', () => {
   describe('getDashboardOverview', () => {
     it('returns totalUsers, totalAdmins, activeSubscriptions and planDistribution', async () => {
       const allUsersData = [
-        { role: 'admin', onboardingCompleted: true, subscription: { plan: 'elite', status: 'active' } },
+        { role: 'admin', onboardingCompleted: true, subscription: { plan: 'enterprise', status: 'active' } },
         { role: 'user', onboardingCompleted: true, subscription: { plan: 'free', status: 'active' } },
-        { role: 'user', onboardingCompleted: false, subscription: { plan: 'pro', status: 'active' } },
+        { role: 'user', onboardingCompleted: false, subscription: { plan: 'mentorship', status: 'active' } },
       ];
       const activeSubsData = allUsersData.filter(u => u.subscription.status === 'active');
 
@@ -173,8 +179,8 @@ describe('AdminService', () => {
       expect(result.overview.totalUsers).toBe(3);
       expect(result.overview.totalAdmins).toBe(1);
       expect(result.overview.activeSubscriptions).toBe(3);
-      expect(result.planDistribution.elite).toBe(1);
-      expect(result.planDistribution.pro).toBe(1);
+      expect(result.planDistribution.mentorship).toBe(1);
+      expect(result.planDistribution.free).toBe(1);
     });
   });
 
@@ -183,14 +189,14 @@ describe('AdminService', () => {
   describe('getSalesReport', () => {
     it('calculates monthlyRevenue from active paid subscriptions', async () => {
       mockFirestore.get.mockResolvedValue({ docs: [
-        { id: 'u1', data: () => ({ subscription: { plan: 'pro', status: 'active' } }) },  // 19.99
-        { id: 'u2', data: () => ({ subscription: { plan: 'core', status: 'active' } }) }, // 9.99
+        { id: 'u1', data: () => ({ subscription: { plan: 'method', status: 'active' } }) },  // 48
+        { id: 'u2', data: () => ({ subscription: { plan: 'core', status: 'active' } }) }, // 12.50
       ]});
 
       const result = await service.getSalesReport();
 
-      expect(result.monthlyRevenue).toBeCloseTo(29.98);
-      expect(result.salesByPlan.pro).toBe(1);
+      expect(result.monthlyRevenue).toBeCloseTo(60.5);
+      expect(result.salesByPlan.method).toBe(1);
       expect(result.salesByPlan.core).toBe(1);
       expect(result.totalPaidUsers).toBe(2);
     });

@@ -5,11 +5,15 @@ export enum UserRole {
   ADMIN = 'admin',
 }
 
+// Matches the landing page's paid tiers exactly (apps/web messages
+// `landing.pricing.plans`). FREE is not sold or shown on the landing page —
+// it's a trial/test grant the admin assigns manually, per user, for however
+// long they choose.
 export enum SubscriptionPlan {
   FREE = 'free',
   CORE = 'core',
-  PRO = 'pro',
-  ELITE = 'elite',
+  METHOD = 'method',
+  MENTORSHIP = 'mentorship',
 }
 
 export enum SubscriptionStatus {

@@ -7,7 +7,7 @@ import { useAdminOverview, useAdminSales, useAdminAnalytics, useAdminActivity, u
 import { ServiceStatus } from '@/lib/api/services/admin';
 import { downloadCsv } from './lib/exportCsv';
 
-const PLAN_COLORS: Record<string, string> = { free: '#D7DAE4', core: '#8FA6FF', pro: '#3B5BF6', elite: '#14141C' };
+const PLAN_COLORS: Record<string, string> = { free: '#D7DAE4', core: '#8FA6FF', method: '#3B5BF6', mentorship: '#14141C' };
 
 function StatusDot({ status }: { status: ServiceStatus }) {
   const t = useTranslations('adminDashboardPage.system');

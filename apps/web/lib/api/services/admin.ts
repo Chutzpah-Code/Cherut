@@ -7,13 +7,13 @@ export interface DashboardOverview {
     activeSubscriptions: number;
     newUsersLast30Days: number;
   };
-  planDistribution: { free: number; core: number; pro: number; elite: number };
+  planDistribution: { free: number; core: number; method: number; mentorship: number };
   lastUpdated: string;
 }
 
 export interface SalesReport {
   monthlyRevenue: number;
-  salesByPlan: { core: number; pro: number; elite: number };
+  salesByPlan: { core: number; method: number; mentorship: number };
   totalPaidUsers: number;
   averageRevenuePerUser: number;
   conversionRate: number;
@@ -75,14 +75,14 @@ export interface AdminUser {
   email: string;
   displayName?: string;
   role: 'user' | 'admin';
-  subscription?: { plan: 'free' | 'core' | 'pro' | 'elite'; status: 'active' | 'inactive' | 'cancelled' };
+  subscription?: { plan: 'free' | 'core' | 'method' | 'mentorship' | 'enterprise'; status: 'active' | 'inactive' | 'cancelled' };
   createdAt: string;
   suspended?: boolean;
 }
 
 export interface UserFilters {
   role?: 'user' | 'admin';
-  plan?: 'free' | 'core' | 'pro' | 'elite';
+  plan?: 'free' | 'core' | 'method' | 'mentorship';
   status?: 'active' | 'inactive' | 'cancelled';
   search?: string;
   limit?: string;
@@ -114,12 +114,13 @@ export const adminApi = {
   promoteUser: async (dto: { email: string }) => (await apiClient.post('/admin/users/promote', dto)).data,
   updateUser: async (
     uid: string,
-    dto: { displayName?: string; email?: string; role?: 'user' | 'admin'; plan?: 'free' | 'core' | 'pro' | 'elite' },
+    dto: { displayName?: string; email?: string; role?: 'user' | 'admin'; plan?: 'free' | 'core' | 'method' | 'mentorship' },
   ): Promise<AdminUser> => (await apiClient.patch(`/admin/users/${uid}`, dto)).data,
   generatePasswordResetLink: async (uid: string): Promise<{ link: string }> =>
     (await apiClient.post(`/admin/users/${uid}/reset-password-link`)).data,
   suspendUser: async (uid: string): Promise<AdminUser> => (await apiClient.post(`/admin/users/${uid}/suspend`)).data,
   reactivateUser: async (uid: string): Promise<AdminUser> => (await apiClient.post(`/admin/users/${uid}/reactivate`)).data,
+  deleteUser: async (uid: string): Promise<{ id: string; deleted: boolean }> => (await apiClient.delete(`/admin/users/${uid}`)).data,
 
   getSettings: async (): Promise<SystemSettings> => (await apiClient.get('/admin/settings')).data,
   updateSettings: async (dto: Partial<SystemSettings>): Promise<SystemSettings> =>

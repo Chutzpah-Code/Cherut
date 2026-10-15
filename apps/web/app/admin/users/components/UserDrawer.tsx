@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Copy, X } from 'lucide-react';
 import { AdminUser } from '@/lib/api/services/admin';
-import { useUpdateAdminUser, useGeneratePasswordResetLink, useSuspendUser, useReactivateUser } from '@/hooks/useAdmin';
+import { useUpdateAdminUser, useGeneratePasswordResetLink, useSuspendUser, useReactivateUser, useDeleteAdminUser } from '@/hooks/useAdmin';
 import { RolePill, PlanPill, StatusPill } from './pills';
 
 function initials(nameOrEmail: string): string {
@@ -24,12 +24,17 @@ export function UserDrawer({ user, onClose, onToast }: UserDrawerProps) {
   const resetLink = useGeneratePasswordResetLink();
   const suspend = useSuspendUser();
   const reactivate = useReactivateUser();
+  const deleteUser = useDeleteAdminUser();
 
-  const [plan, setPlan] = useState(user.subscription?.plan ?? 'free');
+  type AssignablePlan = 'free' | 'core' | 'method' | 'mentorship';
+  const toAssignablePlan = (plan: string | undefined): AssignablePlan =>
+    plan === 'core' || plan === 'method' || plan === 'mentorship' ? plan : 'free';
+
+  const [plan, setPlan] = useState<AssignablePlan>(toAssignablePlan(user.subscription?.plan));
   const [role, setRole] = useState(user.role);
 
   useEffect(() => {
-    setPlan(user.subscription?.plan ?? 'free');
+    setPlan(toAssignablePlan(user.subscription?.plan));
     setRole(user.role);
   }, [user]);
 
@@ -57,6 +62,21 @@ export function UserDrawer({ user, onClose, onToast }: UserDrawerProps) {
   function copyId() {
     navigator.clipboard?.writeText(user.uid);
     onToast(t('toastIdCopied'));
+  }
+
+  function handleDelete() {
+    const confirmed = window.confirm(
+      t('confirmDelete', {
+        name: user.displayName || user.email,
+        email: user.email,
+        uid: user.uid,
+        joined: new Date(user.createdAt).toLocaleDateString(),
+      }),
+    );
+    if (!confirmed) return;
+    deleteUser.mutate(user.uid, {
+      onSuccess: () => { onToast(t('toastDeleted')); onClose(); },
+    });
   }
 
   return (
@@ -100,8 +120,8 @@ export function UserDrawer({ user, onClose, onToast }: UserDrawerProps) {
                 <select className="adm-in" value={plan} onChange={(e) => setPlan(e.target.value as typeof plan)}>
                   <option value="free">{t('planFree')}</option>
                   <option value="core">{t('planCore')}</option>
-                  <option value="pro">{t('planPro')}</option>
-                  <option value="elite">{t('planElite')}</option>
+                  <option value="method">{t('planMethod')}</option>
+                  <option value="mentorship">{t('planMentorship')}</option>
                 </select>
               </dd>
               <dt>{t('role')}</dt>
@@ -120,6 +140,11 @@ export function UserDrawer({ user, onClose, onToast }: UserDrawerProps) {
           <button type="button" className="adm-btn adm-btn-bad" disabled={suspend.isPending || reactivate.isPending} onClick={handleSuspendToggle}>
             {t(user.suspended ? 'reactivate' : 'suspend')}
           </button>
+          {user.role !== 'admin' && (
+            <button type="button" className="adm-btn adm-btn-bad" disabled={deleteUser.isPending} onClick={handleDelete}>
+              {t('delete')}
+            </button>
+          )}
         </div>
       </div>
     </>

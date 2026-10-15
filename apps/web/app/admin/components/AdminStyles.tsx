@@ -45,14 +45,17 @@ export function AdminStyles() {
       .adm-sb nav button.on, .adm-sb nav a.on { background: #fff; color: var(--adm-ink); box-shadow: 0 1px 2px rgba(20,20,28,.06), 0 0 0 1px var(--adm-line); }
       .adm-sb nav button.on svg, .adm-sb nav a.on svg { color: var(--adm-acc); }
       .adm-sb nav .adm-n { margin-left: auto; font-family: var(--font-geist-mono), monospace; font-size: 11px; color: var(--adm-faint); }
-      .adm-me { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; border: 1px solid var(--adm-line); background: #fff; }
       .adm-av { width: 32px; height: 32px; border-radius: 50%; background: var(--adm-acc-soft); color: var(--adm-acc); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; flex: none; }
-      .adm-me div { min-width: 0; }
-      .adm-me b { display: block; font-size: 13px; }
-      .adm-me small { display: block; color: var(--adm-mute); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .adm-main { padding: 28px 32px 48px; }
       .adm-panel { background: #fff; border-radius: 16px; border: 1px solid var(--adm-line); min-height: calc(100vh - 32px); padding: 32px 36px 48px; }
-      .adm-mob { display: none; }
+
+      /* Top bar — admin identity, top-right, same pattern as the user-side dashboard header */
+      .adm-topbar { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-bottom: 20px; }
+      .adm-topbar-mob { display: none; }
+      .adm-topbar-profile { display: flex; align-items: center; gap: 10px; }
+      .adm-topbar-text { min-width: 0; }
+      .adm-topbar-text b { display: block; font-size: 13px; }
+      .adm-topbar-text small { display: block; color: var(--adm-mute); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
 
       /* Header */
       .adm-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 28px; }
@@ -205,6 +208,7 @@ export function AdminStyles() {
       .adm-box .adm-f { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
       .adm-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
       .adm-req { color: var(--adm-bad); }
+      @media (max-width: 420px) { .adm-two { grid-template-columns: minmax(0,1fr); } }
 
       /* Cover upload */
       .adm-cover { position: relative; height: 150px; border-radius: 12px; overflow: hidden; border: 1px dashed #C9CDDA; background: var(--adm-soft); display: flex; align-items: center; justify-content: center; color: var(--adm-mute); cursor: pointer; background-size: cover; background-position: center; margin-top: 6px; }
@@ -308,7 +312,9 @@ export function AdminStyles() {
         .adm-app { grid-template-columns: minmax(0,1fr); }
         .adm-sb { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; z-index: 42; transform: translateX(-100%); transition: transform .35s var(--adm-ease); background: #F7F8FC; }
         .adm-sb.on { transform: none; }
-        .adm-mob { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 0; }
+        .adm-topbar { justify-content: space-between; margin-bottom: 12px; }
+        .adm-topbar-mob { display: flex; align-items: center; justify-content: space-between; flex: 1; }
+        .adm-topbar-text { display: none; }
         .adm-main { padding: 12px; }
         .adm-panel { padding: 22px 18px 40px; }
         .adm-st { grid-template-columns: minmax(0,1fr); gap: 16px; }

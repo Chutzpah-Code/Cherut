@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, Logger, NotFoundException } from '@nestjs/common';
 import { FirebaseService } from '../../config/firebase.service';
 import { CloudinaryService } from '../../config/cloudinary.service';
 import {
@@ -10,6 +10,15 @@ import {
   SubscriptionPlan,
   SubscriptionStatus,
 } from './dto/admin.dto';
+
+// Paid tiers, matching the landing page pricing exactly (apps/web messages
+// `landing.pricing.plans`, monthly price). "free" has no price — it isn't
+// sold, it's a trial/test grant the admin assigns manually per user.
+const PLAN_PRICES: Record<'core' | 'method' | 'mentorship', number> = {
+  core: 12.5,
+  method: 48,
+  mentorship: 100,
+};
 
 const DEFAULT_SETTINGS = {
   general: {
@@ -144,7 +153,7 @@ export class AdminService {
         onboardingCompleted: true,
         lifePurpose: 'Administration',
         subscription: {
-          plan: 'elite',
+          plan: 'enterprise',
           status: 'active',
           startDate: new Date().toISOString(),
           isAdminAccount: true,
@@ -212,7 +221,7 @@ export class AdminService {
         permissions: ['admin'],
         subscription: {
           ...userData.subscription,
-          plan: 'elite', // Automatic upgrade
+          plan: 'enterprise', // Admin accounts aren't on a customer-facing tier
         },
       });
 
@@ -311,6 +320,40 @@ export class AdminService {
     this.logger.log(`User ${uid} ${suspended ? 'suspended' : 'reactivated'}`);
     const updated = await docRef.get();
     return { id: updated.id, ...updated.data() };
+  }
+
+  /**
+   * Remove um usuário: documento no Firestore + conta no Firebase Auth
+   * (quando ainda existir — documentos órfãos, cuja conta Auth já foi
+   * removida por fora, são comuns e o delete no Auth é best-effort).
+   * Nunca permite auto-exclusão nem exclusão de outro admin.
+   */
+  async deleteUser(uid: string, requestingUid?: string) {
+    if (requestingUid && uid === requestingUid) {
+      throw new BadRequestException('You cannot delete your own account');
+    }
+
+    const db = this.firebaseService.getFirestore();
+    const docRef = db.collection('users').doc(uid);
+    const doc = await docRef.get();
+    if (!doc.exists) throw new NotFoundException(`User ${uid} not found`);
+
+    const userData = doc.data() as any;
+    if (userData.role === 'admin') {
+      throw new ForbiddenException('Cannot delete an admin account from here');
+    }
+
+    const auth = this.firebaseService.getAuth();
+    try {
+      await auth.deleteUser(uid);
+    } catch (error: any) {
+      if (error?.code !== 'auth/user-not-found') throw error;
+      this.logger.warn(`Deleting orphaned Firestore user doc with no matching Auth account: ${uid}`);
+    }
+
+    await docRef.delete();
+    this.logger.log(`User deleted: ${uid} (${userData.email})`);
+    return { id: uid, deleted: true };
   }
 
   /**
@@ -609,8 +652,8 @@ export class AdminService {
       const planDistribution = {
         free: users.filter(user => (user.subscription?.plan ?? 'free') === 'free').length,
         core: users.filter(user => user.subscription?.plan === 'core').length,
-        pro: users.filter(user => user.subscription?.plan === 'pro').length,
-        elite: users.filter(user => user.subscription?.plan === 'elite').length,
+        method: users.filter(user => user.subscription?.plan === 'method').length,
+        mentorship: users.filter(user => user.subscription?.plan === 'mentorship').length,
       };
 
       // New users in last 30 days
@@ -647,37 +690,27 @@ export class AdminService {
 
       const subscriptions = subscriptionsSnapshot.docs.map(doc => doc.data());
 
-      // Calculate estimated revenue (demo values - to be replaced with real payment system)
-      const planPrices = {
-        free: 0,
-        core: 9.99,
-        pro: 19.99,
-        elite: 49.99,
-      };
-
       let monthlyRevenue = 0;
       const salesByPlan = {
         core: 0,
-        pro: 0,
-        elite: 0,
+        method: 0,
+        mentorship: 0,
       };
 
       subscriptions.forEach(user => {
         const plan = user.subscription?.plan;
-        if (plan && planPrices[plan]) {
-          monthlyRevenue += planPrices[plan];
-          if (plan !== 'free') {
-            salesByPlan[plan]++;
-          }
+        if (plan && PLAN_PRICES[plan]) {
+          monthlyRevenue += PLAN_PRICES[plan];
+          salesByPlan[plan]++;
         }
       });
 
       return {
         monthlyRevenue,
         salesByPlan,
-        totalPaidUsers: salesByPlan.core + salesByPlan.pro + salesByPlan.elite,
-        averageRevenuePerUser: monthlyRevenue / (salesByPlan.core + salesByPlan.pro + salesByPlan.elite || 1),
-        conversionRate: Math.round(((salesByPlan.core + salesByPlan.pro + salesByPlan.elite) / subscriptions.length) * 100),
+        totalPaidUsers: salesByPlan.core + salesByPlan.method + salesByPlan.mentorship,
+        averageRevenuePerUser: monthlyRevenue / (salesByPlan.core + salesByPlan.method + salesByPlan.mentorship || 1),
+        conversionRate: Math.round(((salesByPlan.core + salesByPlan.method + salesByPlan.mentorship) / (subscriptions.length || 1)) * 100),
       };
     } catch (error) {
       this.logger.error('Error getting sales report:', error);
@@ -764,13 +797,6 @@ export class AdminService {
    * Calcula revenue mensal estimado
    */
   private calculateMonthlyRevenue(users: any[]) {
-    const planPrices = {
-      free: 0,
-      core: 9.99,
-      pro: 19.99,
-      elite: 49.99,
-    };
-
     const monthlyData = {};
 
     users.forEach(user => {
@@ -783,8 +809,8 @@ export class AdminService {
         }
 
         const plan = user.subscription.plan;
-        if (planPrices[plan]) {
-          monthlyData[monthKey] += planPrices[plan];
+        if (PLAN_PRICES[plan]) {
+          monthlyData[monthKey] += PLAN_PRICES[plan];
         }
       }
     });
@@ -829,14 +855,8 @@ export class AdminService {
     const planCounts = {
       free: users.filter(u => u.subscription?.plan === 'free').length,
       core: users.filter(u => u.subscription?.plan === 'core').length,
-      pro: users.filter(u => u.subscription?.plan === 'pro').length,
-      elite: users.filter(u => u.subscription?.plan === 'elite').length,
-    };
-
-    const planPrices = {
-      core: 9.99,
-      pro: 19.99,
-      elite: 49.99,
+      method: users.filter(u => u.subscription?.plan === 'method').length,
+      mentorship: users.filter(u => u.subscription?.plan === 'mentorship').length,
     };
 
     return {
@@ -844,7 +864,7 @@ export class AdminService {
         .filter(([plan]) => plan !== 'free')
         .map(([plan, count]) => ({
           plan,
-          amount: Math.round(count * planPrices[plan]),
+          amount: Math.round(count * PLAN_PRICES[plan]),
           count,
         })),
       conversions: Object.entries(planCounts)
@@ -858,7 +878,7 @@ export class AdminService {
         .filter(([plan]) => plan !== 'free')
         .map(([plan, count]) => ({
           plan,
-          value: Math.round(count * planPrices[plan] * 12), // LTV anual estimado
+          value: Math.round(count * PLAN_PRICES[plan] * 12), // LTV anual estimado
         })),
     };
   }

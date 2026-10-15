@@ -57,7 +57,7 @@ export const useUpdateAdminUser = () => {
       dto,
     }: {
       uid: string;
-      dto: { displayName?: string; email?: string; role?: 'user' | 'admin'; plan?: 'free' | 'core' | 'pro' | 'elite' };
+      dto: { displayName?: string; email?: string; role?: 'user' | 'admin'; plan?: 'free' | 'core' | 'method' | 'mentorship' };
     }) => adminApi.updateUser(uid, dto),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
   });
@@ -78,6 +78,14 @@ export const useReactivateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (uid: string) => adminApi.reactivateUser(uid),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
+  });
+};
+
+export const useDeleteAdminUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (uid: string) => adminApi.deleteUser(uid),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
   });
 };

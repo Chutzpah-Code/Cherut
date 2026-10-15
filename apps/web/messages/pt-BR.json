@@ -1932,8 +1932,8 @@
       "title": "Distribuição por plano",
       "free": "Free",
       "core": "Core",
-      "pro": "Pro",
-      "elite": "Elite"
+      "method": "Method",
+      "mentorship": "Mentorship"
     },
     "activity": {
       "title": "Atividade recente",
@@ -1984,7 +1984,7 @@
     },
     "pills": {
       "role": { "user": "Usuário", "admin": "Admin" },
-      "plan": { "free": "Free", "core": "Core", "pro": "Pro", "elite": "Elite" },
+      "plan": { "free": "Free", "core": "Core", "method": "Method", "mentorship": "Mentorship", "enterprise": "Enterprise" },
       "status": { "active": "Ativo", "inactive": "Inativo", "cancelled": "Cancelado" }
     },
     "drawer": {
@@ -1998,8 +1998,8 @@
       "plan": "Plano",
       "planFree": "Free",
       "planCore": "Core",
-      "planPro": "Pro",
-      "planElite": "Elite",
+      "planMethod": "Method",
+      "planMentorship": "Mentorship",
       "role": "Papel",
       "roleUser": "Usuário",
       "roleAdmin": "Admin",
@@ -2011,7 +2011,10 @@
       "toastResetLinkCopied": "Link de redefinição copiado",
       "toastSuspended": "Usuário suspenso",
       "toastReactivated": "Usuário reativado",
-      "toastIdCopied": "ID copiado"
+      "toastIdCopied": "ID copiado",
+      "delete": "Excluir usuário",
+      "confirmDelete": "Excluir \"{name}\" ({email})?\n\nUser ID: {uid}\nCadastro: {joined}\n\nIsso remove permanentemente o registro no Firestore e a conta no Auth (se ainda existir). Não pode ser desfeito.",
+      "toastDeleted": "Usuário excluído"
     },
     "promoteModal": {
       "title": "Promover usuário a admin",

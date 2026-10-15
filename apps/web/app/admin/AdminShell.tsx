@@ -136,21 +136,23 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               {t('exitAdmin')}
             </button>
           </nav>
-          <div className="adm-me">
-            <span className="adm-av">{initials(adminUser.displayName || adminUser.email)}</span>
-            <div>
-              <b>{adminUser.displayName || t('adminBadge')}</b>
-              <small>{adminUser.email}</small>
-            </div>
-          </div>
         </aside>
 
         <div className="adm-main">
-          <div className="adm-mob">
-            <CherutLogo viewBox="200 279 338 132" width={88} height={34} fillColor="#14141C" />
-            <button type="button" className="adm-ia" onClick={() => setMobileNavOpen((v) => !v)} aria-label={t('menu')}>
-              {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
+          <div className="adm-topbar">
+            <div className="adm-topbar-mob">
+              <CherutLogo viewBox="200 279 338 132" width={88} height={34} fillColor="#14141C" />
+              <button type="button" className="adm-ia" onClick={() => setMobileNavOpen((v) => !v)} aria-label={t('menu')}>
+                {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
+              </button>
+            </div>
+            <div className="adm-topbar-profile">
+              <span className="adm-av">{initials(adminUser.displayName || adminUser.email)}</span>
+              <div className="adm-topbar-text">
+                <b>{adminUser.displayName || t('adminBadge')}</b>
+                <small>{adminUser.email}</small>
+              </div>
+            </div>
           </div>
           <div className="adm-panel">{children}</div>
         </div>

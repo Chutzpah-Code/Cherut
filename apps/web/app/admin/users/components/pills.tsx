@@ -6,13 +6,15 @@ import { AdminUser } from '@/lib/api/services/admin';
 
 export function RolePill({ role }: { role: AdminUser['role'] }) {
   const t = useTranslations('adminUsersPage.pills');
-  return <span className={`adm-pill${role === 'admin' ? ' bad' : ''}`}>{t(`role.${role}`)}</span>;
+  const r = role ?? 'user';
+  return <span className={`adm-pill${r === 'admin' ? ' bad' : ''}`}>{t.has(`role.${r}`) ? t(`role.${r}`) : r}</span>;
 }
 
-export function PlanPill({ plan }: { plan: 'free' | 'core' | 'pro' | 'elite' }) {
+export function PlanPill({ plan }: { plan: string }) {
   const t = useTranslations('adminUsersPage.pills');
-  const cls = plan === 'free' ? '' : plan === 'elite' ? 'ink' : 'acc';
-  return <span className={`adm-pill${cls ? ' ' + cls : ''}`}>{t(`plan.${plan}`)}</span>;
+  const p = plan || 'free';
+  const cls = p === 'free' ? '' : p === 'mentorship' || p === 'enterprise' ? 'ink' : 'acc';
+  return <span className={`adm-pill${cls ? ' ' + cls : ''}`}>{t.has(`plan.${p}`) ? t(`plan.${p}`) : p}</span>;
 }
 
 export function StatusPill({ status }: { status: NonNullable<AdminUser['subscription']>['status'] | undefined }) {

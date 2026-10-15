@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminOnly } from '../auth/guards/admin.guard';
 import {
@@ -119,6 +119,17 @@ export class AdminController {
   @Post('users/:uid/reactivate')
   async reactivateUser(@Param('uid') uid: string) {
     return this.adminService.setUserSuspended(uid, false);
+  }
+
+  /**
+   * DELETE /admin/users/:uid
+   * Remove um usuário (Firestore + Auth, se ainda existir). Nunca permite
+   * auto-exclusão nem exclusão de outro admin — use "Promover" às avessas
+   * manualmente no Firestore se isso for realmente necessário.
+   */
+  @Delete('users/:uid')
+  async deleteUser(@Param('uid') uid: string, @Req() req: any) {
+    return this.adminService.deleteUser(uid, req.user?.uid);
   }
 
   /**

@@ -65,8 +65,8 @@ export default function AdminUsersPage() {
           <option value="">{t('filters.allPlans')}</option>
           <option value="free">{t('pills.plan.free')}</option>
           <option value="core">{t('pills.plan.core')}</option>
-          <option value="pro">{t('pills.plan.pro')}</option>
-          <option value="elite">{t('pills.plan.elite')}</option>
+          <option value="method">{t('pills.plan.method')}</option>
+          <option value="mentorship">{t('pills.plan.mentorship')}</option>
         </select>
         <span className="adm-cnt">{t('count', { shown: filtered.length, total: data?.users.length ?? 0 })}</span>
       </div>
