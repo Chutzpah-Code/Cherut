@@ -24,6 +24,8 @@ export function LessonVideo({ course, lesson, module, lessonIndex, onOpenExercis
   const t = useTranslations('learning.course');
   const embed = lesson.videoUrl ? embedUrl(lesson.videoUrl) : null;
 
+  const moduleLessonLabel = t('moduleLessonLabel', { module: String((module.order ?? 0) + 1).padStart(2, '0'), lesson: lessonIndex + 1 });
+
   return (
     <div className="lrn-vcard">
       <div className="lrn-video">
@@ -39,14 +41,17 @@ export function LessonVideo({ course, lesson, module, lessonIndex, onOpenExercis
             <video controls src={lesson.videoUrl} poster={course.coverImageUrl} />
           )
         ) : (
-          <span className="lrn-play" />
+          <>
+            <span className="lrn-play" />
+            <div className="lrn-cap">
+              <span className="lrn-mono">{moduleLessonLabel}</span>
+              <h2>{lesson.title}</h2>
+            </div>
+          </>
         )}
-        <div className="lrn-cap">
-          <span className="lrn-mono">{t('moduleLessonLabel', { module: String((module.order ?? 0) + 1).padStart(2, '0'), lesson: lessonIndex + 1 })}</span>
-          <h2>{lesson.title}</h2>
-        </div>
       </div>
       <div className="lrn-vfoot">
+        {lesson.videoUrl && <span className="lrn-mono">{moduleLessonLabel}</span>}
         <div className="lrn-bar"><i style={{ width: lesson.completed ? '100%' : '0%' }} /></div>
         {lesson.exerciseText && (
           <div className="lrn-vrow">
