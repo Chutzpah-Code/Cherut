@@ -32,6 +32,27 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
       <p style={{ color: '#6B7280', margin: 0, maxWidth: 420 }}>
         This page hit an unexpected error. You can try again, or head back home.
       </p>
+      {/* TEMPORARY: surfaces the raw error for live debugging of the
+          admin/courses crash — revert to just the message above once
+          that's root-caused, this shouldn't ship long-term. */}
+      <details style={{ textAlign: 'left', maxWidth: 640, width: '100%' }} open>
+        <summary style={{ cursor: 'pointer', color: '#6B7280', fontSize: 13 }}>Details</summary>
+        <pre
+          style={{
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            background: '#F3F4F6',
+            padding: 12,
+            borderRadius: 8,
+            fontSize: 12,
+            marginTop: 8,
+          }}
+        >
+          {error.name}: {error.message}
+          {error.digest ? `\ndigest: ${error.digest}` : ''}
+          {error.stack ? `\n\n${error.stack}` : ''}
+        </pre>
+      </details>
       <div style={{ display: 'flex', gap: 10 }}>
         <button
           onClick={reset}
