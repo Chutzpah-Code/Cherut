@@ -1933,7 +1933,8 @@
       "free": "Free",
       "core": "Core",
       "method": "Method",
-      "mentorship": "Mentorship"
+      "mentorship": "Mentorship",
+      "admin": "Admin"
     },
     "activity": {
       "title": "Atividade recente",

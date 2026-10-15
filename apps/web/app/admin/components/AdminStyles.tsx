@@ -117,6 +117,8 @@ export function AdminStyles() {
       .adm-leg em { width: 10px; height: 10px; border-radius: 3px; font-style: normal; }
       .adm-leg b { font-variant-numeric: tabular-nums; }
       .adm-leg small { color: var(--adm-mute); width: 44px; text-align: right; }
+      .adm-leg .adm-leg-sub { border-top: 0; padding: 0 0 10px 18px; color: var(--adm-mute); font-size: 12.5px; }
+      .adm-leg .adm-leg-sub em { background: none; border: 1.5px dashed var(--adm-faint); box-sizing: border-box; }
 
       /* Activity feed */
       .adm-feed div { display: grid; grid-template-columns: 32px minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--adm-line-2); }

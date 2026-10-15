@@ -137,14 +137,30 @@ export default function AdminOverviewPage() {
             {planEntries.map((p) => <i key={p.plan} style={{ flex: p.count || 0.001, background: p.color }} />)}
           </div>
           <div className="adm-leg">
-            {planEntries.map((p) => (
-              <div key={p.plan}>
-                <em style={{ background: p.color }} />
-                <span>{t(`plans.${p.plan}`)}</span>
-                <b>{p.count}</b>
-                <small>{p.pct}%</small>
-              </div>
-            ))}
+            {planEntries.flatMap((p) => {
+              const rows = [
+                <div key={p.plan}>
+                  <em style={{ background: p.color }} />
+                  <span>{t(`plans.${p.plan}`)}</span>
+                  <b>{p.count}</b>
+                  <small>{p.pct}%</small>
+                </div>,
+              ];
+              // Admin accounts sit on an internal "enterprise" tier, not a
+              // customer-facing plan — shown as a sub-line under Free rather
+              // than their own slice of the distribution bar.
+              if (p.plan === 'free' && overview && overview.overview.totalAdmins > 0) {
+                rows.push(
+                  <div key="admin-sub" className="adm-leg-sub">
+                    <em />
+                    <span>{t('plans.admin')}</span>
+                    <b>{overview.overview.totalAdmins}</b>
+                    <small />
+                  </div>,
+                );
+              }
+              return rows;
+            })}
           </div>
         </div>
       </div>
