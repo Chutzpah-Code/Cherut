@@ -831,7 +831,13 @@ export function TaskModal({
   const activeTracking = currentTask.timeTracking?.find((t) => t.status === 'running');
 
   const handleSave = () => {
-    onSave(currentTask.id, formData);
+    // checklist is intentionally excluded: every add/edit/remove/toggle
+    // already saves to the server immediately (see handleAddChecklistItem
+    // etc. and onToggleChecklistItem below), and formData.checklist is just
+    // a stale snapshot from when the modal opened — sending it here would
+    // clobber whatever the live checklist saves already persisted.
+    const { checklist: _checklist, ...payload } = formData;
+    onSave(currentTask.id, payload);
     onClose();
     notifications.show({
       title: t('taskUpdated'),
