@@ -1281,7 +1281,9 @@
       "nextAction": "Próxima ação concreta",
       "nextActionPlaceholder": "O que você vai fazer hoje?",
       "nextActionDueDate": "Prazo da ação",
-      "nextActionDueDatePlaceholder": "Selecionar data"
+      "nextActionDueDatePlaceholder": "Selecionar data",
+      "lowLabel": "Baixa",
+      "highLabel": "Alta"
     },
     "audioPicker": {
       "label": "Áudio da visualização",

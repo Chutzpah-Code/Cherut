@@ -1281,7 +1281,9 @@
       "nextAction": "Next concrete action",
       "nextActionPlaceholder": "What will you do today?",
       "nextActionDueDate": "Action due date",
-      "nextActionDueDatePlaceholder": "Select date"
+      "nextActionDueDatePlaceholder": "Select date",
+      "lowLabel": "Low",
+      "highLabel": "High"
     },
     "audioPicker": {
       "label": "Visualization audio",

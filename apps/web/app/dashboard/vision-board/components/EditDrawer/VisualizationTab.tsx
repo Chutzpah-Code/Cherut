@@ -1,10 +1,11 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Stack, Box, Text, Select, SegmentedControl, Divider, Slider, Textarea, Progress } from '@mantine/core';
+import { Stack, Box, Text, Select, SegmentedControl, Divider, Textarea, Progress } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useObjectives } from '@/hooks/useObjectives';
 import { countFilledVisualizationFields, VISUALIZATION_PROGRESS_TOTAL } from '@/lib/vision-board/visualization-fields';
+import { TappableScale } from '@/components/ui/TappableScale';
 import { AudioPicker } from './AudioPicker';
 import { EditDrawerFormState, SetField } from './types';
 
@@ -75,12 +76,22 @@ export function VisualizationTab({ formState, setField }: VisualizationTabProps)
 
       <Box>
         <Text size="sm" fw={600} mb={6}>{t('currentEnergy')} — {formState.currentEnergy}/10</Text>
-        <Slider min={1} max={10} step={1} value={formState.currentEnergy} onChange={(v) => setField('currentEnergy', v)} color="blue" />
+        <TappableScale
+          value={formState.currentEnergy}
+          onChange={(v) => setField('currentEnergy', v)}
+          lowLabel={t('lowLabel')}
+          highLabel={t('highLabel')}
+        />
       </Box>
 
       <Box>
         <Text size="sm" fw={600} mb={6}>{t('currentConfidence')} — {formState.currentConfidence}/10</Text>
-        <Slider min={1} max={10} step={1} value={formState.currentConfidence} onChange={(v) => setField('currentConfidence', v)} color="blue" />
+        <TappableScale
+          value={formState.currentConfidence}
+          onChange={(v) => setField('currentConfidence', v)}
+          lowLabel={t('lowLabel')}
+          highLabel={t('highLabel')}
+        />
       </Box>
 
       <Textarea
