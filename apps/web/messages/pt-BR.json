@@ -1237,7 +1237,18 @@
         "freedom": "Liberdade",
         "focus": "Foco",
         "joy": "Alegria"
-      }
+      },
+      "newLabel": "NOVA META",
+      "cancel": "Cancelar",
+      "createButton": "Criar meta",
+      "fillTitleAndImageHint": "Preencha título e imagem",
+      "fieldRequired": "Este campo é obrigatório",
+      "clickToUpload": "Clique para enviar uma imagem",
+      "fileHint": "PNG, JPG, JPEG, WEBP (máx. 1MB)",
+      "createSuccessTitle": "Sucesso",
+      "createSuccessMessage": "Meta adicionada ao quadro dos sonhos",
+      "createErrorTitle": "Erro",
+      "createFailed": "Falha ao criar a meta. Tente novamente."
     },
     "visualizationTab": {
       "progressLabel": "{current} de {total} campos",
@@ -1368,30 +1379,6 @@
       "lastPracticedToday": "hoje",
       "lastPracticedYesterday": "ontem",
       "lastPracticedDaysAgo": "há {count, plural, one {# dia} other {# dias}}"
-    },
-    "createModal": {
-      "title": "Adicionar ao quadro dos sonhos",
-      "image": "Imagem",
-      "uploadingImage": "Enviando imagem...",
-      "clickToUpload": "Clique para enviar uma imagem",
-      "fileHint": "PNG, JPG, JPEG, WEBP (máx. 1MB)",
-      "changeImage": "Trocar imagem",
-      "invalidFile": "Arquivo inválido",
-      "uploadFailed": "Falha ao enviar a imagem. Tente novamente.",
-      "titleRequired": "Digite um título",
-      "imageRequired": "Envie uma imagem",
-      "createFailed": "Falha ao criar o item do quadro dos sonhos. Tente novamente.",
-      "titleLabel": "Título",
-      "titlePlaceholder": "ex.: Viagem a Kyoto, Correr 5km, Ler 20 livros",
-      "shortDescription": "Descrição curta",
-      "shortDescriptionPlaceholder": "Breve descrição (visível no cartão)",
-      "fullDescription": "Descrição completa",
-      "fullDescriptionPlaceholder": "Descrição detalhada sobre sua meta, por que ela é importante, como você vai alcançá-la...",
-      "dueDate": "Data alvo",
-      "dueDateDesc": "Quando você quer alcançar isso?",
-      "dueDatePlaceholder": "Selecionar data",
-      "cancel": "Cancelar",
-      "addToBoard": "Adicionar ao quadro"
     }
   },
   "learning": {

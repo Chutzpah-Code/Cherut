@@ -12,10 +12,11 @@ interface MetaTabProps {
   formState: EditDrawerFormState;
   setField: SetField;
   onUploadImage: (file: File) => Promise<{ imageUrl: string }>;
-  onDelete: () => void;
+  onDelete?: () => void;
+  showErrors?: boolean;
 }
 
-export function MetaTab({ formState, setField, onUploadImage, onDelete }: MetaTabProps) {
+export function MetaTab({ formState, setField, onUploadImage, onDelete, showErrors }: MetaTabProps) {
   const t = useTranslations('visionBoard.editDrawer');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -45,41 +46,71 @@ export function MetaTab({ formState, setField, onUploadImage, onDelete }: MetaTa
   return (
     <Stack gap="lg">
       <Box>
-        <Text mb="xs" fw={600} size="sm">{t('image')}</Text>
-        <Box
-          style={{
-            position: 'relative',
-            width: '100%',
-            paddingTop: '56.25%',
-            borderRadius: 8,
-            overflow: 'hidden',
-            backgroundColor: '#F5F5F5',
-            border: '1px solid #CCCCCC',
-          }}
-        >
-          <Image
-            src={formState.imageUrl}
-            alt={formState.title}
-            fit="cover"
-            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-          />
-        </Box>
+        <Text mb="xs" fw={600} size="sm">{t('image')} {!formState.imageUrl && <Text component="span" c="red">*</Text>}</Text>
+        {formState.imageUrl ? (
+          <Box
+            style={{
+              position: 'relative',
+              width: '100%',
+              paddingTop: '56.25%',
+              borderRadius: 8,
+              overflow: 'hidden',
+              backgroundColor: '#F5F5F5',
+              border: '1px solid #CCCCCC',
+            }}
+          >
+            <Image
+              src={formState.imageUrl}
+              alt={formState.title}
+              fit="cover"
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+            />
+          </Box>
+        ) : (
+          <FileButton onChange={handleImageChange} accept="image/png,image/jpeg,image/jpg,image/webp" disabled={isUploadingImage}>
+            {(props) => (
+              <Box
+                {...props}
+                style={{
+                  border: showErrors ? '2px dashed #DC2626' : '2px dashed #CCCCCC',
+                  borderRadius: 8,
+                  padding: '32px 16px',
+                  textAlign: 'center',
+                  cursor: isUploadingImage ? 'not-allowed' : 'pointer',
+                  backgroundColor: '#F5F5F5',
+                }}
+              >
+                {isUploadingImage ? (
+                  <Loader size="md" color="#4686FE" />
+                ) : (
+                  <>
+                    <Upload size={28} strokeWidth={1.5} color="#999999" />
+                    <Text mt="xs" size="sm" fw={500}>{t('clickToUpload')}</Text>
+                    <Text mt={2} size="xs" c="dimmed">{t('fileHint')}</Text>
+                  </>
+                )}
+              </Box>
+            )}
+          </FileButton>
+        )}
 
-        <FileButton onChange={handleImageChange} accept="image/png,image/jpeg,image/jpg,image/webp" disabled={isUploadingImage}>
-          {(props) => (
-            <Button
-              {...props}
-              variant="outline"
-              leftSection={isUploadingImage ? <Loader size={16} color="#4686FE" /> : <Upload size={16} />}
-              fullWidth
-              mt="sm"
-              disabled={isUploadingImage}
-              radius={8}
-            >
-              {isUploadingImage ? t('uploading') : t('replaceImage')}
-            </Button>
-          )}
-        </FileButton>
+        {formState.imageUrl && (
+          <FileButton onChange={handleImageChange} accept="image/png,image/jpeg,image/jpg,image/webp" disabled={isUploadingImage}>
+            {(props) => (
+              <Button
+                {...props}
+                variant="outline"
+                leftSection={isUploadingImage ? <Loader size={16} color="#4686FE" /> : <Upload size={16} />}
+                fullWidth
+                mt="sm"
+                disabled={isUploadingImage}
+                radius={8}
+              >
+                {isUploadingImage ? t('uploading') : t('replaceImage')}
+              </Button>
+            )}
+          </FileButton>
+        )}
 
         {uploadError && (
           <Alert icon={<AlertCircle size={16} />} color="red" mt="xs" radius={8}>
@@ -95,6 +126,7 @@ export function MetaTab({ formState, setField, onUploadImage, onDelete }: MetaTa
         onChange={(e) => setField('title', e.target.value)}
         required
         withAsterisk
+        error={showErrors && !formState.title.trim() ? t('fieldRequired') : undefined}
         radius={8}
       />
 
@@ -135,15 +167,17 @@ export function MetaTab({ formState, setField, onUploadImage, onDelete }: MetaTa
         color="green"
       />
 
-      <Button
-        variant="outline"
-        color="red"
-        leftSection={<Trash2 size={16} />}
-        onClick={onDelete}
-        radius={8}
-      >
-        {t('deleteGoal')}
-      </Button>
+      {onDelete && (
+        <Button
+          variant="outline"
+          color="red"
+          leftSection={<Trash2 size={16} />}
+          onClick={onDelete}
+          radius={8}
+        >
+          {t('deleteGoal')}
+        </Button>
+      )}
     </Stack>
   );
 }

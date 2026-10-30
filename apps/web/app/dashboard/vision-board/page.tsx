@@ -8,10 +8,7 @@ import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
   useVisionBoardItems,
-  useCreateVisionBoardItem,
-  useUpdateVisionBoardItem,
   useDeleteVisionBoardItem,
-  useUploadImage,
   useToggleArchiveVisionBoard,
   usePracticeSummary,
 } from '@/hooks/useVisionBoard';
@@ -19,7 +16,6 @@ import { VisionBoardItem } from '@/lib/api/services/vision-board';
 import { VisionBoardCard } from './components/VisionBoardCard';
 import { Surface } from '@/components/ui/Surface';
 import { EditDrawer } from './components/EditDrawer';
-import { CreateVisionBoardModal } from './components/CreateVisionBoardModal';
 import { ArchivedVisionBoardGrid } from './components/ArchivedVisionBoardGrid';
 import { VisionBoardLightbox } from './components/VisionBoardLightbox';
 import { SessionSelectBar } from './components/SessionSelectBar';
@@ -36,13 +32,9 @@ export default function VisionBoardPage() {
   // Lazy-load archived items — only fetch when the user switches to the archived tab
   const { data: archivedItems, isLoading: archivedLoading } = useVisionBoardItems(true, currentFilter === 'archived');
   const { data: practiceSummary } = usePracticeSummary();
-  const createMutation = useCreateVisionBoardItem();
-  const updateMutation = useUpdateVisionBoardItem();
   const deleteMutation = useDeleteVisionBoardItem();
-  const uploadMutation = useUploadImage();
   const toggleArchiveMutation = useToggleArchiveVisionBoard();
 
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<VisionBoardItem | null>(null);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [editInitialTab, setEditInitialTab] = useState<'meta' | 'visualization'>('meta');
@@ -56,27 +48,15 @@ export default function VisionBoardPage() {
 
   const isLoading = currentFilter === 'archived' ? archivedLoading : nonArchivedLoading;
 
-  const handleUploadImage = async (file: File) => {
-    return uploadMutation.mutateAsync(file);
+  const handleCreateNew = () => {
+    setEditingItem(null);
+    setEditInitialTab('meta');
+    setEditDrawerOpen(true);
   };
 
-  const handleCreate = async (data: {
-    title: string;
-    description?: string;
-    fullDescription?: string;
-    imageUrl: string;
-    dueDate?: string;
-  }) => {
-    try {
-      await createMutation.mutateAsync({
-        ...data,
-        order: nonArchivedItems?.length || 0,
-      });
-      setIsCreateModalOpen(false);
-    } catch (error) {
-      console.error('Error creating vision board item:', error);
-      throw error;
-    }
+  const handleItemCreated = (item: VisionBoardItem) => {
+    // Keeps the drawer open, now in edit mode, for the item just created.
+    setEditingItem(item);
   };
 
   const handleEdit = (item: VisionBoardItem, tab: 'meta' | 'visualization' = 'meta') => {
@@ -188,7 +168,7 @@ export default function VisionBoardPage() {
         <Group mb="lg" gap="sm">
           <Button
             leftSection={<Plus size={20} />}
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={handleCreateNew}
             radius={8}
             style={{ fontFamily: 'Inter, sans-serif', background: '#4686FE', border: 'none', fontSize: '16px', fontWeight: 600, color: 'white', height: '48px', padding: '0 24px' }}
           >
@@ -272,7 +252,7 @@ export default function VisionBoardPage() {
                   </Text>
                   <Button
                     leftSection={<Plus size={16} />}
-                    onClick={() => setIsCreateModalOpen(true)}
+                    onClick={handleCreateNew}
                     radius={8}
                     style={{ fontFamily: 'Inter, sans-serif', background: '#4686FE', border: 'none', fontSize: '16px', fontWeight: 600, color: 'white', height: '48px', padding: '0 24px' }}
                   >
@@ -302,24 +282,15 @@ export default function VisionBoardPage() {
         </SimpleGrid>
       )}
 
-      <CreateVisionBoardModal
-        opened={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onCreate={handleCreate}
-        onUploadImage={handleUploadImage}
-        isCreating={createMutation.isPending}
+      <EditDrawer
+        opened={editDrawerOpen}
+        onClose={() => { setEditDrawerOpen(false); setEditingItem(null); }}
+        item={editingItem}
+        initialTab={editInitialTab}
+        onDelete={handleDelete}
+        onVisualizeNow={(item) => { setEditDrawerOpen(false); handleVisualize(item); }}
+        onCreated={handleItemCreated}
       />
-
-      {editingItem && (
-        <EditDrawer
-          opened={editDrawerOpen}
-          onClose={() => { setEditDrawerOpen(false); setEditingItem(null); }}
-          item={editingItem}
-          initialTab={editInitialTab}
-          onDelete={handleDelete}
-          onVisualizeNow={(item) => { setEditDrawerOpen(false); handleVisualize(item); }}
-        />
-      )}
 
       <VisionBoardLightbox items={listForFilter} initialIndex={0} opened={lightboxOpen} onClose={() => setLightboxOpen(false)} />
 

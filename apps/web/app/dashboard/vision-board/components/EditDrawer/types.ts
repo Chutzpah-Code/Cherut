@@ -1,4 +1,4 @@
-import { VisionBoardItem, UpdateVisionBoardItemDto } from '@/lib/api/services/vision-board';
+import { VisionBoardItem, UpdateVisionBoardItemDto, CreateVisionBoardItemDto } from '@/lib/api/services/vision-board';
 
 export interface EditDrawerFormState {
   title: string;
@@ -27,7 +27,35 @@ export interface EditDrawerFormState {
   audioSizeBytes: number | undefined;
 }
 
-export function toFormState(item: VisionBoardItem): EditDrawerFormState {
+export function toFormState(item: VisionBoardItem | null): EditDrawerFormState {
+  if (!item) {
+    return {
+      title: '',
+      description: '',
+      fullDescription: '',
+      dueDateValue: null,
+      completed: false,
+      imageUrl: '',
+      objectiveId: undefined,
+      plannedPracticeDurationMinutes: 10,
+      currentEmotion: undefined,
+      currentEnergy: 5,
+      currentConfidence: 5,
+      desiredState: '',
+      empoweringBelief: '',
+      outcomeVisualizationText: '',
+      processVisualizationText: '',
+      likelyObstacle: '',
+      obstacleResponse: '',
+      nextAction: '',
+      nextActionDueDateValue: null,
+      audioType: 'none',
+      audioTrackId: undefined,
+      audioFileUrl: undefined,
+      audioDurationSec: undefined,
+      audioSizeBytes: undefined,
+    };
+  }
   return {
     title: item.title,
     description: item.description || '',
@@ -63,6 +91,37 @@ export function toDto(formState: EditDrawerFormState): UpdateVisionBoardItemDto 
     fullDescription: formState.fullDescription.trim() || undefined,
     dueDate: formState.dueDateValue ? formState.dueDateValue.toISOString().split('T')[0] : undefined,
     imageUrl: formState.imageUrl || undefined,
+    completed: formState.completed,
+    objectiveId: formState.objectiveId || undefined,
+    plannedPracticeDurationMinutes: formState.plannedPracticeDurationMinutes,
+    currentEmotion: formState.currentEmotion || undefined,
+    currentEnergy: formState.currentEnergy,
+    currentConfidence: formState.currentConfidence,
+    desiredState: formState.desiredState.trim() || undefined,
+    empoweringBelief: formState.empoweringBelief.trim() || undefined,
+    outcomeVisualizationText: formState.outcomeVisualizationText.trim() || undefined,
+    processVisualizationText: formState.processVisualizationText.trim() || undefined,
+    likelyObstacle: formState.likelyObstacle.trim() || undefined,
+    obstacleResponse: formState.obstacleResponse.trim() || undefined,
+    nextAction: formState.nextAction.trim() || undefined,
+    nextActionDueDate: formState.nextActionDueDateValue
+      ? formState.nextActionDueDateValue.toISOString().split('T')[0]
+      : undefined,
+    audioType: formState.audioType,
+    audioTrackId: formState.audioType === 'system' ? formState.audioTrackId : undefined,
+    audioFileUrl: formState.audioType === 'file' ? formState.audioFileUrl : undefined,
+    audioDurationSec: formState.audioType === 'file' ? formState.audioDurationSec : undefined,
+    audioSizeBytes: formState.audioType === 'file' ? formState.audioSizeBytes : undefined,
+  };
+}
+
+export function toCreateDto(formState: EditDrawerFormState): CreateVisionBoardItemDto {
+  return {
+    title: formState.title.trim(),
+    description: formState.description.trim() || undefined,
+    fullDescription: formState.fullDescription.trim() || undefined,
+    dueDate: formState.dueDateValue ? formState.dueDateValue.toISOString().split('T')[0] : undefined,
+    imageUrl: formState.imageUrl,
     completed: formState.completed,
     objectiveId: formState.objectiveId || undefined,
     plannedPracticeDurationMinutes: formState.plannedPracticeDurationMinutes,

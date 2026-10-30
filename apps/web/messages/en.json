@@ -1237,7 +1237,18 @@
         "freedom": "Freedom",
         "focus": "Focus",
         "joy": "Joy"
-      }
+      },
+      "newLabel": "NEW GOAL",
+      "cancel": "Cancel",
+      "createButton": "Create goal",
+      "fillTitleAndImageHint": "Fill in the title and image",
+      "fieldRequired": "This field is required",
+      "clickToUpload": "Click to upload image",
+      "fileHint": "PNG, JPG, JPEG, WEBP (max 1MB)",
+      "createSuccessTitle": "Success",
+      "createSuccessMessage": "Goal added to the vision board",
+      "createErrorTitle": "Error",
+      "createFailed": "Failed to create the goal. Please try again."
     },
     "visualizationTab": {
       "progressLabel": "{current} of {total} fields",
@@ -1368,30 +1379,6 @@
       "lastPracticedToday": "today",
       "lastPracticedYesterday": "yesterday",
       "lastPracticedDaysAgo": "{count, plural, one {# day ago} other {# days ago}}"
-    },
-    "createModal": {
-      "title": "Add to Vision Board",
-      "image": "Image",
-      "uploadingImage": "Uploading image...",
-      "clickToUpload": "Click to upload image",
-      "fileHint": "PNG, JPG, JPEG, WEBP (max 1MB)",
-      "changeImage": "Change Image",
-      "invalidFile": "Invalid file",
-      "uploadFailed": "Failed to upload image. Please try again.",
-      "titleRequired": "Please enter a title",
-      "imageRequired": "Please upload an image",
-      "createFailed": "Failed to create vision board item. Please try again.",
-      "titleLabel": "Title",
-      "titlePlaceholder": "E.g., Trip to Kyoto, Run a 5K, Read 20 Books",
-      "shortDescription": "Short Description",
-      "shortDescriptionPlaceholder": "Brief description (visible on card)",
-      "fullDescription": "Full Description",
-      "fullDescriptionPlaceholder": "Detailed description about your goal, why it's important, how you'll achieve it...",
-      "dueDate": "Due Date",
-      "dueDateDesc": "When do you want to achieve this?",
-      "dueDatePlaceholder": "Select date",
-      "cancel": "Cancel",
-      "addToBoard": "Add to Vision Board"
     }
   },
   "learning": {
