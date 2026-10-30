@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, Edit2, Trash2, Target, TrendingUp, CheckCircle2, Circle, X, Archive, ArchiveRestore, ChevronDown, ChevronUp, MoreVertical } from 'lucide-react';
+import { useMediaQuery } from '@mantine/hooks';
+import { Edit2, Trash2, Plus, TrendingUp, CheckCircle2, Circle, Archive, ArchiveRestore, ChevronDown, ChevronUp, MoreVertical } from 'lucide-react';
 import {
   Title,
   Text,
@@ -12,39 +13,20 @@ import {
   Stack,
   SimpleGrid,
   Modal,
-  TextInput,
-  Textarea,
-  Select,
-  ThemeIcon,
   Progress,
   Loader,
   Center,
   Badge,
-  Grid,
   ActionIcon,
-  Divider,
-  Accordion,
-  Checkbox,
   Paper,
-  Tooltip,
   Box,
-  NumberInput,
   Menu,
 } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
   useObjectives,
-  useCreateObjective,
-  useUpdateObjective,
   useDeleteObjective,
-  useCompleteObjective,
-  useCreateKeyResult,
-  useUpdateKeyResult,
-  useDeleteKeyResult,
-  useCompleteKeyResult,
-  useBatchUpdateKeyResults,
   useToggleObjectiveCompletion,
   useToggleKeyResultCompletion,
   useArchiveObjective,
@@ -52,304 +34,44 @@ import {
 } from '@/hooks/useObjectives';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { Surface } from '@/components/ui/Surface';
-import { useQueryClient } from '@tanstack/react-query';
-import { CreateObjectiveDto, Objective, KeyResult, CreateKeyResultDto } from '@/lib/api/services/objectives';
-
-interface KeyResultFormData {
-  id?: string;
-  title: string;
-  description: string;
-  targetValue: number;
-  currentValue: number;
-  unit: string;
-  isCompleted?: boolean;
-}
+import { Objective, KeyResult } from '@/lib/api/services/objectives';
+import { EditDrawer } from './components/EditDrawer';
 
 export default function ObjectivesPage() {
   const t = useTranslations('objectives');
   const tn = useTranslations('objectives.notifications');
 
-  const { data: objectives, isLoading, error } = useObjectives();
+  const { data: objectives, isLoading } = useObjectives();
   const { data: lifeAreas } = useLifeAreas();
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
-  const createMutation = useCreateObjective();
-  const updateMutation = useUpdateObjective();
   const deleteMutation = useDeleteObjective();
-  const completeMutation = useCompleteObjective();
-  const createKRMutation = useCreateKeyResult();
-  const updateKRMutation = useUpdateKeyResult();
-  const batchUpdateKRMutation = useBatchUpdateKeyResults();
-  const deleteKRMutation = useDeleteKeyResult();
-  const completeKRMutation = useCompleteKeyResult();
   const toggleObjectiveCompletionMutation = useToggleObjectiveCompletion();
   const toggleKeyResultCompletionMutation = useToggleKeyResultCompletion();
   const archiveMutation = useArchiveObjective();
   const unarchiveMutation = useUnarchiveObjective();
-  const queryClient = useQueryClient();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingObjective, setEditingObjective] = useState<Objective | null>(null);
-  const [isKRModalOpen, setIsKRModalOpen] = useState(false);
-  const [editingKR, setEditingKR] = useState<{
-    objective: Objective;
-    kr: KeyResult;
-  } | null>(null);
-  const [currentObjective, setCurrentObjective] = useState<string>('');
+  const [drawerInitialTab, setDrawerInitialTab] = useState<'objective' | 'keyResults'>('objective');
+  const [drawerInitialKrId, setDrawerInitialKrId] = useState<string | undefined>(undefined);
   const [expandedObjectives, setExpandedObjectives] = useState<Set<string>>(new Set());
   const [viewFilter, setViewFilter] = useState<'all' | 'active' | 'archived'>('active');
   const [descModal, setDescModal] = useState<Objective | null>(null);
 
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    lifeAreaId: '',
-    startDate: new Date(),
-    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-  });
+  // Keeps the drawer reading live, cache-backed data (so KR/objective mutations
+  // fired from inside it — and the board cards — stay in sync in real time)
+  // instead of a stale snapshot taken when the drawer was opened.
+  const liveEditingObjective = useMemo(
+    () => (editingObjective ? objectives?.find((o) => o.id === editingObjective.id) ?? editingObjective : null),
+    [objectives, editingObjective],
+  );
 
-  const [keyResults, setKeyResults] = useState<KeyResultFormData[]>([]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.title || !formData.lifeAreaId) {
-      notifications.show({
-        title: tn('error'),
-        message: tn('fillRequiredFields'),
-        color: 'red',
-      });
-      return;
-    }
-
-    try {
-      if (editingObjective) {
-        // For updates, handle objective and key results separately
-        const updateDto = {
-          lifeAreaId: formData.lifeAreaId,
-          title: formData.title,
-          description: formData.description,
-          startDate: formData.startDate.toISOString().split('T')[0],
-          endDate: formData.endDate.toISOString().split('T')[0],
-        };
-        await updateMutation.mutateAsync({ id: editingObjective.id, dto: updateDto });
-
-        // Handle Key Results updates (simplified approach)
-
-        const existingKRs = editingObjective.keyResults || [];
-        const currentKRs = keyResults.filter(kr => kr.title && kr.targetValue && kr.unit);
-
-        // Process operations with error handling but don't stop on failures
-        let updateResults = { success: 0, errors: 0 };
-
-        // 1. Update existing Key Results - BATCH OPTIMIZATION
-        const existingKRsToUpdate = currentKRs.filter(kr => kr.id);
-        if (existingKRsToUpdate.length > 0) {
-          try {
-            const batchUpdates = existingKRsToUpdate.map(kr => ({
-              id: kr.id!,
-              dto: {
-                title: kr.title,
-                description: kr.description || '',
-                targetValue: kr.targetValue,
-                currentValue: kr.currentValue || 0,
-                unit: kr.unit,
-              }
-            }));
-
-            const batchResult = await batchUpdateKRMutation.mutateAsync({
-              objectiveId: editingObjective.id,
-              updates: batchUpdates,
-            });
-
-            updateResults.success += batchResult.success;
-            updateResults.errors += batchResult.errors;
-          } catch (error) {
-            console.error(`❌ Batch update failed:`, error);
-
-            // Fallback: Update each Key Result individually
-            for (const kr of existingKRsToUpdate) {
-              try {
-                await updateKRMutation.mutateAsync({
-                  objectiveId: editingObjective.id,
-                  keyResultId: kr.id!,
-                  dto: {
-                    title: kr.title,
-                    description: kr.description || '',
-                    targetValue: kr.targetValue,
-                    currentValue: kr.currentValue || 0,
-                    unit: kr.unit,
-                  },
-                  skipInvalidation: true,
-                });
-                updateResults.success++;
-              } catch (individualError) {
-                console.error(`❌ Individual update failed for KR ${kr.id}:`, individualError);
-                updateResults.errors++;
-              }
-            }
-          }
-        }
-
-        // 2. Create new Key Results (those without id) - WITH BATCH OPTIMIZATION
-        for (const kr of currentKRs.filter(kr => !kr.id)) {
-          try {
-            await createKRMutation.mutateAsync({
-              objectiveId: editingObjective.id,
-              dto: {
-                title: kr.title,
-                description: kr.description || '',
-                targetValue: kr.targetValue,
-                currentValue: kr.currentValue || 0,
-                unit: kr.unit,
-              },
-              skipInvalidation: true, // Skip individual invalidations
-            });
-            updateResults.success++;
-          } catch (error) {
-            console.error(`❌ Error creating KR:`, error);
-            updateResults.errors++;
-          }
-        }
-
-        // 3. Delete removed Key Results
-        const currentKRIds = currentKRs.filter(kr => kr.id).map(kr => kr.id);
-        for (const existingKR of existingKRs) {
-          if (!currentKRIds.includes(existingKR.id)) {
-            try {
-              await deleteKRMutation.mutateAsync({
-                objectiveId: editingObjective.id,
-                keyResultId: existingKR.id!,
-                skipInvalidation: true, // Skip individual invalidations
-              });
-              updateResults.success++;
-            } catch (error) {
-              console.error(`❌ Error deleting KR ${existingKR.id}:`, error);
-              updateResults.errors++;
-            }
-          }
-        }
-
-
-        // Manually invalidate queries ONCE at the end for better performance
-        queryClient.invalidateQueries({ queryKey: ['objectives'] });
-
-        // Show notification based on Key Results update results
-        if (updateResults.errors === 0) {
-          notifications.show({
-            title: tn('success'),
-            message: tn('objectiveAndKrUpdated'),
-            color: 'green',
-          });
-        } else if (updateResults.success > 0) {
-          notifications.show({
-            title: tn('partialSuccess'),
-            message: tn('partialKrUpdate', { success: updateResults.success, errors: updateResults.errors }),
-            color: 'yellow',
-          });
-        } else {
-          notifications.show({
-            title: tn('warning'),
-            message: tn('allKrUpdateFailed'),
-            color: 'orange',
-          });
-        }
-      } else {
-        // For creation, include keyResults
-        const createDto: CreateObjectiveDto = {
-          lifeAreaId: formData.lifeAreaId,
-          title: formData.title,
-          description: formData.description,
-          startDate: formData.startDate.toISOString().split('T')[0],
-          endDate: formData.endDate.toISOString().split('T')[0],
-          keyResults: keyResults
-            .filter((kr) => kr.title && kr.targetValue && kr.unit)
-            .map((kr) => ({
-              title: kr.title,
-              description: kr.description,
-              targetValue: kr.targetValue,
-              currentValue: kr.currentValue || 0,
-              unit: kr.unit,
-            })),
-        };
-        await createMutation.mutateAsync(createDto);
-
-        // For creation, always show success since creation includes KRs
-        notifications.show({
-          title: tn('success'),
-          message: tn('objectiveCreated'),
-          color: 'green',
-        });
-      }
-
-      setIsModalOpen(false);
-      resetForm();
-    } catch (error: any) {
-      console.error('Error saving objective:', error);
-
-      // Extract error message from API response
-      let errorMessage = tn('saveFailed');
-      if (error?.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error?.message) {
-        errorMessage = error.message;
-      }
-
-      notifications.show({
-        title: tn('error'),
-        message: errorMessage,
-        color: 'red',
-      });
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      description: '',
-      lifeAreaId: '',
-      startDate: new Date(),
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    });
-    setKeyResults([]);
-    setEditingObjective(null);
-  };
-
-  const handleEditObjective = (objective: Objective) => {
-
+  const handleEditObjective = (objective: Objective, tab: 'objective' | 'keyResults' = 'objective', krId?: string) => {
     setEditingObjective(objective);
-
-    // Safely parse dates with fallback to current date
-    const parseDate = (dateString: string | Date) => {
-      if (!dateString) return new Date();
-      const parsed = new Date(dateString);
-      return isNaN(parsed.getTime()) ? new Date() : parsed;
-    };
-
-    setFormData({
-      title: objective.title,
-      description: objective.description || '',
-      lifeAreaId: objective.lifeAreaId,
-      startDate: parseDate(objective.startDate),
-      endDate: parseDate(objective.endDate),
-    });
-
-    // Convert existing Key Results to form data
-    if (objective.keyResults) {
-      const krFormData = objective.keyResults.map(kr => ({
-        id: kr.id,
-        title: kr.title,
-        description: kr.description || '',
-        targetValue: kr.targetValue,
-        currentValue: kr.currentValue,
-        unit: kr.unit,
-        isCompleted: kr.isCompleted,
-      }));
-      setKeyResults(krFormData);
-    } else {
-      setKeyResults([]);
-    }
-
-    setIsModalOpen(true);
+    setDrawerInitialTab(tab);
+    setDrawerInitialKrId(krId);
+    setDrawerOpen(true);
   };
 
   const handleDeleteObjective = (objective: Objective) => {
@@ -484,32 +206,15 @@ export default function ObjectivesPage() {
   };
 
   const handleCreateNew = () => {
-    resetForm();
-    setIsModalOpen(true);
+    setEditingObjective(null);
+    setDrawerInitialTab('objective');
+    setDrawerInitialKrId(undefined);
+    setDrawerOpen(true);
   };
 
-  const addKeyResult = () => {
-    setKeyResults([
-      ...keyResults,
-      {
-        title: '',
-        description: '',
-        targetValue: 0,
-        currentValue: 0,
-        unit: '',
-        isCompleted: false,
-      },
-    ]);
-  };
-
-  const removeKeyResult = (index: number) => {
-    setKeyResults(keyResults.filter((_, i) => i !== index));
-  };
-
-  const updateKeyResult = (index: number, field: keyof KeyResultFormData, value: any) => {
-    const updated = [...keyResults];
-    updated[index] = { ...updated[index], [field]: value };
-    setKeyResults(updated);
+  const handleObjectiveCreated = (objective: Objective) => {
+    // Keeps the drawer open, now in edit mode, for the objective just created.
+    setEditingObjective(objective);
   };
 
   // Filter objectives based on archive status
@@ -538,6 +243,8 @@ export default function ObjectivesPage() {
       p={{ base: 'md', sm: 'xl' }}
       style={{
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        paddingRight: drawerOpen && isDesktop ? 500 : undefined,
+        transition: 'padding-right 0.2s ease',
       }}
     >
       <style jsx global>{`
@@ -796,7 +503,7 @@ export default function ObjectivesPage() {
                 opacity: objective.isArchived ? 0.7 : 1,
                 filter: objective.isArchived ? 'grayscale(0.3)' : 'none',
                 background: 'white',
-                border: '1px solid #CCCCCC',
+                border: drawerOpen && editingObjective?.id === objective.id ? '1px solid #4686FE' : '1px solid #CCCCCC',
                 transition: 'all 0.2s ease',
               }}
               styles={{
@@ -813,8 +520,14 @@ export default function ObjectivesPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <Stack gap="xs">
                       <Group gap="xs">
-                        <Text
+                        <button
+                          onClick={() => handleEditObjective(objective, 'objective')}
                           style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            textAlign: 'left',
                             wordBreak: "break-word",
                             fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                             fontSize: '18px',
@@ -823,7 +536,7 @@ export default function ObjectivesPage() {
                           }}
                         >
                           {objective.title}
-                        </Text>
+                        </button>
                         <Badge
                           color={
                             objective.status === 'completed'
@@ -980,9 +693,11 @@ export default function ObjectivesPage() {
                           key={kr.id}
                           p="sm"
                           radius={8}
+                          onClick={() => handleEditObjective(objective, 'keyResults', kr.id)}
                           style={{
                             border: '1px solid #CCCCCC',
                             background: '#F5F5F5',
+                            cursor: 'pointer',
                           }}
                         >
                           <Group justify="space-between" align="center">
@@ -1016,7 +731,7 @@ export default function ObjectivesPage() {
                               size="sm"
                               variant="subtle"
                               color={kr.isCompleted ? 'green' : 'gray'}
-                              onClick={() => handleToggleKeyResult(objective, kr)}
+                              onClick={(e) => { e.stopPropagation(); handleToggleKeyResult(objective, kr); }}
                             >
                               {kr.isCompleted ? <CheckCircle2 size={14} /> : <Circle size={14} />}
                             </ActionIcon>
@@ -1045,397 +760,15 @@ export default function ObjectivesPage() {
         </SimpleGrid>
       )}
 
-      <Modal
-        opened={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={
-          <Text
-            style={{
-              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '20px',
-              fontWeight: 600,
-              color: '#000000',
-            }}
-          >
-            {editingObjective ? t('editObjectiveTitle') : t('createNewObjective')}
-          </Text>
-        }
-        size="lg"
-        radius={16}
-        styles={{
-          content: {
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            display: 'flex',
-            flexDirection: 'column',
-            maxHeight: '85dvh',
-            overflow: 'hidden',
-          },
-          body: {
-            flex: 1,
-            minHeight: 0,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: 0,
-          },
-        }}
-      >
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
-          <Stack gap="lg">
-            <TextInput
-              label={t('titleLabel')}
-              placeholder={t('titlePlaceholder')}
-              required
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              size="md"
-              radius={8}
-              styles={{
-                label: {
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#000000',
-                  fontWeight: 600,
-                  marginBottom: 8,
-                  fontSize: '14px',
-                },
-                input: {
-                  fontFamily: 'Inter, sans-serif',
-                  backgroundColor: 'white',
-                  border: '1px solid #CCCCCC',
-                  color: '#000000',
-                  height: '48px',
-                  fontSize: '16px',
-                  '&::placeholder': {
-                    color: '#999999',
-                  },
-                  '&:focus': {
-                    borderColor: '#4686FE',
-                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                  },
-                },
-              }}
-            />
-
-            <Textarea
-              label={t('description')}
-              placeholder={t('descriptionPlaceholder')}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              radius={8}
-              styles={{
-                label: {
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#000000',
-                  fontWeight: 600,
-                  marginBottom: 8,
-                  fontSize: '14px',
-                },
-                input: {
-                  fontFamily: 'Inter, sans-serif',
-                  backgroundColor: 'white',
-                  border: '1px solid #CCCCCC',
-                  color: '#000000',
-                  fontSize: '16px',
-                  '&::placeholder': {
-                    color: '#999999',
-                  },
-                  '&:focus': {
-                    borderColor: '#4686FE',
-                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                  },
-                },
-              }}
-            />
-
-            <Select
-              label={t('lifeArea')}
-              placeholder={t('selectLifeArea')}
-              required
-              data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
-              value={formData.lifeAreaId}
-              onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
-              size="md"
-              radius={8}
-              styles={{
-                label: {
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#000000',
-                  fontWeight: 600,
-                  marginBottom: 8,
-                  fontSize: '14px',
-                },
-                input: {
-                  fontFamily: 'Inter, sans-serif',
-                  backgroundColor: 'white',
-                  border: '1px solid #CCCCCC',
-                  color: '#000000',
-                  height: '48px',
-                  fontSize: '16px',
-                  '&::placeholder': {
-                    color: '#999999',
-                  },
-                  '&:focus': {
-                    borderColor: '#4686FE',
-                    boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                  },
-                },
-              }}
-            />
-
-            <Stack gap="sm">
-              <Grid grow>
-                <Grid.Col span={{ base: 12, sm: 6 }}>
-                  <DateInput
-                    label={t('startDate')}
-                    placeholder={t('startDatePlaceholder')}
-                    value={formData.startDate && !isNaN(formData.startDate.getTime()) ? formData.startDate : new Date()}
-                    onChange={(value) => setFormData({ ...formData, startDate: value || new Date() })}
-                    required
-                  />
-                </Grid.Col>
-                <Grid.Col span={{ base: 12, sm: 6 }}>
-                  <DateInput
-                    label={t('endDate')}
-                    placeholder={t('endDatePlaceholder')}
-                    value={formData.endDate && !isNaN(formData.endDate.getTime()) ? formData.endDate : new Date()}
-                    onChange={(value) => setFormData({ ...formData, endDate: value || new Date() })}
-                    required
-                  />
-                </Grid.Col>
-              </Grid>
-            </Stack>
-
-            <Divider />
-
-            <div>
-              <Group justify="space-between" align="center" mb="md">
-                <Text
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 500,
-                    color: '#000000',
-                  }}
-                >
-                  {t('keyResults')}
-                </Text>
-                <Button
-                  variant="outline"
-                  size="compact-sm"
-                  onClick={addKeyResult}
-                  radius={6}
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    borderColor: '#4686FE',
-                    color: '#4686FE',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    background: 'white',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        backgroundColor: 'rgba(70, 134, 254, 0.08)',
-                      },
-                    },
-                  }}
-                >
-                  <Plus size={14} />
-                </Button>
-              </Group>
-
-              <Stack gap="md">
-                {keyResults.map((kr, index) => (
-                  <Paper key={index} p="md" withBorder>
-                    <Group justify="space-between" align="center" mb="sm">
-                      <Text size="sm" fw={500}>
-                        {t('keyResultN', { n: index + 1 })}
-                      </Text>
-                      <ActionIcon
-                        variant="light"
-                        color="red"
-                        size="sm"
-                        onClick={() => removeKeyResult(index)}
-                      >
-                        <X size={14} />
-                      </ActionIcon>
-                    </Group>
-
-                    <Stack gap="sm">
-                      <TextInput
-                        label={t('krTitleLabel')}
-                        placeholder={t('krTitlePlaceholder')}
-                        value={kr.title}
-                        onChange={(e) => updateKeyResult(index, 'title', e.target.value)}
-                        size="sm"
-                        required
-                        description={t('krTitleDesc')}
-                      />
-                      <Textarea
-                        label={t('krDetailsLabel')}
-                        placeholder={t('krDetailsPlaceholder')}
-                        value={kr.description}
-                        onChange={(e) => updateKeyResult(index, 'description', e.target.value)}
-                        size="sm"
-                        rows={2}
-                        description={t('krDetailsDesc')}
-                      />
-
-                      <Text size="sm" fw={500} mt="xs" mb="xs">{t('measurement')}</Text>
-                      <Stack gap="sm">
-                        <Grid grow>
-                          <Grid.Col span={{ base: 12, sm: 4 }}>
-                            <NumberInput
-                              label={t('targetGoal')}
-                              placeholder="1000"
-                              value={kr.targetValue}
-                              onChange={(value) => updateKeyResult(index, 'targetValue', value || 0)}
-                              size="sm"
-                              min={0}
-                              required
-                              description={t('targetGoalDesc')}
-                            />
-                          </Grid.Col>
-                          <Grid.Col span={{ base: 12, sm: 4 }}>
-                            <NumberInput
-                              label={t('currentProgress')}
-                              placeholder="250"
-                              value={kr.currentValue}
-                              onChange={(value) => updateKeyResult(index, 'currentValue', value || 0)}
-                              size="sm"
-                              min={0}
-                              description={t('currentProgressDesc')}
-                            />
-                          </Grid.Col>
-                          <Grid.Col span={{ base: 12, sm: 4 }}>
-                            <TextInput
-                              label={t('unitOfMeasure')}
-                              placeholder={t('unitPlaceholder')}
-                              value={kr.unit}
-                              onChange={(e) => updateKeyResult(index, 'unit', e.target.value)}
-                              size="sm"
-                              required
-                              description={t('unitDesc')}
-                            />
-                          </Grid.Col>
-                        </Grid>
-                      </Stack>
-
-                      {kr.targetValue > 0 && kr.currentValue >= 0 && (
-                        <Box mt="xs" p="xs" style={{ backgroundColor: '#f8f9fa', borderRadius: 4 }}>
-                          <Group justify="space-between" align="center" mb="xs">
-                            <Text size="xs" c="dimmed">{t('progressPreview')}</Text>
-                            {kr.id && (
-                              <ActionIcon
-                                size="xs"
-                                variant="subtle"
-                                color={kr.isCompleted ? 'green' : 'gray'}
-                                onClick={() => {
-                                  if (editingObjective) {
-                                    handleToggleKeyResult(editingObjective, kr as KeyResult);
-                                  }
-                                }}
-                              >
-                                {kr.isCompleted ? <CheckCircle2 size={12} /> : <Circle size={12} />}
-                              </ActionIcon>
-                            )}
-                          </Group>
-                          <Group gap="xs" align="center">
-                            <Progress
-                              value={Math.min((kr.currentValue / kr.targetValue) * 100, 100)}
-                              size="sm"
-                              style={{ flex: 1 }}
-                            />
-                            <Text size="xs" fw={500}>
-                              {t('krProgressValue', { current: kr.currentValue, target: kr.targetValue, unit: kr.unit, pct: Math.min(Math.round((kr.currentValue / kr.targetValue) * 100), 100) })}
-                            </Text>
-                          </Group>
-                        </Box>
-                      )}
-                    </Stack>
-                  </Paper>
-                ))}
-
-                {keyResults.length === 0 && (
-                  <Text
-                    ta="center"
-                    py="md"
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '14px',
-                      fontWeight: 400,
-                      color: '#666666',
-                    }}
-                  >
-                    {t('noKeyResultsYet')}
-                  </Text>
-                )}
-              </Stack>
-            </div>
-
-          </Stack>
-          </Box>
-          <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
-            <Grid justify="flex-end" align="center">
-              <Grid.Col span={{ base: 6, sm: 'content' }}>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                  fullWidth
-                  radius={8}
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    borderColor: '#CCCCCC',
-                    color: '#333333',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    height: '48px',
-                    background: 'white',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        borderColor: '#4686FE',
-                        color: '#4686FE',
-                      },
-                    },
-                  }}
-                >
-                  {t('cancel')}
-                </Button>
-              </Grid.Col>
-              <Grid.Col span={{ base: 6, sm: 'content' }}>
-                <Button
-                  type="submit"
-                  loading={createMutation.isPending || updateMutation.isPending}
-                  fullWidth
-                  radius={8}
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    background: '#4686FE',
-                    border: 'none',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    color: 'white',
-                    height: '48px',
-                  }}
-                  styles={{
-                    root: {
-                      '&:hover': {
-                        background: '#3366E5',
-                      },
-                    },
-                  }}
-                >
-                  {editingObjective ? t('updateObjective') : t('createObjectiveBtn')}
-                </Button>
-              </Grid.Col>
-            </Grid>
-          </Box>
-        </form>
-      </Modal>
+      <EditDrawer
+        opened={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        objective={liveEditingObjective}
+        lifeAreas={lifeAreas || []}
+        initialTab={drawerInitialTab}
+        initialExpandedKrId={drawerInitialKrId}
+        onCreated={handleObjectiveCreated}
+      />
 
       {/* Description read modal */}
       <Modal

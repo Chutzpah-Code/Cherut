@@ -172,4 +172,10 @@ export class ObjectivesController {
   archiveObjective(@Request() req, @Param('id') id: string) {
     return this.objectivesService.archiveObjective(req.user.uid, id);
   }
+
+  // Unarchive endpoint
+  @Patch(':id/unarchive')
+  unarchiveObjective(@Request() req, @Param('id') id: string) {
+    return this.objectivesService.unarchiveObjective(req.user.uid, id);
+  }
 }

@@ -1060,6 +1060,25 @@
       "archiveFailed": "Failed to archive objective",
       "objectiveUnarchived": "Objective unarchived successfully",
       "unarchiveFailed": "Failed to unarchive objective"
+    },
+    "fieldRequired": "This field is required",
+    "seeKeyResults": "See {count, plural, one {# key result} other {# key results}} →",
+    "addKeyResult": "Add key result",
+    "removeKeyResult": "Remove key result",
+    "removeKeyResultBody": "Are you sure you want to remove \"{title}\"? This action cannot be undone.",
+    "decreaseProgress": "Decrease progress",
+    "increaseProgress": "Increase progress",
+    "krCompactProgress": "{current}/{target} {unit}",
+    "editDrawer": {
+      "editLabel": "EDIT OBJECTIVE",
+      "newLabel": "NEW OBJECTIVE",
+      "close": "Close",
+      "objectiveTabLabel": "Objective",
+      "keyResultsTabLabel": "Key Results · {count}",
+      "fillTitleAndDatesHint": "Fill in the title and dates",
+      "errorStatus": "Failed to save",
+      "savedStatus": "Changes saved automatically",
+      "finishEditing": "Finish editing"
     }
   },
   "lifeAreas": {

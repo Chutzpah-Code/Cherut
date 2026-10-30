@@ -682,4 +682,34 @@ export class ObjectivesService {
 
     return this.findOne(userId, id);
   }
+
+  // Unarchive method (mirrors archiveObjective)
+  async unarchiveObjective(userId: string, id: string) {
+    await this.findOne(userId, id);
+
+    const db = this.firebaseService.getFirestore();
+
+    const keyResultsSnapshot = await db
+      .collection(this.keyResultsCollection)
+      .where('objectiveId', '==', id)
+      .get();
+
+    const batch = db.batch();
+    keyResultsSnapshot.docs.forEach((doc) => {
+      batch.update(doc.ref, {
+        isArchived: false,
+        updatedAt: new Date().toISOString(),
+      });
+    });
+    await batch.commit();
+
+    await db.collection(this.collection).doc(id).update({
+      isArchived: false,
+      updatedAt: new Date().toISOString(),
+    });
+
+    this.logger.log(`Objective ${id} and its key results unarchived`);
+
+    return this.findOne(userId, id);
+  }
 }

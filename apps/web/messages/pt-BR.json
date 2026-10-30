@@ -1060,6 +1060,25 @@
       "archiveFailed": "Falha ao arquivar o objetivo",
       "objectiveUnarchived": "Objetivo desarquivado com sucesso",
       "unarchiveFailed": "Falha ao desarquivar o objetivo"
+    },
+    "fieldRequired": "Este campo é obrigatório",
+    "seeKeyResults": "Ver {count, plural, one {# resultado-chave} other {# resultados-chave}} →",
+    "addKeyResult": "Adicionar resultado-chave",
+    "removeKeyResult": "Remover resultado-chave",
+    "removeKeyResultBody": "Tem certeza que deseja remover \"{title}\"? Essa ação não pode ser desfeita.",
+    "decreaseProgress": "Diminuir progresso",
+    "increaseProgress": "Aumentar progresso",
+    "krCompactProgress": "{current}/{target} {unit}",
+    "editDrawer": {
+      "editLabel": "EDITAR OBJETIVO",
+      "newLabel": "NOVO OBJETIVO",
+      "close": "Fechar",
+      "objectiveTabLabel": "Objetivo",
+      "keyResultsTabLabel": "Resultados-chave · {count}",
+      "fillTitleAndDatesHint": "Preencha título e datas",
+      "errorStatus": "Falha ao salvar",
+      "savedStatus": "Alterações salvas automaticamente",
+      "finishEditing": "Concluir edição"
     }
   },
   "lifeAreas": {
