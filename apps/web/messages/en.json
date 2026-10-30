@@ -1130,17 +1130,11 @@
     "editValue": "Edit Value",
     "titleLabel": "Title",
     "titlePlaceholder": "e.g., Honesty, Growth, Family",
-    "titleRequired": "Title is required",
     "shortDescription": "Short Description",
     "shortDescriptionPlaceholder": "Brief description of this value...",
     "behaviorsPlaceholder": "Describe specific behaviors, actions, or practices that reinforce this value...",
     "cancel": "Cancel",
-    "update": "Update",
     "create": "Create",
-    "titleRequiredToastTitle": "Title Required",
-    "titleRequiredToastMessage": "Please provide a title for your value or cancel.",
-    "valueUpdatedTitle": "Value Updated",
-    "valueUpdatedMessage": "Your value has been successfully updated.",
     "valueCreatedTitle": "Value Created",
     "valueCreatedMessage": "Your value has been successfully created.",
     "error": "Error",
@@ -1150,10 +1144,16 @@
     "valueDeletedTitle": "Value Deleted",
     "valueDeletedMessage": "Your value has been successfully deleted.",
     "deleteFailed": "Failed to delete value. Please try again.",
-    "discardChangesTitle": "Discard Changes",
-    "discardChangesBody": "You have unsaved changes. Are you sure you want to cancel?",
-    "discard": "Discard",
-    "keepEditing": "Keep Editing"
+    "editDrawer": {
+      "editLabel": "EDIT VALUE",
+      "newLabel": "NEW VALUE",
+      "close": "Close",
+      "fieldRequired": "This field is required",
+      "fillTitleHint": "Fill in the title",
+      "savedStatus": "Changes saved automatically",
+      "errorStatus": "Failed to save",
+      "finishEditing": "Finish editing"
+    }
   },
   "visionBoard": {
     "page": {

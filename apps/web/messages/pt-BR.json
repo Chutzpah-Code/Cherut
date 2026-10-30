@@ -1130,17 +1130,11 @@
     "editValue": "Editar valor",
     "titleLabel": "Título",
     "titlePlaceholder": "ex.: Honestidade, Crescimento, Família",
-    "titleRequired": "O título é obrigatório",
     "shortDescription": "Descrição curta",
     "shortDescriptionPlaceholder": "Breve descrição deste valor...",
     "behaviorsPlaceholder": "Descreva comportamentos, ações ou práticas específicas que reforçam este valor...",
     "cancel": "Cancelar",
-    "update": "Atualizar",
     "create": "Criar",
-    "titleRequiredToastTitle": "Título obrigatório",
-    "titleRequiredToastMessage": "Informe um título para o seu valor ou cancele.",
-    "valueUpdatedTitle": "Valor atualizado",
-    "valueUpdatedMessage": "Seu valor foi atualizado com sucesso.",
     "valueCreatedTitle": "Valor criado",
     "valueCreatedMessage": "Seu valor foi criado com sucesso.",
     "error": "Erro",
@@ -1150,10 +1144,16 @@
     "valueDeletedTitle": "Valor excluído",
     "valueDeletedMessage": "Seu valor foi excluído com sucesso.",
     "deleteFailed": "Falha ao excluir o valor. Tente novamente.",
-    "discardChangesTitle": "Descartar alterações",
-    "discardChangesBody": "Você tem alterações não salvas. Tem certeza que deseja cancelar?",
-    "discard": "Descartar",
-    "keepEditing": "Continuar editando"
+    "editDrawer": {
+      "editLabel": "EDITAR VALOR",
+      "newLabel": "NOVO VALOR",
+      "close": "Fechar",
+      "fieldRequired": "Este campo é obrigatório",
+      "fillTitleHint": "Preencha o título",
+      "savedStatus": "Alterações salvas automaticamente",
+      "errorStatus": "Falha ao salvar",
+      "finishEditing": "Concluir edição"
+    }
   },
   "visionBoard": {
     "page": {

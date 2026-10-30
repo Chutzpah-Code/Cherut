@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useMediaQuery } from '@mantine/hooks';
 import { Plus, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import {
   Title,
@@ -11,40 +12,30 @@ import {
   Group,
   Stack,
   SimpleGrid,
-  Modal,
-  TextInput,
-  Textarea,
   Loader,
   Center,
   Box,
   ActionIcon,
   Menu,
-  Transition,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { useValues, useCreateValue, useUpdateValue, useDeleteValue } from '@/hooks/useValues';
+import { useValues, useDeleteValue } from '@/hooks/useValues';
 import { Surface } from '@/components/ui/Surface';
-import { CreateValueDto, Value } from '@/lib/api/services/values';
-
+import { Value } from '@/lib/api/services/values';
+import { EditDrawer } from './components/EditDrawer';
 
 export default function ValuesPage() {
   const t = useTranslations('values');
   const { data: values, isLoading } = useValues();
-  const createMutation = useCreateValue();
-  const updateMutation = useUpdateValue();
   const deleteMutation = useDeleteValue();
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingValue, setEditingValue] = useState<Value | null>(null);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set());
   const [expandedBehaviors, setExpandedBehaviors] = useState<Set<string>>(new Set());
-  const [formData, setFormData] = useState<CreateValueDto>({
-    title: '',
-    shortDescription: '',
-    behaviors: '',
-  });
 
   // Helper function to truncate text by character count
   const truncateText = (text: string, limit: number) => {
@@ -78,65 +69,14 @@ export default function ValuesPage() {
     });
   };
 
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      shortDescription: '',
-      behaviors: '',
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validate required title
-    if (!formData.title.trim()) {
-      notifications.show({
-        title: t('titleRequiredToastTitle'),
-        message: t('titleRequiredToastMessage'),
-        color: 'red',
-      });
-      return;
-    }
-
-    try {
-      if (editingValue) {
-        await updateMutation.mutateAsync({ id: editingValue.id, dto: formData });
-        notifications.show({
-          title: t('valueUpdatedTitle'),
-          message: t('valueUpdatedMessage'),
-          color: 'green',
-        });
-      } else {
-        await createMutation.mutateAsync(formData);
-        notifications.show({
-          title: t('valueCreatedTitle'),
-          message: t('valueCreatedMessage'),
-          color: 'green',
-        });
-      }
-
-      setIsModalOpen(false);
-      setEditingValue(null);
-      resetForm();
-    } catch (error) {
-      console.error('Error saving value:', error);
-      notifications.show({
-        title: t('error'),
-        message: t('saveFailed'),
-        color: 'red',
-      });
-    }
+  const handleValueCreated = (value: Value) => {
+    // Keeps the drawer open, now in edit mode, for the value just created.
+    setEditingValue(value);
   };
 
   const handleEdit = (value: Value) => {
     setEditingValue(value);
-    setFormData({
-      title: value.title,
-      shortDescription: value.shortDescription || '',
-      behaviors: value.behaviors || '',
-    });
-    setIsModalOpen(true);
+    setDrawerOpen(true);
   };
 
   const handleDelete = (id: string) => {
@@ -185,46 +125,7 @@ export default function ValuesPage() {
 
   const handleNew = () => {
     setEditingValue(null);
-    resetForm();
-    setIsModalOpen(true);
-  };
-
-  const handleCancel = () => {
-    if (formData.title.trim() && !editingValue) {
-      modals.openConfirmModal({
-        title: t('discardChangesTitle'),
-        children: (
-          <Text
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '14px',
-              fontWeight: 400,
-              color: '#666666',
-              lineHeight: '20px',
-            }}
-          >
-            {t('discardChangesBody')}
-          </Text>
-        ),
-        labels: { confirm: t('discard'), cancel: t('keepEditing') },
-        confirmProps: {
-          color: 'red',
-          style: {
-            fontFamily: 'Inter, sans-serif',
-            fontWeight: 600,
-          },
-        },
-        onConfirm: () => {
-          setIsModalOpen(false);
-          setEditingValue(null);
-          resetForm();
-        },
-      });
-    } else {
-      setIsModalOpen(false);
-      setEditingValue(null);
-      resetForm();
-    }
+    setDrawerOpen(true);
   };
 
   if (isLoading) {
@@ -236,7 +137,7 @@ export default function ValuesPage() {
   }
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }}>
+    <Surface p={{ base: 'md', sm: 'xl' }} style={{ paddingRight: drawerOpen && isDesktop ? 460 : undefined, transition: 'padding-right 0.2s ease' }}>
     <Stack
       gap="xl"
       style={{
@@ -314,7 +215,7 @@ export default function ValuesPage() {
             onMouseLeave={() => setHoveredCard(null)}
             style={{
               background: 'white',
-              border: '1px solid #E5E7EB',
+              border: drawerOpen && editingValue?.id === value.id ? '1px solid #4686FE' : '1px solid #E5E7EB',
               transition: 'all 0.2s ease',
               position: 'relative',
             }}
@@ -560,218 +461,12 @@ export default function ValuesPage() {
         </Card>
       )}
 
-      {/* Modal */}
-      <Modal
-        opened={isModalOpen}
-        onClose={handleCancel}
-        title={
-          <Text
-            style={{
-              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '20px',
-              fontWeight: 600,
-              color: '#000000',
-            }}
-          >
-            {editingValue ? t('editValue') : t('newValue')}
-          </Text>
-        }
-        size="md"
-        fullScreen={false}
-        radius={16}
-        styles={{
-          content: {
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            display: 'flex',
-            flexDirection: 'column',
-            maxHeight: '85dvh',
-            overflow: 'hidden',
-          },
-          body: {
-            flex: 1,
-            minHeight: 0,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: 0,
-          },
-        }}
-      >
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}
-        >
-          <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
-            <Stack gap="lg" py="xs">
-              <TextInput
-                label={t('titleLabel')}
-                placeholder={t('titlePlaceholder')}
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                required
-                withAsterisk
-                error={!formData.title.trim() && formData.title !== '' ? t('titleRequired') : null}
-                size="md"
-                radius={8}
-                styles={{
-                  label: {
-                    fontFamily: 'Inter, sans-serif',
-                    color: '#000000',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    fontFamily: 'Inter, sans-serif',
-                    backgroundColor: 'white',
-                    border: '1px solid #CCCCCC',
-                    color: '#000000',
-                    height: '48px',
-                    fontSize: '16px',
-                    '&::placeholder': {
-                      color: '#999999',
-                    },
-                    '&:focus': {
-                      borderColor: '#4686FE',
-                      boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                    },
-                  },
-                  error: {
-                    fontFamily: 'Inter, sans-serif',
-                    color: '#dc2626',
-                  },
-                }}
-              />
-
-              <TextInput
-                label={t('shortDescription')}
-                placeholder={t('shortDescriptionPlaceholder')}
-                value={formData.shortDescription}
-                onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-                size="md"
-                radius={8}
-                styles={{
-                  label: {
-                    fontFamily: 'Inter, sans-serif',
-                    color: '#000000',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    fontFamily: 'Inter, sans-serif',
-                    backgroundColor: 'white',
-                    border: '1px solid #CCCCCC',
-                    color: '#000000',
-                    height: '48px',
-                    fontSize: '16px',
-                    '&::placeholder': {
-                      color: '#999999',
-                    },
-                    '&:focus': {
-                      borderColor: '#4686FE',
-                      boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                    },
-                  },
-                }}
-              />
-
-              <Textarea
-                label={t('reinforcingBehaviors')}
-                placeholder={t('behaviorsPlaceholder')}
-                value={formData.behaviors}
-                onChange={(e) => setFormData({ ...formData, behaviors: e.target.value })}
-                rows={4}
-                autosize
-                maxRows={8}
-                radius={8}
-                styles={{
-                  label: {
-                    fontFamily: 'Inter, sans-serif',
-                    color: '#000000',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    fontFamily: 'Inter, sans-serif',
-                    backgroundColor: 'white',
-                    border: '1px solid #CCCCCC',
-                    color: '#000000',
-                    fontSize: '16px',
-                    '&::placeholder': {
-                      color: '#999999',
-                    },
-                    '&:focus': {
-                      borderColor: '#4686FE',
-                      boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                    },
-                  },
-                }}
-              />
-            </Stack>
-          </Box>
-          <Box
-            px="md"
-            py="sm"
-            style={{
-              borderTop: '1px solid #E2E8F0',
-              paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-              flexShrink: 0,
-            }}
-          >
-            <Group justify="flex-end">
-              <Button
-                variant="outline"
-                onClick={handleCancel}
-                radius={8}
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  borderColor: '#CCCCCC',
-                  color: '#333333',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  height: '48px',
-                  background: 'white',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      borderColor: '#4686FE',
-                      color: '#4686FE',
-                    },
-                  },
-                }}
-              >
-                {t('cancel')}
-              </Button>
-              <Button
-                type="submit"
-                loading={createMutation.isPending || updateMutation.isPending}
-                radius={8}
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  background: '#4686FE',
-                  border: 'none',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  color: 'white',
-                  height: '48px',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      background: '#3366E5',
-                    },
-                  },
-                }}
-              >
-                {editingValue ? t('update') : t('create')}
-              </Button>
-            </Group>
-          </Box>
-        </form>
-      </Modal>
+      <EditDrawer
+        opened={drawerOpen}
+        onClose={() => { setDrawerOpen(false); setEditingValue(null); }}
+        value={editingValue}
+        onCreated={handleValueCreated}
+      />
     </Stack>
     </Surface>
   );
