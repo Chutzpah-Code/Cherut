@@ -31,6 +31,18 @@ export class VisionBoardService {
   private readonly MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB em bytes
   private readonly ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
+  private readonly LOGS_COLLECTION = 'visionBoardPracticeLogs';
+  private readonly SESSION_STATE_COLLECTION = 'visionBoardSessionState';
+  private readonly MAX_AUDIO_FILE_SIZE = 10 * 1024 * 1024; // 10MB em bytes
+  private readonly MAX_AUDIO_DURATION_SEC = 300; // 5 minutos
+  private readonly ALLOWED_AUDIO_MIME_TYPES = [
+    'audio/mpeg',
+    'audio/mp4',
+    'audio/x-m4a',
+    'audio/wav',
+    'audio/webm',
+  ];
+
   constructor(
     private readonly firebaseService: FirebaseService,
     private readonly cloudinaryService: CloudinaryService,
@@ -78,6 +90,46 @@ export class VisionBoardService {
   }
 
   /**
+   * 🔒 UPLOAD SEGURO DE ÁUDIO
+   *
+   * Confia na duração reportada pelo cliente (sem ffprobe no servidor,
+   * mesmo padrão de "multer limits + mime whitelist" usado em todo upload
+   * deste projeto) — valida apenas tipo e tamanho do arquivo.
+   */
+  async uploadAudio(
+    userId: string,
+    file: Express.Multer.File,
+    durationSec: number,
+  ): Promise<{ audioFileUrl: string; audioDurationSec: number; audioSizeBytes: number }> {
+    if (!this.ALLOWED_AUDIO_MIME_TYPES.includes(file.mimetype)) {
+      throw new BadRequestException(
+        `Invalid file type. Allowed types: ${this.ALLOWED_AUDIO_MIME_TYPES.join(', ')}`,
+      );
+    }
+
+    if (file.size > this.MAX_AUDIO_FILE_SIZE) {
+      throw new BadRequestException(
+        `File too large. Maximum size: ${this.MAX_AUDIO_FILE_SIZE / (1024 * 1024)}MB`,
+      );
+    }
+
+    if (!durationSec || durationSec > this.MAX_AUDIO_DURATION_SEC) {
+      throw new BadRequestException(
+        `Audio too long. Maximum duration: ${this.MAX_AUDIO_DURATION_SEC / 60} minutes`,
+      );
+    }
+
+    try {
+      const audioFileUrl = await this.cloudinaryService.uploadVisionBoardAudio(file.buffer, userId);
+      this.logger.log(`Audio uploaded successfully to Cloudinary for user: ${userId}`);
+      return { audioFileUrl, audioDurationSec: durationSec, audioSizeBytes: file.size };
+    } catch (error) {
+      this.logger.error('Error uploading audio to Cloudinary', error);
+      throw new BadRequestException('Failed to upload audio');
+    }
+  }
+
+  /**
    * Criar item no Vision Board
    */
   async create(userId: string, dto: CreateVisionBoardItemDto) {
@@ -119,6 +171,13 @@ export class VisionBoardService {
     if (dto.obstacleResponse !== undefined) itemData.obstacleResponse = dto.obstacleResponse;
     if (dto.nextAction !== undefined) itemData.nextAction = dto.nextAction;
     if (dto.nextActionDueDate !== undefined) itemData.nextActionDueDate = dto.nextActionDueDate;
+
+    // Audio (plays during visualization)
+    if (dto.audioType !== undefined) itemData.audioType = dto.audioType;
+    if (dto.audioTrackId !== undefined) itemData.audioTrackId = dto.audioTrackId;
+    if (dto.audioFileUrl !== undefined) itemData.audioFileUrl = dto.audioFileUrl;
+    if (dto.audioDurationSec !== undefined) itemData.audioDurationSec = dto.audioDurationSec;
+    if (dto.audioSizeBytes !== undefined) itemData.audioSizeBytes = dto.audioSizeBytes;
 
     const docRef = await db.collection(this.COLLECTION_NAME).add(itemData);
     const doc = await docRef.get();
@@ -249,6 +308,13 @@ export class VisionBoardService {
       if (dto.nextAction !== undefined) updateData.nextAction = dto.nextAction;
       if (dto.nextActionDueDate !== undefined) updateData.nextActionDueDate = dto.nextActionDueDate;
 
+      // Audio (plays during visualization)
+      if (dto.audioType !== undefined) updateData.audioType = dto.audioType;
+      if (dto.audioTrackId !== undefined) updateData.audioTrackId = dto.audioTrackId;
+      if (dto.audioFileUrl !== undefined) updateData.audioFileUrl = dto.audioFileUrl;
+      if (dto.audioDurationSec !== undefined) updateData.audioDurationSec = dto.audioDurationSec;
+      if (dto.audioSizeBytes !== undefined) updateData.audioSizeBytes = dto.audioSizeBytes;
+
       await docRef.update(updateData);
 
       const updatedDoc = await docRef.get();
@@ -295,6 +361,15 @@ export class VisionBoardService {
     } catch (error) {
       this.logger.warn('Failed to delete image from storage', error);
       // Continua mesmo se falhar ao deletar a imagem
+    }
+
+    // Deletar áudio enviado pelo usuário, se houver
+    if (data.audioType === 'file' && data.audioFileUrl) {
+      try {
+        await this.deleteAudioFromStorage(data.audioFileUrl);
+      } catch (error) {
+        this.logger.warn('Failed to delete audio from storage', error);
+      }
     }
 
     await docRef.delete();
@@ -377,5 +452,153 @@ export class VisionBoardService {
       this.logger.error('Error deleting image from Cloudinary', error);
       throw error;
     }
+  }
+
+  /**
+   * Helper: Deletar áudio do Cloudinary (mesmo formato de URL da imagem)
+   */
+  private async deleteAudioFromStorage(audioUrl: string): Promise<void> {
+    try {
+      await this.cloudinaryService.deleteImage(audioUrl);
+      this.logger.log(`Audio deleted from Cloudinary: ${audioUrl}`);
+    } catch (error) {
+      this.logger.error('Error deleting audio from Cloudinary', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Registrar uma sessão de prática concluída — um log por meta praticada,
+   * atualiza o "estado atual" de cada meta e o estado da sessão do usuário
+   * (para pré-preencher o check-in da próxima vez). Tudo em um único batch.
+   */
+  async logPracticeSession(
+    userId: string,
+    entries: { itemId: string; date: string }[],
+    feeling: string,
+    energy: number,
+    confidence: number,
+  ) {
+    const db = this.firebaseService.getFirestore();
+    const batch = db.batch();
+    const now = admin.firestore.FieldValue.serverTimestamp();
+
+    for (const entry of entries) {
+      // Upsert do log por userId+itemId+date (uma prática por dia por meta)
+      const existing = await db
+        .collection(this.LOGS_COLLECTION)
+        .where('userId', '==', userId)
+        .where('itemId', '==', entry.itemId)
+        .where('date', '==', entry.date)
+        .limit(1)
+        .get();
+
+      const logData = {
+        userId,
+        itemId: entry.itemId,
+        date: entry.date,
+        feeling,
+        energy,
+        confidence,
+        updatedAt: now,
+      };
+
+      if (!existing.empty) {
+        batch.update(existing.docs[0].ref, logData);
+      } else {
+        const newLogRef = db.collection(this.LOGS_COLLECTION).doc();
+        batch.set(newLogRef, { ...logData, createdAt: now });
+      }
+
+      const itemRef = db.collection(this.COLLECTION_NAME).doc(entry.itemId);
+      batch.update(itemRef, {
+        currentEmotion: feeling,
+        currentEnergy: energy,
+        currentConfidence: confidence,
+        updatedAt: now,
+      });
+    }
+
+    const sessionStateRef = db.collection(this.SESSION_STATE_COLLECTION).doc(userId);
+    batch.set(
+      sessionStateRef,
+      {
+        userId,
+        lastFeeling: feeling,
+        lastEnergy: energy,
+        lastConfidence: confidence,
+        lastSessionAt: now,
+        updatedAt: now,
+      },
+      { merge: true },
+    );
+
+    await batch.commit();
+
+    return { message: 'Practice session logged successfully' };
+  }
+
+  /**
+   * Buscar o último check-in salvo do usuário, para pré-preencher a próxima sessão.
+   */
+  async getSessionState(userId: string) {
+    const db = this.firebaseService.getFirestore();
+    const doc = await db.collection(this.SESSION_STATE_COLLECTION).doc(userId).get();
+
+    if (!doc.exists) {
+      return { lastFeeling: null, lastEnergy: null, lastConfidence: null, lastSessionAt: null };
+    }
+
+    const data = doc.data() as any;
+    return {
+      lastFeeling: data.lastFeeling ?? null,
+      lastEnergy: data.lastEnergy ?? null,
+      lastConfidence: data.lastConfidence ?? null,
+      lastSessionAt: data.lastSessionAt?.toDate?.().toISOString() ?? null,
+    };
+  }
+
+  /**
+   * Resumo de prática por meta (histórico de 7 dias + contagem vitalícia +
+   * última prática), para os quadradinhos do card — UMA query para todos os
+   * logs do usuário, agrupada em memória por itemId (evita N+1 por card).
+   */
+  async getPracticeSummary(userId: string) {
+    const db = this.firebaseService.getFirestore();
+    const snapshot = await db
+      .collection(this.LOGS_COLLECTION)
+      .where('userId', '==', userId)
+      .get();
+
+    const logsByItem = new Map<string, string[]>(); // itemId -> dates[]
+    snapshot.docs.forEach((doc) => {
+      const data = doc.data() as any;
+      const dates = logsByItem.get(data.itemId) ?? [];
+      dates.push(data.date);
+      logsByItem.set(data.itemId, dates);
+    });
+
+    const last7Dates: string[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      last7Dates.push(d.toISOString().split('T')[0]);
+    }
+
+    const summary: Record<
+      string,
+      { last7Days: boolean[]; totalCount: number; lastPracticedAt: string | null }
+    > = {};
+
+    logsByItem.forEach((dates, itemId) => {
+      const dateSet = new Set(dates);
+      summary[itemId] = {
+        last7Days: last7Dates.map((d) => dateSet.has(d)),
+        totalCount: dates.length,
+        lastPracticedAt: dates.sort().at(-1) ?? null,
+      };
+    });
+
+    return summary;
   }
 }

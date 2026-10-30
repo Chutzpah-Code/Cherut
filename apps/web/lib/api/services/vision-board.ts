@@ -2,8 +2,8 @@ import { apiClient } from '../client';
 
 // Visualization practice fields ("Visualizar e agir") — optional, shared by
 // the item itself and both DTOs since they're saved directly on the item.
-// State/outcome/process/action structure (see VisionBoardModal.tsx for the
-// "why" behind this shape).
+// State/outcome/process/action structure (see EditDrawer/VisualizationTab.tsx
+// for the "why" behind this shape).
 interface VisualizationPracticeFields {
   objectiveId?: string;
   plannedPracticeDurationMinutes?: 5 | 10 | 15;
@@ -18,6 +18,26 @@ interface VisualizationPracticeFields {
   obstacleResponse?: string;
   nextAction?: string;
   nextActionDueDate?: string;
+  audioType?: 'none' | 'system' | 'file';
+  audioTrackId?: string;
+  audioFileUrl?: string;
+  audioDurationSec?: number;
+  audioSizeBytes?: number;
+}
+
+export interface PracticeSummaryEntry {
+  last7Days: boolean[];
+  totalCount: number;
+  lastPracticedAt: string | null;
+}
+
+export type PracticeSummary = Record<string, PracticeSummaryEntry>;
+
+export interface SessionState {
+  lastFeeling: string | null;
+  lastEnergy: number | null;
+  lastConfidence: number | null;
+  lastSessionAt: string | null;
 }
 
 export interface VisionBoardItem extends VisualizationPracticeFields {
@@ -155,6 +175,54 @@ export const visionBoardApi = {
     const { data } = await apiClient.patch(`/vision-board/${id}/archive`);
     return data;
   },
+
+  /**
+   * 🎵 Upload de áudio próprio para tocar durante a visualização
+   */
+  uploadAudio: async (
+    file: File,
+    durationSec: number,
+  ): Promise<{ audioFileUrl: string; audioDurationSec: number; audioSizeBytes: number }> => {
+    const formData = new FormData();
+    formData.append('audio', file);
+    formData.append('durationSec', String(Math.round(durationSec)));
+
+    const { data } = await apiClient.post('/vision-board/upload-audio', formData, {
+      timeout: 30000,
+      headers: { 'Content-Type': undefined },
+    });
+
+    return data;
+  },
+
+  /**
+   * 📊 Resumo de prática por meta (histórico 7 dias + contagem vitalícia),
+   * buscado uma única vez para todos os cards do quadro.
+   */
+  getPracticeSummary: async (): Promise<PracticeSummary> => {
+    const { data } = await apiClient.get('/vision-board/practice-summary');
+    return data;
+  },
+
+  /**
+   * 🧭 Último check-in salvo do usuário, para pré-preencher a sessão seguinte
+   */
+  getSessionState: async (): Promise<SessionState> => {
+    const { data } = await apiClient.get('/vision-board/session-state');
+    return data;
+  },
+
+  /**
+   * ✅ Registrar uma sessão de prática concluída (uma ou mais metas)
+   */
+  logPracticeSession: async (
+    entries: { itemId: string; date: string }[],
+    feeling: string,
+    energy: number,
+    confidence: number,
+  ): Promise<void> => {
+    await apiClient.post('/vision-board/practice-sessions', { entries, feeling, energy, confidence });
+  },
 };
 
 /**
@@ -204,5 +272,66 @@ export const imageValidation = {
     // TODO: Implementar compressão se necessário
     // Por enquanto, retorna o arquivo original
     return file;
+  },
+};
+
+/**
+ * 🛡️ VALIDAÇÃO DE ÁUDIO NO FRONTEND
+ *
+ * Diferente de imageValidation, precisa ler a duração do arquivo (não dá
+ * pra saber isso só pelo File object) — por isso validateFile é assíncrono.
+ */
+export const audioValidation = {
+  ALLOWED_TYPES: ['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/webm'],
+
+  /** Tamanho máximo: 10MB */
+  MAX_SIZE: 10 * 1024 * 1024,
+
+  /** Duração máxima: 5 minutos */
+  MAX_DURATION_SEC: 300,
+
+  validateFile: (file: File): Promise<{ valid: boolean; error?: string; durationSec?: number }> => {
+    return new Promise((resolve) => {
+      if (!audioValidation.ALLOWED_TYPES.includes(file.type)) {
+        resolve({ valid: false, error: 'wrongFormat' });
+        return;
+      }
+
+      if (file.size > audioValidation.MAX_SIZE) {
+        resolve({ valid: false, error: 'tooLarge' });
+        return;
+      }
+
+      const objectUrl = URL.createObjectURL(file);
+      const audio = new Audio();
+      const timeout = setTimeout(() => {
+        cleanup();
+        // Metadados não carregaram a tempo — não bloqueia o usuário, deixa o
+        // servidor confiar no valor (nesse caso, 0) e seguir em frente.
+        resolve({ valid: true, durationSec: 0 });
+      }, 8000);
+
+      const cleanup = () => {
+        clearTimeout(timeout);
+        URL.revokeObjectURL(objectUrl);
+      };
+
+      audio.addEventListener('loadedmetadata', () => {
+        const durationSec = audio.duration;
+        cleanup();
+        if (durationSec > audioValidation.MAX_DURATION_SEC) {
+          resolve({ valid: false, error: 'tooLong', durationSec });
+          return;
+        }
+        resolve({ valid: true, durationSec });
+      });
+
+      audio.addEventListener('error', () => {
+        cleanup();
+        resolve({ valid: false, error: 'wrongFormat' });
+      });
+
+      audio.src = objectUrl;
+    });
   },
 };

@@ -100,4 +100,29 @@ export class UpdateVisionBoardItemDto {
   @IsDateString()
   @IsOptional()
   nextActionDueDate?: string;
+
+  // ─── Audio (plays during visualization) ────────────────────────────────
+  @IsIn(['none', 'system', 'file'])
+  @IsOptional()
+  audioType?: 'none' | 'system' | 'file';
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(50)
+  audioTrackId?: string;
+
+  @IsString()
+  @IsOptional()
+  audioFileUrl?: string;
+
+  @IsInt()
+  @Min(1)
+  @Max(300)
+  @IsOptional()
+  audioDurationSec?: number;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  audioSizeBytes?: number;
 }

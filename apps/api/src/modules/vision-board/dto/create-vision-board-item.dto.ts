@@ -115,4 +115,31 @@ export class CreateVisionBoardItemDto {
   @IsDateString()
   @IsOptional()
   nextActionDueDate?: string;
+
+  // ─── Audio (plays during visualization) ────────────────────────────────
+  @IsIn(['none', 'system', 'file'])
+  @IsOptional()
+  audioType?: 'none' | 'system' | 'file';
+
+  // Only meaningful when audioType === 'system' — id from SYSTEM_TRACKS
+  @IsString()
+  @IsOptional()
+  @MaxLength(50)
+  audioTrackId?: string;
+
+  // Only meaningful when audioType === 'file' — Cloudinary URL
+  @IsString()
+  @IsOptional()
+  audioFileUrl?: string;
+
+  @IsInt()
+  @Min(1)
+  @Max(300)
+  @IsOptional()
+  audioDurationSec?: number;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  audioSizeBytes?: number;
 }

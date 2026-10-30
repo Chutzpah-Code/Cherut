@@ -85,6 +85,82 @@ export class VisionBoardController {
   }
 
   /**
+   * 📤 UPLOAD DE ÁUDIO (trilha própria de visualização)
+   *
+   * PROTEÇÕES: MP3/M4A/WAV, máximo 10MB. Duração (máx 5min) é validada a
+   * partir do valor reportado pelo cliente — sem checagem server-side de
+   * duração real (sem ffprobe neste projeto).
+   */
+  @Post('upload-audio')
+  @UseGuards(FirebaseAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('audio', {
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
+        files: 1,
+      },
+      fileFilter: (req, file, callback) => {
+        const allowedMimes = ['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/webm'];
+
+        if (!allowedMimes.includes(file.mimetype)) {
+          return callback(
+            new BadRequestException('Only MP3, M4A, or WAV files are allowed'),
+            false,
+          );
+        }
+
+        callback(null, true);
+      },
+    }),
+  )
+  async uploadAudio(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('durationSec') durationSec: string,
+    @Request() req,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const userId = req.user.uid;
+    return this.visionBoardService.uploadAudio(userId, file, Number(durationSec));
+  }
+
+  /**
+   * 📊 RESUMO DE PRÁTICA POR META (histórico 7 dias + contagem vitalícia)
+   *
+   * Declarada antes de GET /:id para não ser capturada pela rota param.
+   */
+  @Get('practice-summary')
+  getPracticeSummary(@Request() req) {
+    const userId = req.user.uid;
+    return this.visionBoardService.getPracticeSummary(userId);
+  }
+
+  /**
+   * 🧭 ÚLTIMO CHECK-IN DO USUÁRIO (pré-preenche a próxima sessão)
+   *
+   * Declarada antes de GET /:id para não ser capturada pela rota param.
+   */
+  @Get('session-state')
+  getSessionState(@Request() req) {
+    const userId = req.user.uid;
+    return this.visionBoardService.getSessionState(userId);
+  }
+
+  /**
+   * ✅ REGISTRAR SESSÃO DE PRÁTICA CONCLUÍDA
+   */
+  @Post('practice-sessions')
+  logPracticeSession(
+    @Body() body: { entries: { itemId: string; date: string }[]; feeling: string; energy: number; confidence: number },
+    @Request() req,
+  ) {
+    const userId = req.user.uid;
+    return this.visionBoardService.logPracticeSession(userId, body.entries, body.feeling, body.energy, body.confidence);
+  }
+
+  /**
    * ✨ CRIAR ITEM NO VISION BOARD
    */
   @Post()

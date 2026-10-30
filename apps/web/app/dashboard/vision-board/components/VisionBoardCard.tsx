@@ -2,188 +2,175 @@
 
 import { useTranslations } from 'next-intl';
 import { Card, Box, Text, Badge, Group, Image, ActionIcon, Menu } from '@mantine/core';
-import { MoreVertical, Archive, Trash2, Eye, Edit } from 'lucide-react';
+import { MoreVertical, Archive, Trash2, Eye, Play, Pencil, Check } from 'lucide-react';
 import { VisionBoardItem } from '@/lib/api/services/vision-board';
+import { PracticeSummaryEntry } from '@/lib/api/services/vision-board';
+import { countFilledVisualizationFields, VISUALIZATION_PROGRESS_TOTAL } from '@/lib/vision-board/visualization-fields';
+import { classifyLastPracticed } from '@/lib/vision-board/practice-format';
 import { useState } from 'react';
 
 interface VisionBoardCardProps {
   item: VisionBoardItem;
-  onClick: () => void;
-  onEdit?: (item: VisionBoardItem) => void;
+  practiceSummary?: PracticeSummaryEntry;
+  onVisualize: (item: VisionBoardItem) => void;
+  onEdit: (item: VisionBoardItem, tab: 'meta' | 'visualization') => void;
   onArchive?: (item: VisionBoardItem) => void;
   onDelete?: (itemId: string) => void;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (item: VisionBoardItem) => void;
 }
 
-export function VisionBoardCard({ item, onClick, onEdit, onArchive, onDelete }: VisionBoardCardProps) {
+export function VisionBoardCard({
+  item,
+  practiceSummary,
+  onVisualize,
+  onEdit,
+  onArchive,
+  onDelete,
+  selectionMode = false,
+  selected = false,
+  onToggleSelect,
+}: VisionBoardCardProps) {
   const t = useTranslations('visionBoard.card');
   const td = useTranslations('visionBoard.dueDateBadge');
+  const tp = useTranslations('visionBoard.practiceHistory');
   const [hoveredCard, setHoveredCard] = useState(false);
-  // Calcular se está próximo do due date
+
   const getDueDateBadge = () => {
     if (item.completed) {
-      return <Badge color="green" variant="filled">{td('completed')}</Badge>;
+      return <Badge color="green" variant="filled" style={{ whiteSpace: 'nowrap' }}>{td('completed')}</Badge>;
     }
     if (!item.dueDate) return null;
 
     const today = new Date();
     const dueDate = new Date(item.dueDate);
-    const diffTime = dueDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) {
-      return <Badge color="red" variant="filled">{td('overdue')}</Badge>;
-    } else if (diffDays === 0) {
-      return <Badge color="orange" variant="filled">{td('today')}</Badge>;
-    } else if (diffDays <= 7) {
-      return <Badge color="yellow" variant="filled">{td('daysLeft', { count: diffDays })}</Badge>;
-    } else if (diffDays <= 30) {
-      return <Badge color="cyan" variant="filled">{td('days', { count: diffDays })}</Badge>;
-    } else {
-      // Always show days count, even after 30 days
-      return <Badge color="violet" variant="filled">{td('days', { count: diffDays })}</Badge>;
+      return <Badge color="red" variant="filled" style={{ whiteSpace: 'nowrap' }}>{td('overdue')}</Badge>;
+    }
+    return <Badge color="violet" variant="filled" style={{ whiteSpace: 'nowrap' }}>{td('days', { count: diffDays })}</Badge>;
+  };
+
+  const filledCount = countFilledVisualizationFields(item);
+  const isComplete = filledCount >= VISUALIZATION_PROGRESS_TOTAL;
+  const lastPracticed = classifyLastPracticed(practiceSummary?.lastPracticedAt ?? null);
+
+  const handleCardClick = () => {
+    if (selectionMode) {
+      onToggleSelect?.(item);
     }
   };
 
   return (
-    <>
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
-      `}</style>
-      <Card
-        shadow="none"
-        padding={0}
-        radius={16}
-        style={{
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          overflow: 'hidden',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          border: '1px solid #CCCCCC',
-          background: 'white',
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          position: 'relative',
-        }}
-        onMouseEnter={(e) => {
-          setHoveredCard(true);
-          e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.borderColor = '#4686FE';
-          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
-        }}
-        onMouseLeave={(e) => {
-          setHoveredCard(false);
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.borderColor = '#CCCCCC';
-          e.currentTarget.style.boxShadow = 'none';
-        }}
-      >
-      {/* Imagem */}
-      <Box style={{ position: 'relative', paddingTop: '75%', overflow: 'hidden' }} onClick={onClick}>
+    <Card
+      shadow="none"
+      padding={0}
+      radius={16}
+      style={{
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        overflow: 'hidden',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        border: selectionMode && selected ? '2px solid #4686FE' : '1px solid #CCCCCC',
+        background: 'white',
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        position: 'relative',
+      }}
+      onMouseEnter={() => setHoveredCard(true)}
+      onMouseLeave={() => setHoveredCard(false)}
+    >
+      <Box style={{ position: 'relative', paddingTop: '75%', overflow: 'hidden' }} onClick={handleCardClick}>
         <Image
           src={item.imageUrl}
           alt={item.title}
           fit="cover"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-          }}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
         />
 
-        {/* Menu Button */}
-        {(onEdit || onArchive || onDelete) && (
-          <Menu shadow="md" width={200} position="bottom-end">
-            <Menu.Target>
-              <ActionIcon
-                variant="filled"
-                color="white"
-                size="md"
-                style={{
-                  position: 'absolute',
-                  top: 12,
-                  left: 12,
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  color: '#666666',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  opacity: hoveredCard ? 1 : 0,
-                  transition: 'opacity 0.2s ease',
-                }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreVertical size={16} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<Eye size={16} />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClick();
-                }}
-              >
-                {t('viewDetails')}
-              </Menu.Item>
-              {onEdit && (
-                <Menu.Item
-                  leftSection={<Edit size={16} />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(item);
-                  }}
-                >
-                  {t('edit')}
-                </Menu.Item>
-              )}
-              {onArchive && (
-                <Menu.Item
-                  leftSection={<Archive size={16} />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onArchive(item);
-                  }}
-                >
-                  {t('archive')}
-                </Menu.Item>
-              )}
-              {onDelete && (
-                <>
-                  <Menu.Divider />
-                  <Menu.Item
-                    leftSection={<Trash2 size={16} />}
-                    color="red"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(item.id);
-                    }}
-                  >
-                    {t('delete')}
-                  </Menu.Item>
-                </>
-              )}
-            </Menu.Dropdown>
-          </Menu>
-        )}
-
-        {/* Badge do due date no canto superior direito */}
-        {getDueDateBadge() && (
+        {selectionMode ? (
           <Box
             style={{
               position: 'absolute',
-              top: 8,
-              right: 8,
+              top: 12,
+              left: 12,
+              width: 26,
+              height: 26,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: selected ? '#4686FE' : 'rgba(255,255,255,0.85)',
+              border: selected ? 'none' : '1.5px solid rgba(0,0,0,0.15)',
             }}
           >
+            {selected && <Check size={15} color="white" />}
+          </Box>
+        ) : (
+          <Menu shadow="md" width={200} position="bottom-end">
+              <Menu.Target>
+                <ActionIcon
+                  variant="filled"
+                  color="white"
+                  size="md"
+                  style={{
+                    position: 'absolute',
+                    top: 12,
+                    left: 12,
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    color: '#666666',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    opacity: hoveredCard ? 1 : 0,
+                    transition: 'opacity 0.2s ease',
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreVertical size={16} />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<Eye size={16} />}
+                  onClick={(e) => { e.stopPropagation(); onEdit(item, 'meta'); }}
+                >
+                  {t('viewDetails')}
+                </Menu.Item>
+                {onArchive && (
+                  <Menu.Item
+                    leftSection={<Archive size={16} />}
+                    onClick={(e) => { e.stopPropagation(); onArchive(item); }}
+                  >
+                    {t('archive')}
+                  </Menu.Item>
+                )}
+                {onDelete && (
+                  <>
+                    <Menu.Divider />
+                    <Menu.Item
+                      leftSection={<Trash2 size={16} />}
+                      color="red"
+                      onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
+                    >
+                      {t('delete')}
+                    </Menu.Item>
+                  </>
+                )}
+              </Menu.Dropdown>
+            </Menu>
+        )}
+
+        {getDueDateBadge() && (
+          <Box style={{ position: 'absolute', top: 8, right: 8 }}>
             {getDueDateBadge()}
           </Box>
         )}
       </Box>
 
-      {/* Conteúdo */}
-      <Box p="lg" style={{ flex: 1, display: 'flex', flexDirection: 'column' }} onClick={onClick}>
+      <Box p="lg" pb="sm" style={{ flex: 1, display: 'flex', flexDirection: 'column' }} onClick={handleCardClick}>
         <Text
           lineClamp={2}
           mb="xs"
@@ -212,8 +199,82 @@ export function VisionBoardCard({ item, onClick, onEdit, onArchive, onDelete }: 
             {item.description}
           </Text>
         )}
+
+        <Box style={{ flex: 1 }} />
+
+        <Group gap={4} mt="sm" mb={4}>
+          {Array.from({ length: 7 }, (_, i) => (
+            <Box
+              key={i}
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: 3,
+                background: practiceSummary?.last7Days?.[i] ? '#4686FE' : '#E5E7EB',
+              }}
+            />
+          ))}
+        </Group>
+        <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+          {practiceSummary && practiceSummary.totalCount > 0
+            ? tp('practicesCount', {
+                count: practiceSummary.totalCount,
+                when: lastPracticed
+                  ? lastPracticed.kind === 'today'
+                    ? tp('lastPracticedToday')
+                    : lastPracticed.kind === 'yesterday'
+                      ? tp('lastPracticedYesterday')
+                      : tp('lastPracticedDaysAgo', { count: lastPracticed.days })
+                  : '',
+              })
+            : tp('noPracticeYet')}
+        </Text>
       </Box>
+
+      {!selectionMode && (
+        <Group gap={0} style={{ borderTop: '1px solid #E5E7EB' }} wrap="nowrap">
+          <Box
+            onClick={(e) => { e.stopPropagation(); onVisualize(item); }}
+            style={{
+              flex: 1,
+              padding: '12px 8px',
+              textAlign: 'center',
+              fontSize: 14,
+              fontWeight: 600,
+              color: '#4686FE',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              whiteSpace: 'nowrap',
+              cursor: 'pointer',
+            }}
+          >
+            <Play size={14} /> {t('visualizeButton')}
+          </Box>
+          <Box style={{ width: 1, background: '#E5E7EB', alignSelf: 'stretch' }} />
+          <Box
+            onClick={(e) => { e.stopPropagation(); onEdit(item, isComplete ? 'meta' : 'visualization'); }}
+            style={{
+              flex: 1,
+              padding: '12px 8px',
+              textAlign: 'center',
+              fontSize: 14,
+              fontWeight: 600,
+              color: '#374151',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              whiteSpace: 'nowrap',
+              cursor: 'pointer',
+            }}
+          >
+            {!isComplete && <Pencil size={14} />}
+            {isComplete ? t('editButton') : t('completeButton', { current: filledCount, total: VISUALIZATION_PROGRESS_TOTAL })}
+          </Box>
+        </Group>
+      )}
     </Card>
-    </>
   );
 }

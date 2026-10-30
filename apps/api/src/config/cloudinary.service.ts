@@ -174,6 +174,37 @@ export class CloudinaryService {
   }
 
   /**
+   * Faz upload de um áudio (trilha de visualização do usuário) para o Cloudinary
+   *
+   * @param fileBuffer - Buffer do arquivo de áudio
+   * @param userId - ID do usuário (para organizar os arquivos)
+   * @returns URL pública do arquivo
+   */
+  async uploadVisionBoardAudio(fileBuffer: Buffer, userId: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: `cherut/vision-board-audio/${userId}`,
+          resource_type: 'auto', // supports audio files
+        },
+        (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
+          if (error) {
+            this.logger.error('Error uploading vision board audio to Cloudinary', error);
+            return reject(error);
+          }
+          if (!result) {
+            this.logger.error('No result from Cloudinary upload');
+            return reject(new Error('Upload failed: no result'));
+          }
+          this.logger.log(`Vision board audio uploaded successfully: ${result.public_id}`);
+          resolve(result.secure_url);
+        },
+      );
+      uploadStream.end(fileBuffer);
+    });
+  }
+
+  /**
    * Faz upload da imagem de capa de um curso (Learning module)
    *
    * @param fileBuffer - Buffer da imagem

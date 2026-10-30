@@ -1128,13 +1128,18 @@
     "page": {
       "title": "My Vision Board",
       "subtitleActive": "Drag and drop to organize your goals",
+      "subtitleCompleted": "Goals you've already achieved",
       "subtitleArchived": "View and manage your archived vision board items",
       "addGoal": "Add Goal",
+      "startSession": "Visualization Session",
       "active": "Active",
+      "completed": "Completed",
       "archived": "Archived",
       "activeCount": "{count, plural, one {# active item} other {# active items}}",
+      "completedCount": "{count, plural, one {# completed item} other {# completed items}}",
       "archivedCount": "{count, plural, one {# archived item} other {# archived items}}",
       "emptyTitle": "Start Your Vision Board",
+      "emptyCompletedTitle": "No completed goals yet.",
       "emptyHint": "Create a visual representation of your dreams and goals. Add images that inspire you and track your progress towards achieving them!",
       "addFirstGoal": "Add Your First Goal",
       "itemArchived": "\"{title}\" has been archived",
@@ -1152,16 +1157,16 @@
     },
     "dueDateBadge": {
       "overdue": "Overdue",
-      "today": "Today",
-      "daysLeft": "{count, plural, one {# day left} other {# days left}}",
       "days": "{count, plural, one {# day} other {# days}}",
       "completed": "Completed"
     },
     "card": {
       "viewDetails": "View Details",
-      "edit": "Edit",
       "archive": "Archive",
-      "delete": "Delete"
+      "delete": "Delete",
+      "visualizeButton": "Visualize",
+      "editButton": "Edit",
+      "completeButton": "Complete ({current}/{total})"
     },
     "lightbox": {
       "openGallery": "View gallery",
@@ -1178,57 +1183,30 @@
       "deletePermanently": "Delete Permanently",
       "archivedLabel": "Archived"
     },
-    "editModal": {
-      "title": "Edit Vision Board Item",
+    "editDrawer": {
+      "visualizationLabel": "VISUALIZATION",
+      "close": "Close",
+      "metaTabLabel": "Goal",
+      "visualizationTabLabel": "Visualization · {current}/{total}",
+      "savedStatus": "Saved automatically",
+      "errorStatus": "Failed to save",
+      "visualizeNowButton": "Visualize now",
       "image": "Image",
       "uploading": "Uploading...",
-      "replaceImage": "Replace Image",
+      "replaceImage": "Replace image",
       "invalidFile": "Invalid file",
       "uploadFailed": "Failed to upload image. Please try again.",
-      "saveFailed": "Failed to save changes. Please try again.",
       "titleLabel": "Title",
       "titlePlaceholder": "E.g., Trip to Kyoto",
-      "shortDescription": "Short Description",
+      "shortDescription": "Short description",
       "shortDescriptionPlaceholder": "Brief description (visible on card)",
-      "fullDescription": "Full Description",
-      "fullDescriptionPlaceholder": "Detailed description (visible only in modal)",
-      "dueDate": "Due Date",
+      "fullDescription": "Full description",
+      "fullDescriptionPlaceholder": "Detailed description",
+      "dueDate": "Due date",
       "dueDateDesc": "Target completion date",
       "dueDatePlaceholder": "Select date",
       "completed": "Mark as completed",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "saveChanges": "Save Changes",
-      "visualizationSectionTitle": "Visualization",
-      "relatedObjective": "Related goal",
-      "relatedObjectivePlaceholder": "Not linked",
-      "practiceDuration": "Practice duration",
-      "duration5min": "5 min",
-      "duration10min": "10 min",
-      "duration15min": "15 min",
-      "stateGroupTitle": "State",
-      "currentEmotion": "How are you feeling right now?",
-      "currentEmotionPlaceholder": "Select a feeling",
-      "currentEnergy": "Energy level",
-      "currentConfidence": "Confidence level",
-      "desiredState": "What state do you want to cultivate?",
-      "desiredStatePlaceholder": "Calm, focused and confident...",
-      "empoweringBelief": "Belief you want to strengthen",
-      "empoweringBeliefPlaceholder": "I'm capable of developing the skills and taking consistent action...",
-      "visualizationGroupTitle": "Visualization",
-      "outcomeVisualizationText": "What will it look like when this goal is achieved?",
-      "outcomeVisualizationTextPlaceholder": "Describe in detail what you want to achieve...",
-      "processVisualizationText": "What steps do you see yourself taking to get there?",
-      "processVisualizationTextPlaceholder": "Describe the actions you imagine yourself taking...",
-      "likelyObstacle": "What obstacle might come up?",
-      "likelyObstaclePlaceholder": "Describe a likely obstacle...",
-      "obstacleResponse": "How will you respond to it?",
-      "obstacleResponsePlaceholder": "Describe how you'll adjust and keep going...",
-      "actionGroupTitle": "Action",
-      "nextAction": "Next concrete action",
-      "nextActionPlaceholder": "What will you do today?",
-      "nextActionDueDate": "Action due date",
-      "enterState": "Visualize and act",
+      "deleteGoal": "Delete goal",
       "feelings": {
         "calm": "Calm",
         "confidence": "Confidence",
@@ -1242,26 +1220,135 @@
         "joy": "Joy"
       }
     },
-    "stateView": {
+    "visualizationTab": {
+      "progressLabel": "{current} of {total} fields",
+      "persistNote": "Your answers are saved and reused in every session. Your current state pre-fills the check-in and is updated at the end of each session.",
+      "relatedObjective": "Related goal",
+      "relatedObjectivePlaceholder": "Not linked",
+      "practiceDuration": "Practice duration",
+      "duration5min": "5 min",
+      "duration10min": "10 min",
+      "duration15min": "15 min",
+      "stateDivider": "State",
+      "currentEmotion": "How are you feeling right now?",
+      "currentEmotionPlaceholder": "Select a feeling",
+      "currentEnergy": "Energy level",
+      "currentConfidence": "Confidence level",
+      "desiredState": "What state do you want to cultivate?",
+      "desiredStatePlaceholder": "Calm, focused and confident...",
+      "empoweringBelief": "Belief you want to strengthen",
+      "empoweringBeliefPlaceholder": "I'm capable of developing the skills and taking consistent action...",
+      "visualizationDivider": "Visualization",
+      "outcomeVisualizationText": "What will it look like when this goal is achieved?",
+      "outcomeVisualizationTextPlaceholder": "Describe in detail what you want to achieve...",
+      "processVisualizationText": "What steps do you see yourself taking to get there?",
+      "processVisualizationTextPlaceholder": "Describe the actions you imagine yourself taking...",
+      "likelyObstacle": "What obstacle might come up?",
+      "likelyObstaclePlaceholder": "Describe a likely obstacle...",
+      "obstacleResponse": "How will you respond to it?",
+      "obstacleResponsePlaceholder": "Describe how you'll adjust and keep going...",
+      "actionDivider": "Action",
+      "nextAction": "Next concrete action",
+      "nextActionPlaceholder": "What will you do today?",
+      "nextActionDueDate": "Action due date",
+      "nextActionDueDatePlaceholder": "Select date"
+    },
+    "audioPicker": {
+      "label": "Visualization audio",
+      "none": "None",
+      "system": "Cherut music",
+      "file": "My audio",
+      "hintPlaysOnVisualize": "Plays when you click Visualize",
+      "listenButton": "Listen",
+      "stopButton": "Stop",
+      "tracks": {
+        "calm-depth": {
+          "label": "Deep calm",
+          "description": "Soft pad · loop"
+        },
+        "focus": {
+          "label": "Focus",
+          "description": "Clean tones · loop"
+        },
+        "sunrise": {
+          "label": "Sunrise",
+          "description": "Open chord · loop"
+        },
+        "ocean": {
+          "label": "Ocean",
+          "description": "Water · loop"
+        }
+      },
+      "uploadButton": "Upload audio",
+      "replaceButton": "Replace",
+      "removeButton": "Remove",
+      "errorTooLarge": "File is too large. The limit is 10MB.",
+      "errorTooLong": "Audio is too long. The limit is 5 minutes.",
+      "errorWrongFormat": "Unsupported audio format.",
+      "uploadFailed": "Failed to upload audio. Please try again.",
+      "durationSizeFormat": "{duration} · {size}"
+    },
+    "sessionSelect": {
+      "goalsCount": "{count, plural, one {# goal} other {# goals}} · ~{minutes} min",
+      "hintClickPhotos": "Click the photos to choose",
+      "selectAll": "All",
+      "cancel": "Cancel",
+      "beginSession": "Start session"
+    },
+    "sessionPlayer": {
       "close": "Close",
-      "stepCounter": "Step {current} of {total}",
-      "continue": "Continue",
-      "finish": "Finish",
-      "state": {
-        "prompt": "Breathe, and choose the state you want to cultivate",
-        "currentEmotionLabel": "Right now",
-        "energyLabel": "Energy",
-        "confidenceLabel": "Confidence"
+      "checkinTitle": "BEFORE YOU BEGIN",
+      "checkinSubtitle": "How are you right now?",
+      "prefilledNote": "Pre-filled with your last session",
+      "feelingLabel": "How I'm feeling",
+      "feelings": {
+        "calm": "Calm",
+        "focused": "Focused",
+        "excited": "Excited",
+        "anxious": "Anxious",
+        "tired": "Tired",
+        "scattered": "Scattered"
       },
-      "outcome": {
-        "prompt": "Imagine the goal as already achieved"
-      },
-      "process": {
-        "prompt": "Now imagine yourself taking the next steps",
-        "obstacleLabel": "Likely obstacle",
-        "responseLabel": "My response",
-        "actionLabel": "Next action"
-      }
+      "energyLabel": "Energy",
+      "confidenceLabel": "Confidence",
+      "lowLabel": "Low",
+      "highLabel": "High",
+      "beginButton": "Begin",
+      "checkinLegend": "Check-in · {count, plural, one {# goal} other {# goals}} in this session",
+      "stepLegend": "Goal {goalCurrent} of {goalTotal} · Step {stepCurrent} of {stepTotal}",
+      "stepStatePrompt": "Breathe, and choose the state you want to cultivate",
+      "stepOutcomePrompt": "Imagine the goal as already achieved",
+      "stepProcessPrompt": "Now imagine yourself taking the next steps",
+      "nowLabel": "Right now",
+      "obstacleLabel": "Likely obstacle",
+      "responseLabel": "My response",
+      "nextActionLabel": "Next action",
+      "dueDatePrefix": "due",
+      "fallbackDesiredState": "A calm, focused, confident state.",
+      "fallbackBelief": "I'm capable of making this happen.",
+      "fallbackOutcome": "Picture this goal fully achieved.",
+      "fallbackProcess": "Picture yourself taking the next steps.",
+      "fallbackObstacle": "No obstacle noted yet.",
+      "fallbackResponse": "No response noted yet.",
+      "fallbackNextAction": "No action defined",
+      "backButton": "Back",
+      "continueButton": "Continue",
+      "nextGoalButton": "Next goal",
+      "finishButton": "Finish",
+      "finalTitle": "SESSION COMPLETE",
+      "finalSubtitle": "Your next actions",
+      "backToBoard": "Back to board",
+      "playAudio": "Play",
+      "pauseAudio": "Pause",
+      "muteAudio": "Mute",
+      "unmuteAudio": "Unmute"
+    },
+    "practiceHistory": {
+      "noPracticeYet": "No practice yet",
+      "practicesCount": "{count, plural, one {# practice} other {# practices}} · last {when}",
+      "lastPracticedToday": "today",
+      "lastPracticedYesterday": "yesterday",
+      "lastPracticedDaysAgo": "{count, plural, one {# day ago} other {# days ago}}"
     },
     "createModal": {
       "title": "Add to Vision Board",
@@ -1466,8 +1553,14 @@
       "ctaPrimary": "Start your system",
       "ctaSecondary": "See how it works",
       "note": "Choose the level of structure your direction requires.",
-      "mockCardA": { "label": "Streak · Read 20 pages", "value": "21 days" },
-      "mockCardB": { "label": "Key result", "value": "Run 300 km this quarter" }
+      "mockCardA": {
+        "label": "Streak · Read 20 pages",
+        "value": "21 days"
+      },
+      "mockCardB": {
+        "label": "Key result",
+        "value": "Run 300 km this quarter"
+      }
     },
     "pattern": {
       "heading": "You know what to do. You still don't keep the promises you make to yourself.",
@@ -1501,10 +1594,22 @@
       "lede": "Cherut concentrates your energy and connects your values, objectives and daily actions. Fall off, and you can review and pick back up without starting over.",
       "badge": "All In All The Time",
       "pillars": [
-        { "title": "One Direction", "body": "Choose the one direction that matters most right now, not everything at once." },
-        { "title": "Structured Intensity", "body": "Turn intensity into actions, schedules and systems instead of short bursts." },
-        { "title": "Stay Through the Hard Moment", "body": "Move through boredom, fear and distraction instead of escaping automatically." },
-        { "title": "Return Without Starting Over", "body": "Come back after a bad day without turning it into an identity crisis." }
+        {
+          "title": "One Direction",
+          "body": "Choose the one direction that matters most right now, not everything at once."
+        },
+        {
+          "title": "Structured Intensity",
+          "body": "Turn intensity into actions, schedules and systems instead of short bursts."
+        },
+        {
+          "title": "Stay Through the Hard Moment",
+          "body": "Move through boredom, fear and distraction instead of escaping automatically."
+        },
+        {
+          "title": "Return Without Starting Over",
+          "body": "Come back after a bad day without turning it into an identity crisis."
+        }
       ],
       "notePre": "All in does not mean all output.",
       "noteBold": "It means no disconnection from the direction."
@@ -1513,13 +1618,48 @@
       "heading": "One system for the life you are actually trying to build.",
       "lede": "You don't need five subscriptions and a spreadsheet. Direction, action and reflection live in one place.",
       "tabs": [
-        { "title": "Objectives & OKRs", "body": "Set a direction, break it into measurable outcomes, and review your progress instead of guessing at it.", "url": "app.cherut / objectives", "mock": "okrs" },
-        { "title": "Tasks & Calendar", "body": "One inbox, one agenda. What you commit to shows up next to the time you actually have.", "url": "app.cherut / tasks", "mock": "tasks" },
-        { "title": "Values & Dream Board", "body": "Define what matters, then pin the future it points to. Every habit and task traces back to the dream that started it.", "url": "app.cherut / dream-board", "mock": "dreams" },
-        { "title": "Habits", "body": "Track streaks, intent and reflection. Habits that serve a direction, not habits for their own sake.", "url": "app.cherut / habits", "mock": "habits" },
-        { "title": "Finances", "body": "Accounts, budgets and net worth tracked alongside your goals, not in a separate app you forget to open.", "url": "app.cherut / finances", "mock": "finances" },
-        { "title": "Journal & Reflection", "body": "Morning intentions, evening reflections, and a searchable record, so your patterns stop hiding from you.", "url": "app.cherut / journal", "mock": "journal" },
-        { "title": "Learning", "body": "The All In All The Time course, practical exercises and implementation templates, built into the same system you use every day.", "url": "app.cherut / learning", "mock": "learning" }
+        {
+          "title": "Objectives & OKRs",
+          "body": "Set a direction, break it into measurable outcomes, and review your progress instead of guessing at it.",
+          "url": "app.cherut / objectives",
+          "mock": "okrs"
+        },
+        {
+          "title": "Tasks & Calendar",
+          "body": "One inbox, one agenda. What you commit to shows up next to the time you actually have.",
+          "url": "app.cherut / tasks",
+          "mock": "tasks"
+        },
+        {
+          "title": "Values & Dream Board",
+          "body": "Define what matters, then pin the future it points to. Every habit and task traces back to the dream that started it.",
+          "url": "app.cherut / dream-board",
+          "mock": "dreams"
+        },
+        {
+          "title": "Habits",
+          "body": "Track streaks, intent and reflection. Habits that serve a direction, not habits for their own sake.",
+          "url": "app.cherut / habits",
+          "mock": "habits"
+        },
+        {
+          "title": "Finances",
+          "body": "Accounts, budgets and net worth tracked alongside your goals, not in a separate app you forget to open.",
+          "url": "app.cherut / finances",
+          "mock": "finances"
+        },
+        {
+          "title": "Journal & Reflection",
+          "body": "Morning intentions, evening reflections, and a searchable record, so your patterns stop hiding from you.",
+          "url": "app.cherut / journal",
+          "mock": "journal"
+        },
+        {
+          "title": "Learning",
+          "body": "The All In All The Time course, practical exercises and implementation templates, built into the same system you use every day.",
+          "url": "app.cherut / learning",
+          "mock": "learning"
+        }
       ],
       "foot": "Fewer subscriptions. Fewer disconnected systems. One direction."
     },
@@ -1527,12 +1667,30 @@
       "heading": "Start with one direction. Build from there.",
       "lede": "Six steps. You do not need to set up your whole life to start.",
       "steps": [
-        { "title": "Choose what matters now", "body": "Pick the one direction that deserves your energy today." },
-        { "title": "Define a concrete result", "body": "Turn that direction into an outcome you can actually measure." },
-        { "title": "Build the minimum system you need", "body": "Only the habits, tasks and check-ins that result requires." },
-        { "title": "Execute the next step today", "body": "Not the whole plan. The next action, done now." },
-        { "title": "Review, adjust, and pick back up", "body": "Check what worked, correct what didn't, and return, even after a bad week." },
-        { "title": "Move to the next direction", "body": "Finish one loop, then choose the next without reconfiguring everything." }
+        {
+          "title": "Choose what matters now",
+          "body": "Pick the one direction that deserves your energy today."
+        },
+        {
+          "title": "Define a concrete result",
+          "body": "Turn that direction into an outcome you can actually measure."
+        },
+        {
+          "title": "Build the minimum system you need",
+          "body": "Only the habits, tasks and check-ins that result requires."
+        },
+        {
+          "title": "Execute the next step today",
+          "body": "Not the whole plan. The next action, done now."
+        },
+        {
+          "title": "Review, adjust, and pick back up",
+          "body": "Check what worked, correct what didn't, and return, even after a bad week."
+        },
+        {
+          "title": "Move to the next direction",
+          "body": "Finish one loop, then choose the next without reconfiguring everything."
+        }
       ]
     },
     "return": {
@@ -1564,29 +1722,74 @@
       "plans": [
         {
           "title": "Core",
-          "monthly": ["$12.50", "/month", "Billed monthly"],
-          "annual": ["$120", "/year", "$10/month, billed annually"],
+          "monthly": [
+            "$12.50",
+            "/month",
+            "Billed monthly"
+          ],
+          "annual": [
+            "$120",
+            "/year",
+            "$10/month, billed annually"
+          ],
           "desc": "For organizing your direction, your actions and your routine.",
-          "features": ["Values, objectives and OKRs", "Habits, tasks and calendar", "Journal and reflection", "Finances and net worth", "Dream board"],
+          "features": [
+            "Values, objectives and OKRs",
+            "Habits, tasks and calendar",
+            "Journal and reflection",
+            "Finances and net worth",
+            "Dream board"
+          ],
           "cta": "Start the system",
           "href": "/auth/register"
         },
         {
           "title": "Method",
           "tag": "Most popular",
-          "monthly": ["$48", "/month", "Billed monthly"],
-          "annual": ["$480", "/year", "$40/month, billed annually"],
+          "monthly": [
+            "$48",
+            "/month",
+            "Billed monthly"
+          ],
+          "annual": [
+            "$480",
+            "/year",
+            "$40/month, billed annually"
+          ],
           "desc": "For using the system and learning the method behind it.",
-          "features": ["Everything in Core", "All In All The Time course", "Practical exercises", "Guided 7- or 14-day path", "Implementation templates", "Direction, execution, discomfort and return practices"],
+          "features": [
+            "Everything in Core",
+            "All In All The Time course",
+            "Practical exercises",
+            "Guided 7- or 14-day path",
+            "Implementation templates",
+            "Direction, execution, discomfort and return practices"
+          ],
           "cta": "Build the method",
           "href": "/auth/register"
         },
         {
           "title": "Mentorship",
-          "monthly": ["$100", "/month", "Billed monthly"],
-          "annual": ["$1,000", "/year", "$83.33/month, billed annually"],
+          "monthly": [
+            "$100",
+            "/month",
+            "Billed monthly"
+          ],
+          "annual": [
+            "$1,000",
+            "/year",
+            "$83.33/month, billed annually"
+          ],
           "desc": "For applying the method with guidance through a real change.",
-          "features": ["Core", "All In All The Time course", "Individual mentorship", "Direction review", "Execution pattern analysis", "System adjustment", "Return plan"],
+          "features": [
+            "Core",
+            "All In All The Time course",
+            "Individual mentorship",
+            "Direction review",
+            "Execution pattern analysis",
+            "System adjustment",
+            "Return plan"
+          ],
           "cta": "Apply for mentorship",
           "href": "/contact"
         }
@@ -1597,14 +1800,38 @@
       "lede": "Something else?",
       "contactLink": "Talk to the team.",
       "items": [
-        { "q": "Is Cherut just another productivity app?", "a": "No. Most productivity apps stop at a task list. Cherut connects your values, objectives and daily actions in one system, and gives you a structure for the days you don't feel like showing up." },
-        { "q": "Do I need to be disciplined to use Cherut?", "a": "No. This isn't about discipline or laziness. It's about missing structure." },
-        { "q": "Does All In All The Time mean working all the time?", "a": "No. All in does not mean all output. It means no disconnection from the direction." },
-        { "q": "Do I need to set up my entire life to get started?", "a": "No. You only need to choose the next direction, and build the minimum system that result requires." },
-        { "q": "What happens if I stop using it for a few days?", "a": "You review and pick back up, without starting over." },
-        { "q": "Is there a free plan or freemium version?", "a": "No free plan, no trial. Every level is a paid commitment to the direction you choose." },
-        { "q": "How much does Core cost?", "a": "$120/year, which is $10/month billed annually." },
-        { "q": "Does Cherut replace therapy or psychological treatment?", "a": "No. Cherut is a personal execution system. It is not therapy, medical care, or a substitute for professional mental health treatment." }
+        {
+          "q": "Is Cherut just another productivity app?",
+          "a": "No. Most productivity apps stop at a task list. Cherut connects your values, objectives and daily actions in one system, and gives you a structure for the days you don't feel like showing up."
+        },
+        {
+          "q": "Do I need to be disciplined to use Cherut?",
+          "a": "No. This isn't about discipline or laziness. It's about missing structure."
+        },
+        {
+          "q": "Does All In All The Time mean working all the time?",
+          "a": "No. All in does not mean all output. It means no disconnection from the direction."
+        },
+        {
+          "q": "Do I need to set up my entire life to get started?",
+          "a": "No. You only need to choose the next direction, and build the minimum system that result requires."
+        },
+        {
+          "q": "What happens if I stop using it for a few days?",
+          "a": "You review and pick back up, without starting over."
+        },
+        {
+          "q": "Is there a free plan or freemium version?",
+          "a": "No free plan, no trial. Every level is a paid commitment to the direction you choose."
+        },
+        {
+          "q": "How much does Core cost?",
+          "a": "$120/year, which is $10/month billed annually."
+        },
+        {
+          "q": "Does Cherut replace therapy or psychological treatment?",
+          "a": "No. Cherut is a personal execution system. It is not therapy, medical care, or a substitute for professional mental health treatment."
+        }
       ]
     },
     "finalCta": {
@@ -1616,7 +1843,11 @@
     }
   },
   "aboutPage": {
-    "hero": { "kicker": "Manifesto", "title": "This is what we actually believe.", "lead": "Not a mission statement. Not marketing language. The beliefs the whole system is built on." },
+    "hero": {
+      "kicker": "Manifesto",
+      "title": "This is what we actually believe.",
+      "lead": "Not a mission statement. Not marketing language. The beliefs the whole system is built on."
+    },
     "manifesto": [
       "Motivation is not a strategy. Structure is.",
       "Your obsession is not the problem. The absence of a system is.",
@@ -1630,25 +1861,55 @@
     "principlesKicker": "How we build",
     "principlesHeading": "The rules behind every feature",
     "principles": [
-      { "title": "System over willpower", "body": "Motivation is unreliable. A well-designed system works on the hard days too. We build for consistency, not inspiration bursts." },
-      { "title": "Method, not mood", "body": "The OKR framework, habit science and spaced reflection are not motivational fluff — they are engineering applied to human behaviour." },
-      { "title": "Freedom through responsibility", "body": "Owning your commitments is what makes real freedom possible, not avoiding them. Every module ties back to that." },
-      { "title": "Quiet, not loud", "body": "Streaks and progress exist to show you the truth, not to gamify it. No badges, no engagement tricks, no dark patterns." }
+      {
+        "title": "System over willpower",
+        "body": "Motivation is unreliable. A well-designed system works on the hard days too. We build for consistency, not inspiration bursts."
+      },
+      {
+        "title": "Method, not mood",
+        "body": "The OKR framework, habit science and spaced reflection are not motivational fluff — they are engineering applied to human behaviour."
+      },
+      {
+        "title": "Freedom through responsibility",
+        "body": "Owning your commitments is what makes real freedom possible, not avoiding them. Every module ties back to that."
+      },
+      {
+        "title": "Quiet, not loud",
+        "body": "Streaks and progress exist to show you the truth, not to gamify it. No badges, no engagement tricks, no dark patterns."
+      }
     ],
     "tryHeading": "Now build the structure.",
     "trySub": "No free tier, no trial. Every plan is a paid commitment — choose the level your direction needs.",
     "tryCta": "Start your system"
   },
   "careersPage": {
-    "hero": { "kicker": "Careers", "title": "Come build the future of intentional living", "lead": "No open roles right now — but we always want to hear from exceptional people." },
+    "hero": {
+      "kicker": "Careers",
+      "title": "Come build the future of intentional living",
+      "lead": "No open roles right now — but we always want to hear from exceptional people."
+    },
     "whyJoinHeading": "Why join Cherut",
     "whyJoin": [
-      { "title": "Small team, real ownership", "body": "You will own features end-to-end. No silos, no waiting for sign-off chains. Your decisions ship." },
-      { "title": "Work that reaches real people", "body": "Cherut is used daily by people building their lives. What you build has direct, visible impact." },
-      { "title": "Async-first, no nonsense", "body": "We write well, document decisions and trust each other. No daily standups. Deep work by default." }
+      {
+        "title": "Small team, real ownership",
+        "body": "You will own features end-to-end. No silos, no waiting for sign-off chains. Your decisions ship."
+      },
+      {
+        "title": "Work that reaches real people",
+        "body": "Cherut is used daily by people building their lives. What you build has direct, visible impact."
+      },
+      {
+        "title": "Async-first, no nonsense",
+        "body": "We write well, document decisions and trust each other. No daily standups. Deep work by default."
+      }
     ],
     "valuesHeading": "What we value",
-    "values": ["Ownership over permission-asking", "Craft over speed for its own sake", "Honesty over comfortable ambiguity", "Long-term thinking over short-term wins"],
+    "values": [
+      "Ownership over permission-asking",
+      "Craft over speed for its own sake",
+      "Honesty over comfortable ambiguity",
+      "Long-term thinking over short-term wins"
+    ],
     "poolHeading": "Join the talent pool",
     "poolSub": "When we do hire, we reach into this pool first. Introduce yourself — no CV required, just tell us who you are.",
     "successTitle": "Got it — thank you!",
@@ -1660,32 +1921,150 @@
       "emailPlaceholder": "you@example.com",
       "skillLabel": "Skill area",
       "skillPlaceholder": "Select area…",
-      "skillAreas": ["Engineering", "Design", "Product", "Marketing", "Content", "Operations", "Other"],
+      "skillAreas": [
+        "Engineering",
+        "Design",
+        "Product",
+        "Marketing",
+        "Content",
+        "Operations",
+        "Other"
+      ],
       "messageLabel": "Tell us about yourself",
       "messagePlaceholder": "What you've built, what excites you, what you're looking for…",
       "submit": "Send introduction"
     }
   },
   "changelogPage": {
-    "hero": { "kicker": "Changelog", "title": "What's new in Cherut", "lead": "All the improvements, week by week." },
-    "tags": { "major": "Major", "feature": "Feature", "integration": "Integration", "improvement": "Improvement", "launch": "Launch" },
+    "hero": {
+      "kicker": "Changelog",
+      "title": "What's new in Cherut",
+      "lead": "All the improvements, week by week."
+    },
+    "tags": {
+      "major": "Major",
+      "feature": "Feature",
+      "integration": "Integration",
+      "improvement": "Improvement",
+      "launch": "Launch"
+    },
     "entries": [
-      { "date": "September 2026", "title": "Redesigned landing page", "items": ["New positioning around structured obsession and the All In All The Time method, with a rewritten hero, problem/solution and benefits sections.", "Pricing plans renamed and restructured: Core, Method and Mentorship, all billed monthly or annually with two months free on annual billing.", "Cleaner mobile experience across every public page, plus a header that now stays pinned while scrolling."] },
-      { "date": "September 2026", "title": "New pricing structure", "items": ["Retired the free tier and the Pro/Lifetime plans.", "New structure: Core ($20/month or $200/year), Method ($50/month or $500/year), and Mentorship ($100/month or $1,000/year) — annual billing saves two months on every plan.", "No free trial — every plan is a paid commitment from checkout."] },
-      { "date": "May 2026", "title": "General Availability", "items": ["Cherut is now publicly available — free tier, Pro and Lifetime plans live.", "All core modules production-ready: Habits, Tasks, OKRs, Journal, Vision Board, Values, Life Areas.", "Mobile web fully optimised; iOS and Android beta open to all paid plans."] },
-      { "date": "April 2026", "title": "Finances module beta", "items": ["Budget tracking with categories and monthly targets.", "Net worth snapshot with manual asset and liability entries.", "Financial goals connected to your OKRs."] },
-      { "date": "March 2026", "title": "Vision Board & Values", "items": ["Visual canvas to pin images, quotes and goals.", "Values module: define your compass and surface misalignment in daily reviews.", "Tasks and habits can now be linked to a specific value or dream."] },
-      { "date": "February 2026", "title": "Google Calendar sync", "items": ["Two-way sync with Google Calendar — tasks appear as events.", "Calendar view inside Cherut shows your schedule alongside habit slots.", "Conflict detection for scheduled tasks and time blocks."] },
-      { "date": "January 2026", "title": "Journal", "items": ["Structured daily journal with morning intention and evening reflection prompts.", "Free-form notes with full-text search across all entries.", "Gratitude log with weekly digest."] },
-      { "date": "December 2025", "title": "OKR framework", "items": ["Set quarterly Objectives with up to 5 Key Results each.", "Weekly check-in flow with confidence score and notes.", "Progress visualisation with a compact timeline view."] },
-      { "date": "November 2025", "title": "Life Areas & Dashboard", "items": ["Life Areas let you segment habits, tasks and goals into meaningful domains.", "New Dashboard with stats, recent activity and quick-add shortcuts.", "Consistent design language across all pages."] },
-      { "date": "October 2025", "title": "Kanban boards", "items": ["Tasks now support multiple boards with customisable columns.", "Drag-and-drop between columns and boards.", "Board-level filters by assignee, label and due date."] },
-      { "date": "September 2025", "title": "Habits v2", "items": ["Habit streaks with intention-setting and daily reflection.", "Flexible frequencies: daily, weekdays, custom days.", "Archive and restore habits without losing history."] },
-      { "date": "August 2025", "title": "First private beta", "items": ["Core habit tracking and basic task list — the first working prototype.", "User accounts with email/password auth.", "Feedback loop with the first 50 beta testers."] }
+      {
+        "date": "September 2026",
+        "title": "Redesigned landing page",
+        "items": [
+          "New positioning around structured obsession and the All In All The Time method, with a rewritten hero, problem/solution and benefits sections.",
+          "Pricing plans renamed and restructured: Core, Method and Mentorship, all billed monthly or annually with two months free on annual billing.",
+          "Cleaner mobile experience across every public page, plus a header that now stays pinned while scrolling."
+        ]
+      },
+      {
+        "date": "September 2026",
+        "title": "New pricing structure",
+        "items": [
+          "Retired the free tier and the Pro/Lifetime plans.",
+          "New structure: Core ($20/month or $200/year), Method ($50/month or $500/year), and Mentorship ($100/month or $1,000/year) — annual billing saves two months on every plan.",
+          "No free trial — every plan is a paid commitment from checkout."
+        ]
+      },
+      {
+        "date": "May 2026",
+        "title": "General Availability",
+        "items": [
+          "Cherut is now publicly available — free tier, Pro and Lifetime plans live.",
+          "All core modules production-ready: Habits, Tasks, OKRs, Journal, Vision Board, Values, Life Areas.",
+          "Mobile web fully optimised; iOS and Android beta open to all paid plans."
+        ]
+      },
+      {
+        "date": "April 2026",
+        "title": "Finances module beta",
+        "items": [
+          "Budget tracking with categories and monthly targets.",
+          "Net worth snapshot with manual asset and liability entries.",
+          "Financial goals connected to your OKRs."
+        ]
+      },
+      {
+        "date": "March 2026",
+        "title": "Vision Board & Values",
+        "items": [
+          "Visual canvas to pin images, quotes and goals.",
+          "Values module: define your compass and surface misalignment in daily reviews.",
+          "Tasks and habits can now be linked to a specific value or dream."
+        ]
+      },
+      {
+        "date": "February 2026",
+        "title": "Google Calendar sync",
+        "items": [
+          "Two-way sync with Google Calendar — tasks appear as events.",
+          "Calendar view inside Cherut shows your schedule alongside habit slots.",
+          "Conflict detection for scheduled tasks and time blocks."
+        ]
+      },
+      {
+        "date": "January 2026",
+        "title": "Journal",
+        "items": [
+          "Structured daily journal with morning intention and evening reflection prompts.",
+          "Free-form notes with full-text search across all entries.",
+          "Gratitude log with weekly digest."
+        ]
+      },
+      {
+        "date": "December 2025",
+        "title": "OKR framework",
+        "items": [
+          "Set quarterly Objectives with up to 5 Key Results each.",
+          "Weekly check-in flow with confidence score and notes.",
+          "Progress visualisation with a compact timeline view."
+        ]
+      },
+      {
+        "date": "November 2025",
+        "title": "Life Areas & Dashboard",
+        "items": [
+          "Life Areas let you segment habits, tasks and goals into meaningful domains.",
+          "New Dashboard with stats, recent activity and quick-add shortcuts.",
+          "Consistent design language across all pages."
+        ]
+      },
+      {
+        "date": "October 2025",
+        "title": "Kanban boards",
+        "items": [
+          "Tasks now support multiple boards with customisable columns.",
+          "Drag-and-drop between columns and boards.",
+          "Board-level filters by assignee, label and due date."
+        ]
+      },
+      {
+        "date": "September 2025",
+        "title": "Habits v2",
+        "items": [
+          "Habit streaks with intention-setting and daily reflection.",
+          "Flexible frequencies: daily, weekdays, custom days.",
+          "Archive and restore habits without losing history."
+        ]
+      },
+      {
+        "date": "August 2025",
+        "title": "First private beta",
+        "items": [
+          "Core habit tracking and basic task list — the first working prototype.",
+          "User accounts with email/password auth.",
+          "Feedback loop with the first 50 beta testers."
+        ]
+      }
     ]
   },
   "contactPage": {
-    "hero": { "kicker": "Contact", "title": "Let's talk", "lead": "Question, idea, or just want to say hi?" },
+    "hero": {
+      "kicker": "Contact",
+      "title": "Let's talk",
+      "lead": "Question, idea, or just want to say hi?"
+    },
     "successTitle": "Message sent!",
     "successBody": "We'll get back to you within a day or two. Thanks for reaching out.",
     "formTitle": "Send us a message",
@@ -1695,7 +2074,14 @@
     "emailPlaceholder": "you@example.com",
     "subjectLabel": "Subject",
     "subjectPlaceholder": "Select a topic…",
-    "subjects": ["General question", "Feature request", "Bug report", "Press inquiry", "Partnership", "Other"],
+    "subjects": [
+      "General question",
+      "Feature request",
+      "Bug report",
+      "Press inquiry",
+      "Partnership",
+      "Other"
+    ],
     "messageLabel": "Message",
     "messagePlaceholder": "Tell us what's on your mind…",
     "submit": "Send message",
@@ -1711,22 +2097,63 @@
     }
   },
   "gettingStartedPage": {
-    "hero": { "kicker": "Getting Started", "title": "Set up your system in 30 minutes", "lead": "A step-by-step guide to get ALL IN ALL THE TIME from day one." },
+    "hero": {
+      "kicker": "Getting Started",
+      "title": "Set up your system in 30 minutes",
+      "lead": "A step-by-step guide to get ALL IN ALL THE TIME from day one."
+    },
     "checklistKicker": "Onboarding checklist",
     "checklistHeading": "Seven steps. Thirty minutes. One system.",
     "steps": [
-      { "time": "5 min", "title": "Complete your profile", "body": "Upload a photo, set your timezone, choose notification settings and define your working hours for better task planning." },
-      { "time": "10 min", "title": "Define your core values", "body": "Navigate to Values and choose 3–5 principles that guide your decisions. Write a short description for each and rank them. These become your compass." },
-      { "time": "8 min", "title": "Set up your life areas", "body": "Create 4–6 life domains (Health, Career, Finance, Relationships…). Write a vision statement for each and set priority levels." },
-      { "time": "15 min", "title": "Create your first OKRs", "body": "Start with 1–2 objectives per life area. Write inspiring, qualitative objectives, then add 2–4 measurable key results with specific deadlines." },
-      { "time": "10 min", "title": "Build success habits", "body": "Create 3–5 keystone habits that support multiple objectives. Start small, set specific triggers, and link habits to your life areas and OKRs." },
-      { "time": "12 min", "title": "Plan your first week", "body": "Break key results into specific tasks. Schedule focused work blocks for the most important tasks. Plan habit execution times throughout the week." },
-      { "time": "8 min", "title": "Set up tracking & reviews", "body": "Configure your dashboard, schedule daily check-ins (5 min) and weekly reviews (30 min). Enable analytics to understand performance patterns." }
+      {
+        "time": "5 min",
+        "title": "Complete your profile",
+        "body": "Upload a photo, set your timezone, choose notification settings and define your working hours for better task planning."
+      },
+      {
+        "time": "10 min",
+        "title": "Define your core values",
+        "body": "Navigate to Values and choose 3–5 principles that guide your decisions. Write a short description for each and rank them. These become your compass."
+      },
+      {
+        "time": "8 min",
+        "title": "Set up your life areas",
+        "body": "Create 4–6 life domains (Health, Career, Finance, Relationships…). Write a vision statement for each and set priority levels."
+      },
+      {
+        "time": "15 min",
+        "title": "Create your first OKRs",
+        "body": "Start with 1–2 objectives per life area. Write inspiring, qualitative objectives, then add 2–4 measurable key results with specific deadlines."
+      },
+      {
+        "time": "10 min",
+        "title": "Build success habits",
+        "body": "Create 3–5 keystone habits that support multiple objectives. Start small, set specific triggers, and link habits to your life areas and OKRs."
+      },
+      {
+        "time": "12 min",
+        "title": "Plan your first week",
+        "body": "Break key results into specific tasks. Schedule focused work blocks for the most important tasks. Plan habit execution times throughout the week."
+      },
+      {
+        "time": "8 min",
+        "title": "Set up tracking & reviews",
+        "body": "Configure your dashboard, schedule daily check-ins (5 min) and weekly reviews (30 min). Enable analytics to understand performance patterns."
+      }
     ],
     "tips": [
-      { "title": "Start small, think big", "body": "Consistent small wins beat ambitious failures. Build momentum early — the system compounds when you actually use it." },
-      { "title": "Weekly reviews are non-negotiable", "body": "Schedule 30 minutes every Sunday. Celebrate wins, analyze obstacles, adjust plans. This single habit is what separates drifters from executors." },
-      { "title": "Connect everything to values", "body": "When goals align with your core values, motivation becomes automatic. Always ask: why does this matter to me?" }
+      {
+        "title": "Start small, think big",
+        "body": "Consistent small wins beat ambitious failures. Build momentum early — the system compounds when you actually use it."
+      },
+      {
+        "title": "Weekly reviews are non-negotiable",
+        "body": "Schedule 30 minutes every Sunday. Celebrate wins, analyze obstacles, adjust plans. This single habit is what separates drifters from executors."
+      },
+      {
+        "title": "Connect everything to values",
+        "body": "When goals align with your core values, motivation becomes automatic. Always ask: why does this matter to me?"
+      }
     ],
     "ctaHeading": "Ready to begin?",
     "ctaSub": "The system is only as powerful as your commitment to using it.",
@@ -1734,76 +2161,232 @@
     "ctaHelp": "Help center"
   },
   "helpCenterPage": {
-    "hero": { "kicker": "Help Center", "title": "How can we help?", "lead": "Guides, answers and everything you need to get the most out of Cherut." },
+    "hero": {
+      "kicker": "Help Center",
+      "title": "How can we help?",
+      "lead": "Guides, answers and everything you need to get the most out of Cherut."
+    },
     "searchPlaceholder": "Search articles",
     "noResults": "No articles match your search.",
     "categories": [
-      { "title": "Getting started", "articles": [
-        { "title": "What is Cherut?", "body": "Cherut is a personal operating system that connects your habits, tasks, OKRs, journal and vision board in one place. Start by setting up your Life Areas and creating your first Objective." },
-        { "title": "Setting up your account", "body": "After signing up, you land directly on the Dashboard — there's no mandatory onboarding flow, and no modules to turn on or off. Every module (Habits, Tasks, OKRs, Journal, Dream Board, Values, Life Areas, Finances) is already available in the sidebar; just use whichever ones make sense for you right now." },
-        { "title": "Choosing your first module", "body": "Not sure where to start? Most people begin with Habits or Tasks. Once you have a rhythm, add OKRs to give your daily actions a direction." }
-      ]},
-      { "title": "Habits", "articles": [
-        { "title": "Creating a habit", "body": "Go to Habits → New Habit. Set a name, frequency (daily, weekdays, or custom days), and optionally link it to a Life Area or OKR." },
-        { "title": "How streaks work", "body": "A streak increments each day you complete a habit. Missing a day breaks the streak, but your completion history is always preserved." },
-        { "title": "Archiving vs deleting", "body": "Archive a habit to pause it without losing history. Delete only when you want to remove all records permanently." }
-      ]},
-      { "title": "Tasks & Boards", "articles": [
-        { "title": "Creating a board", "body": "Go to Tasks and click \"New Board\". Give it a name and optionally assign it to a Life Area. Boards have columns you can rename and reorder." },
-        { "title": "Moving tasks between columns", "body": "Drag a task card to any column, or open the task and change its status from the dropdown." },
-        { "title": "Linking tasks to OKRs", "body": "Inside any task, use the \"Linked OKR\" field to connect it to a Key Result. Progress is reflected in your OKR view." }
-      ]},
-      { "title": "OKRs", "articles": [
-        { "title": "What are OKRs?", "body": "OKRs (Objectives and Key Results) are a goal-setting framework. An Objective is an ambitious qualitative goal; Key Results are measurable outcomes that indicate you have reached it." },
-        { "title": "Setting your first OKR", "body": "Go to OKRs → New Objective. Write a clear, inspiring objective for the quarter. Then add 1–5 Key Results with numeric targets." },
-        { "title": "Weekly check-ins", "body": "Every week, open each Key Result and update the current value. Add a confidence score and a short note. Cherut tracks the trend over time." }
-      ]},
-      { "title": "Account & billing", "articles": [
-        { "title": "Changing your plan", "body": "Self-service plan management is on the way. Until it ships, contact us to change or cancel your plan and we'll take care of it directly." },
-        { "title": "Exporting your data", "body": "Go to Settings → Data → Export. Your habits, tasks, OKRs, journal and all other data are exported as a single JSON file." },
-        { "title": "Deleting your account", "body": "Go to Settings → Account → Delete account. This permanently removes all your data. It cannot be undone. Export first if you want a copy." }
-      ]}
+      {
+        "title": "Getting started",
+        "articles": [
+          {
+            "title": "What is Cherut?",
+            "body": "Cherut is a personal operating system that connects your habits, tasks, OKRs, journal and vision board in one place. Start by setting up your Life Areas and creating your first Objective."
+          },
+          {
+            "title": "Setting up your account",
+            "body": "After signing up, you land directly on the Dashboard — there's no mandatory onboarding flow, and no modules to turn on or off. Every module (Habits, Tasks, OKRs, Journal, Dream Board, Values, Life Areas, Finances) is already available in the sidebar; just use whichever ones make sense for you right now."
+          },
+          {
+            "title": "Choosing your first module",
+            "body": "Not sure where to start? Most people begin with Habits or Tasks. Once you have a rhythm, add OKRs to give your daily actions a direction."
+          }
+        ]
+      },
+      {
+        "title": "Habits",
+        "articles": [
+          {
+            "title": "Creating a habit",
+            "body": "Go to Habits → New Habit. Set a name, frequency (daily, weekdays, or custom days), and optionally link it to a Life Area or OKR."
+          },
+          {
+            "title": "How streaks work",
+            "body": "A streak increments each day you complete a habit. Missing a day breaks the streak, but your completion history is always preserved."
+          },
+          {
+            "title": "Archiving vs deleting",
+            "body": "Archive a habit to pause it without losing history. Delete only when you want to remove all records permanently."
+          }
+        ]
+      },
+      {
+        "title": "Tasks & Boards",
+        "articles": [
+          {
+            "title": "Creating a board",
+            "body": "Go to Tasks and click \"New Board\". Give it a name and optionally assign it to a Life Area. Boards have columns you can rename and reorder."
+          },
+          {
+            "title": "Moving tasks between columns",
+            "body": "Drag a task card to any column, or open the task and change its status from the dropdown."
+          },
+          {
+            "title": "Linking tasks to OKRs",
+            "body": "Inside any task, use the \"Linked OKR\" field to connect it to a Key Result. Progress is reflected in your OKR view."
+          }
+        ]
+      },
+      {
+        "title": "OKRs",
+        "articles": [
+          {
+            "title": "What are OKRs?",
+            "body": "OKRs (Objectives and Key Results) are a goal-setting framework. An Objective is an ambitious qualitative goal; Key Results are measurable outcomes that indicate you have reached it."
+          },
+          {
+            "title": "Setting your first OKR",
+            "body": "Go to OKRs → New Objective. Write a clear, inspiring objective for the quarter. Then add 1–5 Key Results with numeric targets."
+          },
+          {
+            "title": "Weekly check-ins",
+            "body": "Every week, open each Key Result and update the current value. Add a confidence score and a short note. Cherut tracks the trend over time."
+          }
+        ]
+      },
+      {
+        "title": "Account & billing",
+        "articles": [
+          {
+            "title": "Changing your plan",
+            "body": "Self-service plan management is on the way. Until it ships, contact us to change or cancel your plan and we'll take care of it directly."
+          },
+          {
+            "title": "Exporting your data",
+            "body": "Go to Settings → Data → Export. Your habits, tasks, OKRs, journal and all other data are exported as a single JSON file."
+          },
+          {
+            "title": "Deleting your account",
+            "body": "Go to Settings → Account → Delete account. This permanently removes all your data. It cannot be undone. Export first if you want a copy."
+          }
+        ]
+      }
     ],
     "notFound": "Did not find what you were looking for?",
     "contactCta": "Contact us"
   },
   "privacyPolicyPage": {
-    "hero": { "kicker": "Privacy", "title": "Your privacy is not a footnote.", "lead": "Plain language. No surprises. Last updated May 2026." },
+    "hero": {
+      "kicker": "Privacy",
+      "title": "Your privacy is not a footnote.",
+      "lead": "Plain language. No surprises. Last updated May 2026."
+    },
     "notice": "This is a plain-language summary of our privacy practices. It is designed to be readable, not exhaustive. For the full legal text, contact us at contact@hanielrolemberg.com",
     "sections": [
-      { "title": "What we collect", "items": ["Your email address and name when you sign up.", "Usage data: which features you use and when, to improve the product.", "Content you create: habits, tasks, journal entries, OKRs. Stored encrypted.", "Device and browser type for debugging and performance."] },
-      { "title": "What we don't do", "items": ["We do not sell your data — ever. Not to advertisers, not to data brokers.", "We do not show you ads. There are no ad networks in Cherut.", "We do not use your journal, habits or goals to train AI models.", "We do not share your personal data with third parties without your consent."] },
-      { "title": "How we store it", "items": ["Data is stored on Firebase (Google Cloud) with encryption at rest and in transit.", "Backups run daily and are retained for 30 days.", "We use industry-standard TLS for all data in transit.", "Access to production data is restricted to core team members."] },
-      { "title": "Your rights", "items": ["Export: you can download all your data as JSON at any time from Settings.", "Delete: you can permanently delete your account and all associated data.", "Correction: you can update or correct any personal information you have provided.", "Portability: your exported data is in open formats, not locked in."] },
-      { "title": "Contact", "items": ["Questions about this policy? Email us at contact@hanielrolemberg.com", "We aim to respond to all privacy inquiries within 5 business days.", "For urgent data deletion requests, include \"URGENT\" in your subject line."] }
+      {
+        "title": "What we collect",
+        "items": [
+          "Your email address and name when you sign up.",
+          "Usage data: which features you use and when, to improve the product.",
+          "Content you create: habits, tasks, journal entries, OKRs. Stored encrypted.",
+          "Device and browser type for debugging and performance."
+        ]
+      },
+      {
+        "title": "What we don't do",
+        "items": [
+          "We do not sell your data — ever. Not to advertisers, not to data brokers.",
+          "We do not show you ads. There are no ad networks in Cherut.",
+          "We do not use your journal, habits or goals to train AI models.",
+          "We do not share your personal data with third parties without your consent."
+        ]
+      },
+      {
+        "title": "How we store it",
+        "items": [
+          "Data is stored on Firebase (Google Cloud) with encryption at rest and in transit.",
+          "Backups run daily and are retained for 30 days.",
+          "We use industry-standard TLS for all data in transit.",
+          "Access to production data is restricted to core team members."
+        ]
+      },
+      {
+        "title": "Your rights",
+        "items": [
+          "Export: you can download all your data as JSON at any time from Settings.",
+          "Delete: you can permanently delete your account and all associated data.",
+          "Correction: you can update or correct any personal information you have provided.",
+          "Portability: your exported data is in open formats, not locked in."
+        ]
+      },
+      {
+        "title": "Contact",
+        "items": [
+          "Questions about this policy? Email us at contact@hanielrolemberg.com",
+          "We aim to respond to all privacy inquiries within 5 business days.",
+          "For urgent data deletion requests, include \"URGENT\" in your subject line."
+        ]
+      }
     ]
   },
   "roadmapPage": {
-    "hero": { "kicker": "Roadmap", "title": "What we're building", "lead": "Honest about where we are and where we're going." },
+    "hero": {
+      "kicker": "Roadmap",
+      "title": "What we're building",
+      "lead": "Honest about where we are and where we're going."
+    },
     "statusShipped": "Shipped",
     "statusInProgress": "In Progress",
     "statusPlanned": "Planned",
     "itemsCount": "{count} items",
     "shipped": [
-      { "name": "Habits", "desc": "Daily tracking with streaks, intent and reflection." },
-      { "name": "Tasks & Boards", "desc": "Kanban boards, list view and task management." },
-      { "name": "OKRs", "desc": "Objectives and key results with weekly check-ins." },
-      { "name": "Journal", "desc": "Morning intentions, evening reflections, free-form notes." },
-      { "name": "Vision Board", "desc": "A visual canvas for the future you are building." },
-      { "name": "Values", "desc": "Define your compass and check decisions against it." },
-      { "name": "Life Areas", "desc": "Segment your life and balance what matters." },
-      { "name": "Finance", "desc": "Accounts, transactions, budgets and investments." }
+      {
+        "name": "Habits",
+        "desc": "Daily tracking with streaks, intent and reflection."
+      },
+      {
+        "name": "Tasks & Boards",
+        "desc": "Kanban boards, list view and task management."
+      },
+      {
+        "name": "OKRs",
+        "desc": "Objectives and key results with weekly check-ins."
+      },
+      {
+        "name": "Journal",
+        "desc": "Morning intentions, evening reflections, free-form notes."
+      },
+      {
+        "name": "Vision Board",
+        "desc": "A visual canvas for the future you are building."
+      },
+      {
+        "name": "Values",
+        "desc": "Define your compass and check decisions against it."
+      },
+      {
+        "name": "Life Areas",
+        "desc": "Segment your life and balance what matters."
+      },
+      {
+        "name": "Finance",
+        "desc": "Accounts, transactions, budgets and investments."
+      }
     ],
     "inProgress": [
-      { "name": "Calendar sync", "desc": "Two-way sync with Google Calendar." },
-      { "name": "Mobile apps", "desc": "Native iOS and Android apps, currently in beta." }
+      {
+        "name": "Calendar sync",
+        "desc": "Two-way sync with Google Calendar."
+      },
+      {
+        "name": "Mobile apps",
+        "desc": "Native iOS and Android apps, currently in beta."
+      }
     ],
     "planned": [
-      { "name": "AI weekly review", "desc": "Automated insights from your habits and OKRs." },
-      { "name": "Open API", "desc": "Build your own integrations with Cherut data." },
-      { "name": "Teams", "desc": "Shared goals and accountability for small teams." },
-      { "name": "Integrations hub", "desc": "Notion, Apple Health, Outlook, Slack and more." },
-      { "name": "Native widgets", "desc": "Home screen widgets for iOS and Android." }
+      {
+        "name": "AI weekly review",
+        "desc": "Automated insights from your habits and OKRs."
+      },
+      {
+        "name": "Open API",
+        "desc": "Build your own integrations with Cherut data."
+      },
+      {
+        "name": "Teams",
+        "desc": "Shared goals and accountability for small teams."
+      },
+      {
+        "name": "Integrations hub",
+        "desc": "Notion, Apple Health, Outlook, Slack and more."
+      },
+      {
+        "name": "Native widgets",
+        "desc": "Home screen widgets for iOS and Android."
+      }
     ],
     "footerNote": "The roadmap is shaped by what the community asks for.",
     "footerCta": "Suggest a feature"
@@ -1984,9 +2567,22 @@
       "joined": "Joined"
     },
     "pills": {
-      "role": { "user": "User", "admin": "Admin" },
-      "plan": { "free": "Free", "core": "Core", "method": "Method", "mentorship": "Mentorship", "enterprise": "Enterprise" },
-      "status": { "active": "Active", "inactive": "Inactive", "cancelled": "Cancelled" }
+      "role": {
+        "user": "User",
+        "admin": "Admin"
+      },
+      "plan": {
+        "free": "Free",
+        "core": "Core",
+        "method": "Method",
+        "mentorship": "Mentorship",
+        "enterprise": "Enterprise"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "cancelled": "Cancelled"
+      }
     },
     "drawer": {
       "close": "Close",
@@ -2237,9 +2833,19 @@
     "noLessons": "No lessons yet.",
     "addLesson": "Add Lesson",
     "lessonCount": "{count} lessons",
-    "status": { "published": "Published", "draft": "Draft" },
-    "plan": { "any": "Any plan" },
-    "planOptions": { "any": "Any plan", "core": "Core", "method": "Method", "mentorship": "Mentorship" },
+    "status": {
+      "published": "Published",
+      "draft": "Draft"
+    },
+    "plan": {
+      "any": "Any plan"
+    },
+    "planOptions": {
+      "any": "Any plan",
+      "core": "Core",
+      "method": "Method",
+      "mentorship": "Mentorship"
+    },
     "editModule": "Edit module",
     "deleteModule": "Delete module",
     "editLesson": "Edit lesson",
@@ -2271,15 +2877,48 @@
       "greeting": "Good morning, Alex",
       "subGreeting": "Wednesday, October 14 · 5 items need attention",
       "stats": {
-        "overdue": { "label": "Overdue", "sub": "Oldest is 3 days late" },
-        "dueToday": { "label": "Due today", "sub": "Next at 10:30" },
-        "habits": { "label": "Habits", "sub": "71% in the last 14 days" },
-        "netWorth": { "label": "Net worth", "sub": "+2.4% this month" }
+        "overdue": {
+          "label": "Overdue",
+          "sub": "Oldest is 3 days late"
+        },
+        "dueToday": {
+          "label": "Due today",
+          "sub": "Next at 10:30"
+        },
+        "habits": {
+          "label": "Habits",
+          "sub": "71% in the last 14 days"
+        },
+        "netWorth": {
+          "label": "Net worth",
+          "sub": "+2.4% this month"
+        }
       },
-      "balance": { "title": "Balance", "link": "Finances", "sub": "Last 30 days · checking accounts" },
-      "taskProductivity": { "title": "Task productivity", "link": "Tasks", "sub": "Completed per week · last 8 weeks", "weeksAgo": "8 weeks ago", "thisWeek": "This week" },
-      "habitConsistency": { "title": "Habit consistency", "link": "Habits", "sub": "Last 14 days" },
-      "habitNames": ["Morning run", "Read 20 pages", "Deep work 2h", "Meditate", "No sugar", "Evening journal"]
+      "balance": {
+        "title": "Balance",
+        "link": "Finances",
+        "sub": "Last 30 days · checking accounts"
+      },
+      "taskProductivity": {
+        "title": "Task productivity",
+        "link": "Tasks",
+        "sub": "Completed per week · last 8 weeks",
+        "weeksAgo": "8 weeks ago",
+        "thisWeek": "This week"
+      },
+      "habitConsistency": {
+        "title": "Habit consistency",
+        "link": "Habits",
+        "sub": "Last 14 days"
+      },
+      "habitNames": [
+        "Morning run",
+        "Read 20 pages",
+        "Deep work 2h",
+        "Meditate",
+        "No sugar",
+        "Evening journal"
+      ]
     },
     "okrs": {
       "title": "Objectives",
@@ -2293,9 +2932,19 @@
           "progress": 42,
           "krLabel": "Key results (4)",
           "krs": [
-            { "t": "Ship the first version", "s": "1/1 release (100%)", "done": true },
-            { "t": "Get 50 beta users", "s": "21/50 users (42%)" },
-            { "t": "Publish 8 build logs", "s": "3/8 posts (37%)" }
+            {
+              "t": "Ship the first version",
+              "s": "1/1 release (100%)",
+              "done": true
+            },
+            {
+              "t": "Get 50 beta users",
+              "s": "21/50 users (42%)"
+            },
+            {
+              "t": "Publish 8 build logs",
+              "s": "3/8 posts (37%)"
+            }
           ]
         },
         {
@@ -2303,9 +2952,19 @@
           "progress": 60,
           "krLabel": "Key results (3)",
           "krs": [
-            { "t": "Run 300 km this quarter", "s": "186/300 km (62%)" },
-            { "t": "Long run of 18 km", "s": "1/1 run (100%)", "done": true },
-            { "t": "Strength sessions", "s": "14/24 sessions (58%)" }
+            {
+              "t": "Run 300 km this quarter",
+              "s": "186/300 km (62%)"
+            },
+            {
+              "t": "Long run of 18 km",
+              "s": "1/1 run (100%)",
+              "done": true
+            },
+            {
+              "t": "Strength sessions",
+              "s": "14/24 sessions (58%)"
+            }
           ]
         },
         {
@@ -2313,22 +2972,71 @@
           "progress": 25,
           "krLabel": "Key results (4)",
           "krs": [
-            { "t": "Save $6,000", "s": "1,500/6,000 USD (25%)" },
-            { "t": "Cut 3 subscriptions", "s": "2/3 cancelled (66%)" },
-            { "t": "Weekly money review", "s": "5/12 reviews (41%)" }
+            {
+              "t": "Save $6,000",
+              "s": "1,500/6,000 USD (25%)"
+            },
+            {
+              "t": "Cut 3 subscriptions",
+              "s": "2/3 cancelled (66%)"
+            },
+            {
+              "t": "Weekly money review",
+              "s": "5/12 reviews (41%)"
+            }
           ]
         }
       ]
     },
     "tasks": {
       "boardName": "Personal",
-      "tabs": { "board": "Board", "calendar": "Calendar", "time": "Time" },
+      "tabs": {
+        "board": "Board",
+        "calendar": "Calendar",
+        "time": "Time"
+      },
       "columns": [
-        { "title": "Backlog", "items": ["Plan the next quarter", "Renew passport", "Research running shoes", "Clean up photo library", "Book dentist"] },
-        { "title": "This week", "items": ["Draft landing page copy", "Call the bank", "Prepare team review", "Grocery run"] },
-        { "title": "Today", "items": ["Write 500 words", "30 min Spanish", "Reply to client email"] },
-        { "title": "Doing", "items": ["Edit chapter 2", "Update budget"] },
-        { "title": "Done", "items": ["Morning run", "Weekly review"] }
+        {
+          "title": "Backlog",
+          "items": [
+            "Plan the next quarter",
+            "Renew passport",
+            "Research running shoes",
+            "Clean up photo library",
+            "Book dentist"
+          ]
+        },
+        {
+          "title": "This week",
+          "items": [
+            "Draft landing page copy",
+            "Call the bank",
+            "Prepare team review",
+            "Grocery run"
+          ]
+        },
+        {
+          "title": "Today",
+          "items": [
+            "Write 500 words",
+            "30 min Spanish",
+            "Reply to client email"
+          ]
+        },
+        {
+          "title": "Doing",
+          "items": [
+            "Edit chapter 2",
+            "Update budget"
+          ]
+        },
+        {
+          "title": "Done",
+          "items": [
+            "Morning run",
+            "Weekly review"
+          ]
+        }
       ]
     },
     "dreams": {
@@ -2338,22 +3046,58 @@
       "active": "Active",
       "archived": "Archived",
       "items": [
-        { "t": "Live by the sea", "s": "A year working remotely from the coast", "pill": "78 days" },
-        { "t": "Run a marathon", "s": "Finish 42 km under 4 hours", "pill": "120 days" },
-        { "t": "A home for my parents", "s": "Help them move somewhere calm", "pill": "2 years" },
-        { "t": "Open my own studio", "s": "Independent and profitable", "pill": "Overdue" }
+        {
+          "t": "Live by the sea",
+          "s": "A year working remotely from the coast",
+          "pill": "78 days"
+        },
+        {
+          "t": "Run a marathon",
+          "s": "Finish 42 km under 4 hours",
+          "pill": "120 days"
+        },
+        {
+          "t": "A home for my parents",
+          "s": "Help them move somewhere calm",
+          "pill": "2 years"
+        },
+        {
+          "t": "Open my own studio",
+          "s": "Independent and profitable",
+          "pill": "Overdue"
+        }
       ]
     },
     "habits": {
       "title": "Habits",
       "subtitle": "6 habits · last 30 days · 71% overall",
       "newHabit": "+ New habit",
-      "names": ["Morning run", "Read 20 pages", "Deep work 2h", "Meditate 10 min", "No sugar", "Evening journal", "Sleep before 23:00"],
+      "names": [
+        "Morning run",
+        "Read 20 pages",
+        "Deep work 2h",
+        "Meditate 10 min",
+        "No sugar",
+        "Evening journal",
+        "Sleep before 23:00"
+      ],
       "stats": {
-        "bestStreak": { "label": "Best streak", "value": "21 days" },
-        "today": { "label": "Today", "sub": "3 remaining" },
-        "thisWeek": { "label": "This week", "sub": "+6% vs last week" },
-        "needsAttention": { "label": "Needs attention", "sub": "Missed 3 of 7" }
+        "bestStreak": {
+          "label": "Best streak",
+          "value": "21 days"
+        },
+        "today": {
+          "label": "Today",
+          "sub": "3 remaining"
+        },
+        "thisWeek": {
+          "label": "This week",
+          "sub": "+6% vs last week"
+        },
+        "needsAttention": {
+          "label": "Needs attention",
+          "sub": "Missed 3 of 7"
+        }
       }
     },
     "finances": {
@@ -2367,23 +3111,80 @@
       "addAccount": "Add account",
       "transactionsTitle": "Transactions",
       "categories": [
-        ["Housing", 72, "$1,800"],
-        ["Groceries", 38, "$620"],
-        ["Transport", 22, "$310"],
-        ["Learning", 14, "$180"],
-        ["Leisure", 26, "$390"]
+        [
+          "Housing",
+          72,
+          "$1,800"
+        ],
+        [
+          "Groceries",
+          38,
+          "$620"
+        ],
+        [
+          "Transport",
+          22,
+          "$310"
+        ],
+        [
+          "Learning",
+          14,
+          "$180"
+        ],
+        [
+          "Leisure",
+          26,
+          "$390"
+        ]
       ],
       "accounts": [
-        ["Main checking", "Checking", "$3,240.00"],
-        ["Savings", "Savings", "$9,240.00"],
-        ["Credit card", "Card", "−$412.30"]
+        [
+          "Main checking",
+          "Checking",
+          "$3,240.00"
+        ],
+        [
+          "Savings",
+          "Savings",
+          "$9,240.00"
+        ],
+        [
+          "Credit card",
+          "Card",
+          "−$412.30"
+        ]
       ],
       "transactions": [
-        ["Oct 14", "Grocery store", "Groceries", "−$84.20"],
-        ["Oct 13", "Salary", "Income", "+$2,600.00"],
-        ["Oct 12", "Online course", "Learning", "−$49.00"],
-        ["Oct 11", "Metro card", "Transport", "−$30.00"],
-        ["Oct 10", "Rent", "Housing", "−$1,800.00"]
+        [
+          "Oct 14",
+          "Grocery store",
+          "Groceries",
+          "−$84.20"
+        ],
+        [
+          "Oct 13",
+          "Salary",
+          "Income",
+          "+$2,600.00"
+        ],
+        [
+          "Oct 12",
+          "Online course",
+          "Learning",
+          "−$49.00"
+        ],
+        [
+          "Oct 11",
+          "Metro card",
+          "Transport",
+          "−$30.00"
+        ],
+        [
+          "Oct 10",
+          "Rent",
+          "Housing",
+          "−$1,800.00"
+        ]
       ]
     },
     "learning": {
@@ -2397,28 +3198,76 @@
       "modulesTitle": "Modules",
       "percentComplete": "58% complete",
       "modules": [
-        ["One Direction", "4 lessons · 32 min"],
-        ["Structured Intensity", "5 lessons · 41 min"],
-        ["Stay Through the Hard Moment", "5 lessons · 38 min"],
-        ["Return Without Starting Over", "4 lessons · 29 min"]
+        [
+          "One Direction",
+          "4 lessons · 32 min"
+        ],
+        [
+          "Structured Intensity",
+          "5 lessons · 41 min"
+        ],
+        [
+          "Stay Through the Hard Moment",
+          "5 lessons · 38 min"
+        ],
+        [
+          "Return Without Starting Over",
+          "4 lessons · 29 min"
+        ]
       ],
-      "templates": { "label": "Templates", "sub": "Ready to apply" },
-      "streak": { "label": "Practice streak", "value": "9 days", "sub": "Keep the path" }
+      "templates": {
+        "label": "Templates",
+        "sub": "Ready to apply"
+      },
+      "streak": {
+        "label": "Practice streak",
+        "value": "9 days",
+        "sub": "Keep the path"
+      }
     },
     "journal": {
       "title": "Journal",
       "subtitle": "Morning intentions and evening reflections",
       "newEntry": "+ New entry",
       "days": [
-        ["Today", "Wednesday, Oct 14"],
-        ["Yesterday", "Tuesday, Oct 13"],
-        ["Monday", "Oct 12"],
-        ["Sunday", "Weekly review · Oct 11"],
-        ["Saturday", "Oct 10"]
+        [
+          "Today",
+          "Wednesday, Oct 14"
+        ],
+        [
+          "Yesterday",
+          "Tuesday, Oct 13"
+        ],
+        [
+          "Monday",
+          "Oct 12"
+        ],
+        [
+          "Sunday",
+          "Weekly review · Oct 11"
+        ],
+        [
+          "Saturday",
+          "Oct 10"
+        ]
       ],
       "entries": [
-        { "label": "Morning intention", "body": "One thing that moves the side project: finish the onboarding flow before lunch. Everything else waits.", "tags": ["Focused", "Slept 7h"] },
-        { "label": "Evening reflection", "body": "Finished the flow, skipped the run. Noticed I reached for my phone every time a task felt unclear. Tomorrow: write the next step down before starting.", "tags": ["Calm", "Kept 3 of 4 commitments"] }
+        {
+          "label": "Morning intention",
+          "body": "One thing that moves the side project: finish the onboarding flow before lunch. Everything else waits.",
+          "tags": [
+            "Focused",
+            "Slept 7h"
+          ]
+        },
+        {
+          "label": "Evening reflection",
+          "body": "Finished the flow, skipped the run. Noticed I reached for my phone every time a task felt unclear. Tomorrow: write the next step down before starting.",
+          "tags": [
+            "Calm",
+            "Kept 3 of 4 commitments"
+          ]
+        }
       ]
     },
     "calendar": {
@@ -2426,15 +3275,119 @@
       "segMonth": "Month",
       "segWeek": "Week",
       "segDay": "Day",
-      "days": [["Mon", 12], ["Tue", 13], ["Wed", 14], ["Thu", 15], ["Fri", 16], ["Sat", 17], ["Sun", 18]],
+      "days": [
+        [
+          "Mon",
+          12
+        ],
+        [
+          "Tue",
+          13
+        ],
+        [
+          "Wed",
+          14
+        ],
+        [
+          "Thu",
+          15
+        ],
+        [
+          "Fri",
+          16
+        ],
+        [
+          "Sat",
+          17
+        ],
+        [
+          "Sun",
+          18
+        ]
+      ],
       "events": [
-        [["Morning run", ""], ["Deep work block", "Side project"], ["Call the bank", ""]],
-        [["Team review", ""], ["Deep work block", "Side project"], ["Dentist", ""]],
-        [["Morning run", ""], ["Deep work block", "Side project"], ["Lunch with Sam", ""], ["Write 500 words", ""]],
-        [["Client workshop", ""], ["Meditate", ""]],
-        [["Morning run", ""], ["1:1 with manager", ""], ["Weekly review", ""]],
-        [["Long run", "18 km"]],
-        [["Grocery run", ""]]
+        [
+          [
+            "Morning run",
+            ""
+          ],
+          [
+            "Deep work block",
+            "Side project"
+          ],
+          [
+            "Call the bank",
+            ""
+          ]
+        ],
+        [
+          [
+            "Team review",
+            ""
+          ],
+          [
+            "Deep work block",
+            "Side project"
+          ],
+          [
+            "Dentist",
+            ""
+          ]
+        ],
+        [
+          [
+            "Morning run",
+            ""
+          ],
+          [
+            "Deep work block",
+            "Side project"
+          ],
+          [
+            "Lunch with Sam",
+            ""
+          ],
+          [
+            "Write 500 words",
+            ""
+          ]
+        ],
+        [
+          [
+            "Client workshop",
+            ""
+          ],
+          [
+            "Meditate",
+            ""
+          ]
+        ],
+        [
+          [
+            "Morning run",
+            ""
+          ],
+          [
+            "1:1 with manager",
+            ""
+          ],
+          [
+            "Weekly review",
+            ""
+          ]
+        ],
+        [
+          [
+            "Long run",
+            "18 km"
+          ]
+        ],
+        [
+          [
+            "Grocery run",
+            ""
+          ]
+        ]
       ]
     },
     "taskDetail": {
@@ -2451,11 +3404,24 @@
       "pomodorosValue": "2/3",
       "checklistLabel": "Checklist",
       "checklistProgress": "1/3",
-      "checklistItems": ["Outline the sections", "Write the hero copy", "Add pricing table"],
+      "checklistItems": [
+        "Outline the sections",
+        "Write the hero copy",
+        "Add pricing table"
+      ],
       "priorityLabel": "Priority",
-      "priorityOptions": ["Low", "Medium", "High", "Urgent"],
+      "priorityOptions": [
+        "Low",
+        "Medium",
+        "High",
+        "Urgent"
+      ],
       "dueDateLabel": "Due date",
-      "dueDateOptions": ["Today", "This week", "No date"],
+      "dueDateOptions": [
+        "Today",
+        "This week",
+        "No date"
+      ],
       "lifeAreaLabel": "Life area",
       "lifeAreaValue": "Career",
       "objectiveLabel": "Objective",
@@ -2472,25 +3438,70 @@
       "clock": "00:24:18",
       "stopBtn": "■ Stop",
       "stats": {
-        "today": { "label": "Today", "value": "2h 40m", "sub": "4 sessions" },
-        "thisWeek": { "label": "This week", "value": "14h 05m", "sub": "+1h 20m vs last week" },
-        "pomodoros": { "label": "Pomodoros", "value": "9", "sub": "This week" }
+        "today": {
+          "label": "Today",
+          "value": "2h 40m",
+          "sub": "4 sessions"
+        },
+        "thisWeek": {
+          "label": "This week",
+          "value": "14h 05m",
+          "sub": "+1h 20m vs last week"
+        },
+        "pomodoros": {
+          "label": "Pomodoros",
+          "value": "9",
+          "sub": "This week"
+        }
       },
       "focusByDay": "Focus time by day",
-      "weekdayLabels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "weekdayLabels": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
       "sessionLog": {
         "todayLabel": "Today",
         "todayTotal": "2h 40m",
         "todayEntries": [
-          ["#3B5BF6", "Write 500 words", "09:10 – 09:52", "42m"],
-          ["#2FAE7A", "Deep work block", "10:15 – 12:00", "1h 45m"],
-          ["#D98B2B", "Reply to client email", "13:30 – 13:43", "13m"]
+          [
+            "#3B5BF6",
+            "Write 500 words",
+            "09:10 – 09:52",
+            "42m"
+          ],
+          [
+            "#2FAE7A",
+            "Deep work block",
+            "10:15 – 12:00",
+            "1h 45m"
+          ],
+          [
+            "#D98B2B",
+            "Reply to client email",
+            "13:30 – 13:43",
+            "13m"
+          ]
         ],
         "yesterdayLabel": "Yesterday",
         "yesterdayTotal": "3h 05m",
         "yesterdayEntries": [
-          ["#3B5BF6", "Edit chapter 2", "08:50 – 10:20", "1h 30m"],
-          ["#2FAE7A", "Update budget", "11:00 – 12:35", "1h 35m"]
+          [
+            "#3B5BF6",
+            "Edit chapter 2",
+            "08:50 – 10:20",
+            "1h 30m"
+          ],
+          [
+            "#2FAE7A",
+            "Update budget",
+            "11:00 – 12:35",
+            "1h 35m"
+          ]
         ]
       }
     }

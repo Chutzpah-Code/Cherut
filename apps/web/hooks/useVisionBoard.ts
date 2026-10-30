@@ -98,3 +98,49 @@ export const useToggleArchiveVisionBoard = () => {
     },
   });
 };
+
+export const useUploadAudio = () => {
+  return useMutation({
+    mutationFn: ({ file, durationSec }: { file: File; durationSec: number }) =>
+      visionBoardApi.uploadAudio(file, durationSec),
+  });
+};
+
+export const usePracticeSummary = () => {
+  return useQuery({
+    queryKey: ['vision-board-practice-summary'],
+    queryFn: () => visionBoardApi.getPracticeSummary(),
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useSessionState = () => {
+  return useQuery({
+    queryKey: ['vision-board-session-state'],
+    queryFn: () => visionBoardApi.getSessionState(),
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useLogPracticeSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      entries,
+      feeling,
+      energy,
+      confidence,
+    }: {
+      entries: { itemId: string; date: string }[];
+      feeling: string;
+      energy: number;
+      confidence: number;
+    }) => visionBoardApi.logPracticeSession(entries, feeling, energy, confidence),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vision-board-items'] });
+      queryClient.invalidateQueries({ queryKey: ['vision-board-practice-summary'] });
+      queryClient.invalidateQueries({ queryKey: ['vision-board-session-state'] });
+    },
+  });
+};

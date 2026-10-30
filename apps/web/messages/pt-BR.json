@@ -1128,13 +1128,18 @@
     "page": {
       "title": "Meu quadro dos sonhos",
       "subtitleActive": "Arraste e solte para organizar suas metas",
+      "subtitleCompleted": "Metas que você já realizou",
       "subtitleArchived": "Veja e gerencie seus itens arquivados do quadro dos sonhos",
       "addGoal": "Adicionar meta",
+      "startSession": "Sessão de visualização",
       "active": "Ativos",
+      "completed": "Concluídos",
       "archived": "Arquivados",
       "activeCount": "{count, plural, one {# item ativo} other {# itens ativos}}",
+      "completedCount": "{count, plural, one {# item concluído} other {# itens concluídos}}",
       "archivedCount": "{count, plural, one {# item arquivado} other {# itens arquivados}}",
       "emptyTitle": "Comece seu quadro dos sonhos",
+      "emptyCompletedTitle": "Nenhuma meta concluída ainda.",
       "emptyHint": "Crie uma representação visual dos seus sonhos e metas. Adicione imagens que te inspiram e acompanhe seu progresso rumo a alcançá-las!",
       "addFirstGoal": "Adicionar sua primeira meta",
       "itemArchived": "\"{title}\" foi arquivado",
@@ -1152,16 +1157,16 @@
     },
     "dueDateBadge": {
       "overdue": "Atrasado",
-      "today": "Hoje",
-      "daysLeft": "{count, plural, one {falta # dia} other {faltam # dias}}",
       "days": "{count, plural, one {# dia} other {# dias}}",
       "completed": "Concluído"
     },
     "card": {
       "viewDetails": "Ver detalhes",
-      "edit": "Editar",
       "archive": "Arquivar",
-      "delete": "Excluir"
+      "delete": "Excluir",
+      "visualizeButton": "Visualizar",
+      "editButton": "Editar",
+      "completeButton": "Completar ({current}/{total})"
     },
     "lightbox": {
       "openGallery": "Ver galeria",
@@ -1178,57 +1183,30 @@
       "deletePermanently": "Excluir permanentemente",
       "archivedLabel": "Arquivado"
     },
-    "editModal": {
-      "title": "Editar item do quadro dos sonhos",
+    "editDrawer": {
+      "visualizationLabel": "VISUALIZAÇÃO",
+      "close": "Fechar",
+      "metaTabLabel": "Meta",
+      "visualizationTabLabel": "Visualização · {current}/{total}",
+      "savedStatus": "Salvo automaticamente",
+      "errorStatus": "Falha ao salvar",
+      "visualizeNowButton": "Visualizar agora",
       "image": "Imagem",
       "uploading": "Enviando...",
       "replaceImage": "Substituir imagem",
       "invalidFile": "Arquivo inválido",
       "uploadFailed": "Falha ao enviar a imagem. Tente novamente.",
-      "saveFailed": "Falha ao salvar as alterações. Tente novamente.",
       "titleLabel": "Título",
       "titlePlaceholder": "ex.: Viagem a Kyoto",
       "shortDescription": "Descrição curta",
       "shortDescriptionPlaceholder": "Breve descrição (visível no cartão)",
       "fullDescription": "Descrição completa",
-      "fullDescriptionPlaceholder": "Descrição detalhada (visível apenas no modal)",
+      "fullDescriptionPlaceholder": "Descrição detalhada",
       "dueDate": "Data alvo",
       "dueDateDesc": "Data alvo de conclusão",
       "dueDatePlaceholder": "Selecionar data",
       "completed": "Marcar como concluído",
-      "delete": "Excluir",
-      "cancel": "Cancelar",
-      "saveChanges": "Salvar alterações",
-      "visualizationSectionTitle": "Visualização",
-      "relatedObjective": "Meta relacionada",
-      "relatedObjectivePlaceholder": "Não vinculada",
-      "practiceDuration": "Duração da prática",
-      "duration5min": "5 min",
-      "duration10min": "10 min",
-      "duration15min": "15 min",
-      "stateGroupTitle": "Estado",
-      "currentEmotion": "Como estou me sentindo agora?",
-      "currentEmotionPlaceholder": "Selecione um sentimento",
-      "currentEnergy": "Nível de energia",
-      "currentConfidence": "Nível de confiança",
-      "desiredState": "Qual estado quero cultivar?",
-      "desiredStatePlaceholder": "Calmo, focado e confiante...",
-      "empoweringBelief": "Crença que quero fortalecer",
-      "empoweringBeliefPlaceholder": "Consigo desenvolver as competências e realizar ações consistentes...",
-      "visualizationGroupTitle": "Visualização",
-      "outcomeVisualizationText": "Como será quando essa meta for realizada?",
-      "outcomeVisualizationTextPlaceholder": "Descreva em detalhes o que quer alcançar...",
-      "processVisualizationText": "Quais passos vou me imaginar realizando até chegar lá?",
-      "processVisualizationTextPlaceholder": "Descreva as ações que você se imagina realizando...",
-      "likelyObstacle": "Qual obstáculo pode aparecer?",
-      "likelyObstaclePlaceholder": "Descreva um obstáculo provável...",
-      "obstacleResponse": "Como vou responder a esse obstáculo?",
-      "obstacleResponsePlaceholder": "Descreva como vai ajustar a estratégia e continuar...",
-      "actionGroupTitle": "Ação",
-      "nextAction": "Próxima ação concreta",
-      "nextActionPlaceholder": "O que você vai fazer hoje?",
-      "nextActionDueDate": "Prazo da ação",
-      "enterState": "Visualizar e agir",
+      "deleteGoal": "Excluir meta",
       "feelings": {
         "calm": "Calma",
         "confidence": "Confiança",
@@ -1242,26 +1220,135 @@
         "joy": "Alegria"
       }
     },
-    "stateView": {
+    "visualizationTab": {
+      "progressLabel": "{current} de {total} campos",
+      "persistNote": "As respostas ficam salvas e são reaproveitadas em toda sessão. Seu estado atual pré-preenche o check-in e é atualizado ao final de cada sessão.",
+      "relatedObjective": "Meta relacionada",
+      "relatedObjectivePlaceholder": "Não vinculada",
+      "practiceDuration": "Duração da prática",
+      "duration5min": "5 min",
+      "duration10min": "10 min",
+      "duration15min": "15 min",
+      "stateDivider": "Estado",
+      "currentEmotion": "Como estou me sentindo agora?",
+      "currentEmotionPlaceholder": "Selecione um sentimento",
+      "currentEnergy": "Nível de energia",
+      "currentConfidence": "Nível de confiança",
+      "desiredState": "Qual estado quero cultivar?",
+      "desiredStatePlaceholder": "Calmo, focado e confiante...",
+      "empoweringBelief": "Crença que quero fortalecer",
+      "empoweringBeliefPlaceholder": "Consigo desenvolver as competências e realizar ações consistentes...",
+      "visualizationDivider": "Visualização",
+      "outcomeVisualizationText": "Como será quando essa meta for realizada?",
+      "outcomeVisualizationTextPlaceholder": "Descreva em detalhes o que quer alcançar...",
+      "processVisualizationText": "Quais passos vou me imaginar realizando até chegar lá?",
+      "processVisualizationTextPlaceholder": "Descreva as ações que você se imagina realizando...",
+      "likelyObstacle": "Qual obstáculo pode aparecer?",
+      "likelyObstaclePlaceholder": "Descreva um obstáculo provável...",
+      "obstacleResponse": "Como vou responder a esse obstáculo?",
+      "obstacleResponsePlaceholder": "Descreva como vai ajustar a estratégia e continuar...",
+      "actionDivider": "Ação",
+      "nextAction": "Próxima ação concreta",
+      "nextActionPlaceholder": "O que você vai fazer hoje?",
+      "nextActionDueDate": "Prazo da ação",
+      "nextActionDueDatePlaceholder": "Selecionar data"
+    },
+    "audioPicker": {
+      "label": "Áudio da visualização",
+      "none": "Nenhum",
+      "system": "Música do Cherut",
+      "file": "Meu áudio",
+      "hintPlaysOnVisualize": "Toca ao clicar em Visualizar",
+      "listenButton": "Ouvir",
+      "stopButton": "Parar",
+      "tracks": {
+        "calm-depth": {
+          "label": "Calma profunda",
+          "description": "Pad suave · loop"
+        },
+        "focus": {
+          "label": "Foco",
+          "description": "Tons limpos · loop"
+        },
+        "sunrise": {
+          "label": "Amanhecer",
+          "description": "Acorde aberto · loop"
+        },
+        "ocean": {
+          "label": "Oceano",
+          "description": "Água · loop"
+        }
+      },
+      "uploadButton": "Enviar áudio",
+      "replaceButton": "Trocar",
+      "removeButton": "Remover",
+      "errorTooLarge": "Arquivo muito grande. O limite é 10MB.",
+      "errorTooLong": "Áudio muito longo. O limite é 5 minutos.",
+      "errorWrongFormat": "Formato de áudio não suportado.",
+      "uploadFailed": "Falha ao enviar o áudio. Tente novamente.",
+      "durationSizeFormat": "{duration} · {size}"
+    },
+    "sessionSelect": {
+      "goalsCount": "{count, plural, one {# meta} other {# metas}} · ~{minutes} min",
+      "hintClickPhotos": "Clique nas fotos para escolher",
+      "selectAll": "Todas",
+      "cancel": "Cancelar",
+      "beginSession": "Começar sessão"
+    },
+    "sessionPlayer": {
       "close": "Fechar",
-      "stepCounter": "Passo {current} de {total}",
-      "continue": "Continuar",
-      "finish": "Concluir",
-      "state": {
-        "prompt": "Respire e escolha o estado que deseja cultivar",
-        "currentEmotionLabel": "Agora",
-        "energyLabel": "Energia",
-        "confidenceLabel": "Confiança"
+      "checkinTitle": "ANTES DE COMEÇAR",
+      "checkinSubtitle": "Como você está agora?",
+      "prefilledNote": "Pré-preenchido com sua última sessão",
+      "feelingLabel": "Como estou me sentindo",
+      "feelings": {
+        "calm": "Calma",
+        "focused": "Focado",
+        "excited": "Animado",
+        "anxious": "Ansioso",
+        "tired": "Cansado",
+        "scattered": "Disperso"
       },
-      "outcome": {
-        "prompt": "Imagine a meta como realizada"
-      },
-      "process": {
-        "prompt": "Agora imagine você realizando os próximos passos",
-        "obstacleLabel": "Obstáculo provável",
-        "responseLabel": "Minha resposta",
-        "actionLabel": "Próxima ação"
-      }
+      "energyLabel": "Energia",
+      "confidenceLabel": "Confiança",
+      "lowLabel": "Baixa",
+      "highLabel": "Alta",
+      "beginButton": "Começar",
+      "checkinLegend": "Check-in · {count, plural, one {# meta} other {# metas}} nesta sessão",
+      "stepLegend": "Meta {goalCurrent} de {goalTotal} · Passo {stepCurrent} de {stepTotal}",
+      "stepStatePrompt": "Respire e escolha o estado que deseja cultivar",
+      "stepOutcomePrompt": "Imagine a meta como realizada",
+      "stepProcessPrompt": "Agora imagine você realizando os próximos passos",
+      "nowLabel": "Agora",
+      "obstacleLabel": "Obstáculo provável",
+      "responseLabel": "Minha resposta",
+      "nextActionLabel": "Próxima ação",
+      "dueDatePrefix": "até",
+      "fallbackDesiredState": "Um estado calmo, focado e confiante.",
+      "fallbackBelief": "Eu sou capaz de fazer isso acontecer.",
+      "fallbackOutcome": "Imagine essa meta totalmente realizada.",
+      "fallbackProcess": "Imagine-se dando os próximos passos.",
+      "fallbackObstacle": "Nenhum obstáculo anotado ainda.",
+      "fallbackResponse": "Nenhuma resposta anotada ainda.",
+      "fallbackNextAction": "Nenhuma ação definida",
+      "backButton": "Voltar",
+      "continueButton": "Continuar",
+      "nextGoalButton": "Próxima meta",
+      "finishButton": "Concluir",
+      "finalTitle": "SESSÃO CONCLUÍDA",
+      "finalSubtitle": "Suas próximas ações",
+      "backToBoard": "Voltar ao quadro",
+      "playAudio": "Tocar",
+      "pauseAudio": "Pausar",
+      "muteAudio": "Silenciar",
+      "unmuteAudio": "Ativar som"
+    },
+    "practiceHistory": {
+      "noPracticeYet": "Nenhuma prática ainda",
+      "practicesCount": "{count, plural, one {# prática} other {# práticas}} · última {when}",
+      "lastPracticedToday": "hoje",
+      "lastPracticedYesterday": "ontem",
+      "lastPracticedDaysAgo": "há {count, plural, one {# dia} other {# dias}}"
     },
     "createModal": {
       "title": "Adicionar ao quadro dos sonhos",
@@ -1466,8 +1553,14 @@
       "ctaPrimary": "Comece seu sistema",
       "ctaSecondary": "Veja como funciona",
       "note": "Escolha o nível de estrutura que sua direção exige.",
-      "mockCardA": { "label": "Sequência · Ler 20 páginas", "value": "21 dias" },
-      "mockCardB": { "label": "Resultado-chave", "value": "Correr 300 km neste trimestre" }
+      "mockCardA": {
+        "label": "Sequência · Ler 20 páginas",
+        "value": "21 dias"
+      },
+      "mockCardB": {
+        "label": "Resultado-chave",
+        "value": "Correr 300 km neste trimestre"
+      }
     },
     "pattern": {
       "heading": "Você sabe o que fazer. Ainda assim não cumpre o que prometeu a si mesmo.",
@@ -1501,10 +1594,22 @@
       "lede": "O Cherut concentra sua energia e conecta seus valores, objetivos e ações diárias. Se você cair, pode revisar e retomar sem começar do zero.",
       "badge": "All In All The Time",
       "pillars": [
-        { "title": "Uma Direção", "body": "Escolha a única direção que mais importa agora, não tudo ao mesmo tempo." },
-        { "title": "Intensidade Estruturada", "body": "Transforme intensidade em ações, horários e sistemas — não em explosões pontuais." },
-        { "title": "Atravessar o Momento Difícil", "body": "Passe pelo tédio, pelo medo e pela distração em vez de fugir automaticamente." },
-        { "title": "Voltar Sem Recomeçar do Zero", "body": "Volte depois de um dia ruim sem transformar isso em uma crise de identidade." }
+        {
+          "title": "Uma Direção",
+          "body": "Escolha a única direção que mais importa agora, não tudo ao mesmo tempo."
+        },
+        {
+          "title": "Intensidade Estruturada",
+          "body": "Transforme intensidade em ações, horários e sistemas — não em explosões pontuais."
+        },
+        {
+          "title": "Atravessar o Momento Difícil",
+          "body": "Passe pelo tédio, pelo medo e pela distração em vez de fugir automaticamente."
+        },
+        {
+          "title": "Voltar Sem Recomeçar do Zero",
+          "body": "Volte depois de um dia ruim sem transformar isso em uma crise de identidade."
+        }
       ],
       "notePre": "All in não significa produzir o tempo todo.",
       "noteBold": "Significa nunca se desconectar da direção."
@@ -1513,13 +1618,48 @@
       "heading": "Um sistema só para a vida que você está de fato tentando construir.",
       "lede": "Você não precisa de cinco assinaturas e uma planilha. Direção, ação e reflexão vivem em um só lugar.",
       "tabs": [
-        { "title": "Objetivos & OKRs", "body": "Defina uma direção, quebre-a em resultados mensuráveis e revise seu progresso em vez de chutar.", "url": "app.cherut / objectives", "mock": "okrs" },
-        { "title": "Tarefas & Calendário", "body": "Uma caixa de entrada, uma agenda. O que você assume aparece ao lado do tempo que você realmente tem.", "url": "app.cherut / tasks", "mock": "tasks" },
-        { "title": "Valores & Quadro dos Sonhos", "body": "Defina o que importa, depois fixe o futuro para o qual isso aponta. Cada hábito e tarefa se conecta ao sonho que o originou.", "url": "app.cherut / dream-board", "mock": "dreams" },
-        { "title": "Hábitos", "body": "Acompanhe sequências, intenção e reflexão. Hábitos a serviço de uma direção, não hábitos por si só.", "url": "app.cherut / habits", "mock": "habits" },
-        { "title": "Finanças", "body": "Contas, orçamentos e patrimônio acompanhados junto das suas metas, não num app separado que você esquece de abrir.", "url": "app.cherut / finances", "mock": "finances" },
-        { "title": "Diário & Reflexão", "body": "Intenções matinais, reflexões noturnas e um registro pesquisável, para seus padrões pararem de se esconder.", "url": "app.cherut / journal", "mock": "journal" },
-        { "title": "Learning", "body": "O curso All In All The Time, exercícios práticos e templates de implementação, dentro do mesmo sistema que você usa todo dia.", "url": "app.cherut / learning", "mock": "learning" }
+        {
+          "title": "Objetivos & OKRs",
+          "body": "Defina uma direção, quebre-a em resultados mensuráveis e revise seu progresso em vez de chutar.",
+          "url": "app.cherut / objectives",
+          "mock": "okrs"
+        },
+        {
+          "title": "Tarefas & Calendário",
+          "body": "Uma caixa de entrada, uma agenda. O que você assume aparece ao lado do tempo que você realmente tem.",
+          "url": "app.cherut / tasks",
+          "mock": "tasks"
+        },
+        {
+          "title": "Valores & Quadro dos Sonhos",
+          "body": "Defina o que importa, depois fixe o futuro para o qual isso aponta. Cada hábito e tarefa se conecta ao sonho que o originou.",
+          "url": "app.cherut / dream-board",
+          "mock": "dreams"
+        },
+        {
+          "title": "Hábitos",
+          "body": "Acompanhe sequências, intenção e reflexão. Hábitos a serviço de uma direção, não hábitos por si só.",
+          "url": "app.cherut / habits",
+          "mock": "habits"
+        },
+        {
+          "title": "Finanças",
+          "body": "Contas, orçamentos e patrimônio acompanhados junto das suas metas, não num app separado que você esquece de abrir.",
+          "url": "app.cherut / finances",
+          "mock": "finances"
+        },
+        {
+          "title": "Diário & Reflexão",
+          "body": "Intenções matinais, reflexões noturnas e um registro pesquisável, para seus padrões pararem de se esconder.",
+          "url": "app.cherut / journal",
+          "mock": "journal"
+        },
+        {
+          "title": "Learning",
+          "body": "O curso All In All The Time, exercícios práticos e templates de implementação, dentro do mesmo sistema que você usa todo dia.",
+          "url": "app.cherut / learning",
+          "mock": "learning"
+        }
       ],
       "foot": "Menos assinaturas. Menos sistemas desconectados. Uma direção."
     },
@@ -1527,12 +1667,30 @@
       "heading": "Comece com uma direção. Construa a partir dela.",
       "lede": "Seis passos. Você não precisa organizar a vida inteira para começar.",
       "steps": [
-        { "title": "Escolha o que importa agora", "body": "Escolha a única direção que merece sua energia hoje." },
-        { "title": "Defina um resultado concreto", "body": "Transforme essa direção em um resultado que você consegue medir de verdade." },
-        { "title": "Crie o sistema mínimo necessário", "body": "Só os hábitos, tarefas e check-ins que esse resultado exige." },
-        { "title": "Execute o próximo passo hoje", "body": "Não o plano inteiro. A próxima ação, feita agora." },
-        { "title": "Revise, ajuste e retome", "body": "Veja o que funcionou, corrija o que não funcionou e volte, mesmo depois de uma semana ruim." },
-        { "title": "Passe para a próxima direção", "body": "Terminou um ciclo? Escolha o próximo sem precisar reconfigurar tudo." }
+        {
+          "title": "Escolha o que importa agora",
+          "body": "Escolha a única direção que merece sua energia hoje."
+        },
+        {
+          "title": "Defina um resultado concreto",
+          "body": "Transforme essa direção em um resultado que você consegue medir de verdade."
+        },
+        {
+          "title": "Crie o sistema mínimo necessário",
+          "body": "Só os hábitos, tarefas e check-ins que esse resultado exige."
+        },
+        {
+          "title": "Execute o próximo passo hoje",
+          "body": "Não o plano inteiro. A próxima ação, feita agora."
+        },
+        {
+          "title": "Revise, ajuste e retome",
+          "body": "Veja o que funcionou, corrija o que não funcionou e volte, mesmo depois de uma semana ruim."
+        },
+        {
+          "title": "Passe para a próxima direção",
+          "body": "Terminou um ciclo? Escolha o próximo sem precisar reconfigurar tudo."
+        }
       ]
     },
     "return": {
@@ -1564,29 +1722,74 @@
       "plans": [
         {
           "title": "Core",
-          "monthly": ["US$ 12,50", "/mês", "Cobrado mensalmente"],
-          "annual": ["US$ 120", "/ano", "US$ 10/mês, cobrado anualmente"],
+          "monthly": [
+            "US$ 12,50",
+            "/mês",
+            "Cobrado mensalmente"
+          ],
+          "annual": [
+            "US$ 120",
+            "/ano",
+            "US$ 10/mês, cobrado anualmente"
+          ],
           "desc": "Para organizar sua direção, suas ações e sua rotina.",
-          "features": ["Valores, objetivos e OKRs", "Hábitos, tarefas e calendário", "Diário e reflexão", "Finanças e patrimônio", "Quadro dos sonhos"],
+          "features": [
+            "Valores, objetivos e OKRs",
+            "Hábitos, tarefas e calendário",
+            "Diário e reflexão",
+            "Finanças e patrimônio",
+            "Quadro dos sonhos"
+          ],
           "cta": "Começar o sistema",
           "href": "/auth/register"
         },
         {
           "title": "Method",
           "tag": "Mais popular",
-          "monthly": ["US$ 48", "/mês", "Cobrado mensalmente"],
-          "annual": ["US$ 480", "/ano", "US$ 40/mês, cobrado anualmente"],
+          "monthly": [
+            "US$ 48",
+            "/mês",
+            "Cobrado mensalmente"
+          ],
+          "annual": [
+            "US$ 480",
+            "/ano",
+            "US$ 40/mês, cobrado anualmente"
+          ],
           "desc": "Para usar o sistema e aprender o método por trás dele.",
-          "features": ["Tudo do Core", "Curso All In All The Time", "Exercícios práticos", "Percurso guiado de 7 ou 14 dias", "Templates de implementação", "Práticas de direção, execução, desconforto e retomada"],
+          "features": [
+            "Tudo do Core",
+            "Curso All In All The Time",
+            "Exercícios práticos",
+            "Percurso guiado de 7 ou 14 dias",
+            "Templates de implementação",
+            "Práticas de direção, execução, desconforto e retomada"
+          ],
           "cta": "Construir o método",
           "href": "/auth/register"
         },
         {
           "title": "Mentorship",
-          "monthly": ["US$ 100", "/mês", "Cobrado mensalmente"],
-          "annual": ["US$ 1.000", "/ano", "US$ 83,33/mês, cobrado anualmente"],
+          "monthly": [
+            "US$ 100",
+            "/mês",
+            "Cobrado mensalmente"
+          ],
+          "annual": [
+            "US$ 1.000",
+            "/ano",
+            "US$ 83,33/mês, cobrado anualmente"
+          ],
           "desc": "Para aplicar o método com acompanhamento durante uma mudança de verdade.",
-          "features": ["Core", "Curso All In All The Time", "Mentoria individual", "Revisão de direção", "Análise do padrão de execução", "Ajuste do sistema", "Plano de retomada"],
+          "features": [
+            "Core",
+            "Curso All In All The Time",
+            "Mentoria individual",
+            "Revisão de direção",
+            "Análise do padrão de execução",
+            "Ajuste do sistema",
+            "Plano de retomada"
+          ],
           "cta": "Aplicar para a mentoria",
           "href": "/contact"
         }
@@ -1597,14 +1800,38 @@
       "lede": "Outra coisa?",
       "contactLink": "Fale com o time.",
       "items": [
-        { "q": "O Cherut é apenas mais um aplicativo de produtividade?", "a": "Não. A maioria dos apps de produtividade para numa lista de tarefas. O Cherut conecta seus valores, objetivos e ações diárias em um sistema só, e dá a você uma estrutura para os dias em que não tem vontade de aparecer." },
-        { "q": "Preciso ser disciplinado para usar o Cherut?", "a": "Não. Isso não é sobre disciplina ou preguiça. É sobre estrutura que falta." },
-        { "q": "All In All The Time significa trabalhar o tempo todo?", "a": "Não. All in não significa produzir o tempo todo. Significa nunca se desconectar da direção." },
-        { "q": "Preciso configurar minha vida inteira para começar?", "a": "Não. Você só precisa escolher a próxima direção e construir o sistema mínimo que esse resultado exige." },
-        { "q": "O que acontece se eu parar de usar por alguns dias?", "a": "Você revisa e retoma, sem começar do zero." },
-        { "q": "Existe plano gratuito ou freemium?", "a": "Sem plano grátis, sem teste gratuito. Cada nível é um compromisso pago com a direção que você escolhe." },
-        { "q": "Quanto custa o Core?", "a": "US$ 120/ano, o que equivale a US$ 10/mês cobrado anualmente." },
-        { "q": "O Cherut substitui terapia ou tratamento psicológico?", "a": "Não. O Cherut é um sistema pessoal de execução. Não é terapia, cuidado médico, nem substitui tratamento profissional de saúde mental." }
+        {
+          "q": "O Cherut é apenas mais um aplicativo de produtividade?",
+          "a": "Não. A maioria dos apps de produtividade para numa lista de tarefas. O Cherut conecta seus valores, objetivos e ações diárias em um sistema só, e dá a você uma estrutura para os dias em que não tem vontade de aparecer."
+        },
+        {
+          "q": "Preciso ser disciplinado para usar o Cherut?",
+          "a": "Não. Isso não é sobre disciplina ou preguiça. É sobre estrutura que falta."
+        },
+        {
+          "q": "All In All The Time significa trabalhar o tempo todo?",
+          "a": "Não. All in não significa produzir o tempo todo. Significa nunca se desconectar da direção."
+        },
+        {
+          "q": "Preciso configurar minha vida inteira para começar?",
+          "a": "Não. Você só precisa escolher a próxima direção e construir o sistema mínimo que esse resultado exige."
+        },
+        {
+          "q": "O que acontece se eu parar de usar por alguns dias?",
+          "a": "Você revisa e retoma, sem começar do zero."
+        },
+        {
+          "q": "Existe plano gratuito ou freemium?",
+          "a": "Sem plano grátis, sem teste gratuito. Cada nível é um compromisso pago com a direção que você escolhe."
+        },
+        {
+          "q": "Quanto custa o Core?",
+          "a": "US$ 120/ano, o que equivale a US$ 10/mês cobrado anualmente."
+        },
+        {
+          "q": "O Cherut substitui terapia ou tratamento psicológico?",
+          "a": "Não. O Cherut é um sistema pessoal de execução. Não é terapia, cuidado médico, nem substitui tratamento profissional de saúde mental."
+        }
       ]
     },
     "finalCta": {
@@ -1616,7 +1843,11 @@
     }
   },
   "aboutPage": {
-    "hero": { "kicker": "Manifesto", "title": "É nisso que a gente realmente acredita.", "lead": "Não é uma missão institucional. Não é linguagem de marketing. São as crenças em que o sistema inteiro foi construído." },
+    "hero": {
+      "kicker": "Manifesto",
+      "title": "É nisso que a gente realmente acredita.",
+      "lead": "Não é uma missão institucional. Não é linguagem de marketing. São as crenças em que o sistema inteiro foi construído."
+    },
     "manifesto": [
       "Motivação não é estratégia. Estrutura é.",
       "Sua obsessão não é o problema. A ausência de um sistema é.",
@@ -1630,25 +1861,55 @@
     "principlesKicker": "Como construímos",
     "principlesHeading": "As regras por trás de cada funcionalidade",
     "principles": [
-      { "title": "Sistema em vez de força de vontade", "body": "Motivação não é confiável. Um sistema bem projetado funciona também nos dias difíceis. Construímos para consistência, não para picos de inspiração." },
-      { "title": "Método, não humor", "body": "O framework OKR, a ciência dos hábitos e a reflexão espaçada não são enfeite motivacional — são engenharia aplicada ao comportamento humano." },
-      { "title": "Liberdade através da responsabilidade", "body": "Assumir seus compromissos é o que torna a liberdade real possível, não evitá-los. Todo módulo se conecta a essa ideia." },
-      { "title": "Discreto, não barulhento", "body": "Sequências e progresso existem para mostrar a verdade, não para gamificá-la. Sem selos, sem truques de engajamento, sem dark patterns." }
+      {
+        "title": "Sistema em vez de força de vontade",
+        "body": "Motivação não é confiável. Um sistema bem projetado funciona também nos dias difíceis. Construímos para consistência, não para picos de inspiração."
+      },
+      {
+        "title": "Método, não humor",
+        "body": "O framework OKR, a ciência dos hábitos e a reflexão espaçada não são enfeite motivacional — são engenharia aplicada ao comportamento humano."
+      },
+      {
+        "title": "Liberdade através da responsabilidade",
+        "body": "Assumir seus compromissos é o que torna a liberdade real possível, não evitá-los. Todo módulo se conecta a essa ideia."
+      },
+      {
+        "title": "Discreto, não barulhento",
+        "body": "Sequências e progresso existem para mostrar a verdade, não para gamificá-la. Sem selos, sem truques de engajamento, sem dark patterns."
+      }
     ],
     "tryHeading": "Agora construa a estrutura.",
     "trySub": "Sem plano grátis, sem teste gratuito. Todo plano é um compromisso pago — escolha o nível que sua direção exige.",
     "tryCta": "Comece seu sistema"
   },
   "careersPage": {
-    "hero": { "kicker": "Carreiras", "title": "Venha construir o futuro da vida intencional", "lead": "Não há vagas abertas no momento — mas sempre queremos ouvir pessoas excepcionais." },
+    "hero": {
+      "kicker": "Carreiras",
+      "title": "Venha construir o futuro da vida intencional",
+      "lead": "Não há vagas abertas no momento — mas sempre queremos ouvir pessoas excepcionais."
+    },
     "whyJoinHeading": "Por que entrar no Cherut",
     "whyJoin": [
-      { "title": "Time pequeno, dono de verdade", "body": "Você vai ser dono de funcionalidades de ponta a ponta. Sem silos, sem esperar cadeias de aprovação. Suas decisões vão para produção." },
-      { "title": "Trabalho que alcança pessoas reais", "body": "O Cherut é usado diariamente por pessoas construindo suas vidas. O que você constrói tem impacto direto e visível." },
-      { "title": "Assíncrono por padrão, sem enrolação", "body": "Escrevemos bem, documentamos decisões e confiamos uns nos outros. Sem daily standups. Trabalho profundo por padrão." }
+      {
+        "title": "Time pequeno, dono de verdade",
+        "body": "Você vai ser dono de funcionalidades de ponta a ponta. Sem silos, sem esperar cadeias de aprovação. Suas decisões vão para produção."
+      },
+      {
+        "title": "Trabalho que alcança pessoas reais",
+        "body": "O Cherut é usado diariamente por pessoas construindo suas vidas. O que você constrói tem impacto direto e visível."
+      },
+      {
+        "title": "Assíncrono por padrão, sem enrolação",
+        "body": "Escrevemos bem, documentamos decisões e confiamos uns nos outros. Sem daily standups. Trabalho profundo por padrão."
+      }
     ],
     "valuesHeading": "O que valorizamos",
-    "values": ["Autonomia em vez de pedir permissão", "Capricho em vez de velocidade pela velocidade", "Honestidade em vez de ambiguidade confortável", "Pensamento de longo prazo em vez de vitórias de curto prazo"],
+    "values": [
+      "Autonomia em vez de pedir permissão",
+      "Capricho em vez de velocidade pela velocidade",
+      "Honestidade em vez de ambiguidade confortável",
+      "Pensamento de longo prazo em vez de vitórias de curto prazo"
+    ],
     "poolHeading": "Entre no banco de talentos",
     "poolSub": "Quando formos contratar, procuramos aqui primeiro. Se apresente — sem currículo obrigatório, só nos conte quem você é.",
     "successTitle": "Recebemos — obrigado!",
@@ -1660,32 +1921,150 @@
       "emailPlaceholder": "voce@exemplo.com",
       "skillLabel": "Área de atuação",
       "skillPlaceholder": "Selecione uma área…",
-      "skillAreas": ["Engenharia", "Design", "Produto", "Marketing", "Conteúdo", "Operações", "Outro"],
+      "skillAreas": [
+        "Engenharia",
+        "Design",
+        "Produto",
+        "Marketing",
+        "Conteúdo",
+        "Operações",
+        "Outro"
+      ],
       "messageLabel": "Conte sobre você",
       "messagePlaceholder": "O que você já construiu, o que te empolga, o que você procura…",
       "submit": "Enviar apresentação"
     }
   },
   "changelogPage": {
-    "hero": { "kicker": "Novidades", "title": "O que há de novo no Cherut", "lead": "Todas as melhorias, semana a semana." },
-    "tags": { "major": "Grande atualização", "feature": "Recurso", "integration": "Integração", "improvement": "Melhoria", "launch": "Lançamento" },
+    "hero": {
+      "kicker": "Novidades",
+      "title": "O que há de novo no Cherut",
+      "lead": "Todas as melhorias, semana a semana."
+    },
+    "tags": {
+      "major": "Grande atualização",
+      "feature": "Recurso",
+      "integration": "Integração",
+      "improvement": "Melhoria",
+      "launch": "Lançamento"
+    },
     "entries": [
-      { "date": "Setembro de 2026", "title": "Landing page redesenhada", "items": ["Novo posicionamento em torno de obsessão estruturada e do método All In All The Time, com hero, seções de problema/solução e benefícios reescritas.", "Planos renomeados e reestruturados: Core, Method e Mentorship, todos cobrados mensal ou anualmente, com dois meses grátis no plano anual.", "Experiência mobile mais limpa em todas as páginas públicas, além de um cabeçalho que agora permanece fixo durante a rolagem."] },
-      { "date": "Setembro de 2026", "title": "Nova estrutura de preços", "items": ["Aposentamos o plano grátis e os planos Pro/Vitalício.", "Nova estrutura: Core (US$ 20/mês ou US$ 200/ano), Method (US$ 50/mês ou US$ 500/ano) e Mentorship (US$ 100/mês ou US$ 1.000/ano) — a cobrança anual economiza dois meses em qualquer plano.", "Sem teste gratuito — todo plano é um compromisso pago desde o checkout."] },
-      { "date": "Maio de 2026", "title": "Disponibilidade Geral", "items": ["O Cherut agora está disponível publicamente — planos Grátis, Pro e Vitalício no ar.", "Todos os módulos principais prontos para produção: Hábitos, Tarefas, OKRs, Diário, Quadro dos Sonhos, Valores, Áreas da Vida.", "Web mobile totalmente otimizada; beta de iOS e Android aberto para todos os planos pagos."] },
-      { "date": "Abril de 2026", "title": "Beta do módulo de Finanças", "items": ["Acompanhamento de orçamento com categorias e metas mensais.", "Instantâneo de patrimônio líquido com entradas manuais de ativos e passivos.", "Metas financeiras conectadas aos seus OKRs."] },
-      { "date": "Março de 2026", "title": "Quadro dos Sonhos e Valores", "items": ["Tela visual para fixar imagens, citações e metas.", "Módulo de Valores: defina sua bússola e identifique desalinhamentos nas revisões diárias.", "Tarefas e hábitos agora podem ser vinculados a um valor ou sonho específico."] },
-      { "date": "Fevereiro de 2026", "title": "Sincronização com o Google Agenda", "items": ["Sincronização bidirecional com o Google Agenda — tarefas aparecem como eventos.", "Visão de calendário dentro do Cherut mostra sua agenda junto com os horários de hábitos.", "Detecção de conflito para tarefas agendadas e blocos de tempo."] },
-      { "date": "Janeiro de 2026", "title": "Diário", "items": ["Diário estruturado com intenção matinal e prompts de reflexão noturna.", "Anotações livres com busca de texto completo em todas as entradas.", "Registro de gratidão com resumo semanal."] },
-      { "date": "Dezembro de 2025", "title": "Framework de OKR", "items": ["Defina Objetivos trimestrais com até 5 Resultados-Chave cada.", "Fluxo de check-in semanal com nota de confiança e observações.", "Visualização de progresso com uma linha do tempo compacta."] },
-      { "date": "Novembro de 2025", "title": "Áreas da Vida e Painel", "items": ["Áreas da Vida permitem segmentar hábitos, tarefas e metas em domínios com significado.", "Novo Painel com estatísticas, atividade recente e atalhos de adição rápida.", "Linguagem de design consistente em todas as páginas."] },
-      { "date": "Outubro de 2025", "title": "Quadros Kanban", "items": ["Tarefas agora suportam múltiplos quadros com colunas customizáveis.", "Arrastar e soltar entre colunas e quadros.", "Filtros por quadro por responsável, etiqueta e data de vencimento."] },
-      { "date": "Setembro de 2025", "title": "Hábitos v2", "items": ["Sequências de hábitos com definição de intenção e reflexão diária.", "Frequências flexíveis: diária, dias úteis, dias customizados.", "Arquive e restaure hábitos sem perder o histórico."] },
-      { "date": "Agosto de 2025", "title": "Primeiro beta privado", "items": ["Acompanhamento básico de hábitos e lista de tarefas simples — o primeiro protótipo funcional.", "Contas de usuário com autenticação por e-mail/senha.", "Ciclo de feedback com os primeiros 50 beta testers."] }
+      {
+        "date": "Setembro de 2026",
+        "title": "Landing page redesenhada",
+        "items": [
+          "Novo posicionamento em torno de obsessão estruturada e do método All In All The Time, com hero, seções de problema/solução e benefícios reescritas.",
+          "Planos renomeados e reestruturados: Core, Method e Mentorship, todos cobrados mensal ou anualmente, com dois meses grátis no plano anual.",
+          "Experiência mobile mais limpa em todas as páginas públicas, além de um cabeçalho que agora permanece fixo durante a rolagem."
+        ]
+      },
+      {
+        "date": "Setembro de 2026",
+        "title": "Nova estrutura de preços",
+        "items": [
+          "Aposentamos o plano grátis e os planos Pro/Vitalício.",
+          "Nova estrutura: Core (US$ 20/mês ou US$ 200/ano), Method (US$ 50/mês ou US$ 500/ano) e Mentorship (US$ 100/mês ou US$ 1.000/ano) — a cobrança anual economiza dois meses em qualquer plano.",
+          "Sem teste gratuito — todo plano é um compromisso pago desde o checkout."
+        ]
+      },
+      {
+        "date": "Maio de 2026",
+        "title": "Disponibilidade Geral",
+        "items": [
+          "O Cherut agora está disponível publicamente — planos Grátis, Pro e Vitalício no ar.",
+          "Todos os módulos principais prontos para produção: Hábitos, Tarefas, OKRs, Diário, Quadro dos Sonhos, Valores, Áreas da Vida.",
+          "Web mobile totalmente otimizada; beta de iOS e Android aberto para todos os planos pagos."
+        ]
+      },
+      {
+        "date": "Abril de 2026",
+        "title": "Beta do módulo de Finanças",
+        "items": [
+          "Acompanhamento de orçamento com categorias e metas mensais.",
+          "Instantâneo de patrimônio líquido com entradas manuais de ativos e passivos.",
+          "Metas financeiras conectadas aos seus OKRs."
+        ]
+      },
+      {
+        "date": "Março de 2026",
+        "title": "Quadro dos Sonhos e Valores",
+        "items": [
+          "Tela visual para fixar imagens, citações e metas.",
+          "Módulo de Valores: defina sua bússola e identifique desalinhamentos nas revisões diárias.",
+          "Tarefas e hábitos agora podem ser vinculados a um valor ou sonho específico."
+        ]
+      },
+      {
+        "date": "Fevereiro de 2026",
+        "title": "Sincronização com o Google Agenda",
+        "items": [
+          "Sincronização bidirecional com o Google Agenda — tarefas aparecem como eventos.",
+          "Visão de calendário dentro do Cherut mostra sua agenda junto com os horários de hábitos.",
+          "Detecção de conflito para tarefas agendadas e blocos de tempo."
+        ]
+      },
+      {
+        "date": "Janeiro de 2026",
+        "title": "Diário",
+        "items": [
+          "Diário estruturado com intenção matinal e prompts de reflexão noturna.",
+          "Anotações livres com busca de texto completo em todas as entradas.",
+          "Registro de gratidão com resumo semanal."
+        ]
+      },
+      {
+        "date": "Dezembro de 2025",
+        "title": "Framework de OKR",
+        "items": [
+          "Defina Objetivos trimestrais com até 5 Resultados-Chave cada.",
+          "Fluxo de check-in semanal com nota de confiança e observações.",
+          "Visualização de progresso com uma linha do tempo compacta."
+        ]
+      },
+      {
+        "date": "Novembro de 2025",
+        "title": "Áreas da Vida e Painel",
+        "items": [
+          "Áreas da Vida permitem segmentar hábitos, tarefas e metas em domínios com significado.",
+          "Novo Painel com estatísticas, atividade recente e atalhos de adição rápida.",
+          "Linguagem de design consistente em todas as páginas."
+        ]
+      },
+      {
+        "date": "Outubro de 2025",
+        "title": "Quadros Kanban",
+        "items": [
+          "Tarefas agora suportam múltiplos quadros com colunas customizáveis.",
+          "Arrastar e soltar entre colunas e quadros.",
+          "Filtros por quadro por responsável, etiqueta e data de vencimento."
+        ]
+      },
+      {
+        "date": "Setembro de 2025",
+        "title": "Hábitos v2",
+        "items": [
+          "Sequências de hábitos com definição de intenção e reflexão diária.",
+          "Frequências flexíveis: diária, dias úteis, dias customizados.",
+          "Arquive e restaure hábitos sem perder o histórico."
+        ]
+      },
+      {
+        "date": "Agosto de 2025",
+        "title": "Primeiro beta privado",
+        "items": [
+          "Acompanhamento básico de hábitos e lista de tarefas simples — o primeiro protótipo funcional.",
+          "Contas de usuário com autenticação por e-mail/senha.",
+          "Ciclo de feedback com os primeiros 50 beta testers."
+        ]
+      }
     ]
   },
   "contactPage": {
-    "hero": { "kicker": "Contato", "title": "Vamos conversar", "lead": "Dúvida, ideia, ou só quer dar um oi?" },
+    "hero": {
+      "kicker": "Contato",
+      "title": "Vamos conversar",
+      "lead": "Dúvida, ideia, ou só quer dar um oi?"
+    },
     "successTitle": "Mensagem enviada!",
     "successBody": "Vamos responder em um ou dois dias. Obrigado por entrar em contato.",
     "formTitle": "Envie uma mensagem",
@@ -1695,7 +2074,14 @@
     "emailPlaceholder": "voce@exemplo.com",
     "subjectLabel": "Assunto",
     "subjectPlaceholder": "Selecione um tópico…",
-    "subjects": ["Pergunta geral", "Sugestão de recurso", "Relatar bug", "Contato com a imprensa", "Parceria", "Outro"],
+    "subjects": [
+      "Pergunta geral",
+      "Sugestão de recurso",
+      "Relatar bug",
+      "Contato com a imprensa",
+      "Parceria",
+      "Outro"
+    ],
     "messageLabel": "Mensagem",
     "messagePlaceholder": "Conte o que está pensando…",
     "submit": "Enviar mensagem",
@@ -1711,22 +2097,63 @@
     }
   },
   "gettingStartedPage": {
-    "hero": { "kicker": "Primeiros Passos", "title": "Configure seu sistema em 30 minutos", "lead": "Um guia passo a passo para viver ALL IN ALL THE TIME desde o primeiro dia." },
+    "hero": {
+      "kicker": "Primeiros Passos",
+      "title": "Configure seu sistema em 30 minutos",
+      "lead": "Um guia passo a passo para viver ALL IN ALL THE TIME desde o primeiro dia."
+    },
     "checklistKicker": "Checklist de integração",
     "checklistHeading": "Sete passos. Trinta minutos. Um sistema.",
     "steps": [
-      { "time": "5 min", "title": "Complete seu perfil", "body": "Envie uma foto, defina seu fuso horário, escolha as configurações de notificação e defina seu horário de trabalho para um planejamento de tarefas melhor." },
-      { "time": "10 min", "title": "Defina seus valores centrais", "body": "Vá em Valores e escolha de 3 a 5 princípios que guiam suas decisões. Escreva uma breve descrição para cada um e os ordene. Eles se tornam sua bússola." },
-      { "time": "8 min", "title": "Configure suas áreas da vida", "body": "Crie de 4 a 6 domínios de vida (Saúde, Carreira, Finanças, Relacionamentos…). Escreva uma declaração de visão para cada um e defina níveis de prioridade." },
-      { "time": "15 min", "title": "Crie seus primeiros OKRs", "body": "Comece com 1 a 2 objetivos por área da vida. Escreva objetivos qualitativos e inspiradores, depois adicione de 2 a 4 resultados-chave mensuráveis com prazos específicos." },
-      { "time": "10 min", "title": "Construa hábitos de sucesso", "body": "Crie de 3 a 5 hábitos-chave que sustentam múltiplos objetivos. Comece pequeno, defina gatilhos específicos e vincule hábitos às suas áreas da vida e OKRs." },
-      { "time": "12 min", "title": "Planeje sua primeira semana", "body": "Divida resultados-chave em tarefas específicas. Agende blocos de trabalho focado para as tarefas mais importantes. Planeje os horários de execução de hábitos ao longo da semana." },
-      { "time": "8 min", "title": "Configure acompanhamento e revisões", "body": "Configure seu painel, agende check-ins diários (5 min) e revisões semanais (30 min). Ative análises para entender padrões de desempenho." }
+      {
+        "time": "5 min",
+        "title": "Complete seu perfil",
+        "body": "Envie uma foto, defina seu fuso horário, escolha as configurações de notificação e defina seu horário de trabalho para um planejamento de tarefas melhor."
+      },
+      {
+        "time": "10 min",
+        "title": "Defina seus valores centrais",
+        "body": "Vá em Valores e escolha de 3 a 5 princípios que guiam suas decisões. Escreva uma breve descrição para cada um e os ordene. Eles se tornam sua bússola."
+      },
+      {
+        "time": "8 min",
+        "title": "Configure suas áreas da vida",
+        "body": "Crie de 4 a 6 domínios de vida (Saúde, Carreira, Finanças, Relacionamentos…). Escreva uma declaração de visão para cada um e defina níveis de prioridade."
+      },
+      {
+        "time": "15 min",
+        "title": "Crie seus primeiros OKRs",
+        "body": "Comece com 1 a 2 objetivos por área da vida. Escreva objetivos qualitativos e inspiradores, depois adicione de 2 a 4 resultados-chave mensuráveis com prazos específicos."
+      },
+      {
+        "time": "10 min",
+        "title": "Construa hábitos de sucesso",
+        "body": "Crie de 3 a 5 hábitos-chave que sustentam múltiplos objetivos. Comece pequeno, defina gatilhos específicos e vincule hábitos às suas áreas da vida e OKRs."
+      },
+      {
+        "time": "12 min",
+        "title": "Planeje sua primeira semana",
+        "body": "Divida resultados-chave em tarefas específicas. Agende blocos de trabalho focado para as tarefas mais importantes. Planeje os horários de execução de hábitos ao longo da semana."
+      },
+      {
+        "time": "8 min",
+        "title": "Configure acompanhamento e revisões",
+        "body": "Configure seu painel, agende check-ins diários (5 min) e revisões semanais (30 min). Ative análises para entender padrões de desempenho."
+      }
     ],
     "tips": [
-      { "title": "Comece pequeno, pense grande", "body": "Pequenas vitórias consistentes vencem fracassos ambiciosos. Construa momentum cedo — o sistema se acumula quando você realmente o usa." },
-      { "title": "Revisões semanais não são negociáveis", "body": "Reserve 30 minutos todo domingo. Celebre vitórias, analise obstáculos, ajuste planos. Esse único hábito é o que separa quem se dispersa de quem executa." },
-      { "title": "Conecte tudo aos seus valores", "body": "Quando as metas se alinham com seus valores centrais, a motivação se torna automática. Sempre pergunte: por que isso importa para mim?" }
+      {
+        "title": "Comece pequeno, pense grande",
+        "body": "Pequenas vitórias consistentes vencem fracassos ambiciosos. Construa momentum cedo — o sistema se acumula quando você realmente o usa."
+      },
+      {
+        "title": "Revisões semanais não são negociáveis",
+        "body": "Reserve 30 minutos todo domingo. Celebre vitórias, analise obstáculos, ajuste planos. Esse único hábito é o que separa quem se dispersa de quem executa."
+      },
+      {
+        "title": "Conecte tudo aos seus valores",
+        "body": "Quando as metas se alinham com seus valores centrais, a motivação se torna automática. Sempre pergunte: por que isso importa para mim?"
+      }
     ],
     "ctaHeading": "Pronto para começar?",
     "ctaSub": "O sistema é tão poderoso quanto seu compromisso em usá-lo.",
@@ -1734,76 +2161,232 @@
     "ctaHelp": "Central de ajuda"
   },
   "helpCenterPage": {
-    "hero": { "kicker": "Central de Ajuda", "title": "Como podemos ajudar?", "lead": "Guias, respostas e tudo que você precisa para aproveitar ao máximo o Cherut." },
+    "hero": {
+      "kicker": "Central de Ajuda",
+      "title": "Como podemos ajudar?",
+      "lead": "Guias, respostas e tudo que você precisa para aproveitar ao máximo o Cherut."
+    },
     "searchPlaceholder": "Buscar artigos",
     "noResults": "Nenhum artigo encontrado para sua busca.",
     "categories": [
-      { "title": "Primeiros passos", "articles": [
-        { "title": "O que é o Cherut?", "body": "O Cherut é um sistema operacional pessoal que conecta seus hábitos, tarefas, OKRs, diário e quadro dos sonhos em um só lugar. Comece configurando suas Áreas da Vida e criando seu primeiro Objetivo." },
-        { "title": "Configurando sua conta", "body": "Depois de se cadastrar, você cai direto no Dashboard — não existe um fluxo de integração obrigatório nem módulos para ligar ou desligar. Todos os módulos (Hábitos, Tarefas, OKRs, Diário, Quadro dos Sonhos, Valores, Áreas da Vida, Finanças) já ficam disponíveis na barra lateral; use só o que fizer sentido para você agora." },
-        { "title": "Escolhendo seu primeiro módulo", "body": "Não sabe por onde começar? A maioria das pessoas começa com Hábitos ou Tarefas. Depois de pegar o ritmo, adicione OKRs para dar direção às suas ações diárias." }
-      ]},
-      { "title": "Hábitos", "articles": [
-        { "title": "Criando um hábito", "body": "Vá em Hábitos → Novo Hábito. Defina um nome, frequência (diária, dias úteis ou dias customizados) e, opcionalmente, vincule a uma Área da Vida ou OKR." },
-        { "title": "Como funcionam as sequências", "body": "Uma sequência aumenta a cada dia que você completa um hábito. Perder um dia quebra a sequência, mas seu histórico de conclusões é sempre preservado." },
-        { "title": "Arquivar vs excluir", "body": "Arquive um hábito para pausá-lo sem perder o histórico. Exclua apenas quando quiser remover todos os registros permanentemente." }
-      ]},
-      { "title": "Tarefas e Quadros", "articles": [
-        { "title": "Criando um quadro", "body": "Vá em Tarefas e clique em \"Novo Quadro\". Dê um nome a ele e, opcionalmente, atribua a uma Área da Vida. Quadros têm colunas que você pode renomear e reordenar." },
-        { "title": "Movendo tarefas entre colunas", "body": "Arraste um cartão de tarefa para qualquer coluna, ou abra a tarefa e altere seu status no menu suspenso." },
-        { "title": "Vinculando tarefas a OKRs", "body": "Dentro de qualquer tarefa, use o campo \"OKR vinculado\" para conectá-la a um Resultado-Chave. O progresso é refletido na sua visão de OKR." }
-      ]},
-      { "title": "OKRs", "articles": [
-        { "title": "O que são OKRs?", "body": "OKRs (Objetivos e Resultados-Chave) são um framework de definição de metas. Um Objetivo é uma meta qualitativa ambiciosa; Resultados-Chave são resultados mensuráveis que indicam que você o alcançou." },
-        { "title": "Definindo seu primeiro OKR", "body": "Vá em OKRs → Novo Objetivo. Escreva um objetivo claro e inspirador para o trimestre. Depois adicione de 1 a 5 Resultados-Chave com metas numéricas." },
-        { "title": "Check-ins semanais", "body": "Toda semana, abra cada Resultado-Chave e atualize o valor atual. Adicione uma nota de confiança e uma breve observação. O Cherut acompanha a tendência ao longo do tempo." }
-      ]},
-      { "title": "Conta e cobrança", "articles": [
-        { "title": "Mudando seu plano", "body": "O gerenciamento de plano por autoatendimento está a caminho. Até lá, entre em contato para mudar ou cancelar seu plano e cuidamos disso diretamente." },
-        { "title": "Exportando seus dados", "body": "Vá em Configurações → Dados → Exportar. Seus hábitos, tarefas, OKRs, diário e todos os outros dados são exportados em um único arquivo JSON." },
-        { "title": "Excluindo sua conta", "body": "Vá em Configurações → Conta → Excluir conta. Isso remove permanentemente todos os seus dados. Não pode ser desfeito. Exporte antes se quiser uma cópia." }
-      ]}
+      {
+        "title": "Primeiros passos",
+        "articles": [
+          {
+            "title": "O que é o Cherut?",
+            "body": "O Cherut é um sistema operacional pessoal que conecta seus hábitos, tarefas, OKRs, diário e quadro dos sonhos em um só lugar. Comece configurando suas Áreas da Vida e criando seu primeiro Objetivo."
+          },
+          {
+            "title": "Configurando sua conta",
+            "body": "Depois de se cadastrar, você cai direto no Dashboard — não existe um fluxo de integração obrigatório nem módulos para ligar ou desligar. Todos os módulos (Hábitos, Tarefas, OKRs, Diário, Quadro dos Sonhos, Valores, Áreas da Vida, Finanças) já ficam disponíveis na barra lateral; use só o que fizer sentido para você agora."
+          },
+          {
+            "title": "Escolhendo seu primeiro módulo",
+            "body": "Não sabe por onde começar? A maioria das pessoas começa com Hábitos ou Tarefas. Depois de pegar o ritmo, adicione OKRs para dar direção às suas ações diárias."
+          }
+        ]
+      },
+      {
+        "title": "Hábitos",
+        "articles": [
+          {
+            "title": "Criando um hábito",
+            "body": "Vá em Hábitos → Novo Hábito. Defina um nome, frequência (diária, dias úteis ou dias customizados) e, opcionalmente, vincule a uma Área da Vida ou OKR."
+          },
+          {
+            "title": "Como funcionam as sequências",
+            "body": "Uma sequência aumenta a cada dia que você completa um hábito. Perder um dia quebra a sequência, mas seu histórico de conclusões é sempre preservado."
+          },
+          {
+            "title": "Arquivar vs excluir",
+            "body": "Arquive um hábito para pausá-lo sem perder o histórico. Exclua apenas quando quiser remover todos os registros permanentemente."
+          }
+        ]
+      },
+      {
+        "title": "Tarefas e Quadros",
+        "articles": [
+          {
+            "title": "Criando um quadro",
+            "body": "Vá em Tarefas e clique em \"Novo Quadro\". Dê um nome a ele e, opcionalmente, atribua a uma Área da Vida. Quadros têm colunas que você pode renomear e reordenar."
+          },
+          {
+            "title": "Movendo tarefas entre colunas",
+            "body": "Arraste um cartão de tarefa para qualquer coluna, ou abra a tarefa e altere seu status no menu suspenso."
+          },
+          {
+            "title": "Vinculando tarefas a OKRs",
+            "body": "Dentro de qualquer tarefa, use o campo \"OKR vinculado\" para conectá-la a um Resultado-Chave. O progresso é refletido na sua visão de OKR."
+          }
+        ]
+      },
+      {
+        "title": "OKRs",
+        "articles": [
+          {
+            "title": "O que são OKRs?",
+            "body": "OKRs (Objetivos e Resultados-Chave) são um framework de definição de metas. Um Objetivo é uma meta qualitativa ambiciosa; Resultados-Chave são resultados mensuráveis que indicam que você o alcançou."
+          },
+          {
+            "title": "Definindo seu primeiro OKR",
+            "body": "Vá em OKRs → Novo Objetivo. Escreva um objetivo claro e inspirador para o trimestre. Depois adicione de 1 a 5 Resultados-Chave com metas numéricas."
+          },
+          {
+            "title": "Check-ins semanais",
+            "body": "Toda semana, abra cada Resultado-Chave e atualize o valor atual. Adicione uma nota de confiança e uma breve observação. O Cherut acompanha a tendência ao longo do tempo."
+          }
+        ]
+      },
+      {
+        "title": "Conta e cobrança",
+        "articles": [
+          {
+            "title": "Mudando seu plano",
+            "body": "O gerenciamento de plano por autoatendimento está a caminho. Até lá, entre em contato para mudar ou cancelar seu plano e cuidamos disso diretamente."
+          },
+          {
+            "title": "Exportando seus dados",
+            "body": "Vá em Configurações → Dados → Exportar. Seus hábitos, tarefas, OKRs, diário e todos os outros dados são exportados em um único arquivo JSON."
+          },
+          {
+            "title": "Excluindo sua conta",
+            "body": "Vá em Configurações → Conta → Excluir conta. Isso remove permanentemente todos os seus dados. Não pode ser desfeito. Exporte antes se quiser uma cópia."
+          }
+        ]
+      }
     ],
     "notFound": "Não encontrou o que procurava?",
     "contactCta": "Fale conosco"
   },
   "privacyPolicyPage": {
-    "hero": { "kicker": "Privacidade", "title": "Sua privacidade não é uma nota de rodapé.", "lead": "Linguagem simples. Sem surpresas. Atualizado pela última vez em maio de 2026." },
+    "hero": {
+      "kicker": "Privacidade",
+      "title": "Sua privacidade não é uma nota de rodapé.",
+      "lead": "Linguagem simples. Sem surpresas. Atualizado pela última vez em maio de 2026."
+    },
     "notice": "Este é um resumo em linguagem simples das nossas práticas de privacidade. Foi feito para ser legível, não exaustivo. Para o texto legal completo, entre em contato pelo contact@hanielrolemberg.com",
     "sections": [
-      { "title": "O que coletamos", "items": ["Seu e-mail e nome quando você se cadastra.", "Dados de uso: quais recursos você usa e quando, para melhorar o produto.", "Conteúdo que você cria: hábitos, tarefas, entradas de diário, OKRs. Armazenado criptografado.", "Tipo de dispositivo e navegador para depuração e desempenho."] },
-      { "title": "O que não fazemos", "items": ["Nunca vendemos seus dados. Nem para anunciantes, nem para corretores de dados.", "Não mostramos anúncios. Não há redes de anúncios no Cherut.", "Não usamos seu diário, hábitos ou metas para treinar modelos de IA.", "Não compartilhamos seus dados pessoais com terceiros sem seu consentimento."] },
-      { "title": "Como armazenamos", "items": ["Os dados são armazenados no Firebase (Google Cloud) com criptografia em repouso e em trânsito.", "Backups rodam diariamente e são retidos por 30 dias.", "Usamos TLS padrão da indústria para todos os dados em trânsito.", "O acesso aos dados de produção é restrito aos membros principais do time."] },
-      { "title": "Seus direitos", "items": ["Exportar: você pode baixar todos os seus dados como JSON a qualquer momento em Configurações.", "Excluir: você pode excluir permanentemente sua conta e todos os dados associados.", "Correção: você pode atualizar ou corrigir qualquer informação pessoal que forneceu.", "Portabilidade: seus dados exportados estão em formatos abertos, sem aprisionamento."] },
-      { "title": "Contato", "items": ["Dúvidas sobre esta política? Escreva para contact@hanielrolemberg.com", "Buscamos responder a todas as solicitações de privacidade em até 5 dias úteis.", "Para pedidos urgentes de exclusão de dados, inclua \"URGENTE\" no assunto."] }
+      {
+        "title": "O que coletamos",
+        "items": [
+          "Seu e-mail e nome quando você se cadastra.",
+          "Dados de uso: quais recursos você usa e quando, para melhorar o produto.",
+          "Conteúdo que você cria: hábitos, tarefas, entradas de diário, OKRs. Armazenado criptografado.",
+          "Tipo de dispositivo e navegador para depuração e desempenho."
+        ]
+      },
+      {
+        "title": "O que não fazemos",
+        "items": [
+          "Nunca vendemos seus dados. Nem para anunciantes, nem para corretores de dados.",
+          "Não mostramos anúncios. Não há redes de anúncios no Cherut.",
+          "Não usamos seu diário, hábitos ou metas para treinar modelos de IA.",
+          "Não compartilhamos seus dados pessoais com terceiros sem seu consentimento."
+        ]
+      },
+      {
+        "title": "Como armazenamos",
+        "items": [
+          "Os dados são armazenados no Firebase (Google Cloud) com criptografia em repouso e em trânsito.",
+          "Backups rodam diariamente e são retidos por 30 dias.",
+          "Usamos TLS padrão da indústria para todos os dados em trânsito.",
+          "O acesso aos dados de produção é restrito aos membros principais do time."
+        ]
+      },
+      {
+        "title": "Seus direitos",
+        "items": [
+          "Exportar: você pode baixar todos os seus dados como JSON a qualquer momento em Configurações.",
+          "Excluir: você pode excluir permanentemente sua conta e todos os dados associados.",
+          "Correção: você pode atualizar ou corrigir qualquer informação pessoal que forneceu.",
+          "Portabilidade: seus dados exportados estão em formatos abertos, sem aprisionamento."
+        ]
+      },
+      {
+        "title": "Contato",
+        "items": [
+          "Dúvidas sobre esta política? Escreva para contact@hanielrolemberg.com",
+          "Buscamos responder a todas as solicitações de privacidade em até 5 dias úteis.",
+          "Para pedidos urgentes de exclusão de dados, inclua \"URGENTE\" no assunto."
+        ]
+      }
     ]
   },
   "roadmapPage": {
-    "hero": { "kicker": "Roadmap", "title": "O que estamos construindo", "lead": "Honestos sobre onde estamos e para onde vamos." },
+    "hero": {
+      "kicker": "Roadmap",
+      "title": "O que estamos construindo",
+      "lead": "Honestos sobre onde estamos e para onde vamos."
+    },
     "statusShipped": "Lançado",
     "statusInProgress": "Em progresso",
     "statusPlanned": "Planejado",
     "itemsCount": "{count} itens",
     "shipped": [
-      { "name": "Hábitos", "desc": "Acompanhamento diário com sequências, intenção e reflexão." },
-      { "name": "Tarefas e Quadros", "desc": "Quadros Kanban, visão em lista e gestão de tarefas." },
-      { "name": "OKRs", "desc": "Objetivos e resultados-chave com check-ins semanais." },
-      { "name": "Diário", "desc": "Intenções matinais, reflexões noturnas, anotações livres." },
-      { "name": "Quadro dos Sonhos", "desc": "Uma tela visual para o futuro que você está construindo." },
-      { "name": "Valores", "desc": "Defina sua bússola e confronte decisões com ela." },
-      { "name": "Áreas da Vida", "desc": "Segmente sua vida e equilibre o que importa." },
-      { "name": "Finanças", "desc": "Contas, transações, orçamentos e investimentos." }
+      {
+        "name": "Hábitos",
+        "desc": "Acompanhamento diário com sequências, intenção e reflexão."
+      },
+      {
+        "name": "Tarefas e Quadros",
+        "desc": "Quadros Kanban, visão em lista e gestão de tarefas."
+      },
+      {
+        "name": "OKRs",
+        "desc": "Objetivos e resultados-chave com check-ins semanais."
+      },
+      {
+        "name": "Diário",
+        "desc": "Intenções matinais, reflexões noturnas, anotações livres."
+      },
+      {
+        "name": "Quadro dos Sonhos",
+        "desc": "Uma tela visual para o futuro que você está construindo."
+      },
+      {
+        "name": "Valores",
+        "desc": "Defina sua bússola e confronte decisões com ela."
+      },
+      {
+        "name": "Áreas da Vida",
+        "desc": "Segmente sua vida e equilibre o que importa."
+      },
+      {
+        "name": "Finanças",
+        "desc": "Contas, transações, orçamentos e investimentos."
+      }
     ],
     "inProgress": [
-      { "name": "Sincronização de calendário", "desc": "Sincronização bidirecional com o Google Agenda." },
-      { "name": "Apps mobile", "desc": "Apps nativos para iOS e Android, atualmente em beta." }
+      {
+        "name": "Sincronização de calendário",
+        "desc": "Sincronização bidirecional com o Google Agenda."
+      },
+      {
+        "name": "Apps mobile",
+        "desc": "Apps nativos para iOS e Android, atualmente em beta."
+      }
     ],
     "planned": [
-      { "name": "Revisão semanal com IA", "desc": "Insights automáticos a partir dos seus hábitos e OKRs." },
-      { "name": "API aberta", "desc": "Construa suas próprias integrações com os dados do Cherut." },
-      { "name": "Times", "desc": "Metas compartilhadas e responsabilidade mútua para times pequenos." },
-      { "name": "Central de integrações", "desc": "Notion, Apple Health, Outlook, Slack e mais." },
-      { "name": "Widgets nativos", "desc": "Widgets de tela inicial para iOS e Android." }
+      {
+        "name": "Revisão semanal com IA",
+        "desc": "Insights automáticos a partir dos seus hábitos e OKRs."
+      },
+      {
+        "name": "API aberta",
+        "desc": "Construa suas próprias integrações com os dados do Cherut."
+      },
+      {
+        "name": "Times",
+        "desc": "Metas compartilhadas e responsabilidade mútua para times pequenos."
+      },
+      {
+        "name": "Central de integrações",
+        "desc": "Notion, Apple Health, Outlook, Slack e mais."
+      },
+      {
+        "name": "Widgets nativos",
+        "desc": "Widgets de tela inicial para iOS e Android."
+      }
     ],
     "footerNote": "O roadmap é moldado pelo que a comunidade pede.",
     "footerCta": "Sugerir um recurso"
@@ -1984,9 +2567,22 @@
       "joined": "Cadastro"
     },
     "pills": {
-      "role": { "user": "Usuário", "admin": "Admin" },
-      "plan": { "free": "Free", "core": "Core", "method": "Method", "mentorship": "Mentorship", "enterprise": "Enterprise" },
-      "status": { "active": "Ativo", "inactive": "Inativo", "cancelled": "Cancelado" }
+      "role": {
+        "user": "Usuário",
+        "admin": "Admin"
+      },
+      "plan": {
+        "free": "Free",
+        "core": "Core",
+        "method": "Method",
+        "mentorship": "Mentorship",
+        "enterprise": "Enterprise"
+      },
+      "status": {
+        "active": "Ativo",
+        "inactive": "Inativo",
+        "cancelled": "Cancelado"
+      }
     },
     "drawer": {
       "close": "Fechar",
@@ -2237,9 +2833,19 @@
     "noLessons": "Nenhuma lição ainda.",
     "addLesson": "Adicionar lição",
     "lessonCount": "{count} lições",
-    "status": { "published": "Publicado", "draft": "Rascunho" },
-    "plan": { "any": "Qualquer plano" },
-    "planOptions": { "any": "Qualquer plano", "core": "Core", "method": "Method", "mentorship": "Mentorship" },
+    "status": {
+      "published": "Publicado",
+      "draft": "Rascunho"
+    },
+    "plan": {
+      "any": "Qualquer plano"
+    },
+    "planOptions": {
+      "any": "Qualquer plano",
+      "core": "Core",
+      "method": "Method",
+      "mentorship": "Mentorship"
+    },
     "editModule": "Editar módulo",
     "deleteModule": "Excluir módulo",
     "editLesson": "Editar lição",
@@ -2271,15 +2877,48 @@
       "greeting": "Bom dia, Alex",
       "subGreeting": "Quarta-feira, 14 de outubro · 5 itens precisam de atenção",
       "stats": {
-        "overdue": { "label": "Atrasadas", "sub": "A mais antiga está 3 dias atrasada" },
-        "dueToday": { "label": "Para hoje", "sub": "Próxima às 10:30" },
-        "habits": { "label": "Hábitos", "sub": "71% nos últimos 14 dias" },
-        "netWorth": { "label": "Patrimônio", "sub": "+2,4% este mês" }
+        "overdue": {
+          "label": "Atrasadas",
+          "sub": "A mais antiga está 3 dias atrasada"
+        },
+        "dueToday": {
+          "label": "Para hoje",
+          "sub": "Próxima às 10:30"
+        },
+        "habits": {
+          "label": "Hábitos",
+          "sub": "71% nos últimos 14 dias"
+        },
+        "netWorth": {
+          "label": "Patrimônio",
+          "sub": "+2,4% este mês"
+        }
       },
-      "balance": { "title": "Saldo", "link": "Finanças", "sub": "Últimos 30 dias · contas correntes" },
-      "taskProductivity": { "title": "Produtividade de tarefas", "link": "Tarefas", "sub": "Concluídas por semana · últimas 8 semanas", "weeksAgo": "8 semanas atrás", "thisWeek": "Esta semana" },
-      "habitConsistency": { "title": "Consistência de hábitos", "link": "Hábitos", "sub": "Últimos 14 dias" },
-      "habitNames": ["Corrida matinal", "Ler 20 páginas", "Trabalho focado 2h", "Meditar", "Sem açúcar", "Diário noturno"]
+      "balance": {
+        "title": "Saldo",
+        "link": "Finanças",
+        "sub": "Últimos 30 dias · contas correntes"
+      },
+      "taskProductivity": {
+        "title": "Produtividade de tarefas",
+        "link": "Tarefas",
+        "sub": "Concluídas por semana · últimas 8 semanas",
+        "weeksAgo": "8 semanas atrás",
+        "thisWeek": "Esta semana"
+      },
+      "habitConsistency": {
+        "title": "Consistência de hábitos",
+        "link": "Hábitos",
+        "sub": "Últimos 14 dias"
+      },
+      "habitNames": [
+        "Corrida matinal",
+        "Ler 20 páginas",
+        "Trabalho focado 2h",
+        "Meditar",
+        "Sem açúcar",
+        "Diário noturno"
+      ]
     },
     "okrs": {
       "title": "Objetivos",
@@ -2293,9 +2932,19 @@
           "progress": 42,
           "krLabel": "Resultados-chave (4)",
           "krs": [
-            { "t": "Lançar a primeira versão", "s": "1/1 lançamento (100%)", "done": true },
-            { "t": "Conseguir 50 usuários beta", "s": "21/50 usuários (42%)" },
-            { "t": "Publicar 8 diários de construção", "s": "3/8 posts (37%)" }
+            {
+              "t": "Lançar a primeira versão",
+              "s": "1/1 lançamento (100%)",
+              "done": true
+            },
+            {
+              "t": "Conseguir 50 usuários beta",
+              "s": "21/50 usuários (42%)"
+            },
+            {
+              "t": "Publicar 8 diários de construção",
+              "s": "3/8 posts (37%)"
+            }
           ]
         },
         {
@@ -2303,9 +2952,19 @@
           "progress": 60,
           "krLabel": "Resultados-chave (3)",
           "krs": [
-            { "t": "Correr 300 km neste trimestre", "s": "186/300 km (62%)" },
-            { "t": "Corrida longa de 18 km", "s": "1/1 corrida (100%)", "done": true },
-            { "t": "Sessões de força", "s": "14/24 sessões (58%)" }
+            {
+              "t": "Correr 300 km neste trimestre",
+              "s": "186/300 km (62%)"
+            },
+            {
+              "t": "Corrida longa de 18 km",
+              "s": "1/1 corrida (100%)",
+              "done": true
+            },
+            {
+              "t": "Sessões de força",
+              "s": "14/24 sessões (58%)"
+            }
           ]
         },
         {
@@ -2313,22 +2972,71 @@
           "progress": 25,
           "krLabel": "Resultados-chave (4)",
           "krs": [
-            { "t": "Economizar US$ 6.000", "s": "1.500/6.000 USD (25%)" },
-            { "t": "Cancelar 3 assinaturas", "s": "2/3 canceladas (66%)" },
-            { "t": "Revisão financeira semanal", "s": "5/12 revisões (41%)" }
+            {
+              "t": "Economizar US$ 6.000",
+              "s": "1.500/6.000 USD (25%)"
+            },
+            {
+              "t": "Cancelar 3 assinaturas",
+              "s": "2/3 canceladas (66%)"
+            },
+            {
+              "t": "Revisão financeira semanal",
+              "s": "5/12 revisões (41%)"
+            }
           ]
         }
       ]
     },
     "tasks": {
       "boardName": "Pessoal",
-      "tabs": { "board": "Quadro", "calendar": "Calendário", "time": "Tempo" },
+      "tabs": {
+        "board": "Quadro",
+        "calendar": "Calendário",
+        "time": "Tempo"
+      },
       "columns": [
-        { "title": "Backlog", "items": ["Planejar o próximo trimestre", "Renovar passaporte", "Pesquisar tênis de corrida", "Organizar biblioteca de fotos", "Marcar dentista"] },
-        { "title": "Esta semana", "items": ["Redigir texto da landing page", "Ligar para o banco", "Preparar revisão do time", "Fazer compras"] },
-        { "title": "Hoje", "items": ["Escrever 500 palavras", "30 min de espanhol", "Responder e-mail do cliente"] },
-        { "title": "Fazendo", "items": ["Editar capítulo 2", "Atualizar orçamento"] },
-        { "title": "Concluído", "items": ["Corrida matinal", "Revisão semanal"] }
+        {
+          "title": "Backlog",
+          "items": [
+            "Planejar o próximo trimestre",
+            "Renovar passaporte",
+            "Pesquisar tênis de corrida",
+            "Organizar biblioteca de fotos",
+            "Marcar dentista"
+          ]
+        },
+        {
+          "title": "Esta semana",
+          "items": [
+            "Redigir texto da landing page",
+            "Ligar para o banco",
+            "Preparar revisão do time",
+            "Fazer compras"
+          ]
+        },
+        {
+          "title": "Hoje",
+          "items": [
+            "Escrever 500 palavras",
+            "30 min de espanhol",
+            "Responder e-mail do cliente"
+          ]
+        },
+        {
+          "title": "Fazendo",
+          "items": [
+            "Editar capítulo 2",
+            "Atualizar orçamento"
+          ]
+        },
+        {
+          "title": "Concluído",
+          "items": [
+            "Corrida matinal",
+            "Revisão semanal"
+          ]
+        }
       ]
     },
     "dreams": {
@@ -2338,22 +3046,58 @@
       "active": "Ativo",
       "archived": "Arquivado",
       "items": [
-        { "t": "Morar à beira-mar", "s": "Um ano trabalhando remotamente no litoral", "pill": "78 dias" },
-        { "t": "Correr uma maratona", "s": "Terminar 42 km em menos de 4 horas", "pill": "120 dias" },
-        { "t": "Uma casa para meus pais", "s": "Ajudá-los a se mudar para um lugar tranquilo", "pill": "2 anos" },
-        { "t": "Abrir meu próprio estúdio", "s": "Independente e lucrativo", "pill": "Atrasado" }
+        {
+          "t": "Morar à beira-mar",
+          "s": "Um ano trabalhando remotamente no litoral",
+          "pill": "78 dias"
+        },
+        {
+          "t": "Correr uma maratona",
+          "s": "Terminar 42 km em menos de 4 horas",
+          "pill": "120 dias"
+        },
+        {
+          "t": "Uma casa para meus pais",
+          "s": "Ajudá-los a se mudar para um lugar tranquilo",
+          "pill": "2 anos"
+        },
+        {
+          "t": "Abrir meu próprio estúdio",
+          "s": "Independente e lucrativo",
+          "pill": "Atrasado"
+        }
       ]
     },
     "habits": {
       "title": "Hábitos",
       "subtitle": "6 hábitos · últimos 30 dias · 71% no geral",
       "newHabit": "+ Novo hábito",
-      "names": ["Corrida matinal", "Ler 20 páginas", "Trabalho focado 2h", "Meditar 10 min", "Sem açúcar", "Diário noturno", "Dormir antes das 23h"],
+      "names": [
+        "Corrida matinal",
+        "Ler 20 páginas",
+        "Trabalho focado 2h",
+        "Meditar 10 min",
+        "Sem açúcar",
+        "Diário noturno",
+        "Dormir antes das 23h"
+      ],
       "stats": {
-        "bestStreak": { "label": "Melhor sequência", "value": "21 dias" },
-        "today": { "label": "Hoje", "sub": "3 restantes" },
-        "thisWeek": { "label": "Esta semana", "sub": "+6% vs. semana passada" },
-        "needsAttention": { "label": "Precisa de atenção", "sub": "Perdeu 3 de 7" }
+        "bestStreak": {
+          "label": "Melhor sequência",
+          "value": "21 dias"
+        },
+        "today": {
+          "label": "Hoje",
+          "sub": "3 restantes"
+        },
+        "thisWeek": {
+          "label": "Esta semana",
+          "sub": "+6% vs. semana passada"
+        },
+        "needsAttention": {
+          "label": "Precisa de atenção",
+          "sub": "Perdeu 3 de 7"
+        }
       }
     },
     "finances": {
@@ -2367,23 +3111,80 @@
       "addAccount": "Adicionar conta",
       "transactionsTitle": "Transações",
       "categories": [
-        ["Moradia", 72, "US$ 1.800"],
-        ["Mercado", 38, "US$ 620"],
-        ["Transporte", 22, "US$ 310"],
-        ["Educação", 14, "US$ 180"],
-        ["Lazer", 26, "US$ 390"]
+        [
+          "Moradia",
+          72,
+          "US$ 1.800"
+        ],
+        [
+          "Mercado",
+          38,
+          "US$ 620"
+        ],
+        [
+          "Transporte",
+          22,
+          "US$ 310"
+        ],
+        [
+          "Educação",
+          14,
+          "US$ 180"
+        ],
+        [
+          "Lazer",
+          26,
+          "US$ 390"
+        ]
       ],
       "accounts": [
-        ["Conta corrente principal", "Conta corrente", "US$ 3.240,00"],
-        ["Poupança", "Poupança", "US$ 9.240,00"],
-        ["Cartão de crédito", "Cartão", "−US$ 412,30"]
+        [
+          "Conta corrente principal",
+          "Conta corrente",
+          "US$ 3.240,00"
+        ],
+        [
+          "Poupança",
+          "Poupança",
+          "US$ 9.240,00"
+        ],
+        [
+          "Cartão de crédito",
+          "Cartão",
+          "−US$ 412,30"
+        ]
       ],
       "transactions": [
-        ["14 out", "Mercado", "Mercado", "−US$ 84,20"],
-        ["13 out", "Salário", "Receita", "+US$ 2.600,00"],
-        ["12 out", "Curso online", "Educação", "−US$ 49,00"],
-        ["11 out", "Cartão de metrô", "Transporte", "−US$ 30,00"],
-        ["10 out", "Aluguel", "Moradia", "−US$ 1.800,00"]
+        [
+          "14 out",
+          "Mercado",
+          "Mercado",
+          "−US$ 84,20"
+        ],
+        [
+          "13 out",
+          "Salário",
+          "Receita",
+          "+US$ 2.600,00"
+        ],
+        [
+          "12 out",
+          "Curso online",
+          "Educação",
+          "−US$ 49,00"
+        ],
+        [
+          "11 out",
+          "Cartão de metrô",
+          "Transporte",
+          "−US$ 30,00"
+        ],
+        [
+          "10 out",
+          "Aluguel",
+          "Moradia",
+          "−US$ 1.800,00"
+        ]
       ]
     },
     "learning": {
@@ -2397,28 +3198,76 @@
       "modulesTitle": "Módulos",
       "percentComplete": "58% concluído",
       "modules": [
-        ["Uma Direção", "4 lições · 32 min"],
-        ["Intensidade Estruturada", "5 lições · 41 min"],
-        ["Atravessar o Momento Difícil", "5 lições · 38 min"],
-        ["Voltar Sem Recomeçar do Zero", "4 lições · 29 min"]
+        [
+          "Uma Direção",
+          "4 lições · 32 min"
+        ],
+        [
+          "Intensidade Estruturada",
+          "5 lições · 41 min"
+        ],
+        [
+          "Atravessar o Momento Difícil",
+          "5 lições · 38 min"
+        ],
+        [
+          "Voltar Sem Recomeçar do Zero",
+          "4 lições · 29 min"
+        ]
       ],
-      "templates": { "label": "Templates", "sub": "Prontos para aplicar" },
-      "streak": { "label": "Sequência de prática", "value": "9 dias", "sub": "Mantenha o percurso" }
+      "templates": {
+        "label": "Templates",
+        "sub": "Prontos para aplicar"
+      },
+      "streak": {
+        "label": "Sequência de prática",
+        "value": "9 dias",
+        "sub": "Mantenha o percurso"
+      }
     },
     "journal": {
       "title": "Diário",
       "subtitle": "Intenções matinais e reflexões noturnas",
       "newEntry": "+ Nova entrada",
       "days": [
-        ["Hoje", "Quarta-feira, 14 de out"],
-        ["Ontem", "Terça-feira, 13 de out"],
-        ["Segunda", "12 de out"],
-        ["Domingo", "Revisão semanal · 11 de out"],
-        ["Sábado", "10 de out"]
+        [
+          "Hoje",
+          "Quarta-feira, 14 de out"
+        ],
+        [
+          "Ontem",
+          "Terça-feira, 13 de out"
+        ],
+        [
+          "Segunda",
+          "12 de out"
+        ],
+        [
+          "Domingo",
+          "Revisão semanal · 11 de out"
+        ],
+        [
+          "Sábado",
+          "10 de out"
+        ]
       ],
       "entries": [
-        { "label": "Intenção matinal", "body": "Uma coisa que move o projeto paralelo: terminar o fluxo de onboarding antes do almoço. Todo o resto espera.", "tags": ["Focado", "Dormiu 7h"] },
-        { "label": "Reflexão noturna", "body": "Terminei o fluxo, pulei a corrida. Percebi que pegava o celular toda vez que uma tarefa parecia pouco clara. Amanhã: escrever o próximo passo antes de começar.", "tags": ["Calmo", "Cumpriu 3 de 4 compromissos"] }
+        {
+          "label": "Intenção matinal",
+          "body": "Uma coisa que move o projeto paralelo: terminar o fluxo de onboarding antes do almoço. Todo o resto espera.",
+          "tags": [
+            "Focado",
+            "Dormiu 7h"
+          ]
+        },
+        {
+          "label": "Reflexão noturna",
+          "body": "Terminei o fluxo, pulei a corrida. Percebi que pegava o celular toda vez que uma tarefa parecia pouco clara. Amanhã: escrever o próximo passo antes de começar.",
+          "tags": [
+            "Calmo",
+            "Cumpriu 3 de 4 compromissos"
+          ]
+        }
       ]
     },
     "calendar": {
@@ -2426,15 +3275,119 @@
       "segMonth": "Mês",
       "segWeek": "Semana",
       "segDay": "Dia",
-      "days": [["Seg", 12], ["Ter", 13], ["Qua", 14], ["Qui", 15], ["Sex", 16], ["Sáb", 17], ["Dom", 18]],
+      "days": [
+        [
+          "Seg",
+          12
+        ],
+        [
+          "Ter",
+          13
+        ],
+        [
+          "Qua",
+          14
+        ],
+        [
+          "Qui",
+          15
+        ],
+        [
+          "Sex",
+          16
+        ],
+        [
+          "Sáb",
+          17
+        ],
+        [
+          "Dom",
+          18
+        ]
+      ],
       "events": [
-        [["Corrida matinal", ""], ["Bloco de trabalho focado", "Projeto paralelo"], ["Ligar pro banco", ""]],
-        [["Revisão de time", ""], ["Bloco de trabalho focado", "Projeto paralelo"], ["Dentista", ""]],
-        [["Corrida matinal", ""], ["Bloco de trabalho focado", "Projeto paralelo"], ["Almoço com Sam", ""], ["Escrever 500 palavras", ""]],
-        [["Workshop com cliente", ""], ["Meditar", ""]],
-        [["Corrida matinal", ""], ["1:1 com gestor", ""], ["Revisão semanal", ""]],
-        [["Corrida longa", "18 km"]],
-        [["Compras do mês", ""]]
+        [
+          [
+            "Corrida matinal",
+            ""
+          ],
+          [
+            "Bloco de trabalho focado",
+            "Projeto paralelo"
+          ],
+          [
+            "Ligar pro banco",
+            ""
+          ]
+        ],
+        [
+          [
+            "Revisão de time",
+            ""
+          ],
+          [
+            "Bloco de trabalho focado",
+            "Projeto paralelo"
+          ],
+          [
+            "Dentista",
+            ""
+          ]
+        ],
+        [
+          [
+            "Corrida matinal",
+            ""
+          ],
+          [
+            "Bloco de trabalho focado",
+            "Projeto paralelo"
+          ],
+          [
+            "Almoço com Sam",
+            ""
+          ],
+          [
+            "Escrever 500 palavras",
+            ""
+          ]
+        ],
+        [
+          [
+            "Workshop com cliente",
+            ""
+          ],
+          [
+            "Meditar",
+            ""
+          ]
+        ],
+        [
+          [
+            "Corrida matinal",
+            ""
+          ],
+          [
+            "1:1 com gestor",
+            ""
+          ],
+          [
+            "Revisão semanal",
+            ""
+          ]
+        ],
+        [
+          [
+            "Corrida longa",
+            "18 km"
+          ]
+        ],
+        [
+          [
+            "Compras do mês",
+            ""
+          ]
+        ]
       ]
     },
     "taskDetail": {
@@ -2451,11 +3404,24 @@
       "pomodorosValue": "2/3",
       "checklistLabel": "Checklist",
       "checklistProgress": "1/3",
-      "checklistItems": ["Esboçar as seções", "Escrever o texto do hero", "Adicionar tabela de preços"],
+      "checklistItems": [
+        "Esboçar as seções",
+        "Escrever o texto do hero",
+        "Adicionar tabela de preços"
+      ],
       "priorityLabel": "Prioridade",
-      "priorityOptions": ["Baixa", "Média", "Alta", "Urgente"],
+      "priorityOptions": [
+        "Baixa",
+        "Média",
+        "Alta",
+        "Urgente"
+      ],
       "dueDateLabel": "Prazo",
-      "dueDateOptions": ["Hoje", "Esta semana", "Sem data"],
+      "dueDateOptions": [
+        "Hoje",
+        "Esta semana",
+        "Sem data"
+      ],
       "lifeAreaLabel": "Área da vida",
       "lifeAreaValue": "Carreira",
       "objectiveLabel": "Objetivo",
@@ -2472,25 +3438,70 @@
       "clock": "00:24:18",
       "stopBtn": "■ Parar",
       "stats": {
-        "today": { "label": "Hoje", "value": "2h 40m", "sub": "4 sessões" },
-        "thisWeek": { "label": "Esta semana", "value": "14h 05m", "sub": "+1h 20m vs semana passada" },
-        "pomodoros": { "label": "Pomodoros", "value": "9", "sub": "Esta semana" }
+        "today": {
+          "label": "Hoje",
+          "value": "2h 40m",
+          "sub": "4 sessões"
+        },
+        "thisWeek": {
+          "label": "Esta semana",
+          "value": "14h 05m",
+          "sub": "+1h 20m vs semana passada"
+        },
+        "pomodoros": {
+          "label": "Pomodoros",
+          "value": "9",
+          "sub": "Esta semana"
+        }
       },
       "focusByDay": "Foco por dia",
-      "weekdayLabels": ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
+      "weekdayLabels": [
+        "Seg",
+        "Ter",
+        "Qua",
+        "Qui",
+        "Sex",
+        "Sáb",
+        "Dom"
+      ],
       "sessionLog": {
         "todayLabel": "Hoje",
         "todayTotal": "2h 40m",
         "todayEntries": [
-          ["#3B5BF6", "Escrever 500 palavras", "09:10 – 09:52", "42m"],
-          ["#2FAE7A", "Bloco de trabalho focado", "10:15 – 12:00", "1h 45m"],
-          ["#D98B2B", "Responder e-mail do cliente", "13:30 – 13:43", "13m"]
+          [
+            "#3B5BF6",
+            "Escrever 500 palavras",
+            "09:10 – 09:52",
+            "42m"
+          ],
+          [
+            "#2FAE7A",
+            "Bloco de trabalho focado",
+            "10:15 – 12:00",
+            "1h 45m"
+          ],
+          [
+            "#D98B2B",
+            "Responder e-mail do cliente",
+            "13:30 – 13:43",
+            "13m"
+          ]
         ],
         "yesterdayLabel": "Ontem",
         "yesterdayTotal": "3h 05m",
         "yesterdayEntries": [
-          ["#3B5BF6", "Editar capítulo 2", "08:50 – 10:20", "1h 30m"],
-          ["#2FAE7A", "Atualizar orçamento", "11:00 – 12:35", "1h 35m"]
+          [
+            "#3B5BF6",
+            "Editar capítulo 2",
+            "08:50 – 10:20",
+            "1h 30m"
+          ],
+          [
+            "#2FAE7A",
+            "Atualizar orçamento",
+            "11:00 – 12:35",
+            "1h 35m"
+          ]
         ]
       }
     }
