@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useMediaQuery } from '@mantine/hooks';
 import { Plus, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import {
   Title,
@@ -11,9 +12,6 @@ import {
   Group,
   Stack,
   SimpleGrid,
-  Modal,
-  TextInput,
-  Textarea,
   Loader,
   Center,
   ActionIcon,
@@ -21,25 +19,21 @@ import {
   Menu,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
-import { useLifeAreas, useCreateLifeArea, useUpdateLifeArea, useDeleteLifeArea } from '@/hooks/useLifeAreas';
+import { useLifeAreas, useDeleteLifeArea } from '@/hooks/useLifeAreas';
 import { Surface } from '@/components/ui/Surface';
-import { CreateLifeAreaDto, LifeArea } from '@/lib/api/services/lifeAreas';
+import { LifeArea } from '@/lib/api/services/lifeAreas';
+import { EditDrawer } from './components/EditDrawer';
 
 export default function LifeAreasPage() {
   const t = useTranslations('lifeAreas');
   const { data: lifeAreas, isLoading } = useLifeAreas();
-  const createMutation = useCreateLifeArea();
-  const updateMutation = useUpdateLifeArea();
   const deleteMutation = useDeleteLifeArea();
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingArea, setEditingArea] = useState<LifeArea | null>(null);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set());
-  const [formData, setFormData] = useState<CreateLifeAreaDto>({
-    name: '',
-    description: '',
-  });
 
   // Helper function to truncate text by character count
   const truncateText = (text: string, limit: number) => {
@@ -60,31 +54,14 @@ export default function LifeAreasPage() {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      if (editingArea) {
-        await updateMutation.mutateAsync({ id: editingArea.id, dto: formData });
-      } else {
-        await createMutation.mutateAsync(formData);
-      }
-
-      setIsModalOpen(false);
-      setEditingArea(null);
-      setFormData({ name: '', description: '' });
-    } catch (error) {
-      console.error('Error saving life area:', error);
-    }
+  const handleAreaCreated = (area: LifeArea) => {
+    // Keeps the drawer open, now in edit mode, for the life area just created.
+    setEditingArea(area);
   };
 
   const handleEdit = (area: LifeArea) => {
     setEditingArea(area);
-    setFormData({
-      name: area.name,
-      description: area.description || '',
-    });
-    setIsModalOpen(true);
+    setDrawerOpen(true);
   };
 
   const handleDelete = (id: string) => {
@@ -123,8 +100,7 @@ export default function LifeAreasPage() {
 
   const handleNew = () => {
     setEditingArea(null);
-    setFormData({ name: '', description: '' });
-    setIsModalOpen(true);
+    setDrawerOpen(true);
   };
 
   if (isLoading) {
@@ -136,7 +112,7 @@ export default function LifeAreasPage() {
   }
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }}>
+    <Surface p={{ base: 'md', sm: 'xl' }} style={{ paddingRight: drawerOpen && isDesktop ? 460 : undefined, transition: 'padding-right 0.2s ease' }}>
     <Stack
       gap="xl"
       style={{
@@ -214,7 +190,7 @@ export default function LifeAreasPage() {
             onMouseLeave={() => setHoveredCard(null)}
             style={{
               background: 'white',
-              border: '1px solid #E5E7EB',
+              border: drawerOpen && editingArea?.id === area.id ? '1px solid #4686FE' : '1px solid #E5E7EB',
               transition: 'all 0.2s ease',
               position: 'relative',
             }}
@@ -393,183 +369,12 @@ export default function LifeAreasPage() {
         </Card>
       )}
 
-      {/* Modal */}
-      <Modal
-        opened={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingArea(null);
-        }}
-        title={
-          <Text
-            style={{
-              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '20px',
-              fontWeight: 600,
-              color: '#000000',
-            }}
-          >
-            {editingArea ? t('editLifeArea') : t('newLifeArea')}
-          </Text>
-        }
-        size="md"
-        radius={16}
-        styles={{
-          content: {
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            display: 'flex',
-            flexDirection: 'column',
-            maxHeight: '85dvh',
-            overflow: 'hidden',
-          },
-          body: {
-            flex: 1,
-            minHeight: 0,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: 0,
-          },
-        }}
-      >
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}
-        >
-          <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
-            <Stack gap="lg" py="xs">
-              <TextInput
-                label={t('nameLabel')}
-                placeholder={t('namePlaceholder')}
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                withAsterisk
-                size="md"
-                radius={8}
-                styles={{
-                  label: {
-                    fontFamily: 'Inter, sans-serif',
-                    color: '#000000',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    fontFamily: 'Inter, sans-serif',
-                    backgroundColor: 'white',
-                    border: '1px solid #CCCCCC',
-                    color: '#000000',
-                    height: '48px',
-                    fontSize: '16px',
-                    '&::placeholder': {
-                      color: '#999999',
-                    },
-                    '&:focus': {
-                      borderColor: '#4686FE',
-                      boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                    },
-                  },
-                }}
-              />
-
-              <Textarea
-                label={t('description')}
-                placeholder={t('descriptionPlaceholder')}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-                radius={8}
-                styles={{
-                  label: {
-                    fontFamily: 'Inter, sans-serif',
-                    color: '#000000',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                    fontSize: '14px',
-                  },
-                  input: {
-                    fontFamily: 'Inter, sans-serif',
-                    backgroundColor: 'white',
-                    border: '1px solid #CCCCCC',
-                    color: '#000000',
-                    fontSize: '16px',
-                    '&::placeholder': {
-                      color: '#999999',
-                    },
-                    '&:focus': {
-                      borderColor: '#4686FE',
-                      boxShadow: '0 0 0 4px rgba(70, 134, 254, 0.1)',
-                    },
-                  },
-                }}
-              />
-            </Stack>
-          </Box>
-          <Box
-            px="md"
-            py="sm"
-            style={{
-              borderTop: '1px solid #E2E8F0',
-              paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-              flexShrink: 0,
-            }}
-          >
-            <Group justify="flex-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setEditingArea(null);
-                }}
-                radius={8}
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  borderColor: '#CCCCCC',
-                  color: '#333333',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  height: '48px',
-                  background: 'white',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      borderColor: '#4686FE',
-                      color: '#4686FE',
-                    },
-                  },
-                }}
-              >
-                {t('cancel')}
-              </Button>
-              <Button
-                type="submit"
-                loading={createMutation.isPending || updateMutation.isPending}
-                radius={8}
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  background: '#4686FE',
-                  border: 'none',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  color: 'white',
-                  height: '48px',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      background: '#3366E5',
-                    },
-                  },
-                }}
-              >
-                {editingArea ? t('update') : t('create')}
-              </Button>
-            </Group>
-          </Box>
-        </form>
-      </Modal>
+      <EditDrawer
+        opened={drawerOpen}
+        onClose={() => { setDrawerOpen(false); setEditingArea(null); }}
+        area={editingArea}
+        onCreated={handleAreaCreated}
+      />
     </Stack>
     </Surface>
   );

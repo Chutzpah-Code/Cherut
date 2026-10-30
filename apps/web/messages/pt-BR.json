@@ -1101,7 +1101,19 @@
     "description": "Descrição",
     "descriptionPlaceholder": "Descreva esta área da vida...",
     "update": "Atualizar",
-    "create": "Criar"
+    "create": "Criar",
+    "editDrawer": {
+      "editLabel": "EDITAR ÁREA DA VIDA",
+      "newLabel": "NOVA ÁREA DA VIDA",
+      "close": "Fechar",
+      "fieldRequired": "Este campo é obrigatório",
+      "fillNameHint": "Preencha o nome",
+      "savedStatus": "Alterações salvas automaticamente",
+      "errorStatus": "Falha ao salvar",
+      "finishEditing": "Concluir edição",
+      "createErrorTitle": "Erro",
+      "createFailed": "Falha ao criar a área da vida. Tente novamente."
+    }
   },
   "values": {
     "title": "Valores",

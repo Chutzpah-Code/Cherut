@@ -1101,7 +1101,19 @@
     "description": "Description",
     "descriptionPlaceholder": "Describe this life area...",
     "update": "Update",
-    "create": "Create"
+    "create": "Create",
+    "editDrawer": {
+      "editLabel": "EDIT LIFE AREA",
+      "newLabel": "NEW LIFE AREA",
+      "close": "Close",
+      "fieldRequired": "This field is required",
+      "fillNameHint": "Fill in the name",
+      "savedStatus": "Changes saved automatically",
+      "errorStatus": "Failed to save",
+      "finishEditing": "Finish editing",
+      "createErrorTitle": "Error",
+      "createFailed": "Failed to create the life area. Please try again."
+    }
   },
   "values": {
     "title": "Values",
