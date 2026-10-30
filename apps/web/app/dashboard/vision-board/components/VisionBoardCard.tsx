@@ -270,8 +270,8 @@ export function VisionBoardCard({
               cursor: 'pointer',
             }}
           >
-            {!isComplete && <Pencil size={14} />}
-            {isComplete ? t('editButton') : t('completeButton', { current: filledCount, total: VISUALIZATION_PROGRESS_TOTAL })}
+            <Pencil size={14} />
+            {t('editButton')}
           </Box>
         </Group>
       )}
