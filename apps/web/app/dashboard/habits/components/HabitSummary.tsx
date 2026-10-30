@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Box, Group, Text, Progress } from '@mantine/core';
 import { HabitLog } from '@/lib/api/services/habits';

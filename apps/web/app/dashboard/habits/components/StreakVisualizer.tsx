@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { Box, Group, Tooltip, UnstyledButton } from '@mantine/core';
+import { Group, Tooltip, UnstyledButton } from '@mantine/core';
 import { HabitLog } from '@/lib/api/services/habits';
 
 interface StreakVisualizerProps {

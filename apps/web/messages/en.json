@@ -798,10 +798,6 @@
     "page": {
       "title": "Habit Tracker",
       "subtitle": "Track your daily habits and build consistency",
-      "newGoodHabit": "New Good Habit",
-      "newBadHabit": "New Bad Habit",
-      "challengeTitle": "21-Day Challenge",
-      "challengeMessage": "Research shows it takes 21 days of consistent practice to form a new habit. Stay committed and track your progress daily!",
       "lifeArea": "Life Area",
       "selectArea": "Select an area",
       "titleLabel": "Title",
@@ -890,8 +886,19 @@
       "restoreHabit": "Restore Habit",
       "archiveHabit": "Archive Habit",
       "deleteHabit": "Delete Habit",
-      "cancel": "Cancel",
-      "saveChanges": "Save Changes"
+      "cancel": "Cancel"
+    },
+    "editDrawer": {
+      "editLabel": "EDIT HABIT",
+      "newLabel": "NEW HABIT",
+      "close": "Close",
+      "fieldRequired": "This field is required",
+      "fillRequiredHint": "Fill in the title and life area",
+      "savedStatus": "Changes saved automatically",
+      "errorStatus": "Failed to save",
+      "finishEditing": "Finish editing",
+      "createErrorTitle": "Error",
+      "createFailed": "Failed to create the habit. Please try again."
     }
   },
   "journal": {

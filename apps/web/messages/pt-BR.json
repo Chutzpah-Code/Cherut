@@ -798,10 +798,6 @@
     "page": {
       "title": "Rastreador de hábitos",
       "subtitle": "Acompanhe seus hábitos diários e construa consistência",
-      "newGoodHabit": "Novo hábito bom",
-      "newBadHabit": "Novo hábito ruim",
-      "challengeTitle": "Desafio de 21 dias",
-      "challengeMessage": "Estudos mostram que são necessários 21 dias de prática consistente para formar um novo hábito. Mantenha o compromisso e acompanhe seu progresso diariamente!",
       "lifeArea": "Área da vida",
       "selectArea": "Selecione uma área",
       "titleLabel": "Título",
@@ -890,8 +886,19 @@
       "restoreHabit": "Restaurar hábito",
       "archiveHabit": "Arquivar hábito",
       "deleteHabit": "Excluir hábito",
-      "cancel": "Cancelar",
-      "saveChanges": "Salvar alterações"
+      "cancel": "Cancelar"
+    },
+    "editDrawer": {
+      "editLabel": "EDITAR HÁBITO",
+      "newLabel": "NOVO HÁBITO",
+      "close": "Fechar",
+      "fieldRequired": "Este campo é obrigatório",
+      "fillRequiredHint": "Preencha o título e a área da vida",
+      "savedStatus": "Alterações salvas automaticamente",
+      "errorStatus": "Falha ao salvar",
+      "finishEditing": "Concluir edição",
+      "createErrorTitle": "Erro",
+      "createFailed": "Falha ao criar o hábito. Tente novamente."
     }
   },
   "journal": {

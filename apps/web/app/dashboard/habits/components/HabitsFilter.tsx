@@ -1,9 +1,7 @@
 'use client';
 
-import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Group, Button, Text, Badge } from '@mantine/core';
-import { Archive, Eye, EyeOff } from 'lucide-react';
 import { HabitCounts } from '@/lib/api/services/habits';
 
 export type HabitsFilterType = 'active' | 'archived' | 'all';

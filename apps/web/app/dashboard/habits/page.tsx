@@ -2,41 +2,31 @@
 
 import React, { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus } from 'lucide-react';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   Title,
   Text,
-  Button,
   Stack,
-  Modal,
-  TextInput,
-  Textarea,
-  Select,
   Loader,
   Center,
   Box,
-  Group,
-  Divider,
-  Alert,
-  Grid,
 } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
 import { modals } from '@mantine/modals';
-import { useHabits, useAllHabits, useCreateHabit, useUpdateHabit, useDeleteHabit, useLogHabit, useArchivedHabits, useHabitCounts, useToggleArchive, usePermanentDeleteHabit } from '@/hooks/useHabits';
+import { useHabits, useAllHabits, useDeleteHabit, useLogHabit, useArchivedHabits, useHabitCounts, useToggleArchive } from '@/hooks/useHabits';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
-import { CreateHabitDto, Habit } from '@/lib/api/services/habits';
+import { Habit } from '@/lib/api/services/habits';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { Surface } from '@/components/ui/Surface';
-import { HabitCard } from './components/HabitCard';
-import { HabitModal } from './components/HabitModal';
 import { HabitsFilter, HabitsFilterType } from './components/HabitsFilter';
 import { HabitColumn } from './components/HabitColumn';
+import { EditDrawer } from './components/EditDrawer';
 import { habitsApi } from '@/lib/api/services/habits';
 
 export default function HabitsPage() {
   const t = useTranslations('habits.page');
   const [currentFilter, setCurrentFilter] = useState<HabitsFilterType>('active');
   const colors = useThemeColors();
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const { data: activeHabits, isLoading: activeLoading } = useHabits(undefined, false); // Only active habits
   const { data: allHabits, isLoading: allLoading } = useAllHabits(); // All habits (active + archived)
@@ -47,31 +37,14 @@ export default function HabitsPage() {
   const habits = currentFilter === 'all' ? allHabits : activeHabits;
   const isLoading = currentFilter === 'all' ? allLoading : activeLoading;
   const { data: lifeAreas } = useLifeAreas();
-  const createMutation = useCreateHabit();
-  const updateMutation = useUpdateHabit();
   const deleteMutation = useDeleteHabit();
-  const permanentDeleteMutation = usePermanentDeleteHabit();
   const logMutation = useLogHabit();
   const archiveMutation = useToggleArchive();
 
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [creatingCategory, setCreatingCategory] = useState<'good' | 'bad'>('good');
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [habitLogs, setHabitLogs] = useState<Record<string, any[]>>({});
-
-  const [formData, setFormData] = useState<CreateHabitDto>({
-    title: '',
-    description: '',
-    category: 'good',
-    type: 'boolean',
-    frequency: 'daily',
-    lifeAreaId: '',
-    startDate: '',
-    dueDate: '',
-  });
-  const [startDateValue, setStartDateValue] = useState<Date | null>(null);
-  const [dueDateValue, setDueDateValue] = useState<Date | null>(null);
 
   const isPageLoading = isLoading || (currentFilter === 'archived' && archivedLoading);
 
@@ -107,57 +80,22 @@ export default function HabitsPage() {
 
   // Logs are loaded on-demand via loadHabitLogs when user interacts with a habit
 
-  const handleOpenCreateModal = (category: 'good' | 'bad') => {
+  const handleOpenCreateDrawer = (category: 'good' | 'bad') => {
     setCreatingCategory(category);
-    // Default start date: today
-    const defaultStartDate = new Date();
-    // Default due date: 21 days from today
-    const defaultDueDate = new Date();
-    defaultDueDate.setDate(defaultDueDate.getDate() + 21);
-
-    setStartDateValue(defaultStartDate);
-    setDueDateValue(defaultDueDate);
-
-    setFormData({
-      title: '',
-      description: '',
-      category,
-      type: 'boolean',
-      frequency: 'daily',
-      lifeAreaId: '',
-      startDate: defaultStartDate.toISOString().split('T')[0],
-      dueDate: defaultDueDate.toISOString().split('T')[0],
-    });
-    setIsCreateModalOpen(true);
+    setEditingHabit(null);
+    setDrawerOpen(true);
   };
 
-  const handleCreateSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await createMutation.mutateAsync(formData);
-      setIsCreateModalOpen(false);
-    } catch (error) {
-      console.error('Error creating habit:', error);
-    }
+  const handleHabitCreated = async (habit: Habit) => {
+    // Keeps the drawer open, now in edit mode, for the habit just created.
+    setEditingHabit(habit);
+    await loadHabitLogs(habit.id);
   };
 
   const handleEdit = async (habit: Habit) => {
     setEditingHabit(habit);
     await loadHabitLogs(habit.id);
-    setEditModalOpen(true);
-  };
-
-  const handleSaveEdit = async (habitId: string, updates: { title: string; description?: string; startDate?: string; dueDate?: string }) => {
-    try {
-      await updateMutation.mutateAsync({
-        id: habitId,
-        dto: updates,
-      });
-      setEditModalOpen(false);
-      setEditingHabit(null);
-    } catch (error) {
-      console.error('Error updating habit:', error);
-    }
+    setDrawerOpen(true);
   };
 
   const handleDelete = (habitId: string) => {
@@ -173,7 +111,7 @@ export default function HabitsPage() {
       onConfirm: async () => {
         try {
           await deleteMutation.mutateAsync(habitId);
-          setEditModalOpen(false);
+          setDrawerOpen(false);
           setEditingHabit(null);
         } catch (error) {
           console.error('Error deleting habit:', error);
@@ -184,32 +122,12 @@ export default function HabitsPage() {
 
   const handleArchive = (habitId: string) => {
     archiveMutation.mutate(habitId);
-    setEditModalOpen(false);
+    setDrawerOpen(false);
     setEditingHabit(null);
   };
 
   const handleUnarchive = (habit: Habit) => {
     archiveMutation.mutate(habit.id);
-  };
-
-  const handlePermanentDelete = (habitId: string) => {
-    modals.openConfirmModal({
-      title: t('deleteForeverTitle'),
-      children: (
-        <Text size="sm">
-          {t('deleteForeverBody')}
-        </Text>
-      ),
-      labels: { confirm: t('deleteForever'), cancel: t('cancel') },
-      confirmProps: { color: 'red' },
-      onConfirm: async () => {
-        try {
-          await permanentDeleteMutation.mutateAsync(habitId);
-        } catch (error) {
-          console.error('Error permanently deleting habit:', error);
-        }
-      },
-    });
   };
 
   const handleDayClick = async (habitId: string, date: string) => {
@@ -276,7 +194,7 @@ export default function HabitsPage() {
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
-      <Surface p={{ base: 'md', sm: 'xl' }}>
+      <Surface p={{ base: 'md', sm: 'xl' }} style={{ paddingRight: drawerOpen && isDesktop ? 480 : undefined, transition: 'padding-right 0.2s ease' }}>
       <Stack
         gap="xl"
         style={{
@@ -342,6 +260,7 @@ export default function HabitsPage() {
               addButtonText=""
               emptyStateTitle={t('archivedGoodEmpty')}
               emptyStateMessage={t('archivedGoodEmptyMsg')}
+              openHabitId={drawerOpen ? editingHabit?.id : undefined}
             />
 
             {/* Archived Bad Habits Column */}
@@ -357,6 +276,7 @@ export default function HabitsPage() {
               addButtonText=""
               emptyStateTitle={t('archivedBadEmpty')}
               emptyStateMessage={t('archivedBadEmptyMsg')}
+              openHabitId={drawerOpen ? editingHabit?.id : undefined}
             />
           </>
         ) : (
@@ -366,13 +286,14 @@ export default function HabitsPage() {
               title={t('goodTitle')}
               habits={goodHabits}
               habitLogs={habitLogs}
-              onAddHabit={() => handleOpenCreateModal('good')}
+              onAddHabit={() => handleOpenCreateDrawer('good')}
               onEdit={handleEdit}
               onDayClick={handleDayClick}
               isArchived={false}
               addButtonText={t('addGood')}
               emptyStateTitle={t('goodEmpty')}
               emptyStateMessage={t('goodEmptyMsg')}
+              openHabitId={drawerOpen ? editingHabit?.id : undefined}
             />
 
             {/* Bad Habits Column */}
@@ -380,234 +301,31 @@ export default function HabitsPage() {
               title={t('badTitle')}
               habits={badHabits}
               habitLogs={habitLogs}
-              onAddHabit={() => handleOpenCreateModal('bad')}
+              onAddHabit={() => handleOpenCreateDrawer('bad')}
               onEdit={handleEdit}
               onDayClick={handleDayClick}
               isArchived={false}
               addButtonText={t('addBad')}
               emptyStateTitle={t('badEmpty')}
               emptyStateMessage={t('badEmptyMsg')}
+              openHabitId={drawerOpen ? editingHabit?.id : undefined}
             />
           </>
         )}
       </Box>
 
-      {/* Create Modal */}
-      <Modal
-        opened={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title={
-          <Text
-            fw={600}
-            size="lg"
-            style={{
-              fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: '20px',
-              fontWeight: 600,
-              color: colors.text.primary,
-            }}
-          >
-            {creatingCategory === 'good' ? t('newGoodHabit') : t('newBadHabit')}
-          </Text>
-        }
-        size="md"
-        radius={16}
-        styles={{
-          content: {
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            display: 'flex',
-            flexDirection: 'column',
-            maxHeight: '85dvh',
-            overflow: 'hidden',
-          },
-          body: {
-            flex: 1,
-            minHeight: 0,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: 0,
-          },
-          header: {
-            padding: '24px 32px 0 32px',
-            borderBottom: 'none',
-          },
-        }}
-        overlayProps={{
-          backgroundOpacity: 0.6,
-          blur: 4,
-        }}
-      >
-        <form onSubmit={handleCreateSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <Box px="md" py="xs" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
-            <Stack gap="md">
-              <Alert
-                variant="light"
-                color="blue"
-                title={t('challengeTitle')}
-                radius={12}
-                styles={{
-                  root: {
-                    backgroundColor: '#EBF8FF',
-                    border: `1px solid ${colors.primary}`,
-                  },
-                  icon: {
-                    color: colors.primary,
-                  },
-                  title: {
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    color: colors.text.primary,
-                  },
-                  message: {
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 400,
-                    color: colors.text.secondary,
-                  },
-                }}
-              >
-                {t('challengeMessage')}
-              </Alert>
-              <Select
-                label={t('lifeArea')}
-                placeholder={t('selectArea')}
-                value={formData.lifeAreaId}
-                onChange={(value) => setFormData({ ...formData, lifeAreaId: value || '' })}
-                data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
-                required
-                withAsterisk
-              />
-
-              <TextInput
-                label={t('titleLabel')}
-                placeholder={t('titlePlaceholder')}
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                required
-                withAsterisk
-              />
-
-              <Textarea
-                label={t('description')}
-                placeholder={t('descriptionPlaceholder')}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-              />
-
-              <Grid grow>
-                <Grid.Col span={{ base: 12, sm: 6 }}>
-                  <DateInput
-                    label={t('startDate')}
-                    description={t('startDateDesc')}
-                    placeholder={t('startDatePlaceholder')}
-                    value={startDateValue}
-                    onChange={(date) => {
-                      setStartDateValue(date);
-                      setFormData({
-                        ...formData,
-                        startDate: date ? date.toISOString().split('T')[0] : '',
-                      });
-                    }}
-                    minDate={new Date()}
-                    withAsterisk
-                  />
-                </Grid.Col>
-                <Grid.Col span={{ base: 12, sm: 6 }}>
-                  <DateInput
-                    label={t('dueDate')}
-                    description={t('dueDateDesc')}
-                    placeholder={t('dueDatePlaceholder')}
-                    value={dueDateValue}
-                    onChange={(date) => {
-                      setDueDateValue(date);
-                      setFormData({
-                        ...formData,
-                        dueDate: date ? date.toISOString().split('T')[0] : '',
-                      });
-                    }}
-                    minDate={startDateValue || new Date()}
-                    withAsterisk
-                  />
-                </Grid.Col>
-              </Grid>
-            </Stack>
-          </Box>
-          <Box px="md" py="sm" style={{ borderTop: '1px solid #E2E8F0', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flexShrink: 0 }}>
-            <Group justify="flex-end">
-              <Button
-                variant="outline"
-                onClick={() => setIsCreateModalOpen(false)}
-                radius={8}
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  borderColor: colors.border,
-                  color: colors.text.primary,
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  height: '48px',
-                  background: colors.surfaceElevated,
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      borderColor: colors.primary,
-                      color: colors.primary,
-                    },
-                  },
-                }}
-              >
-                {t('cancel')}
-              </Button>
-              <Button
-                type="submit"
-                loading={createMutation.isPending}
-                color={creatingCategory === 'good' ? 'green' : 'red'}
-                radius={8}
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  height: '48px',
-                  backgroundColor: creatingCategory === 'good' ? '#22C55E' : '#EF4444',
-                  border: 'none',
-                  color: 'white',
-                }}
-                styles={{
-                  root: {
-                    '&:hover': {
-                      backgroundColor: creatingCategory === 'good' ? '#16A34A' : '#DC2626',
-                      transform: 'translateY(-1px)',
-                    },
-                  },
-                }}
-              >
-                {t('createHabit')}
-              </Button>
-            </Group>
-          </Box>
-        </form>
-      </Modal>
-
-      {/* Edit Modal */}
-      {editingHabit && (
-        <HabitModal
-          opened={editModalOpen}
-          onClose={() => {
-            setEditModalOpen(false);
-            setEditingHabit(null);
-          }}
-          habit={editingHabit}
-          logs={habitLogs[editingHabit.id] || []}
-          onSave={handleSaveEdit}
-          onDelete={handleDelete}
-          onArchive={handleArchive}
-          onDayClick={handleDayClick}
-          isSaving={updateMutation.isPending}
-        />
-      )}
+      <EditDrawer
+        opened={drawerOpen}
+        onClose={() => { setDrawerOpen(false); setEditingHabit(null); }}
+        habit={editingHabit}
+        category={creatingCategory}
+        logs={editingHabit ? habitLogs[editingHabit.id] || [] : []}
+        lifeAreas={lifeAreas || []}
+        onDelete={handleDelete}
+        onArchive={handleArchive}
+        onDayClick={handleDayClick}
+        onCreated={handleHabitCreated}
+      />
       </Stack>
       </Surface>
     </React.Fragment>

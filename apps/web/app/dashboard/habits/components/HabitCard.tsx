@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import { Card, Group, Stack, Text, ActionIcon, Badge, Box, ScrollArea, Menu } from '@mantine/core';
+import { Card, Group, Stack, Text, ActionIcon, Badge, Box, Menu } from '@mantine/core';
 import { Edit2, Flame, MoreVertical, ArchiveRestore, Eye } from 'lucide-react';
 import { Habit, HabitLog } from '@/lib/api/services/habits';
 import { HabitSummary } from './HabitSummary';
@@ -14,6 +14,7 @@ interface HabitCardProps {
   onDayClick: (habitId: string, date: string) => void;
   isArchived?: boolean;
   onUnarchive?: (habit: Habit) => void;
+  isOpenInDrawer?: boolean;
 }
 
 function calculateCurrentStreak(logs: HabitLog[]): number {
@@ -46,7 +47,7 @@ function calculateCurrentStreak(logs: HabitLog[]): number {
   return streak;
 }
 
-export function HabitCard({ habit, logs, onEdit, onDayClick, isArchived = false, onUnarchive }: HabitCardProps) {
+export function HabitCard({ habit, logs, onEdit, onDayClick, isArchived = false, onUnarchive, isOpenInDrawer = false }: HabitCardProps) {
   const t = useTranslations('habits.card');
   const currentStreak = calculateCurrentStreak(logs);
 
@@ -61,7 +62,7 @@ export function HabitCard({ habit, logs, onEdit, onDayClick, isArchived = false,
         radius={16}
         style={{
           background: '#FFFFFF',
-          border: '1px solid #E5E7EB',
+          border: isOpenInDrawer ? '1px solid #4686FE' : '1px solid #E5E7EB',
           transition: 'all 0.2s ease',
         }}
         styles={{

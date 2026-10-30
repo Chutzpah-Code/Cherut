@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Box, Stack, Title, Button, Group, Alert, ScrollArea } from '@mantine/core';
 import { Plus } from 'lucide-react';
 import { Habit, HabitLog } from '@/lib/api/services/habits';
@@ -19,6 +18,7 @@ interface HabitColumnProps {
   addButtonText: string;
   emptyStateTitle: string;
   emptyStateMessage: string;
+  openHabitId?: string;
 }
 
 export function HabitColumn({
@@ -33,6 +33,7 @@ export function HabitColumn({
   addButtonText,
   emptyStateTitle,
   emptyStateMessage,
+  openHabitId,
 }: HabitColumnProps) {
   const colors = useThemeColors();
   return (
@@ -152,6 +153,7 @@ export function HabitColumn({
                 onDayClick={onDayClick}
                 isArchived={isArchived}
                 onUnarchive={onUnarchive}
+                isOpenInDrawer={openHabitId === habit.id}
               />
             ))}
           </Stack>

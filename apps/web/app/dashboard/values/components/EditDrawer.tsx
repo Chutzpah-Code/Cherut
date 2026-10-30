@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMediaQuery } from '@mantine/hooks';
-import { Drawer, Group, Box, Text, ActionIcon, ThemeIcon, Button, TextInput, Textarea, Stack } from '@mantine/core';
-import { X, Heart, Check, Loader2, AlertCircle } from 'lucide-react';
+import { Drawer, Group, Box, Text, ActionIcon, Button, TextInput, Textarea, Stack } from '@mantine/core';
+import { X, Check, Loader2, AlertCircle } from 'lucide-react';
 import { notifications } from '@mantine/notifications';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCreateValue, useUpdateValue } from '@/hooks/useValues';
@@ -137,9 +137,6 @@ export function EditDrawer({ opened, onClose, value, onCreated }: EditDrawerProp
       <Box px="md" py="sm" style={{ borderBottom: '1px solid #E5E7EB', flexShrink: 0 }}>
         <Group justify="space-between" wrap="nowrap">
           <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
-            <ThemeIcon size={40} radius={8} variant="light" color="blue">
-              <Heart size={20} />
-            </ThemeIcon>
             <Box style={{ minWidth: 0 }}>
               <Text size="xs" c="dimmed" fw={700} tt="uppercase" style={{ letterSpacing: '0.04em' }}>
                 {mode === 'edit' ? te('editLabel') : te('newLabel')}
