@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { SimpleGrid, Card, Text, Badge, Group, ActionIcon, Stack, Menu, Tooltip, Image } from '@mantine/core';
+import { SimpleGrid, Card, Text, Badge, Group, ActionIcon, Stack, Menu, Image } from '@mantine/core';
 import { MoreVertical, ArchiveRestore, Trash2, Eye } from 'lucide-react';
 import { VisionBoardItem } from '@/lib/api/services/vision-board';
 
@@ -26,20 +26,12 @@ export function ArchivedVisionBoardGrid({ items, onUnarchive, onDelete, onView }
 
     const today = new Date();
     const due = new Date(dueDate);
-    const diffTime = due.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) {
       return <Badge color="red" variant="filled" size="sm">{td('overdue')}</Badge>;
-    } else if (diffDays === 0) {
-      return <Badge color="orange" variant="filled" size="sm">{td('today')}</Badge>;
-    } else if (diffDays <= 7) {
-      return <Badge color="yellow" variant="filled" size="sm">{td('daysLeft', { count: diffDays })}</Badge>;
-    } else if (diffDays <= 30) {
-      return <Badge color="cyan" variant="filled" size="sm">{td('days', { count: diffDays })}</Badge>;
-    } else {
-      return <Badge color="violet" variant="filled" size="sm">{td('days', { count: diffDays })}</Badge>;
     }
+    return <Badge color="violet" variant="filled" size="sm">{td('days', { count: diffDays })}</Badge>;
   };
 
   if (items.length === 0) {

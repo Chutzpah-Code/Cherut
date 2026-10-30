@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Title, Text, Button, Stack, Box, SimpleGrid, Loader, Center, Card, Group, ActionIcon, Tooltip } from '@mantine/core';
 import { Plus, Images, Play } from 'lucide-react';
