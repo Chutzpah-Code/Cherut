@@ -351,7 +351,7 @@ export function EditDrawer({
               <Grid grow>
                 <Grid.Col span={{ base: 4, sm: 4 }}>
                   <Box ta="center">
-                    <Text size="xl" fw={700} c={effectiveCategory === 'good' ? 'green' : 'red'}>{stats.currentStreak}</Text>
+                    <Text size="xl" fw={700} c="blue">{stats.currentStreak}</Text>
                     <Text size="xs" c="dimmed">{t('currentStreak')}</Text>
                   </Box>
                 </Grid.Col>

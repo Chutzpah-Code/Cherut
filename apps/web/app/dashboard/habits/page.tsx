@@ -140,44 +140,41 @@ export default function HabitsPage() {
 
     const logs = habitLogs[habitId] || [];
     const existingLog = logs.find((log) => log.date === date);
+    const newCompletedState = existingLog ? !existingLog.completed : true;
+    const previousLogsForHabit = logs;
+
+    // Atualiza a UI imediatamente (otimista); reverte se a chamada falhar.
+    if (existingLog) {
+      setHabitLogs((prev) => ({
+        ...prev,
+        [habitId]: prev[habitId].map((log) =>
+          log.date === date ? { ...log, completed: newCompletedState } : log
+        ),
+      }));
+    } else {
+      setHabitLogs((prev) => ({
+        ...prev,
+        [habitId]: [...(prev[habitId] || []), { id: `temp-${date}`, habitId, date, completed: true } as any],
+      }));
+    }
 
     try {
-      if (existingLog) {
-        // Se já existe, alternar o estado de completed
-        const newCompletedState = !existingLog.completed;
+      const savedLog = await logMutation.mutateAsync({
+        habitId,
+        date,
+        completed: newCompletedState,
+      });
 
-        await logMutation.mutateAsync({
-          habitId,
-          date,
-          completed: newCompletedState,
-        });
-
-        // Atualizar logs localmente
+      if (!existingLog) {
+        // Substitui o log temporário pelo registro real (com id definitivo).
         setHabitLogs((prev) => ({
           ...prev,
-          [habitId]: prev[habitId].map((log) =>
-            log.date === date ? { ...log, completed: newCompletedState } : log
-          ),
-        }));
-      } else {
-        // Se não existe, criar novo log como completado
-        const newLog = await logMutation.mutateAsync({
-          habitId,
-          date,
-          completed: true,
-        });
-
-        // Adicionar aos logs localmente
-        setHabitLogs((prev) => ({
-          ...prev,
-          [habitId]: [...(prev[habitId] || []), newLog],
+          [habitId]: prev[habitId].map((log) => (log.date === date ? savedLog : log)),
         }));
       }
-
-      // Recarregar logs do hábito
-      await loadHabitLogs(habitId);
     } catch (error) {
       console.error('Error toggling habit log:', error);
+      setHabitLogs((prev) => ({ ...prev, [habitId]: previousLogsForHabit }));
     }
   };
 
