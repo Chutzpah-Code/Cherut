@@ -4,6 +4,7 @@ import React from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import {
   Modal,
+  Drawer,
   TextInput,
   Textarea,
   Select,
@@ -772,6 +773,7 @@ export function TaskModal({
   const [formData, setFormData] = useState<UpdateTaskDto>({});
   const [newChecklistItem, setNewChecklistItem] = useState('');
 
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isTablet = useMediaQuery('(max-width: 759px)');
   const isPhone = useMediaQuery('(max-width: 519px)');
 
@@ -896,14 +898,37 @@ export function TaskModal({
   };
 
   return (
-    <Modal
+    <Drawer
       opened={opened}
       onClose={onClose}
-      withCloseButton
-      size={720}
-      radius={isPhone ? 0 : 12}
-      fullScreen={isPhone}
-      title={
+      position="right"
+      size={isPhone ? '100%' : 720}
+      withOverlay={!isDesktop}
+      closeOnClickOutside={!isDesktop}
+      withCloseButton={false}
+      padding={0}
+      styles={{
+        content: {
+          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          maxWidth: '100vw',
+          height: isPhone ? '100dvh' : undefined,
+          display: 'flex',
+          flexDirection: 'column',
+        },
+        body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
+      }}
+    >
+      <Box
+        style={{
+          padding: isPhone ? '16px 20px 12px' : '20px 24px 16px',
+          borderBottom: `1px solid ${BORDER}`,
+          flex: 'none',
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 12,
+        }}
+      >
         <Stack gap={6} style={{ minWidth: 0 }}>
           <Text style={{ fontFamily: 'Inter Display, sans-serif', fontSize: 17, fontWeight: 700, color: INK }}>
             {t('editTask')}
@@ -919,24 +944,11 @@ export function TaskModal({
             </Text>
           </Group>
         </Stack>
-      }
-      styles={{
-        content: {
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          display: 'flex',
-          flexDirection: 'column',
-          maxHeight: isPhone ? '100vh' : 'calc(100vh - 80px)',
-        },
-        header: {
-          padding: isPhone ? '16px 20px 12px' : '20px 24px 16px',
-          borderBottom: `1px solid ${BORDER}`,
-          flex: 'none',
-        },
-        close: { color: MUTED },
-        body: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 },
-      }}
-      overlayProps={{ backgroundOpacity: 0.36, color: '#0F172A' }}
-    >
+        <ActionIcon size={44} variant="subtle" onClick={onClose} aria-label={t('cancel')} style={{ color: MUTED, flexShrink: 0 }}>
+          <X size={20} />
+        </ActionIcon>
+      </Box>
+
       <Box style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <Box
           style={{
@@ -1310,7 +1322,6 @@ export function TaskModal({
           paddingBottom: isPhone ? 'max(12px, env(safe-area-inset-bottom))' : 22,
           borderTop: `1px solid ${BORDER}`,
           background: SURFACE,
-          borderRadius: isPhone ? 0 : '0 0 12px 12px',
           flexShrink: 0,
         }}
       >
@@ -1336,6 +1347,6 @@ export function TaskModal({
           </Button>
         </Group>
       </Box>
-    </Modal>
+    </Drawer>
   );
 }

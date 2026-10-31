@@ -445,6 +445,7 @@ interface BoardTimeLogViewProps {
 export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
   const t = useTranslations('tasks.timeLog');
   const locale = useLocale();
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
   const { data: columns, isLoading } = useBoardKanban(boardId);
   const [showManual, setShowManual] = useState(false);
   const [filterFrom, setFilterFrom] = useState('');
@@ -522,7 +523,11 @@ export function BoardTimeLogView({ boardId }: BoardTimeLogViewProps) {
   return (
     <>
       <style>{`@keyframes ttPulse { 0%,100%{opacity:1} 50%{opacity:.35} }`}</style>
-      <Stack gap="md" py="md">
+      <Stack
+        gap="md"
+        py="md"
+        style={{ paddingRight: modalOpened && isDesktop ? 720 : undefined, transition: 'padding-right 0.2s ease' }}
+      >
         <TimerBar
           tasks={tasks}
           activeTask={activeTask}

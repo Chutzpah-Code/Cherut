@@ -8,6 +8,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import ptBrLocale from '@fullcalendar/core/locales/pt-br';
 import type { EventClickArg } from '@fullcalendar/core';
 import { Box, Center, Loader, Text } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { useBoardKanban } from '@/hooks/useBoards';
 import {
   useUpdateTask,
@@ -47,6 +48,7 @@ function toLocalISOString(d: Date): string {
 export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
   const t = useTranslations('tasks.calendar');
   const locale = useLocale();
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
   const { data: columns, isLoading } = useBoardKanban(boardId);
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
@@ -138,7 +140,7 @@ export function BoardCalendarView({ boardId }: BoardCalendarViewProps) {
   }
 
   return (
-    <Box>
+    <Box style={{ paddingRight: modalOpened && isDesktop ? 720 : undefined, transition: 'padding-right 0.2s ease' }}>
       <style>{`
         .fc { font-family: 'Inter', -apple-system, sans-serif; }
         .fc .fc-toolbar-title { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #0F172A; }

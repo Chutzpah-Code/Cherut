@@ -214,7 +214,7 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           // toolbar row above the columns.
           height: isMobile ? 'calc(100dvh - 249px)' : 'calc(100dvh - 274px)',
           paddingBottom: 16,
-          paddingRight: !isDesktop ? undefined : manageOpened ? 480 : archivedOpened ? 420 : undefined,
+          paddingRight: !isDesktop ? undefined : modalOpened ? 720 : manageOpened ? 480 : archivedOpened ? 420 : undefined,
           marginLeft: isMobile ? -4 : 0,
           marginRight: isMobile ? -4 : 0,
           transition: 'padding-right 0.2s ease',
