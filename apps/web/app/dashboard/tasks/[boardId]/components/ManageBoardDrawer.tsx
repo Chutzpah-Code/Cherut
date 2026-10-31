@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import {
-  Modal,
+  Drawer,
   Stack,
   Box,
   Group,
@@ -14,9 +14,10 @@ import {
   Avatar,
   Button,
   Tooltip,
+  ThemeIcon,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { Trash2, UserPlus } from 'lucide-react';
+import { Trash2, UserPlus, Settings2, X } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { arrayMove } from '@dnd-kit/sortable';
 import { modals } from '@mantine/modals';
@@ -175,7 +176,7 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
                     else if (v === 'editor' || v === 'collaborator') handleRoleChange(member.uid, v);
                   }}
                   size="sm"
-                  style={{ width: isMobile ? undefined : 288, flex: isMobile ? 1 : undefined }}
+                  style={{ width: isMobile ? undefined : 200, flex: isMobile ? 1 : undefined }}
                   comboboxProps={{ width: 200 }}
                   allowDeselect={false}
                 />
@@ -189,7 +190,7 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
                   value={isPending ? 'pending' : member.role}
                   disabled
                   size="sm"
-                  style={{ width: isMobile ? undefined : 288, flex: isMobile ? 1 : undefined }}
+                  style={{ width: isMobile ? undefined : 200, flex: isMobile ? 1 : undefined }}
                   allowDeselect={false}
                 />
               )}
@@ -238,7 +239,7 @@ function MembersSection({ boardId, isMobile }: { boardId: string; isMobile: bool
   );
 }
 
-interface ManageBoardModalProps {
+interface ManageBoardDrawerProps {
   boardId: string;
   columns: KanbanColumn[];
   opened: boolean;
@@ -278,8 +279,10 @@ function ColumnNameInput({ name, onCommit }: { name: string; onCommit: (newName:
   );
 }
 
-export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBoardModalProps) {
+export function ManageBoardDrawer({ boardId, columns, opened, onClose }: ManageBoardDrawerProps) {
   const t = useTranslations('tasks.manageBoard');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isFullScreen = useMediaQuery('(max-width: 639px)');
   const isMobile = useMediaQuery('(max-width: 768px)');
   const queryClient = useQueryClient();
   const updateColumn = useUpdateColumn();
@@ -412,75 +415,102 @@ export function ManageBoardModal({ boardId, columns, opened, onClose }: ManageBo
   };
 
   return (
-    <Modal
+    <Drawer
       opened={opened}
       onClose={onClose}
-      title={<Text fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>{t('title')}</Text>}
-      size="xl"
-      radius={isMobile ? 0 : 'lg'}
-      fullScreen={isMobile}
+      position="right"
+      size={isFullScreen ? '100%' : 480}
+      withOverlay={!isDesktop}
+      closeOnClickOutside={!isDesktop}
+      withCloseButton={false}
+      padding={0}
+      styles={{
+        content: {
+          maxWidth: '100vw',
+          height: isFullScreen ? '100dvh' : undefined,
+          display: 'flex',
+          flexDirection: 'column',
+        },
+        body: { padding: 0, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' },
+      }}
     >
-      <Stack gap="lg">
-        <MembersSection boardId={boardId} isMobile={!!isMobile} />
+      <Box px="md" py="sm" style={{ borderBottom: '1px solid #E5E7EB', flexShrink: 0 }}>
+        <Group justify="space-between" wrap="nowrap">
+          <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+            <ThemeIcon size={40} radius={8} variant="light" color="blue">
+              <Settings2 size={20} />
+            </ThemeIcon>
+            <Text size="sm" fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>{t('title')}</Text>
+          </Group>
+          <ActionIcon size={44} variant="subtle" onClick={onClose} aria-label={t('close')}>
+            <X size={20} />
+          </ActionIcon>
+        </Group>
+      </Box>
 
-        {columns.map((col, index) => (
-          <Box key={col.id} style={{ border: '1px solid #E2E8F0', borderRadius: 12, padding: 16 }}>
-            <Group justify="space-between" mb="sm" wrap="wrap" gap="xs">
-              <Box style={{ flex: isMobile ? '1 1 100%' : 1, minWidth: 140 }}>
-                <ColumnNameInput name={col.name} onCommit={(name) => handleRenameColumn(col.id, name)} />
-              </Box>
-              <Group gap="xs" wrap="nowrap" style={{ flex: isMobile ? '1 1 100%' : undefined }}>
-                <Select
-                  data={columns.map((_, i) => ({ value: String(i), label: t('position', { n: i + 1 }) }))}
-                  value={String(index)}
-                  onChange={(v) => v !== null && handleMoveColumn(col.id, Number(v))}
-                  size="sm"
-                  style={{ width: isMobile ? undefined : 130, flex: isMobile ? 1 : undefined }}
-                  allowDeselect={false}
-                />
-                <ActionIcon
-                  color="red"
-                  variant="subtle"
-                  disabled={columns.length <= 1}
-                  onClick={() => handleDeleteColumn(col.id, col.name, col.tasks.length, archivedCountByColumn[col.id] ?? 0)}
-                >
-                  <Trash2 size={14} />
-                </ActionIcon>
+      <Box px="md" py="md" style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <Stack gap="lg">
+          <MembersSection boardId={boardId} isMobile={!!isMobile} />
+
+          {columns.map((col, index) => (
+            <Box key={col.id} style={{ border: '1px solid #E2E8F0', borderRadius: 12, padding: 16 }}>
+              <Group justify="space-between" mb="sm" wrap="wrap" gap="xs">
+                <Box style={{ flex: isMobile ? '1 1 100%' : 1, minWidth: 140 }}>
+                  <ColumnNameInput name={col.name} onCommit={(name) => handleRenameColumn(col.id, name)} />
+                </Box>
+                <Group gap="xs" wrap="nowrap" style={{ flex: isMobile ? '1 1 100%' : undefined }}>
+                  <Select
+                    data={columns.map((_, i) => ({ value: String(i), label: t('position', { n: i + 1 }) }))}
+                    value={String(index)}
+                    onChange={(v) => v !== null && handleMoveColumn(col.id, Number(v))}
+                    size="sm"
+                    style={{ width: isMobile ? undefined : 130, flex: isMobile ? 1 : undefined }}
+                    allowDeselect={false}
+                  />
+                  <ActionIcon
+                    color="red"
+                    variant="subtle"
+                    disabled={columns.length <= 1}
+                    onClick={() => handleDeleteColumn(col.id, col.name, col.tasks.length, archivedCountByColumn[col.id] ?? 0)}
+                  >
+                    <Trash2 size={14} />
+                  </ActionIcon>
+                </Group>
               </Group>
-            </Group>
 
-            <Stack gap={6}>
-              {col.tasks.length === 0 ? (
-                <Text size="xs" c="dimmed">{t('noTasks')}</Text>
-              ) : (
-                col.tasks.map((task, taskIndex) => (
-                  <Group key={task.id} justify="space-between" wrap="wrap" gap="xs">
-                    <Text size="sm" style={{ flex: '1 1 100%' }} lineClamp={1}>
-                      {task.title}
-                    </Text>
-                    <Select
-                      data={columns.map((c) => ({ value: c.id, label: c.name }))}
-                      value={col.id}
-                      onChange={(v) => v !== null && handleMoveTaskToColumn(task, col.id, v)}
-                      size="xs"
-                      style={{ flex: isMobile ? '1 1 auto' : undefined, width: isMobile ? undefined : 150 }}
-                      allowDeselect={false}
-                    />
-                    <Select
-                      data={col.tasks.map((_, i) => ({ value: String(i), label: `#${i + 1}` }))}
-                      value={String(taskIndex)}
-                      onChange={(v) => v !== null && handleMoveTaskPosition(task, col.id, Number(v))}
-                      size="xs"
-                      style={{ width: 80, flexShrink: 0 }}
-                      allowDeselect={false}
-                    />
-                  </Group>
-                ))
-              )}
-            </Stack>
-          </Box>
-        ))}
-      </Stack>
-    </Modal>
+              <Stack gap={6}>
+                {col.tasks.length === 0 ? (
+                  <Text size="xs" c="dimmed">{t('noTasks')}</Text>
+                ) : (
+                  col.tasks.map((task, taskIndex) => (
+                    <Group key={task.id} justify="space-between" wrap="wrap" gap="xs">
+                      <Text size="sm" style={{ flex: '1 1 100%' }} lineClamp={1}>
+                        {task.title}
+                      </Text>
+                      <Select
+                        data={columns.map((c) => ({ value: c.id, label: c.name }))}
+                        value={col.id}
+                        onChange={(v) => v !== null && handleMoveTaskToColumn(task, col.id, v)}
+                        size="xs"
+                        style={{ flex: isMobile ? '1 1 auto' : undefined, width: isMobile ? undefined : 150 }}
+                        allowDeselect={false}
+                      />
+                      <Select
+                        data={col.tasks.map((_, i) => ({ value: String(i), label: `#${i + 1}` }))}
+                        value={String(taskIndex)}
+                        onChange={(v) => v !== null && handleMoveTaskPosition(task, col.id, Number(v))}
+                        size="xs"
+                        style={{ width: 80, flexShrink: 0 }}
+                        allowDeselect={false}
+                      />
+                    </Group>
+                  ))
+                )}
+              </Stack>
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+    </Drawer>
   );
 }

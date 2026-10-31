@@ -244,6 +244,7 @@
     },
     "manageBoard": {
       "title": "Manage board",
+      "close": "Close",
       "deleteList": "Delete list",
       "deleteConfirmWithTasks": "Are you sure you want to delete \"{name}\"? This will also permanently delete {count, plural, one {# task} other {# tasks}} inside it. This action cannot be undone.",
       "deleteConfirmSimple": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
@@ -274,6 +275,7 @@
     },
     "archivedTasks": {
       "title": "Archived tasks",
+      "close": "Close",
       "loadError": "Couldn't load archived tasks",
       "serverError": "Server responded with {status}.",
       "genericError": "Something went wrong.",

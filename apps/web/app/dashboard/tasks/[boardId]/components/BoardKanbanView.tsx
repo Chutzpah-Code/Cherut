@@ -9,8 +9,8 @@ import { Plus, Settings2, Archive } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { KanbanList } from '../../components/KanbanList';
 import { TaskModal } from '../../components/TaskModal';
-import { ManageBoardModal } from './ManageBoardModal';
-import { ArchivedTasksModal } from './ArchivedTasksModal';
+import { ManageBoardDrawer } from './ManageBoardDrawer';
+import { ArchivedTasksDrawer } from './ArchivedTasksDrawer';
 import { Task, UpdateTaskDto } from '@/lib/api/services/tasks';
 import {
   useUpdateTask,
@@ -32,6 +32,7 @@ interface BoardKanbanViewProps {
 export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
   const t = useTranslations('tasks.kanbanView');
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalOpened, setModalOpened] = useState(false);
   const [manageOpened, setManageOpened] = useState(false);
@@ -213,8 +214,10 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
           // toolbar row above the columns.
           height: isMobile ? 'calc(100dvh - 249px)' : 'calc(100dvh - 274px)',
           paddingBottom: 16,
+          paddingRight: !isDesktop ? undefined : manageOpened ? 480 : archivedOpened ? 420 : undefined,
           marginLeft: isMobile ? -4 : 0,
           marginRight: isMobile ? -4 : 0,
+          transition: 'padding-right 0.2s ease',
         }}
       >
         <Group
@@ -262,14 +265,14 @@ export function BoardKanbanView({ boardId }: BoardKanbanViewProps) {
         </Group>
       </Box>
 
-      <ManageBoardModal
+      <ManageBoardDrawer
         boardId={boardId}
         columns={kanbanColumns}
         opened={manageOpened}
         onClose={() => setManageOpened(false)}
       />
 
-      <ArchivedTasksModal
+      <ArchivedTasksDrawer
         boardId={boardId}
         opened={archivedOpened}
         onClose={() => setArchivedOpened(false)}

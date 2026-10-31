@@ -244,6 +244,7 @@
     },
     "manageBoard": {
       "title": "Gerenciar quadro",
+      "close": "Fechar",
       "deleteList": "Excluir lista",
       "deleteConfirmWithTasks": "Tem certeza que deseja excluir \"{name}\"? Isso também excluirá permanentemente {count, plural, one {# tarefa} other {# tarefas}} dentro dela. Essa ação não pode ser desfeita.",
       "deleteConfirmSimple": "Tem certeza que deseja excluir \"{name}\"? Essa ação não pode ser desfeita.",
@@ -274,6 +275,7 @@
     },
     "archivedTasks": {
       "title": "Tarefas arquivadas",
+      "close": "Fechar",
       "loadError": "Não foi possível carregar as tarefas arquivadas",
       "serverError": "O servidor respondeu com {status}.",
       "genericError": "Algo deu errado.",
