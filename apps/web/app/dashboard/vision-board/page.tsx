@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Title, Text, Button, Stack, Box, SimpleGrid, Loader, Center, Card, Group, ActionIcon, Tooltip } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { Plus, Images, Play } from 'lucide-react';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
@@ -27,6 +28,7 @@ export default function VisionBoardPage() {
   const t = useTranslations('visionBoard.page');
   const tLightbox = useTranslations('visionBoard.lightbox');
   const [currentFilter, setCurrentFilter] = useState<VisionBoardFilterType>('active');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const { data: nonArchivedItems, isLoading: nonArchivedLoading } = useVisionBoardItems(false);
   // Lazy-load archived items — only fetch when the user switches to the archived tab
@@ -152,7 +154,10 @@ export default function VisionBoardPage() {
   const listForFilter = currentFilter === 'active' ? activeItems : currentFilter === 'completed' ? completedItems : archivedItems ?? [];
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }}>
+    <Surface
+      p={{ base: 'md', sm: 'xl' }}
+      style={{ paddingRight: editDrawerOpen && isDesktop ? 460 : undefined, transition: 'padding-right 0.2s ease' }}
+    >
     <Stack gap="xl" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
