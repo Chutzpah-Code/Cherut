@@ -927,19 +927,13 @@
       "totalCount": "{count, plural, one {# entrada no total} other {# entradas no total}}"
     },
     "entryForm": {
-      "newEntry": "Nova entrada de diário",
       "titleLabel": "Título",
       "titlePlaceholder": "Digite um título para sua entrada...",
       "contentLabel": "Conteúdo",
       "contentPlaceholder": "Escreva seus pensamentos aqui... O que está passando pela sua cabeça hoje?",
       "charCount": "{count} / 20.000 caracteres",
       "cancel": "Cancelar",
-      "saveEntry": "Salvar entrada",
-      "errorTitleRequired": "Digite um título para sua entrada.",
-      "errorContentRequired": "Escreva algo antes de salvar.",
-      "errorTitleTooLong": "Título muito longo. Máximo de 200 caracteres.",
-      "errorContentTooLong": "Entrada muito longa. Máximo de 20.000 caracteres.",
-      "errorSaveFailed": "Falha ao salvar a entrada. Tente novamente."
+      "saveEntry": "Salvar entrada"
     },
     "entryCard": {
       "untitled": "Entrada sem título",
@@ -958,23 +952,26 @@
       "untitled": "Entrada sem título",
       "created": "Criada em {date} às {time}",
       "edited": "Editada",
-      "lastUpdated": "Última atualização em {date} às {time}",
       "titleLabel": "Título",
       "contentLabel": "Conteúdo",
       "charCount": "{count} / 20.000 caracteres",
-      "charCountPlain": "{count} caracteres",
-      "cancel": "Cancelar",
-      "saveChanges": "Salvar alterações",
-      "close": "Fechar",
       "deleteTitle": "Excluir entrada de diário",
       "deleteBody": "Tem certeza que deseja excluir esta entrada de diário? Essa ação não pode ser desfeita.",
       "confirm": "Excluir",
-      "cancelBtn": "Cancelar",
-      "errorTitleRequired": "O título não pode ficar vazio.",
-      "errorContentRequired": "O conteúdo não pode ficar vazio.",
-      "errorTitleTooLong": "Título muito longo. Máximo de 200 caracteres.",
-      "errorContentTooLong": "Conteúdo muito longo. Máximo de 20.000 caracteres.",
-      "errorUpdateFailed": "Falha ao atualizar a entrada. Tente novamente."
+      "cancelBtn": "Cancelar"
+    },
+    "editDrawer": {
+      "editLabel": "EDITAR ENTRADA",
+      "newLabel": "NOVA ENTRADA",
+      "close": "Fechar",
+      "fieldRequired": "Este campo é obrigatório",
+      "fillRequiredHint": "Preencha o título e o conteúdo",
+      "savedStatus": "Alterações salvas automaticamente",
+      "errorStatus": "Falha ao salvar",
+      "finishEditing": "Concluir edição",
+      "archiveEntry": "Arquivar entrada",
+      "deleteEntry": "Excluir entrada",
+      "createFailed": "Falha ao criar a entrada. Tente novamente."
     }
   },
   "objectives": {

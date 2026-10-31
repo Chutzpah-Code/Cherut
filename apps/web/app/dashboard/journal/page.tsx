@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { useMediaQuery } from '@mantine/hooks';
 import { Plus, Search, Calendar, X } from 'lucide-react';
 import {
   Title,
@@ -16,34 +17,34 @@ import {
   Card,
   Grid,
   ActionIcon,
-  Popover,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
-import { useJournalEntries, useAllJournalEntries, useArchivedJournalEntries, useCreateJournalEntry, useToggleJournalArchive, useJournalCounts } from '@/hooks/useJournal';
+import { useJournalEntries, useAllJournalEntries, useArchivedJournalEntries, useToggleJournalArchive, useDeleteJournalEntry, useJournalCounts } from '@/hooks/useJournal';
 import { Surface } from '@/components/ui/Surface';
-import { JournalEntryForm } from './components/JournalEntryForm';
 import { EntryCard } from './components/EntryCard';
-import { EntryModal } from './components/EntryModal';
+import { EditDrawer } from './components/EditDrawer';
 import { JournalFilter, JournalFilterType } from './components/JournalFilter';
 import { JournalEntry } from '@/lib/api/services/journal';
+import { modals } from '@mantine/modals';
 
 export default function JournalPage() {
   const t = useTranslations('journal.page');
+  const te = useTranslations('journal.entryModal');
   const [currentFilter, setCurrentFilter] = useState<JournalFilterType>('active');
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
-  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [filteredEntries, setFilteredEntries] = useState<JournalEntry[]>([]);
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const { data: activeEntries, isLoading: activeLoading } = useJournalEntries(searchTerm, false);
   const { data: allEntries, isLoading: allLoading } = useAllJournalEntries(searchTerm);
   const { data: archivedEntries, isLoading: archivedLoading } = useArchivedJournalEntries(searchTerm);
   const { data: journalCounts } = useJournalCounts();
-  const createMutation = useCreateJournalEntry();
   const archiveMutation = useToggleJournalArchive();
+  const deleteMutation = useDeleteJournalEntry();
 
   const entries = currentFilter === 'all' ? allEntries : currentFilter === 'archived' ? archivedEntries : activeEntries;
   const isLoading = currentFilter === 'all' ? allLoading : currentFilter === 'archived' ? archivedLoading : activeLoading;
@@ -82,8 +83,14 @@ export default function JournalPage() {
     setFilteredEntries(filtered);
   }, [entries, dateRange]);
 
-  const handleCreateSuccess = () => {
-    setIsCreateFormOpen(false);
+  const handleCreateNew = () => {
+    setSelectedEntry(null);
+    setDrawerOpen(true);
+  };
+
+  const handleEntryCreated = (entry: JournalEntry) => {
+    // Keeps the drawer open, now in edit mode, for the entry just created.
+    setSelectedEntry(entry);
   };
 
   const clearFilters = () => {
@@ -107,16 +114,33 @@ export default function JournalPage() {
 
   const handleEntryClick = (entry: JournalEntry) => {
     setSelectedEntry(entry);
-    setModalOpen(true);
+    setDrawerOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setModalOpen(false);
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false);
     setSelectedEntry(null);
   };
 
   const handleUnarchive = (entry: JournalEntry) => {
     archiveMutation.mutate(entry.id);
+  };
+
+  const handleDelete = (id: string) => {
+    modals.openConfirmModal({
+      title: te('deleteTitle'),
+      children: <Text size="sm">{te('deleteBody')}</Text>,
+      labels: { confirm: te('confirm'), cancel: te('cancelBtn') },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        try {
+          await deleteMutation.mutateAsync(id);
+          handleCloseDrawer();
+        } catch (error) {
+          console.error('Error deleting journal entry:', error);
+        }
+      },
+    });
   };
 
 
@@ -133,7 +157,7 @@ export default function JournalPage() {
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
-      <Surface p={{ base: 'md', sm: 'xl' }}>
+      <Surface p={{ base: 'md', sm: 'xl' }} style={{ paddingRight: drawerOpen && isDesktop ? 520 : undefined, transition: 'padding-right 0.2s ease' }}>
       <Stack
         gap="xl"
         style={{
@@ -173,7 +197,7 @@ export default function JournalPage() {
         <Box>
           <Button
             leftSection={<Plus size={20} />}
-            onClick={() => setIsCreateFormOpen(true)}
+            onClick={handleCreateNew}
             radius={8}
             style={{
               fontFamily: 'Inter, sans-serif',
@@ -282,17 +306,6 @@ export default function JournalPage() {
         </Stack>
       )}
 
-      {/* Create Form */}
-      {isCreateFormOpen && (
-        <Box>
-          <JournalEntryForm
-            onSuccess={handleCreateSuccess}
-            onCancel={() => setIsCreateFormOpen(false)}
-            isLoading={createMutation.isPending}
-          />
-        </Box>
-      )}
-
       {/* Entries List */}
       {filteredEntries && filteredEntries.length > 0 ? (
         <Grid>
@@ -303,6 +316,7 @@ export default function JournalPage() {
                 onClick={() => handleEntryClick(entry)}
                 isArchived={currentFilter === 'archived'}
                 onUnarchive={currentFilter === 'archived' ? handleUnarchive : undefined}
+                isOpenInDrawer={drawerOpen && selectedEntry?.id === entry.id}
               />
             </Grid.Col>
           ))}
@@ -334,14 +348,13 @@ export default function JournalPage() {
         </Card>
       )}
 
-      {/* Entry Modal */}
-      {selectedEntry && (
-        <EntryModal
-          entry={selectedEntry}
-          opened={modalOpen}
-          onClose={handleCloseModal}
-        />
-      )}
+      <EditDrawer
+        opened={drawerOpen}
+        onClose={handleCloseDrawer}
+        entry={selectedEntry}
+        onDelete={handleDelete}
+        onCreated={handleEntryCreated}
+      />
       </Stack>
       </Surface>
     </>

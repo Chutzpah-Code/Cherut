@@ -927,19 +927,13 @@
       "totalCount": "{count, plural, one {# total entry} other {# total entries}}"
     },
     "entryForm": {
-      "newEntry": "New Journal Entry",
       "titleLabel": "Title",
       "titlePlaceholder": "Enter a title for your journal entry...",
       "contentLabel": "Content",
       "contentPlaceholder": "Write your thoughts here... What's on your mind today?",
       "charCount": "{count} / 20,000 characters",
       "cancel": "Cancel",
-      "saveEntry": "Save Entry",
-      "errorTitleRequired": "Please enter a title for your entry.",
-      "errorContentRequired": "Please write something before saving.",
-      "errorTitleTooLong": "Title is too long. Maximum 200 characters allowed.",
-      "errorContentTooLong": "Entry is too long. Maximum 20,000 characters allowed.",
-      "errorSaveFailed": "Failed to save entry. Please try again."
+      "saveEntry": "Save Entry"
     },
     "entryCard": {
       "untitled": "Untitled Entry",
@@ -958,23 +952,26 @@
       "untitled": "Untitled Entry",
       "created": "Created {date} at {time}",
       "edited": "Edited",
-      "lastUpdated": "Last updated {date} at {time}",
       "titleLabel": "Title",
       "contentLabel": "Content",
       "charCount": "{count} / 20,000 characters",
-      "charCountPlain": "{count} characters",
-      "cancel": "Cancel",
-      "saveChanges": "Save Changes",
-      "close": "Close",
       "deleteTitle": "Delete Journal Entry",
       "deleteBody": "Are you sure you want to delete this journal entry? This action cannot be undone.",
       "confirm": "Delete",
-      "cancelBtn": "Cancel",
-      "errorTitleRequired": "Title cannot be empty.",
-      "errorContentRequired": "Content cannot be empty.",
-      "errorTitleTooLong": "Title is too long. Maximum 200 characters allowed.",
-      "errorContentTooLong": "Content is too long. Maximum 20,000 characters allowed.",
-      "errorUpdateFailed": "Failed to update entry. Please try again."
+      "cancelBtn": "Cancel"
+    },
+    "editDrawer": {
+      "editLabel": "EDIT ENTRY",
+      "newLabel": "NEW ENTRY",
+      "close": "Close",
+      "fieldRequired": "This field is required",
+      "fillRequiredHint": "Fill in the title and content",
+      "savedStatus": "Changes saved automatically",
+      "errorStatus": "Failed to save",
+      "finishEditing": "Finish editing",
+      "archiveEntry": "Archive entry",
+      "deleteEntry": "Delete entry",
+      "createFailed": "Failed to create the entry. Please try again."
     }
   },
   "objectives": {

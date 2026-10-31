@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Card, Text, Group, Badge, ActionIcon, Menu } from '@mantine/core';
 import { MoreVertical, Edit, Trash2, Calendar, Eye, ArchiveRestore } from 'lucide-react';
@@ -15,9 +14,10 @@ interface EntryCardProps {
   onDelete?: () => void;
   isArchived?: boolean;
   onUnarchive?: (entry: JournalEntry) => void;
+  isOpenInDrawer?: boolean;
 }
 
-export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false, onUnarchive }: EntryCardProps) {
+export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false, onUnarchive, isOpenInDrawer = false }: EntryCardProps) {
   const t = useTranslations('journal.entryCard');
   const locale = useLocale();
   const dateFnsLocale = locale === 'pt-BR' ? ptBR : undefined;
@@ -50,7 +50,7 @@ export function EntryCard({ entry, onClick, onEdit, onDelete, isArchived = false
         }}
         styles={{
           root: {
-            border: '1px solid #E5E7EB',
+            border: isOpenInDrawer ? '1px solid #4686FE' : '1px solid #E5E7EB',
             '&:hover': {
               transform: 'translateY(-2px)',
               borderColor: '#4686FE',
