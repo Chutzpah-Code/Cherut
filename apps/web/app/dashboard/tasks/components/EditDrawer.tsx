@@ -47,12 +47,14 @@ export function EditDrawer({ opened, onClose, board, isOwner = true, onDelete, o
 
   const mountedRef = useRef(false);
   const dirtyRef = useRef(false);
+  const colorMountedRef = useRef(false);
 
   useEffect(() => {
     if (!opened) return;
     setFormState(toFormState(board));
     mountedRef.current = false;
     dirtyRef.current = false;
+    colorMountedRef.current = false;
     setSaveStatus('idle');
     setShowErrors(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -65,24 +67,43 @@ export function EditDrawer({ opened, onClose, board, isOwner = true, onDelete, o
     }
     if (mode === 'edit') dirtyRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState]);
+  }, [formState.name]);
 
-  const debouncedFormState = useDebounce(formState, 500);
+  const debouncedName = useDebounce(formState.name, 500);
 
   useEffect(() => {
     if (mode !== 'edit' || !board || !dirtyRef.current) return;
-    if (!debouncedFormState.name.trim()) return; // wait for a non-empty name
+    if (!debouncedName.trim()) return; // wait for a non-empty name
     dirtyRef.current = false;
     setSaveStatus('pending');
     updateMutation.mutate(
-      { boardId: board.id, dto: { name: debouncedFormState.name.trim(), colorIndex: debouncedFormState.colorIndex } },
+      { boardId: board.id, dto: { name: debouncedName.trim() } },
       {
         onSuccess: () => setSaveStatus('saved'),
         onError: () => setSaveStatus('error'),
       },
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedFormState]);
+  }, [debouncedName]);
+
+  // Color is a single deliberate click, not a keystroke stream — save it
+  // immediately instead of waiting out the name field's debounce.
+  useEffect(() => {
+    if (!colorMountedRef.current) {
+      colorMountedRef.current = true;
+      return;
+    }
+    if (mode !== 'edit' || !board) return;
+    setSaveStatus('pending');
+    updateMutation.mutate(
+      { boardId: board.id, dto: { colorIndex: formState.colorIndex } },
+      {
+        onSuccess: () => setSaveStatus('saved'),
+        onError: () => setSaveStatus('error'),
+      },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formState.colorIndex]);
 
   const requiredFieldsFilled = !!formState.name.trim();
 

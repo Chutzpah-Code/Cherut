@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 import {
   boardsApi,
+  Board,
   CreateBoardDto,
   UpdateBoardDto,
   CreateColumnDto,
@@ -52,6 +53,21 @@ export const useUpdateBoard = () => {
   return useMutation({
     mutationFn: ({ boardId, dto }: { boardId: string; dto: UpdateBoardDto }) =>
       boardsApi.update(boardId, dto),
+    onMutate: async ({ boardId, dto }) => {
+      await queryClient.cancelQueries({ queryKey: ['boards'] });
+      const previousBoards = queryClient.getQueryData<Board[]>(['boards']);
+
+      queryClient.setQueryData<Board[]>(['boards'], (old) =>
+        old?.map((b) => (b.id === boardId ? { ...b, ...dto } : b)),
+      );
+
+      return { previousBoards };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousBoards) {
+        queryClient.setQueryData(['boards'], context.previousBoards);
+      }
+    },
     onSuccess: (_data, { boardId }) => {
       queryClient.invalidateQueries({ queryKey: ['boards'] });
       queryClient.invalidateQueries({ queryKey: ['boards', boardId] });
