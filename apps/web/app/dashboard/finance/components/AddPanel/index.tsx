@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useMediaQuery } from '@mantine/hooks';
 import { Drawer, Box, Group, Text, UnstyledButton, Button, Modal } from '@mantine/core';
 import { useAddPanel, AddEntityType } from '../../add-panel-context';
 import { TransactionForm } from './TransactionForm';
@@ -14,6 +15,7 @@ import type { AddSubformHandle } from './types';
 export function AddPanel() {
   const t = useTranslations('finance.addPanel');
   const { state, openCreate, close } = useAddPanel();
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
   const formRef = useRef<AddSubformHandle>(null);
   const [valid, setValid] = useState(false);
   const [pending, setPending] = useState(false);
@@ -87,6 +89,8 @@ export function AddPanel() {
         onClose={requestClose}
         position="right"
         size={404}
+        withOverlay={!isDesktop}
+        closeOnClickOutside={!isDesktop}
         title={<Text fw={700} size="lg">{t('title')}</Text>}
         styles={{
           content: { maxWidth: '100vw' },
