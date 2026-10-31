@@ -9,11 +9,8 @@ import {
   Stack,
   ActionIcon,
   Menu,
-  Modal,
-  TextInput,
-  Button,
 } from '@mantine/core';
-import { MoreHorizontal, Edit2, Trash2, LayoutGrid, Palette, Check } from 'lucide-react';
+import { MoreHorizontal, Edit2, Trash2, LayoutGrid } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export interface Board {
@@ -35,31 +32,17 @@ export const BOARD_COLORS = [
 
 interface BoardCardProps {
   board: Board;
-  onRename: (id: string, newName: string) => void;
+  onEdit: (board: Board) => void;
   onDelete: (id: string) => void;
-  onColorChange: (id: string, colorIndex: number) => void;
   isOwner?: boolean;
+  isOpenInDrawer?: boolean;
 }
 
-export function BoardCard({ board, onRename, onDelete, onColorChange, isOwner = true }: BoardCardProps) {
+export function BoardCard({ board, onEdit, onDelete, isOwner = true, isOpenInDrawer = false }: BoardCardProps) {
   const t = useTranslations('tasks.boardCard');
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
-  const [renameOpen, setRenameOpen] = useState(false);
-  const [renameValue, setRenameValue] = useState('');
-  const [colorOpen, setColorOpen] = useState(false);
   const color = BOARD_COLORS[board.colorIndex % BOARD_COLORS.length];
-
-  const openRename = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setRenameValue(board.name);
-    setRenameOpen(true);
-  };
-
-  const submitRename = () => {
-    if (renameValue.trim()) onRename(board.id, renameValue.trim());
-    setRenameOpen(false);
-  };
 
   return (
     <>
@@ -70,7 +53,7 @@ export function BoardCard({ board, onRename, onDelete, onColorChange, isOwner = 
         style={{
           cursor: 'pointer',
           transition: 'all 0.2s cubic-bezier(0.2, 0, 0, 1)',
-          borderColor: isHovered ? color.accent : '#E9ECEF',
+          borderColor: isOpenInDrawer ? color.accent : isHovered ? color.accent : '#E9ECEF',
           boxShadow: isHovered
             ? `0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px ${color.accent}30`
             : '0 1px 3px rgba(0,0,0,0.06)',
@@ -117,17 +100,14 @@ export function BoardCard({ board, onRename, onDelete, onColorChange, isOwner = 
                 </ActionIcon>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Item leftSection={<Edit2 size={14} />} onClick={openRename}>
-                  {t('rename')}
-                </Menu.Item>
                 <Menu.Item
-                  leftSection={<Palette size={14} />}
+                  leftSection={<Edit2 size={14} />}
                   onClick={(e) => {
                     e.stopPropagation();
-                    setColorOpen(true);
+                    onEdit(board);
                   }}
                 >
-                  {t('color')}
+                  {t('edit')}
                 </Menu.Item>
                 {isOwner && (
                   <>
@@ -161,87 +141,6 @@ export function BoardCard({ board, onRename, onDelete, onColorChange, isOwner = 
           </Text>
         </Stack>
       </Card>
-
-      <Modal
-        opened={renameOpen}
-        onClose={() => setRenameOpen(false)}
-        title={
-          <Text fw={600} style={{ fontFamily: 'Inter Display, sans-serif' }}>
-            {t('renameBoard')}
-          </Text>
-        }
-        radius="lg"
-        centered
-        size="sm"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Stack gap="md">
-          <TextInput
-            label={t('boardNameLabel')}
-            value={renameValue}
-            onChange={(e) => setRenameValue(e.currentTarget.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') submitRename();
-              if (e.key === 'Escape') setRenameOpen(false);
-            }}
-            autoFocus
-            radius={10}
-          />
-          <Group justify="flex-end">
-            <Button variant="subtle" color="gray" onClick={() => setRenameOpen(false)}>
-              {t('cancel')}
-            </Button>
-            <Button
-              onClick={submitRename}
-              disabled={!renameValue.trim() || renameValue.trim() === board.name}
-              style={{ backgroundColor: '#4686FE' }}
-            >
-              {t('save')}
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
-
-      <Modal
-        opened={colorOpen}
-        onClose={() => setColorOpen(false)}
-        title={
-          <Text fw={600} style={{ fontFamily: 'Inter Display, sans-serif' }}>
-            {t('boardColor')}
-          </Text>
-        }
-        radius="lg"
-        centered
-        size="sm"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Group gap="sm" justify="center" py="xs">
-          {BOARD_COLORS.map((swatch, index) => {
-            const selected = index === board.colorIndex % BOARD_COLORS.length;
-            return (
-              <ActionIcon
-                key={index}
-                aria-label={t('colorAriaLabel', { index: index + 1 })}
-                onClick={() => {
-                  onColorChange(board.id, index);
-                  setColorOpen(false);
-                }}
-                radius="xl"
-                size={40}
-                style={{
-                  backgroundColor: swatch.accent,
-                  border: selected ? '2px solid #111' : '2px solid transparent',
-                  outline: selected ? '2px solid #fff' : 'none',
-                  outlineOffset: selected ? -4 : 0,
-                  cursor: 'pointer',
-                }}
-              >
-                {selected && <Check size={18} color="#fff" strokeWidth={3} />}
-              </ActionIcon>
-            );
-          })}
-        </Group>
-      </Modal>
     </>
   );
 }

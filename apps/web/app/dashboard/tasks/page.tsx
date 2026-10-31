@@ -13,20 +13,18 @@ import {
   TextInput,
   ActionIcon,
   Button,
-  Modal,
   Loader,
   Center,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { Plus, Search } from 'lucide-react';
 import { Surface } from '@/components/ui/Surface';
-import { BoardCard } from './components/BoardCard';
+import { BoardCard, Board } from './components/BoardCard';
+import { EditDrawer } from './components/EditDrawer';
 import { PendingInvitationsList } from './components/PendingInvitationsList';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useBoards,
-  useCreateBoard,
-  useUpdateBoard,
   useDeleteBoard,
   useEnsureDefaultBoard,
 } from '@/hooks/useBoards';
@@ -34,15 +32,14 @@ import {
 export default function TasksPage() {
   const t = useTranslations('tasks.boardList');
   const [search, setSearch] = useState('');
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [newBoardName, setNewBoardName] = useState('');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingBoard, setEditingBoard] = useState<Board | null>(null);
   const isMobile = useMediaQuery('(max-width: 600px)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const { user } = useAuth();
   const { data: boards, isLoading } = useBoards();
   const ensureDefault = useEnsureDefaultBoard();
-  const createBoard = useCreateBoard();
-  const updateBoard = useUpdateBoard();
   const deleteBoard = useDeleteBoard();
 
   // Ensure user has at least a default board on first visit
@@ -57,29 +54,25 @@ export default function TasksPage() {
     b.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleCreate = () => {
-    if (!newBoardName.trim()) return;
-    createBoard.mutate(
-      { name: newBoardName.trim(), colorIndex: (boards?.length ?? 0) % 8 },
-      {
-        onSuccess: () => {
-          setNewBoardName('');
-          setCreateModalOpen(false);
-        },
-      }
-    );
+  const handleCreateNew = () => {
+    setEditingBoard(null);
+    setDrawerOpen(true);
   };
 
-  const handleRename = (id: string, name: string) => {
-    updateBoard.mutate({ boardId: id, dto: { name } });
+  const handleBoardCreated = (board: Board) => {
+    // Keeps the drawer open, now in edit mode, for the board just created.
+    setEditingBoard(board);
+  };
+
+  const handleEdit = (board: Board) => {
+    setEditingBoard(board);
+    setDrawerOpen(true);
   };
 
   const handleDelete = (id: string) => {
     deleteBoard.mutate(id);
-  };
-
-  const handleColorChange = (id: string, colorIndex: number) => {
-    updateBoard.mutate({ boardId: id, dto: { colorIndex } });
+    setDrawerOpen(false);
+    setEditingBoard(null);
   };
 
   return (
@@ -88,7 +81,7 @@ export default function TasksPage() {
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
 
-      <Surface p={{ base: 'md', sm: 'xl' }} style={{ fontFamily: 'Inter, sans-serif' }}>
+      <Surface p={{ base: 'md', sm: 'xl' }} style={{ fontFamily: 'Inter, sans-serif', paddingRight: drawerOpen && isDesktop ? 420 : undefined, transition: 'padding-right 0.2s ease' }}>
       <Stack gap="xl">
         <Box>
           <Title
@@ -126,7 +119,7 @@ export default function TasksPage() {
           />
           <Button
             leftSection={<Plus size={16} />}
-            onClick={() => setCreateModalOpen(true)}
+            onClick={handleCreateNew}
             radius={10}
             fullWidth={isMobile}
             style={{ backgroundColor: '#4686FE', fontFamily: 'Inter, sans-serif' }}
@@ -145,10 +138,10 @@ export default function TasksPage() {
               <BoardCard
                 key={board.id}
                 board={{ id: board.id, name: board.name, colorIndex: board.colorIndex }}
-                onRename={handleRename}
+                onEdit={handleEdit}
                 onDelete={handleDelete}
-                onColorChange={handleColorChange}
                 isOwner={board.userId === user?.uid}
+                isOpenInDrawer={drawerOpen && editingBoard?.id === board.id}
               />
             ))}
 
@@ -166,7 +159,7 @@ export default function TasksPage() {
                 minHeight: 148,
                 transition: 'all 0.2s ease',
               }}
-              onClick={() => setCreateModalOpen(true)}
+              onClick={handleCreateNew}
             >
               <ActionIcon size={40} variant="light" color="blue" radius={12} mb="xs">
                 <Plus size={20} />
@@ -186,52 +179,14 @@ export default function TasksPage() {
       </Stack>
       </Surface>
 
-      <Modal
-        opened={createModalOpen}
-        onClose={() => {
-          setCreateModalOpen(false);
-          setNewBoardName('');
-        }}
-        title={
-          <Text fw={600} style={{ fontFamily: 'Inter Display, sans-serif' }}>
-            {t('createNewBoard')}
-          </Text>
-        }
-        radius="lg"
-        centered
-      >
-        <Stack>
-          <TextInput
-            label={t('boardNameLabel')}
-            placeholder={t('boardNamePlaceholder')}
-            value={newBoardName}
-            onChange={(e) => setNewBoardName(e.currentTarget.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-            autoFocus
-            radius={10}
-          />
-          <Group justify="flex-end" mt="sm">
-            <Button
-              variant="subtle"
-              color="gray"
-              onClick={() => {
-                setCreateModalOpen(false);
-                setNewBoardName('');
-              }}
-            >
-              {t('cancel')}
-            </Button>
-            <Button
-              onClick={handleCreate}
-              loading={createBoard.isPending}
-              disabled={!newBoardName.trim()}
-              style={{ backgroundColor: '#4686FE' }}
-            >
-              {t('createBoard')}
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+      <EditDrawer
+        opened={drawerOpen}
+        onClose={() => { setDrawerOpen(false); setEditingBoard(null); }}
+        board={editingBoard}
+        isOwner={editingBoard ? boards?.find((b) => b.id === editingBoard.id)?.userId === user?.uid : true}
+        onDelete={handleDelete}
+        onCreated={handleBoardCreated}
+      />
     </>
   );
 }

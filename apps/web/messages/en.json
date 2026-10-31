@@ -203,14 +203,9 @@
       }
     },
     "boardCard": {
-      "rename": "Rename",
-      "color": "Color",
+      "edit": "Edit",
       "delete": "Delete",
-      "renameBoard": "Rename board",
       "boardColor": "Board color",
-      "boardNameLabel": "Board name",
-      "cancel": "Cancel",
-      "save": "Save",
       "colorAriaLabel": "Board color {index}"
     },
     "viewSwitcher": {
@@ -388,6 +383,16 @@
       "priorityMedium": "Medium",
       "priorityHigh": "High",
       "priorityUrgent": "Urgent"
+    },
+    "editDrawer": {
+      "editLabel": "EDIT BOARD",
+      "newLabel": "NEW BOARD",
+      "close": "Close",
+      "fieldRequired": "This field is required",
+      "fillNameHint": "Fill in the board name",
+      "savedStatus": "Changes saved automatically",
+      "errorStatus": "Failed to save",
+      "finishEditing": "Finish editing"
     }
   },
   "finance": {

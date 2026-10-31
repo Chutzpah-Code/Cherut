@@ -203,14 +203,9 @@
       }
     },
     "boardCard": {
-      "rename": "Renomear",
-      "color": "Cor",
+      "edit": "Editar",
       "delete": "Excluir",
-      "renameBoard": "Renomear quadro",
       "boardColor": "Cor do quadro",
-      "boardNameLabel": "Nome do quadro",
-      "cancel": "Cancelar",
-      "save": "Salvar",
       "colorAriaLabel": "Cor do quadro {index}"
     },
     "viewSwitcher": {
@@ -388,6 +383,16 @@
       "priorityMedium": "Média",
       "priorityHigh": "Alta",
       "priorityUrgent": "Urgente"
+    },
+    "editDrawer": {
+      "editLabel": "EDITAR QUADRO",
+      "newLabel": "NOVO QUADRO",
+      "close": "Fechar",
+      "fieldRequired": "Este campo é obrigatório",
+      "fillNameHint": "Preencha o nome do quadro",
+      "savedStatus": "Alterações salvas automaticamente",
+      "errorStatus": "Falha ao salvar",
+      "finishEditing": "Concluir edição"
     }
   },
   "finance": {
