@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
-import { Save, Lock, Shield, Camera } from 'lucide-react';
+import { useMediaQuery } from '@mantine/hooks';
+import { Save, Lock, Shield, Camera, X } from 'lucide-react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import {
   Button,
@@ -23,7 +24,9 @@ import {
   Grid,
   PasswordInput,
   Alert,
-  Modal,
+  Drawer,
+  ActionIcon,
+  ThemeIcon,
   Badge,
   Tooltip,
   Box,
@@ -80,6 +83,8 @@ export default function ProfilePage() {
   const [avatarHovered, setAvatarHovered] = useState(false);
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isFullScreen = useMediaQuery('(max-width: 639px)');
 
   const [formData, setFormData] = useState<UpdateProfileDto>({
     displayName: '',
@@ -201,7 +206,10 @@ export default function ProfilePage() {
   const displayInitial = (formData.displayName?.[0] ?? user?.email?.[0] ?? 'U').toUpperCase();
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }}>
+    <Surface
+      p={{ base: 'md', sm: 'xl' }}
+      style={{ paddingRight: passwordModalOpened && isDesktop ? 440 : undefined, transition: 'padding-right 0.2s ease' }}
+    >
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
@@ -567,23 +575,41 @@ export default function ProfilePage() {
         </Card>
       </Stack>
 
-      {/* ── Password Modal ─────────────────────────────────────────────────── */}
-      <Modal
+      {/* ── Password Drawer ─────────────────────────────────────────────────── */}
+      <Drawer
         opened={passwordModalOpened}
         onClose={handlePasswordModalClose}
-        title={
-          <Group gap="xs">
-            <Shield size={20} />
-            <Text fw={600} size="lg">{tp('changePassword')}</Text>
-          </Group>
-        }
-        centered
-        radius={16}
+        position="right"
+        size={isFullScreen ? '100%' : 440}
+        withOverlay={!isDesktop}
+        closeOnClickOutside={!isDesktop}
+        withCloseButton={false}
+        padding={0}
         styles={{
-          header: { padding: '24px 24px 0 24px' },
-          body: { padding: '24px' },
+          content: {
+            maxWidth: '100vw',
+            height: isFullScreen ? '100dvh' : undefined,
+            display: 'flex',
+            flexDirection: 'column',
+          },
+          body: { padding: 0, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' },
         }}
       >
+        <Box px="md" py="sm" style={{ borderBottom: '1px solid #E5E7EB', flexShrink: 0 }}>
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+              <ThemeIcon size={40} radius={8} variant="light" color="blue">
+                <Shield size={20} />
+              </ThemeIcon>
+              <Text size="sm" fw={700} style={{ fontFamily: 'Inter Display, sans-serif' }}>{tp('changePassword')}</Text>
+            </Group>
+            <ActionIcon size={44} variant="subtle" onClick={handlePasswordModalClose} aria-label={tp('cancel')}>
+              <X size={20} />
+            </ActionIcon>
+          </Group>
+        </Box>
+
+        <Box px="md" py="md" style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
         {passwordSuccess ? (
           <Alert
             icon={<CheckCircle size={20} />}
@@ -685,7 +711,8 @@ export default function ProfilePage() {
             </Stack>
           </form>
         )}
-      </Modal>
+        </Box>
+      </Drawer>
     </Surface>
   );
 }
