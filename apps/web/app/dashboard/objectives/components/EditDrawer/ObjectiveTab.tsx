@@ -5,11 +5,15 @@ import { Stack, TextInput, Textarea, Select, Grid, Box, Text, Progress, Unstyled
 import { DateInput } from '@mantine/dates';
 import { ChevronRight } from 'lucide-react';
 import { Objective } from '@/lib/api/services/objectives';
+import { getLifeAreaDisplayName } from '@/lib/life-areas/display';
 import { ObjectiveFormState } from './types';
 
 interface LifeAreaOption {
   id: string;
   name: string;
+  isSystemPreset?: boolean;
+  presetSlug?: string;
+  nameOverridden?: boolean;
 }
 
 interface ObjectiveTabProps {
@@ -24,6 +28,7 @@ interface ObjectiveTabProps {
 
 export function ObjectiveTab({ formState, setField, lifeAreas, objective, keyResultsCount, showErrors, onGoToKeyResults }: ObjectiveTabProps) {
   const t = useTranslations('objectives');
+  const tPresets = useTranslations('lifeAreas.presets');
 
   return (
     <Stack gap="md">
@@ -52,7 +57,7 @@ export function ObjectiveTab({ formState, setField, lifeAreas, objective, keyRes
         placeholder={t('selectLifeArea')}
         required
         withAsterisk
-        data={lifeAreas.map((area) => ({ value: area.id, label: area.name }))}
+        data={lifeAreas.map((area) => ({ value: area.id, label: getLifeAreaDisplayName(area, tPresets) }))}
         value={formState.lifeAreaId || null}
         onChange={(value) => setField('lifeAreaId', value || '')}
         error={showErrors && !formState.lifeAreaId ? t('fieldRequired') : undefined}

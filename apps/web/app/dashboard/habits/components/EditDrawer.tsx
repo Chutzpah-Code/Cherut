@@ -13,11 +13,15 @@ import { notifications } from '@mantine/notifications';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCreateHabit, useUpdateHabit } from '@/hooks/useHabits';
 import { Habit, HabitLog } from '@/lib/api/services/habits';
+import { getLifeAreaDisplayName } from '@/lib/life-areas/display';
 import { StreakVisualizer } from './StreakVisualizer';
 
 interface LifeAreaOption {
   id: string;
   name: string;
+  isSystemPreset?: boolean;
+  presetSlug?: string;
+  nameOverridden?: boolean;
 }
 
 interface FormState {
@@ -109,6 +113,7 @@ export function EditDrawer({
   const t = useTranslations('habits.modal');
   const tp = useTranslations('habits.page');
   const te = useTranslations('habits.editDrawer');
+  const tPresets = useTranslations('lifeAreas.presets');
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isFullScreen = useMediaQuery('(max-width: 639px)');
 
@@ -281,7 +286,7 @@ export function EditDrawer({
             placeholder={tp('selectArea')}
             value={formState.lifeAreaId || null}
             onChange={(value) => setFormState((prev) => ({ ...prev, lifeAreaId: value || '' }))}
-            data={lifeAreas.map((area) => ({ value: area.id, label: area.name }))}
+            data={lifeAreas.map((area) => ({ value: area.id, label: getLifeAreaDisplayName(area, tPresets) }))}
             required
             withAsterisk
             error={showErrors && !formState.lifeAreaId ? te('fieldRequired') : undefined}

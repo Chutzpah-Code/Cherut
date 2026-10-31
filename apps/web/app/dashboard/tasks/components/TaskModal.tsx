@@ -28,6 +28,7 @@ import { X, Play, Square, RefreshCw, Plus, ListPlus, Clock } from 'lucide-react'
 import { Task, ChecklistItem, UpdateTaskDto, RecurringConfig } from '@/lib/api/services/tasks';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLifeAreas } from '@/hooks/useLifeAreas';
+import { getLifeAreaDisplayName } from '@/lib/life-areas/display';
 import { useObjectives } from '@/hooks/useObjectives';
 import { useKeyResults } from '@/hooks/useKeyResults';
 import { useTask, useUpdateTask, useToggleRecurringDate } from '@/hooks/useTasks';
@@ -758,6 +759,7 @@ export function TaskModal({
   onToggleChecklistItem,
 }: TaskModalProps) {
   const t = useTranslations('tasks.taskModal');
+  const tPresets = useTranslations('lifeAreas.presets');
   const locale = useLocale();
   const { data: lifeAreas } = useLifeAreas();
   const { data: allObjectives } = useObjectives(undefined);
@@ -1144,7 +1146,7 @@ export function TaskModal({
                 placeholder={t('selectLifeArea')}
                 value={formData.lifeAreaId}
                 onChange={(value) => setFormData({ ...formData, lifeAreaId: value || undefined, objectiveId: undefined, keyResultId: undefined })}
-                data={lifeAreas?.map((area) => ({ value: area.id, label: area.name })) || []}
+                data={lifeAreas?.map((area) => ({ value: area.id, label: getLifeAreaDisplayName(area, tPresets) })) || []}
                 searchable
                 clearable
                 size="sm"

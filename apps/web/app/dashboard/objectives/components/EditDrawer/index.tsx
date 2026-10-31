@@ -24,6 +24,9 @@ import { KeyResultsTab } from './KeyResultsTab';
 interface LifeAreaOption {
   id: string;
   name: string;
+  isSystemPreset?: boolean;
+  presetSlug?: string;
+  nameOverridden?: boolean;
 }
 
 interface EditDrawerProps {
