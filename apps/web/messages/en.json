@@ -1100,8 +1100,6 @@
     "showLess": "Show less",
     "edit": "Edit",
     "delete": "Delete",
-    "deleteTitle": "Delete Life Area",
-    "deleteBody": "Are you sure you want to delete this life area? This action cannot be undone.",
     "cancel": "Cancel",
     "emptyTitle": "No life areas yet",
     "emptyHint": "Life areas help you organize and focus on the key aspects of your personal and professional development.",
@@ -1113,6 +1111,7 @@
     "descriptionPlaceholder": "Describe this life area...",
     "update": "Update",
     "create": "Create",
+    "systemBadge": "System default",
     "editDrawer": {
       "editLabel": "EDIT LIFE AREA",
       "newLabel": "NEW LIFE AREA",
@@ -1123,7 +1122,69 @@
       "errorStatus": "Failed to save",
       "finishEditing": "Finish editing",
       "createErrorTitle": "Error",
-      "createFailed": "Failed to create the life area. Please try again."
+      "createFailed": "Failed to create the life area. Please try again.",
+      "systemReadOnlyHint": "This is a system default life area — you can rename it, but its description can't be edited and it can't be deleted."
+    },
+    "deleteImpact": {
+      "title": "Delete life area",
+      "loading": "Checking what's linked to this area...",
+      "intro": "Deleting \"{name}\" will permanently delete everything linked to it across the system:",
+      "objectivesCount": "{count, plural, one {# objective} other {# objectives}}",
+      "habitsCount": "{count, plural, one {# habit} other {# habits}}",
+      "tasksCount": "{count, plural, one {# task} other {# tasks}}",
+      "emptyImpact": "Nothing else references this area — it's safe to delete.",
+      "cancel": "Cancel",
+      "deleteEverything": "Delete everything"
+    },
+    "presets": {
+      "lifestyle-daily-life": {
+        "name": "Lifestyle & Daily Life",
+        "description": "Home Environment, Life Organization, Time Management, Personal Projects, Digital Life / Digital Organization, Hobbies & Recreation"
+      },
+      "contribution-impact": {
+        "name": "Contribution & Impact",
+        "description": "Volunteering, Community Service, Mentoring, Donations / Philanthropy, Environmental Impact"
+      },
+      "environment-surroundings": {
+        "name": "Environment & Surroundings",
+        "description": "Home Cleanliness, Workspace Organization, Safety, Neighborhood & Community Environment"
+      },
+      "love-intimacy": {
+        "name": "Love & Intimacy",
+        "description": "Intimacy, Emotional Connection, Sexuality, Partnership Growth"
+      },
+      "productivity-performance": {
+        "name": "Productivity & Performance",
+        "description": "Planning, Execution, Focus, Energy Management, Systems & Tools"
+      },
+      "fun-leisure": {
+        "name": "Fun & Leisure",
+        "description": "Entertainment, Travel, Adventure, Passions, Play / Relaxation"
+      },
+      "finances": {
+        "name": "Finances",
+        "description": "Income, Savings, Budgeting, Investing, Debt Management, Financial Planning, Emergency Fund, Assets & Net Worth"
+      },
+      "career-work": {
+        "name": "Career & Work",
+        "description": "Professional Growth, Job Performance, Career Planning, Leadership, Networking, Work Satisfaction, Work-Life Balance"
+      },
+      "health-wellbeing": {
+        "name": "Health & Well-Being",
+        "description": "Physical Health, Mental Health, Emotional Health, Nutrition, Fitness & Exercise, Sleep, Stress Management, Preventive Care"
+      },
+      "personal-growth": {
+        "name": "Personal Growth",
+        "description": "Learning & Education, Skills Development, Mindset & Attitude, Self-Awareness, Creativity, Discipline & Habits, Spirituality / Inner Life"
+      },
+      "relationships": {
+        "name": "Relationships",
+        "description": "Family, Romantic Relationship / Marriage, Friends, Social Life, Community, Networking / Professional Relationships"
+      },
+      "spirituality-meaning": {
+        "name": "Spirituality & Meaning",
+        "description": "Purpose, Values, Meditation / Prayer, Connection with something greater, Inner peace"
+      }
     }
   },
   "values": {

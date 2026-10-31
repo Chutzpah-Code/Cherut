@@ -1100,8 +1100,6 @@
     "showLess": "Mostrar menos",
     "edit": "Editar",
     "delete": "Excluir",
-    "deleteTitle": "Excluir área da vida",
-    "deleteBody": "Tem certeza que deseja excluir esta área da vida? Essa ação não pode ser desfeita.",
     "cancel": "Cancelar",
     "emptyTitle": "Nenhuma área da vida ainda",
     "emptyHint": "Áreas da vida ajudam você a organizar e focar nos aspectos principais do seu desenvolvimento pessoal e profissional.",
@@ -1113,6 +1111,7 @@
     "descriptionPlaceholder": "Descreva esta área da vida...",
     "update": "Atualizar",
     "create": "Criar",
+    "systemBadge": "Padrão do sistema",
     "editDrawer": {
       "editLabel": "EDITAR ÁREA DA VIDA",
       "newLabel": "NOVA ÁREA DA VIDA",
@@ -1123,7 +1122,69 @@
       "errorStatus": "Falha ao salvar",
       "finishEditing": "Concluir edição",
       "createErrorTitle": "Erro",
-      "createFailed": "Falha ao criar a área da vida. Tente novamente."
+      "createFailed": "Falha ao criar a área da vida. Tente novamente.",
+      "systemReadOnlyHint": "Esta é uma área pré-configurada do sistema — você pode renomeá-la, mas a descrição não pode ser editada e ela não pode ser excluída."
+    },
+    "deleteImpact": {
+      "title": "Excluir área da vida",
+      "loading": "Verificando o que está vinculado a essa área...",
+      "intro": "Excluir \"{name}\" vai apagar permanentemente tudo que está vinculado a ela em todo o sistema:",
+      "objectivesCount": "{count, plural, one {# objetivo} other {# objetivos}}",
+      "habitsCount": "{count, plural, one {# hábito} other {# hábitos}}",
+      "tasksCount": "{count, plural, one {# tarefa} other {# tarefas}}",
+      "emptyImpact": "Nada mais depende dessa área — pode excluir com segurança.",
+      "cancel": "Cancelar",
+      "deleteEverything": "Excluir tudo"
+    },
+    "presets": {
+      "lifestyle-daily-life": {
+        "name": "Estilo de Vida e Rotina Diária",
+        "description": "Ambiente Doméstico, Organização da Vida, Gestão do Tempo, Projetos Pessoais, Vida Digital / Organização Digital, Hobbies e Lazer"
+      },
+      "contribution-impact": {
+        "name": "Contribuição e Impacto",
+        "description": "Voluntariado, Serviço Comunitário, Mentoria, Doações / Filantropia, Impacto Ambiental"
+      },
+      "environment-surroundings": {
+        "name": "Ambiente e Entorno",
+        "description": "Limpeza da Casa, Organização do Espaço de Trabalho, Segurança, Vizinhança e Ambiente Comunitário"
+      },
+      "love-intimacy": {
+        "name": "Amor e Intimidade",
+        "description": "Intimidade, Conexão Emocional, Sexualidade, Crescimento do Relacionamento"
+      },
+      "productivity-performance": {
+        "name": "Produtividade e Desempenho",
+        "description": "Planejamento, Execução, Foco, Gestão de Energia, Sistemas e Ferramentas"
+      },
+      "fun-leisure": {
+        "name": "Diversão e Lazer",
+        "description": "Entretenimento, Viagens, Aventura, Paixões, Diversão / Relaxamento"
+      },
+      "finances": {
+        "name": "Finanças",
+        "description": "Renda, Poupança, Orçamento, Investimentos, Gestão de Dívidas, Planejamento Financeiro, Reserva de Emergência, Patrimônio e Bens"
+      },
+      "career-work": {
+        "name": "Carreira e Trabalho",
+        "description": "Crescimento Profissional, Desempenho no Trabalho, Planejamento de Carreira, Liderança, Networking, Satisfação no Trabalho, Equilíbrio entre Vida Pessoal e Profissional"
+      },
+      "health-wellbeing": {
+        "name": "Saúde e Bem-Estar",
+        "description": "Saúde Física, Saúde Mental, Saúde Emocional, Nutrição, Condicionamento Físico e Exercícios, Sono, Gestão do Estresse, Cuidados Preventivos"
+      },
+      "personal-growth": {
+        "name": "Crescimento Pessoal",
+        "description": "Aprendizado e Educação, Desenvolvimento de Habilidades, Mentalidade e Atitude, Autoconhecimento, Criatividade, Disciplina e Hábitos, Espiritualidade / Vida Interior"
+      },
+      "relationships": {
+        "name": "Relacionamentos",
+        "description": "Família, Relacionamento Amoroso / Casamento, Amigos, Vida Social, Comunidade, Networking / Relacionamentos Profissionais"
+      },
+      "spirituality-meaning": {
+        "name": "Espiritualidade e Propósito",
+        "description": "Propósito, Valores, Meditação / Oração, Conexão com algo maior, Paz interior"
+      }
     }
   },
   "values": {

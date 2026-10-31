@@ -33,6 +33,11 @@ export class LifeAreasController {
     return this.lifeAreasService.findOne(req.user.uid, id);
   }
 
+  @Get(':id/impact')
+  getImpact(@Request() req, @Param('id') id: string) {
+    return this.lifeAreasService.getImpact(req.user.uid, id);
+  }
+
   @Patch(':id')
   update(
     @Request() req,

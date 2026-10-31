@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FirebaseService } from '../../config/firebase.service';
+import { LifeAreasService } from '../life-areas/life-areas.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -14,19 +15,6 @@ describe('AuthService', () => {
   const mockAuth = {
     createUser: jest.fn(),
     verifyIdToken: jest.fn(),
-  };
-
-  const mockDoc = {
-    exists: true,
-    data: jest.fn(),
-    id: 'uid-123',
-  };
-
-  const mockFirestore = {
-    collection: jest.fn().mockReturnThis(),
-    doc: jest.fn().mockReturnValue(mockDoc),
-    get: jest.fn(),
-    set: jest.fn(),
   };
 
   // Firestore collection().doc() returns a ref with .get() and .set()
@@ -40,6 +28,10 @@ describe('AuthService', () => {
     getAuth: jest.fn(),
   };
 
+  const mockLifeAreasService = {
+    seedDefaults: jest.fn(),
+  };
+
   const UID = 'uid-123';
   const EMAIL = 'test@x.com';
   const TOKEN = 'firebase-id-token';
@@ -49,6 +41,7 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         { provide: FirebaseService, useValue: mockFirebaseService },
+        { provide: LifeAreasService, useValue: mockLifeAreasService },
       ],
     }).compile();
 
@@ -70,20 +63,56 @@ describe('AuthService', () => {
 
   describe('register', () => {
     it('creates Firebase Auth user and stores Firestore document', async () => {
-      mockAuth.createUser.mockResolvedValue({ uid: UID, email: EMAIL, displayName: 'test' });
-
-      const result = await service.register({ email: EMAIL, password: 'pass123', displayName: 'test' });
-
-      expect(mockAuth.createUser).toHaveBeenCalledWith(expect.objectContaining({ email: EMAIL }));
-      expect(mockDocRef.set).toHaveBeenCalledWith(expect.objectContaining({
+      mockAuth.createUser.mockResolvedValue({
         uid: UID,
-        subscription: expect.objectContaining({ plan: 'free' }),
-      }));
+        email: EMAIL,
+        displayName: 'test',
+      });
+
+      const result = await service.register({
+        email: EMAIL,
+        password: 'pass123',
+        displayName: 'test',
+      });
+
+      expect(mockAuth.createUser).toHaveBeenCalledWith(
+        expect.objectContaining({ email: EMAIL }),
+      );
+      expect(mockDocRef.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          uid: UID,
+          subscription: expect.objectContaining({ plan: 'free' }),
+        }),
+      );
+      expect(result.user.uid).toBe(UID);
+      expect(mockLifeAreasService.seedDefaults).toHaveBeenCalledWith(UID);
+    });
+
+    it('does not fail registration when seeding preset life areas throws', async () => {
+      mockAuth.createUser.mockResolvedValue({
+        uid: UID,
+        email: EMAIL,
+        displayName: 'test',
+      });
+      mockLifeAreasService.seedDefaults.mockRejectedValue(
+        new Error('firestore down'),
+      );
+
+      const result = await service.register({
+        email: EMAIL,
+        password: 'pass123',
+        displayName: 'test',
+      });
+
       expect(result.user.uid).toBe(UID);
     });
 
     it('defaults displayName to email prefix when not provided', async () => {
-      mockAuth.createUser.mockResolvedValue({ uid: UID, email: EMAIL, displayName: 'test' });
+      mockAuth.createUser.mockResolvedValue({
+        uid: UID,
+        email: EMAIL,
+        displayName: 'test',
+      });
 
       await service.register({ email: EMAIL, password: 'pass' });
 
@@ -93,7 +122,9 @@ describe('AuthService', () => {
     });
 
     it('throws ConflictException when email already exists', async () => {
-      mockAuth.createUser.mockRejectedValue({ code: 'auth/email-already-exists' });
+      mockAuth.createUser.mockRejectedValue({
+        code: 'auth/email-already-exists',
+      });
 
       await expect(
         service.register({ email: EMAIL, password: 'pass' }),
@@ -105,7 +136,9 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('throws BadRequestException when no token provided', async () => {
-      await expect(service.login({ firebaseIdToken: '' })).rejects.toThrow(BadRequestException);
+      await expect(service.login({ firebaseIdToken: '' })).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('returns user data when token is valid and user exists in Firestore', async () => {
@@ -122,25 +155,38 @@ describe('AuthService', () => {
     });
 
     it('creates Firestore record and returns user when Firebase user has no Firestore doc', async () => {
-      mockAuth.verifyIdToken.mockResolvedValue({ uid: UID, email: EMAIL, name: 'NewUser' });
+      mockAuth.verifyIdToken.mockResolvedValue({
+        uid: UID,
+        email: EMAIL,
+        name: 'NewUser',
+      });
       mockDocRef.get.mockResolvedValue({ exists: false });
 
       const result = await service.login({ firebaseIdToken: TOKEN });
 
-      expect(mockDocRef.set).toHaveBeenCalledWith(expect.objectContaining({ uid: UID }));
+      expect(mockDocRef.set).toHaveBeenCalledWith(
+        expect.objectContaining({ uid: UID }),
+      );
       expect(result.user.uid).toBe(UID);
+      expect(mockLifeAreasService.seedDefaults).toHaveBeenCalledWith(UID);
     });
 
     it('throws UnauthorizedException on invalid token (auth/ error code)', async () => {
-      mockAuth.verifyIdToken.mockRejectedValue({ code: 'auth/id-token-expired' });
+      mockAuth.verifyIdToken.mockRejectedValue({
+        code: 'auth/id-token-expired',
+      });
 
-      await expect(service.login({ firebaseIdToken: TOKEN })).rejects.toThrow(UnauthorizedException);
+      await expect(service.login({ firebaseIdToken: TOKEN })).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('throws UnauthorizedException on generic verification failure', async () => {
       mockAuth.verifyIdToken.mockRejectedValue(new Error('network error'));
 
-      await expect(service.login({ firebaseIdToken: TOKEN })).rejects.toThrow(UnauthorizedException);
+      await expect(service.login({ firebaseIdToken: TOKEN })).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
@@ -153,7 +199,7 @@ describe('AuthService', () => {
         data: () => ({ email: EMAIL, displayName: 'Alice' }),
       });
 
-      const result = await service.validateToken(UID) as any;
+      const result = await service.validateToken(UID);
 
       expect(result.uid).toBe(UID);
       expect(result.email).toBe(EMAIL);
@@ -175,14 +221,17 @@ describe('AuthService', () => {
       mockDocRef.get.mockResolvedValue({ exists: false });
 
       const decoded = { email: EMAIL, name: 'NewUser' };
-      const result = await service.validateToken(UID, decoded) as any;
+      const result = await service.validateToken(UID, decoded);
 
-      expect(mockDocRef.set).toHaveBeenCalledWith(expect.objectContaining({
-        uid: UID,
-        onboardingCompleted: false,
-        subscription: expect.objectContaining({ plan: 'free' }),
-      }));
+      expect(mockDocRef.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          uid: UID,
+          onboardingCompleted: false,
+          subscription: expect.objectContaining({ plan: 'free' }),
+        }),
+      );
       expect(result.uid).toBe(UID);
+      expect(mockLifeAreasService.seedDefaults).toHaveBeenCalledWith(UID);
     });
 
     it('returns null when doc missing and no decodedToken', async () => {
@@ -196,7 +245,9 @@ describe('AuthService', () => {
     it('throws ServiceUnavailableException on Firestore quota exhaustion (code 8)', async () => {
       mockDocRef.get.mockRejectedValue({ code: 8 });
 
-      await expect(service.validateToken(UID)).rejects.toThrow(ServiceUnavailableException);
+      await expect(service.validateToken(UID)).rejects.toThrow(
+        ServiceUnavailableException,
+      );
     });
   });
 });

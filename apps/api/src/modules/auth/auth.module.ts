@@ -3,6 +3,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { FirebaseStrategy } from './strategies/firebase.strategy';
+import { LifeAreasModule } from '../life-areas/life-areas.module';
 
 /**
  * 📚 EXPLICAÇÃO: Auth Module (Firebase-Only)
@@ -37,6 +38,7 @@ import { FirebaseStrategy } from './strategies/firebase.strategy';
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'firebase' }),
+    LifeAreasModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, FirebaseStrategy],

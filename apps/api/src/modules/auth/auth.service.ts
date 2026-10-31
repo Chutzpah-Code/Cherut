@@ -7,6 +7,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FirebaseService } from '../../config/firebase.service';
+import { LifeAreasService } from '../life-areas/life-areas.service';
 import { RegisterDto, LoginDto } from './dto';
 
 /**
@@ -51,7 +52,16 @@ export class AuthService {
 
   constructor(
     private readonly firebaseService: FirebaseService,
+    private readonly lifeAreasService: LifeAreasService,
   ) {}
+
+  private async seedDefaultLifeAreas(uid: string) {
+    try {
+      await this.lifeAreasService.seedDefaults(uid);
+    } catch (error) {
+      this.logger.error(`Failed to seed preset life areas for ${uid}:`, error);
+    }
+  }
 
   /**
    * Registra novo usuário
@@ -108,6 +118,7 @@ export class AuthService {
       };
 
       await db.collection('users').doc(userRecord.uid).set(userData);
+      await this.seedDefaultLifeAreas(userRecord.uid);
 
       // 3. Retornar dados do usuário
       // Cliente deve autenticar via Firebase Client SDK para obter ID token
@@ -117,7 +128,8 @@ export class AuthService {
           email: userRecord.email,
           displayName: userRecord.displayName,
         },
-        message: 'User registered successfully. Please authenticate via Firebase Client SDK.',
+        message:
+          'User registered successfully. Please authenticate via Firebase Client SDK.',
       };
     } catch (error) {
       this.logger.error('Registration error:', error);
@@ -127,8 +139,13 @@ export class AuthService {
         throw new ConflictException('Email already registered');
       }
 
-      if (error.message?.includes('Firebase') || error.message?.includes('Database service')) {
-        throw new Error('Service temporarily unavailable. Please try again later.');
+      if (
+        error.message?.includes('Firebase') ||
+        error.message?.includes('Database service')
+      ) {
+        throw new Error(
+          'Service temporarily unavailable. Please try again later.',
+        );
       }
 
       throw error;
@@ -152,11 +169,13 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const { firebaseIdToken } = loginDto;
 
-    this.logger.log(`🚀 Login attempt started. Token length: ${firebaseIdToken?.length || 0}`);
+    this.logger.log(
+      `🚀 Login attempt started. Token length: ${firebaseIdToken?.length || 0}`,
+    );
 
     if (!firebaseIdToken) {
       throw new BadRequestException(
-        'Firebase ID token required. Please authenticate via Firebase Client SDK first.'
+        'Firebase ID token required. Please authenticate via Firebase Client SDK first.',
       );
     }
 
@@ -202,7 +221,10 @@ export class AuthService {
         };
 
         await db.collection('users').doc(decodedToken.uid).set(userData);
-        this.logger.log(`Created Firestore record for existing Firebase user: ${decodedToken.uid}`);
+        await this.seedDefaultLifeAreas(decodedToken.uid);
+        this.logger.log(
+          `Created Firestore record for existing Firebase user: ${decodedToken.uid}`,
+        );
 
         return {
           user: {
@@ -215,23 +237,36 @@ export class AuthService {
 
       const userData = userDoc.data()!;
 
-      this.logger.log(`User logged in: ${decodedToken.uid} (${decodedToken.email})`);
+      this.logger.log(
+        `User logged in: ${decodedToken.uid} (${decodedToken.email})`,
+      );
 
       return {
         user: {
           uid: decodedToken.uid,
           email: decodedToken.email,
-          displayName: userData.displayName || decodedToken.name || decodedToken.email?.split('@')[0],
+          displayName:
+            userData.displayName ||
+            decodedToken.name ||
+            decodedToken.email?.split('@')[0],
         },
       };
     } catch (error) {
       this.logger.error('Login error:', error);
 
-      if (error.code && typeof error.code === 'string' && error.code.includes('auth/')) {
+      if (
+        error.code &&
+        typeof error.code === 'string' &&
+        error.code.includes('auth/')
+      ) {
         throw new UnauthorizedException('Invalid Firebase ID token');
       }
 
-      if (error.errorInfo && error.errorInfo.code && error.errorInfo.code.includes('auth/')) {
+      if (
+        error.errorInfo &&
+        error.errorInfo.code &&
+        error.errorInfo.code.includes('auth/')
+      ) {
         throw new UnauthorizedException('Invalid Firebase ID token');
       }
 
@@ -261,7 +296,8 @@ export class AuthService {
           const userData = {
             uid,
             email: decodedToken.email || null,
-            displayName: decodedToken.name || decodedToken.email?.split('@')[0] || uid,
+            displayName:
+              decodedToken.name || decodedToken.email?.split('@')[0] || uid,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             onboardingCompleted: false,
@@ -273,21 +309,36 @@ export class AuthService {
             },
           };
           await db.collection('users').doc(uid).set(userData);
-          this.logger.log(`Auto-created Firestore record for Firebase user: ${uid}`);
-          this.userCache.set(uid, { data: userData, expiry: now + this.USER_CACHE_TTL });
+          await this.seedDefaultLifeAreas(uid);
+          this.logger.log(
+            `Auto-created Firestore record for Firebase user: ${uid}`,
+          );
+          this.userCache.set(uid, {
+            data: userData,
+            expiry: now + this.USER_CACHE_TTL,
+          });
           return userData;
         }
         return null;
       }
 
       const userData = { uid, ...userDoc.data() };
-      this.userCache.set(uid, { data: userData, expiry: now + this.USER_CACHE_TTL });
+      this.userCache.set(uid, {
+        data: userData,
+        expiry: now + this.USER_CACHE_TTL,
+      });
       return userData;
     } catch (error) {
       this.logger.error('Token validation error:', error);
 
-      if (error?.code === 8 || error?.details?.includes('Quota') || error?.message?.includes('RESOURCE_EXHAUSTED')) {
-        throw new ServiceUnavailableException('Database temporarily unavailable. Please try again later.');
+      if (
+        error?.code === 8 ||
+        error?.details?.includes('Quota') ||
+        error?.message?.includes('RESOURCE_EXHAUSTED')
+      ) {
+        throw new ServiceUnavailableException(
+          'Database temporarily unavailable. Please try again later.',
+        );
       }
 
       throw error;

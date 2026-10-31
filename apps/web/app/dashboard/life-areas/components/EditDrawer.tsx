@@ -9,14 +9,20 @@ import { notifications } from '@mantine/notifications';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCreateLifeArea, useUpdateLifeArea } from '@/hooks/useLifeAreas';
 import { LifeArea } from '@/lib/api/services/lifeAreas';
+import { getLifeAreaDisplayName, getLifeAreaDisplayDescription } from '@/lib/life-areas/display';
 
 interface FormState {
   name: string;
   description: string;
 }
 
-function toFormState(area: LifeArea | null): FormState {
-  return { name: area?.name ?? '', description: area?.description ?? '' };
+type PresetsTranslator = (key: string) => string;
+
+function toFormState(area: LifeArea | null, tPresets: PresetsTranslator): FormState {
+  return {
+    name: area ? getLifeAreaDisplayName(area, tPresets) : '',
+    description: area ? (getLifeAreaDisplayDescription(area, tPresets) ?? '') : '',
+  };
 }
 
 interface EditDrawerProps {
@@ -31,6 +37,7 @@ type SaveStatus = 'idle' | 'pending' | 'saved' | 'error';
 export function EditDrawer({ opened, onClose, area, onCreated }: EditDrawerProps) {
   const t = useTranslations('lifeAreas');
   const te = useTranslations('lifeAreas.editDrawer');
+  const tPresets = useTranslations('lifeAreas.presets');
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isFullScreen = useMediaQuery('(max-width: 639px)');
 
@@ -39,7 +46,7 @@ export function EditDrawer({ opened, onClose, area, onCreated }: EditDrawerProps
 
   const mode: 'create' | 'edit' = area ? 'edit' : 'create';
 
-  const [formState, setFormState] = useState<FormState>(() => toFormState(area));
+  const [formState, setFormState] = useState<FormState>(() => toFormState(area, tPresets));
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [showErrors, setShowErrors] = useState(false);
 
@@ -48,7 +55,7 @@ export function EditDrawer({ opened, onClose, area, onCreated }: EditDrawerProps
 
   useEffect(() => {
     if (!opened) return;
-    setFormState(toFormState(area));
+    setFormState(toFormState(area, tPresets));
     mountedRef.current = false;
     dirtyRef.current = false;
     setSaveStatus('idle');
@@ -71,8 +78,13 @@ export function EditDrawer({ opened, onClose, area, onCreated }: EditDrawerProps
     if (mode !== 'edit' || !area || !dirtyRef.current) return;
     dirtyRef.current = false;
     setSaveStatus('pending');
+    // Preset life areas can only be renamed — their description is always
+    // derived from the translation, and the backend rejects any other field.
+    const dto = area.isSystemPreset
+      ? { name: debouncedFormState.name }
+      : { name: debouncedFormState.name, description: debouncedFormState.description || undefined };
     updateMutation.mutate(
-      { id: area.id, dto: { name: debouncedFormState.name, description: debouncedFormState.description || undefined } },
+      { id: area.id, dto },
       {
         onSuccess: () => setSaveStatus('saved'),
         onError: () => setSaveStatus('error'),
@@ -141,6 +153,11 @@ export function EditDrawer({ opened, onClose, area, onCreated }: EditDrawerProps
 
       <Box px="md" py="md" style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <Stack gap="md">
+          {area?.isSystemPreset && (
+            <Text size="xs" c="dimmed" style={{ lineHeight: 1.5 }}>
+              {te('systemReadOnlyHint')}
+            </Text>
+          )}
           <TextInput
             label={t('nameLabel')}
             placeholder={t('namePlaceholder')}
@@ -156,6 +173,8 @@ export function EditDrawer({ opened, onClose, area, onCreated }: EditDrawerProps
             placeholder={t('descriptionPlaceholder')}
             value={formState.description}
             onChange={(e) => setFormState((prev) => ({ ...prev, description: e.target.value }))}
+            readOnly={area?.isSystemPreset}
+            disabled={area?.isSystemPreset}
             rows={4}
             radius={8}
           />

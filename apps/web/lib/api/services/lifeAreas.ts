@@ -6,8 +6,22 @@ export interface LifeArea {
   description?: string;
   icon?: string;
   color?: string;
+  isSystemPreset?: boolean;
+  presetSlug?: string;
+  nameOverridden?: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface LifeAreaImpactGroup {
+  count: number;
+  items: { id: string; title: string }[];
+}
+
+export interface LifeAreaImpact {
+  objectives: LifeAreaImpactGroup;
+  habits: LifeAreaImpactGroup;
+  tasks: LifeAreaImpactGroup;
 }
 
 export interface CreateLifeAreaDto {
@@ -42,5 +56,10 @@ export const lifeAreasApi = {
 
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/life-areas/${id}`);
+  },
+
+  getImpact: async (id: string): Promise<LifeAreaImpact> => {
+    const { data } = await apiClient.get(`/life-areas/${id}/impact`);
+    return data;
   },
 };

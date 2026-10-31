@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMediaQuery } from '@mantine/hooks';
-import { Plus, Edit2, Trash2, MoreVertical } from 'lucide-react';
+import { Plus, Edit2, Trash2, MoreVertical, Lock } from 'lucide-react';
 import {
   Title,
   Text,
@@ -17,21 +17,24 @@ import {
   ActionIcon,
   Box,
   Menu,
+  Badge,
 } from '@mantine/core';
-import { modals } from '@mantine/modals';
-import { useLifeAreas, useDeleteLifeArea } from '@/hooks/useLifeAreas';
+import { useLifeAreas } from '@/hooks/useLifeAreas';
 import { Surface } from '@/components/ui/Surface';
 import { LifeArea } from '@/lib/api/services/lifeAreas';
+import { getLifeAreaDisplayName, getLifeAreaDisplayDescription } from '@/lib/life-areas/display';
 import { EditDrawer } from './components/EditDrawer';
+import { DeleteImpactDrawer } from './components/DeleteImpactDrawer';
 
 export default function LifeAreasPage() {
   const t = useTranslations('lifeAreas');
+  const tPresets = useTranslations('lifeAreas.presets');
   const { data: lifeAreas, isLoading } = useLifeAreas();
-  const deleteMutation = useDeleteLifeArea();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingArea, setEditingArea] = useState<LifeArea | null>(null);
+  const [deletingArea, setDeletingArea] = useState<LifeArea | null>(null);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set());
 
@@ -64,38 +67,19 @@ export default function LifeAreasPage() {
     setDrawerOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    modals.openConfirmModal({
-      title: t('deleteTitle'),
-      children: (
-        <Text
-          style={{
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '14px',
-            fontWeight: 400,
-            color: '#666666',
-            lineHeight: '20px',
-          }}
-        >
-          {t('deleteBody')}
-        </Text>
-      ),
-      labels: { confirm: t('delete'), cancel: t('cancel') },
-      confirmProps: {
-        color: 'red',
-        style: {
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 600,
-        },
-      },
-      onConfirm: async () => {
-        try {
-          await deleteMutation.mutateAsync(id);
-        } catch (error) {
-          console.error('Error deleting life area:', error);
-        }
-      },
-    });
+  const handleDelete = (area: LifeArea) => {
+    setDeletingArea(area);
+  };
+
+  const handleDeleted = (id: string) => {
+    setDeletingArea(null);
+    // The edit drawer may be open for the very item that was just deleted
+    // (e.g. deleted from the card's menu while editing it) — close it too,
+    // otherwise it's left showing stale data for a document that no longer exists.
+    if (editingArea?.id === id) {
+      setDrawerOpen(false);
+      setEditingArea(null);
+    }
   };
 
   const handleNew = () => {
@@ -112,7 +96,13 @@ export default function LifeAreasPage() {
   }
 
   return (
-    <Surface p={{ base: 'md', sm: 'xl' }} style={{ paddingRight: drawerOpen && isDesktop ? 460 : undefined, transition: 'padding-right 0.2s ease' }}>
+    <Surface
+      p={{ base: 'md', sm: 'xl' }}
+      style={{
+        paddingRight: !isDesktop ? undefined : drawerOpen ? 460 : deletingArea ? 440 : undefined,
+        transition: 'padding-right 0.2s ease',
+      }}
+    >
     <Stack
       gap="xl"
       style={{
@@ -190,7 +180,11 @@ export default function LifeAreasPage() {
             onMouseLeave={() => setHoveredCard(null)}
             style={{
               background: 'white',
-              border: drawerOpen && editingArea?.id === area.id ? '1px solid #4686FE' : '1px solid #E5E7EB',
+              border: deletingArea?.id === area.id
+                ? '1px solid #DC2626'
+                : drawerOpen && editingArea?.id === area.id
+                  ? '1px solid #4686FE'
+                  : '1px solid #E5E7EB',
               transition: 'all 0.2s ease',
               position: 'relative',
             }}
@@ -205,6 +199,18 @@ export default function LifeAreasPage() {
           >
             <Group mb="lg" wrap="nowrap" justify="space-between" align="flex-start">
               <div style={{ flex: 1 }}>
+                {area.isSystemPreset && (
+                  <Badge
+                    leftSection={<Lock size={10} />}
+                    variant="light"
+                    color="gray"
+                    size="xs"
+                    mb={6}
+                    style={{ fontFamily: 'Inter, sans-serif', textTransform: 'none' }}
+                  >
+                    {t('systemBadge')}
+                  </Badge>
+                )}
                 <Text
                   style={{
                     fontFamily: 'Inter Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -215,12 +221,14 @@ export default function LifeAreasPage() {
                     lineHeight: '24px',
                   }}
                 >
-                  {area.name}
+                  {getLifeAreaDisplayName(area, tPresets)}
                 </Text>
-                {area.description && (() => {
+                {(() => {
+                  const description = getLifeAreaDisplayDescription(area, tPresets);
+                  if (!description) return null;
                   const isExpanded = expandedDescriptions.has(area.id);
-                  const { text: truncatedText, isTruncated } = truncateText(area.description, 120);
-                  const displayText = isExpanded ? area.description : truncatedText;
+                  const { text: truncatedText, isTruncated } = truncateText(description, 120);
+                  const displayText = isExpanded ? description : truncatedText;
 
                   return (
                     <div>
@@ -296,18 +304,20 @@ export default function LifeAreasPage() {
                   >
                     {t('edit')}
                   </Menu.Item>
-                  <Menu.Item
-                    leftSection={<Trash2 size={14} />}
-                    color="red"
-                    onClick={() => handleDelete(area.id)}
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {t('delete')}
-                  </Menu.Item>
+                  {!area.isSystemPreset && (
+                    <Menu.Item
+                      leftSection={<Trash2 size={14} />}
+                      color="red"
+                      onClick={() => handleDelete(area)}
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '14px',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {t('delete')}
+                    </Menu.Item>
+                  )}
                 </Menu.Dropdown>
               </Menu>
             </Group>
@@ -374,6 +384,12 @@ export default function LifeAreasPage() {
         onClose={() => { setDrawerOpen(false); setEditingArea(null); }}
         area={editingArea}
         onCreated={handleAreaCreated}
+      />
+
+      <DeleteImpactDrawer
+        area={deletingArea}
+        onClose={() => setDeletingArea(null)}
+        onDeleted={handleDeleted}
       />
     </Stack>
     </Surface>
